@@ -1,0 +1,88 @@
+# GLOBAL ENVIRONMENT & SECRETS
+# Environment files
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+.env.staging
+
+# Secrets and certificates
+secrets/
+certificates/
+*.pem
+*.key
+*.crt
+*.p12
+*.pfx
+
+# IDE & EDITOR (Project-wide)
+.vscode/
+.idea/
+*.suo
+*.user
+*.swp
+*.swo
+
+# OS FILES
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# DOCKER & ORCHESTRATION
+# Docker override files
+docker-compose.override.yml
+docker-compose.override.yaml
+docker-compose.local.yml
+docker-compose.local.yaml
+
+# Docker volumes data
+.docker/
+volumes/
+
+# DEPLOYMENT & INFRASTRUCTURE
+# Terraform
+*.tfstate
+*.tfstate.backup
+.terraform/
+*.tfvars
+
+# Kubernetes secrets
+k8s-secrets/
+
+# Deployment scripts with sensitive data
+deploy-local.sh
+deploy-local.bat
+
+# MONITORING & LOGS (Global)
+# Global logs
+logs/
+*.log
+
+# Monitoring data
+grafana-data/
+prometheus-data/
+
+# DOCUMENTATION BUILD
+# Generated docs
+docs/build/
+docs/site/
+
+# BACKUP & TEMPORARY FILES
+*.tmp
+*.temp
+*.bak
+*.backup
+*.old
+*.orig
+*~
+
+# DATABASE (Global/Shared)
+# Shared database files
+shared-db/
+*.sql.backup
