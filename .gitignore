@@ -1,6 +1,7 @@
 # GLOBAL ENVIRONMENT & SECRETS
 # Environment files
 .env
+.envrc
 .env.local
 .env.development
 .env.test
