@@ -1,0 +1,1 @@
+export DATABASE_URL=postgres://auth_service:password@localhost:5432/auth_service?sslmode=disable
