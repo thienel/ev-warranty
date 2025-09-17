@@ -17,24 +17,32 @@ const (
 )
 
 type Office struct {
-	id         uuid.UUID       `gorm:"primary_key;type:uuid;default:uuid_generate_v4()"`
-	officeName string          `gorm:"type:varchar(255);not null"`
-	officeType OfficeType      `gorm:"not null"`
-	address    string          `gorm:"type:varchar(255);not null"`
-	isActive   bool            `gorm:"type:boolean;default:true"`
-	createdAt  time.Time       `gorm:"autoCreateTime"`
-	updatedAt  time.Time       `gorm:"autoUpdateTime"`
-	deletedAt  *gorm.DeletedAt `gorm:"index"`
+	Id         uuid.UUID       `gorm:"primary_key;type:uuid;default:uuid_generate_v4()"`
+	OfficeName string          `gorm:"type:varchar(255);not null"`
+	OfficeType OfficeType      `gorm:"not null"`
+	Address    string          `gorm:"type:varchar(255);not null"`
+	IsActive   bool            `gorm:"type:boolean;default:true"`
+	CreatedAt  time.Time       `gorm:"autoCreateTime"`
+	UpdatedAt  time.Time       `gorm:"autoUpdateTime"`
+	DeletedAt  *gorm.DeletedAt `gorm:"index"`
 }
 
 func NewOffice(officeName string, officeType OfficeType, address string, isActive bool) *Office {
 	return &Office{
-		id:         uuid.New(),
-		officeName: officeName,
-		officeType: officeType,
-		address:    address,
-		isActive:   isActive,
+		Id:         uuid.New(),
+		OfficeName: officeName,
+		OfficeType: officeType,
+		Address:    address,
+		IsActive:   isActive,
 	}
+}
+
+func (o *Office) Active() {
+	o.IsActive = true
+}
+
+func (o *Office) Inactive() {
+	o.IsActive = false
 }
 
 func (ot OfficeType) Value() (driver.Value, error) {
