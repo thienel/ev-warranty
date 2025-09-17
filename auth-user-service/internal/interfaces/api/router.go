@@ -30,6 +30,7 @@ func NewRouter(db *database.Database, authHandler AuthHandler, oauthHandler OAut
 
 	office := router.Group("/offices")
 	office.POST("/", officeHandler.Create)
+	office.GET("/", officeHandler.GetAll)
 	office.GET("/:id", officeHandler.GetById)
 	office.PUT("/:id", officeHandler.Update)
 	office.PUT("/:id/activate", officeHandler.Active)

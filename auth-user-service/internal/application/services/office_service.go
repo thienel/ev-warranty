@@ -12,6 +12,7 @@ import (
 type OfficeService interface {
 	Create(ctx context.Context, officeName string, officeType entities.OfficeType, address string, isActive bool) (*entities.Office, error)
 	GetOfficeByID(ctx context.Context, officeID uuid.UUID) (*entities.Office, error)
+	GetAllOffices(ctx context.Context) ([]*entities.Office, error)
 	ActiveOfficeByID(ctx context.Context, officeID uuid.UUID) error
 	InactiveOfficeByID(ctx context.Context, officeID uuid.UUID) error
 	UpdateOfficeByID(ctx context.Context, officeID uuid.UUID, officeName string, officeType entities.OfficeType, address string) (*entities.Office, error)
@@ -41,6 +42,10 @@ func (s *officeService) Create(ctx context.Context, officeName string, officeTyp
 
 func (s *officeService) GetOfficeByID(ctx context.Context, officeID uuid.UUID) (*entities.Office, error) {
 	return s.repo.FindByID(ctx, officeID)
+}
+
+func (s *officeService) GetAllOffices(ctx context.Context) ([]*entities.Office, error) {
+	return s.repo.FindAll(ctx)
 }
 
 func (s *officeService) ActiveOfficeByID(ctx context.Context, officeID uuid.UUID) error {

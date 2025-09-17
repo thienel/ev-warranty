@@ -42,6 +42,14 @@ func (o *officeRepository) FindByID(ctx context.Context, id uuid.UUID) (*entitie
 	return &office, nil
 }
 
+func (o *officeRepository) FindAll(ctx context.Context) ([]*entities.Office, error) {
+	var offices []*entities.Office
+	if err := o.db.WithContext(ctx).Find(&offices).Error; err != nil {
+		return nil, apperrors.ErrDBOperation(err)
+	}
+	return offices, nil
+}
+
 func (o *officeRepository) Update(ctx context.Context, office *entities.Office) error {
 	if err := o.db.WithContext(ctx).Model(office).
 		Select("office_name", "office_type", "address", "is_active").

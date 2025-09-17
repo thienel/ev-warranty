@@ -16,6 +16,7 @@ import (
 type OfficeHandler interface {
 	Create(c *gin.Context)
 	GetById(c *gin.Context)
+	GetAll(c *gin.Context)
 	Active(c *gin.Context)
 	Inactive(c *gin.Context)
 	Update(c *gin.Context)
@@ -75,8 +76,20 @@ func (h *officeHandler) GetById(c *gin.Context) {
 		handleError(h.logger, c, err, "error getting office")
 		return
 	}
-
 	writeSuccessResponse(c, http.StatusOK, "office retrieved", office)
+}
+
+func (h *officeHandler) GetAll(c *gin.Context) {
+	ctx, cancel := context.WithTimeout(c.Request.Context(), requestTimeout)
+	defer cancel()
+
+	offices, err := h.service.GetAllOffices(ctx)
+	if err != nil {
+		handleError(h.logger, c, err, "error getting offices")
+		return
+	}
+
+	writeSuccessResponse(c, http.StatusOK, "offices retrieved", offices)
 }
 
 func (h *officeHandler) Active(c *gin.Context) {
