@@ -18,7 +18,7 @@ const (
 type Office struct {
 	id         uuid.UUID  `gorm:"primary_key;type:uuid;default:uuid_generate_v4()"`
 	officeName string     `gorm:"type:varchar(255);not null"`
-	officeType OfficeType `gorm:"type:varchar(255);not null"`
+	officeType OfficeType `gorm:"not null"`
 	address    string     `gorm:"type:varchar(255);not null"`
 	isActive   bool       `gorm:"type:boolean;default:true"`
 	createdAt  time.Time  `gorm:"autoCreateTime"`
