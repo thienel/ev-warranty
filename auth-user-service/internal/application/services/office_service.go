@@ -14,6 +14,7 @@ type OfficeService interface {
 	GetOfficeByID(ctx context.Context, officeID uuid.UUID) (*entities.Office, error)
 	ActiveOfficeByID(ctx context.Context, officeID uuid.UUID) error
 	InactiveOfficeByID(ctx context.Context, officeID uuid.UUID) error
+	UpdateOfficeByID(ctx context.Context, officeID uuid.UUID, officeName string, officeType entities.OfficeType, address string) (*entities.Office, error)
 	DeleteOfficeByID(ctx context.Context, officeID uuid.UUID) error
 }
 
@@ -60,6 +61,27 @@ func (s *officeService) InactiveOfficeByID(ctx context.Context, officeID uuid.UU
 
 	office.IsActive = false
 	return s.repo.Update(ctx, office)
+}
+
+func (s *officeService) UpdateOfficeByID(ctx context.Context, officeID uuid.UUID, officeName string, officeType entities.OfficeType, address string) (*entities.Office, error) {
+	office, err := s.repo.FindByID(ctx, officeID)
+	if err != nil {
+		return nil, err
+	}
+
+	if !officeType.IsValid() {
+		return nil, apperrors.ErrInvalidCredentials("invalid office type")
+	}
+
+	office.OfficeName = officeName
+	office.OfficeType = officeType
+	office.Address = address
+
+	if err := s.repo.Update(ctx, office); err != nil {
+		return nil, err
+	}
+
+	return office, nil
 }
 
 func (s *officeService) DeleteOfficeByID(ctx context.Context, officeID uuid.UUID) error {
