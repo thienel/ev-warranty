@@ -11,19 +11,32 @@ type healthHandler struct {
 	DB *database.Database
 }
 
-func NewRouter(db *database.Database, authHandler AuthHandler, oauthHandler OAuthHandler) *gin.Engine {
+func NewRouter(db *database.Database, authHandler AuthHandler, oauthHandler OAuthHandler, officeHandler OfficeHandler) *gin.Engine {
 	router := gin.New()
 	router.Use(gin.Recovery(), gin.Logger())
 	healthHandler := healthHandler{DB: db}
 
 	router.GET("/health", healthHandler.Check)
-	router.POST("/login", authHandler.Login)
-	router.POST("/register", authHandler.Register)
-	router.POST("/logout", authHandler.Logout)
-	router.POST("/token/refresh", authHandler.RefreshToken)
-	router.GET("/token/validate", authHandler.ValidateToken)
-	router.GET("/:provider", oauthHandler.InitiateOAuth)
-	router.GET("/:provider/callback", oauthHandler.HandleCallback)
+
+	auth := router.Group("/auth")
+	auth.POST("/login", authHandler.Login)
+	auth.POST("/register", authHandler.Register)
+	auth.POST("/logout", authHandler.Logout)
+	auth.POST("/token/refresh", authHandler.RefreshToken)
+	auth.GET("/token/validate", authHandler.ValidateToken)
+
+	auth.GET("/:provider", oauthHandler.InitiateOAuth)
+	auth.GET("/:provider/callback", oauthHandler.HandleCallback)
+
+	office := router.Group("/offices")
+	office.POST("/", officeHandler.Create)
+	office.GET("/", officeHandler.GetAll)
+	office.GET("/:id", officeHandler.GetById)
+	office.PUT("/:id", officeHandler.Update)
+	office.PUT("/:id/activate", officeHandler.Active)
+	office.PUT("/:id/deactivate", officeHandler.Inactive)
+	office.DELETE("/:id", officeHandler.Delete)
+
 	return router
 }
 

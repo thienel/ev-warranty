@@ -65,7 +65,10 @@ func main() {
 	oauthService.RegisterProvider(googleProvider)
 	authHandler := api.NewAuthHandler(authService, tokenService, log)
 	oauthHandler := api.NewOAuthHandler(app.Log, oauthService, authService)
-	r := api.NewRouter(app.DB, authHandler, oauthHandler)
+	officeRepo := persistence.NewOfficeRepository(db.DB)
+	officeService := services.NewOfficeService(officeRepo)
+	officeHandler := api.NewOfficeHandler(app.Log, officeService)
+	r := api.NewRouter(app.DB, authHandler, oauthHandler, officeHandler)
 	log.Info("Server starting on port " + cfg.Port)
 	srv := &http.Server{
 		Addr:    ":" + cfg.Port,
