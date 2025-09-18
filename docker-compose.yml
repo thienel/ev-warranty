@@ -22,6 +22,7 @@ services:
 
   auth-user-service:
     platform: linux/amd64
+
     image: lethiendev/auth-user-service:latest
     container_name: auth_user_service
     entrypoint: ["./entrypoint.sh"]
