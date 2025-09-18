@@ -12,6 +12,8 @@ jobs:
     env:
       GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
       GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+      PUBLIC_PEM: ${{ secrets.PUBLIC_PEM }}
+      PRIVATE_PEM: ${{ secrets.PRIVATE_PEM }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
