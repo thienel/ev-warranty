@@ -24,7 +24,7 @@ docker-compose-down:
 docker-compose-up:
 	docker compose up -d --build
 
-MIGRATE = migrate -path ./auth-user-service/internal/infrastructure/database/migrations -database "postgres://auth_service:password@localhost:5432/auth_service?sslmode=disable"
+MIGRATE = migrate -path ./auth-user-service/internal/infrastructure/database/migrations -database "postgres://auth_service:password@postgres:5432/auth_service?sslmode=disable"
 
 db-migrate-up:
 	$(MIGRATE) up
