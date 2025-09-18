@@ -83,7 +83,7 @@ jobs:
       # ---------- Docker Build ----------
       - name: Build Docker image
         run: |
-          docker build -t lethiendev/auth-user-service:latest ./auth-user-service
+          docker buildx build --platform linux/arm64 -t lethiendev/auth-user-service:latest ./auth-user-service
 
       # ---------- Healthcheck Container ----------
       - name: Run container for healthcheck
