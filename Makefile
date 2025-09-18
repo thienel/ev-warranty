@@ -24,16 +24,21 @@ docker-compose-down:
 docker-compose-up:
 	docker compose up -d --build
 
-MIGRATE = migrate -path ./auth-user-service/internal/infrastructure/database/migrations -database "postgres://auth_service:password@postgres:5432/auth_service?sslmode=disable"
+wait-for-services:
+	@echo "Waiting for services to be ready..."
+	@timeout 60 bash -c 'until docker exec auth_postgres pg_isready -U auth_service -d auth_service; do sleep 2; done'
+	@echo "PostgreSQL is ready"
 
-db-migrate-up:
+MIGRATE = migrate -path ./auth-user-service/internal/infrastructure/database/migrations -database "postgres://auth_service:password@localhost:5432/auth_service?sslmode=disable"
+
+db-migrate-up: wait-for-services
 	$(MIGRATE) up
 
 db-migrate-down:
 	$(MIGRATE) down
 
 db-migrate-force:
-	$(MIGRATE) force
+	$(MIGRATE) force $(version)
 
 db-migrate-version:
 	$(MIGRATE) version

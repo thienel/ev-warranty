@@ -7,8 +7,8 @@ services:
       POSTGRES_USER: auth_service
       POSTGRES_PASSWORD: password
       POSTGRES_HOST_AUTH_METHOD: trust
-    expose:
-      - "5432"
+    ports:
+      - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./auth-user-service/internal/infrastructure/database/migrations:/docker-entrypoint-initdb.d
