@@ -61,12 +61,6 @@ jobs:
       - name: Docker Compose down (cleanup)
         run: make docker-compose-down
 
-      # Install migrate tool
-      - name: Install migrate
-        run: |
-          curl -L https://github.com/golang-migrate/migrate/releases/latest/download/migrate.linux-amd64.tar.gz | tar xvz
-          sudo mv migrate /usr/local/bin/
-
       - name: Docker Compose up
         run: make docker-compose-up
 

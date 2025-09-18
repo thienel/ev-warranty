@@ -75,11 +75,8 @@ db-migrate-force: install-migrate
 db-migrate-version: install-migrate
 	$(MIGRATE) version
 
-ci-setup: docker-compose-down docker-compose-up db-migrate-up
+ci-setup: db-migrate-up
 	@echo "CI environment setup complete"
 
 ci-test: ci-setup go-test dotnet-test
 	@echo "All CI tests completed"
-
-ci-cleanup: docker-compose-down
-	@echo "CI cleanup completed"
