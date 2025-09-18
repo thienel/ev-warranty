@@ -21,9 +21,7 @@ services:
       - auth_network
 
   auth-user-service:
-    build:
-      context: ./auth-user-service
-      dockerfile: Dockerfile
+    image: lethiendev/auth-user-service:latest
     container_name: auth_user_service
     entrypoint: ["./entrypoint.sh"]
     environment:
@@ -45,7 +43,7 @@ services:
       postgres:
         condition: service_healthy
     healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8888/health"]
+      test: ["CMD", "curl", "--no-verbose", "--tries=1", "--spider", "http://localhost:8888/health"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -64,7 +62,7 @@ services:
     depends_on:
       - auth-user-service
     healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost"]
+      test: ["CMD", "curl", "--no-verbose", "--tries=1", "--spider", "http://localhost"]
       interval: 30s
       timeout: 10s
       retries: 3

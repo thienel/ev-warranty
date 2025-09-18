@@ -75,8 +75,6 @@ db-migrate-force: install-migrate
 db-migrate-version: install-migrate
 	$(MIGRATE) version
 
-ci-setup: db-migrate-up
-	@echo "CI environment setup complete"
 
-ci-test: ci-setup go-test dotnet-test
+ci-test: go-test dotnet-test
 	@echo "All CI tests completed"

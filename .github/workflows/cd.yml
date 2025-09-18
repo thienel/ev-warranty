@@ -1,0 +1,112 @@
+name: CD Pipeline
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    env:
+      GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+      GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+      PUBLIC_PEM: ${{ secrets.PUBLIC_PEM }}
+      PRIVATE_PEM: ${{ secrets.PRIVATE_PEM }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # ---------- Frontend ----------
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Cache Node modules
+        uses: actions/cache@v3
+        with:
+          path: frontend/node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('frontend/package-lock.json') }}
+
+      - name: Build frontend
+        run: make frontend-build
+
+      # ---------- Go ----------
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: 1.24
+
+      - name: Cache Go modules
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/go/pkg/mod
+            ~/.cache/go-build
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+
+      - name: Build Go service
+        run: make go-build
+
+      - name: Run Go tests
+        run: make go-test
+
+      # ---------- .NET ----------
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 9.0.x
+
+      - name: Cache .NET NuGet packages
+        uses: actions/cache@v3
+        with:
+          path: ~/.nuget/packages
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj') }}
+
+      - name: Restore .NET dependencies
+        run: make dotnet-restore
+
+      - name: Build .NET service
+        run: make dotnet-build
+
+      - name: Run .NET tests
+        run: make dotnet-test
+
+      # ---------- Docker ----------
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      # ---------- Docker Build ----------
+      - name: Build Docker image
+        run: |
+          docker build -t lethiendev/auth-user-service:latest ./auth-user-service
+
+      # ---------- Healthcheck Container ----------
+      - name: Run container for healthcheck
+        run: |
+          docker run -d --name temp_auth_user_service -p 8888:8888 \
+            -e PORT=8888 \
+            -e DATABASE_URL="postgres://auth_service:password@postgres:5432/auth_service?sslmode=disable" \
+            -e PUBLIC_PEM="${{ secrets.PUBLIC_PEM }}" \
+            -e PRIVATE_PEM="${{ secrets.PRIVATE_PEM }}" \
+            lethiendev/auth-user-service:latest
+          echo "Waiting for service to be ready..."
+          for i in {1..15}; do
+            curl -f http://localhost:8888/health && break
+            echo "Waiting 2s..."
+            sleep 2
+          done
+
+      - name: Stop healthcheck container
+        run: docker stop temp_auth_user_service && docker rm temp_auth_user_service
+
+      # ---------- Push Docker Image ----------
+      - name: Push Docker image
+        run: docker push lethiendev/auth-user-service:latest
+
+
