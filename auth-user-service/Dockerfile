@@ -11,14 +11,15 @@ RUN CGO_ENABLED=0 GOOS=linux go build -o main cmd/server/main.go
 
 FROM alpine:latest
 
-RUN apk --no-cache add ca-certificates
+RUN apk add --no-cache ca-certificates curl bash
 
 WORKDIR /root/
 
 COPY --from=builder /app/main .
 
-COPY --from=builder /app/keys ./keys
+COPY --from=builder /app/entrypoint.sh .
+RUN chmod +x entrypoint.sh
 
-EXPOSE 8080
+EXPOSE 8888
 
-CMD ["./main"]
+ENTRYPOINT ["./entrypoint.sh"]
