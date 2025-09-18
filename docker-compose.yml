@@ -1,0 +1,76 @@
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: auth_postgres
+    environment:
+      POSTGRES_DB: auth_service
+      POSTGRES_USER: auth_service
+      POSTGRES_PASSWORD: password
+      POSTGRES_HOST_AUTH_METHOD: trust
+    expose:
+      - "5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./auth-user-service/internal/infrastructure/database/migrations:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U auth_service -d auth_service"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - auth_network
+
+  auth-user-service:
+    build:
+      context: ./auth-user-service
+      dockerfile: Dockerfile
+    container_name: auth_user_service
+    environment:
+      - PORT=8888
+      - DATABASE_URL=postgres://auth_service:password@postgres:5432/auth_service?sslmode=disable
+      - LOG_LEVEL=info
+      - PUBLIC_KEY_PATH=./keys/public.pem
+      - PRIVATE_KEY_PATH=./keys/private.pem
+      - ACCESS_TOKEN_TTL=15m
+      - REFRESH_TOKEN_TTL=168h
+      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
+      - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
+      - GOOGLE_REDIRECT_URL=http://localhost/api/v1/auth/google/callback
+    expose:
+      - "8888"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8888/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - auth_network
+
+  nginx:
+    image: nginx:alpine
+    container_name: auth_nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - auth-user-service
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - auth_network
+
+volumes:
+  postgres_data:
+
+networks:
+  auth_network:
+    driver: bridge
