@@ -17,8 +17,8 @@ WORKDIR /root/
 
 COPY --from=builder /app/main .
 
-COPY --from=builder /app/keys ./keys
-
 EXPOSE 8080
 
 CMD ["./main"]
+
+ENTRYPOINT ["./entrypoint.sh"]
