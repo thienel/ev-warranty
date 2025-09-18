@@ -80,10 +80,17 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      # ---------- Docker Build ----------
-      - name: Build Docker image
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Build multi-arch Docker image
         run: |
-          docker buildx build --platform linux/arm64 -t lethiendev/auth-user-service:latest ./auth-user-service
+          docker buildx build \
+          --platform linux/amd64,linux/arm64 \
+          --push \
+          --cache-from=lethiendev/auth-user-service:latest \
+          -t lethiendev/auth-user-service:latest \
+          ./auth-user-service
 
       # ---------- Healthcheck Container ----------
       - name: Run container for healthcheck
@@ -103,9 +110,3 @@ jobs:
 
       - name: Stop healthcheck container
         run: docker stop temp_auth_user_service && docker rm temp_auth_user_service
-
-      # ---------- Push Docker Image ----------
-      - name: Push Docker image
-        run: docker push lethiendev/auth-user-service:latest
-
-
