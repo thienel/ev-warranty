@@ -25,6 +25,7 @@ services:
       context: ./auth-user-service
       dockerfile: Dockerfile
     container_name: auth_user_service
+    entrypoint: ["./entrypoint.sh"]
     environment:
       - PORT=8888
       - DATABASE_URL=postgres://auth_service:password@postgres:5432/auth_service?sslmode=disable
