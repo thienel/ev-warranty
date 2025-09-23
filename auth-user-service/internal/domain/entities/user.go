@@ -3,40 +3,53 @@ package entities
 import (
 	"net/mail"
 	"regexp"
-	"strings"
 	"time"
 
 	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
+const (
+	UserRoleAdmin        = "admin"
+	UserRoleEvmStaff     = "evm staff"
+	UserRoleScStaff      = "sc staff"
+	UserRoleScTechnician = "sc technician"
+)
+
 type User struct {
 	ID            uuid.UUID      `gorm:"primaryKey;type:uuid;default:gen_random_uuid()"`
-	Email         string         `gorm:"uniqueIndex;size:100"`
-	PasswordHash  *string        `gorm:"size:255"`
-	IsActive      bool           `gorm:"default:true"`
+	Name          string         `gorm:"not null;size:30"`
+	Email         string         `gorm:"not null;uniqueIndex;size:100"`
+	Role          string         `gorm:"not null;size:20"`
+	PasswordHash  string         `gorm:"not null;size:255"`
+	IsActive      bool           `gorm:"not null;default:true"`
+	OfficeID      uuid.UUID      `gorm:"not null;type:uuid"`
+	Office        Office         `gorm:"foreignKey:OfficeID;references:ID"`
 	CreatedAt     time.Time      `gorm:"autoCreateTime"`
 	UpdatedAt     time.Time      `gorm:"autoUpdateTime"`
 	DeletedAt     gorm.DeletedAt `gorm:"index"`
-	Tokens        []RefreshToken `gorm:"foreignKey:UserID;constraint:OnDelete:CASCADE"`
 	OAuthProvider *string        `gorm:"size:32;column:oauth_provider"`
 	OAuthID       *string        `gorm:"size:64;column:oauth_id"`
 }
 
-func NewUser(email, passwordHash string) *User {
-	return &User{
-		Email:        strings.ToLower(strings.TrimSpace(email)),
-		PasswordHash: &passwordHash,
-		IsActive:     true,
+func IsValidUserRole(userRole string) bool {
+	switch userRole {
+	case UserRoleAdmin, UserRoleEvmStaff, UserRoleScStaff, UserRoleScTechnician:
+		return true
+	default:
+		return false
 	}
 }
 
-func NewOAuthUser(email, provider, oauthID string) *User {
+func NewUser(name, email, role, passwordHash string, isActive bool, officeID uuid.UUID) *User {
 	return &User{
-		Email:         strings.ToLower(strings.TrimSpace(email)),
-		IsActive:      true,
-		OAuthProvider: &provider,
-		OAuthID:       &oauthID,
+		ID:           uuid.New(),
+		Name:         name,
+		Email:        email,
+		Role:         role,
+		PasswordHash: passwordHash,
+		IsActive:     isActive,
+		OfficeID:     officeID,
 	}
 }
 
@@ -56,14 +69,6 @@ func IsValidPassword(password string) bool {
 	hasSpecial := regexp.MustCompile(`[^A-Za-z0-9]`).MatchString(password)
 
 	return hasLower && hasUpper && hasDigit && hasSpecial
-}
-
-func (user *User) Activate() {
-	user.IsActive = true
-}
-
-func (user *User) Deactivate() {
-	user.IsActive = false
 }
 
 func (user *User) IsOAuthUser() bool {
