@@ -51,9 +51,9 @@ func (h *authHandler) Login(c *gin.Context) {
 		return
 	}
 
-	h.logger.Info("attempting login", "username_or_email", req.UsernameOrEmail)
+	h.logger.Info("attempting login", "username_or_email", req.Email)
 
-	accessToken, refreshToken, err := h.authService.Login(ctx, req.UsernameOrEmail, req.Password)
+	accessToken, refreshToken, err := h.authService.Login(ctx, req.Email, req.Password)
 	if err != nil {
 		handleError(h.logger, c, err, "login failed")
 		return
@@ -91,9 +91,9 @@ func (h *authHandler) Register(c *gin.Context) {
 		return
 	}
 
-	h.logger.Info("attempting registration", "username", req.Username, "email", req.Email)
+	h.logger.Info("attempting registration", "email", req.Email)
 
-	user, err := h.authService.Register(ctx, req.Username, req.Email, req.Password)
+	user, err := h.authService.Register(ctx, req.Email, req.Password)
 	if err != nil {
 		handleError(h.logger, c, err, "registration failed")
 		return

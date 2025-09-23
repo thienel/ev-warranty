@@ -23,7 +23,7 @@ type User struct {
 	OAuthID       *string        `gorm:"size:64;column:oauth_id"`
 }
 
-func NewUser(username, email, passwordHash string) *User {
+func NewUser(email, passwordHash string) *User {
 	return &User{
 		Email:        strings.ToLower(strings.TrimSpace(email)),
 		PasswordHash: &passwordHash,
@@ -31,7 +31,7 @@ func NewUser(username, email, passwordHash string) *User {
 	}
 }
 
-func NewOAuthUser(username, email, provider, oauthID string) *User {
+func NewOAuthUser(email, provider, oauthID string) *User {
 	return &User{
 		Email:         strings.ToLower(strings.TrimSpace(email)),
 		IsActive:      true,
@@ -43,12 +43,6 @@ func NewOAuthUser(username, email, provider, oauthID string) *User {
 func IsValidEmail(email string) bool {
 	_, err := mail.ParseAddress(email)
 	return err == nil
-}
-
-func IsValidUserName(username string) bool {
-	pattern := `^[A-Za-z0-9._]{2,24}$`
-	re := regexp.MustCompile(pattern)
-	return re.MatchString(username)
 }
 
 func IsValidPassword(password string) bool {

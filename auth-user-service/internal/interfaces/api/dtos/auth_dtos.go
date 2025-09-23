@@ -7,8 +7,8 @@ import (
 )
 
 type LoginRequest struct {
-	UsernameOrEmail string `json:"username_or_email" binding:"required"`
-	Password        string `json:"password" binding:"required"`
+	Email    string `json:"email" binding:"required"`
+	Password string `json:"password" binding:"required"`
 }
 
 type LoginResponse struct {
@@ -18,23 +18,20 @@ type LoginResponse struct {
 }
 
 type RegisterRequest struct {
-	Username string `json:"username" binding:"required,min=2,max=24"`
 	Email    string `json:"email" binding:"required,email,max=100"`
 	Password string `json:"password" binding:"required,min=8,max=128"`
 }
 
 type UserDTO struct {
-	ID       uuid.UUID           `json:"id" binding:"required"`
-	Username string              `json:"username" binding:"required,min=2,max=24"`
-	Email    string              `json:"email" binding:"required,email,max=100"`
-	Status   entities.UserStatus `json:"status" binding:"required,oneof=active inactive suspended pending"`
+	ID       uuid.UUID `json:"id" binding:"required"`
+	Email    string    `json:"email" binding:"required,email,max=100"`
+	IsActive bool      `json:"is_active" binding:"required"`
 }
 
 func GenerateUserDTO(user entities.User) *UserDTO {
 	return &UserDTO{
 		ID:       user.ID,
-		Username: user.Username,
 		Email:    user.Email,
-		Status:   user.Status,
+		IsActive: user.IsActive,
 	}
 }

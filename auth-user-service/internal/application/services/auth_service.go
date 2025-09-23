@@ -7,23 +7,16 @@ import (
 	"auth-service/internal/infrastructure/oauth/providers"
 	"auth-service/internal/security"
 	"context"
-	"fmt"
 	"strings"
 
 	"github.com/google/uuid"
 )
 
-const (
-	loginTypeEmail    = "email"
-	loginTypeUsername = "username"
-)
-
 type AuthService interface {
-	Login(ctx context.Context, usernameOrEmail, password string) (string, string, error)
-	Register(ctx context.Context, username, email, password string) (*entities.User, error)
+	Login(ctx context.Context, email, password string) (string, string, error)
+	Register(ctx context.Context, email, password string) (*entities.User, error)
 	Logout(ctx context.Context, token string) error
 	GetUserByID(ctx context.Context, id uuid.UUID) (*entities.User, error)
-	GetUserByUsername(ctx context.Context, username string) (*entities.User, error)
 	HandleOAuthUser(ctx context.Context, userInfo *providers.UserInfo) (*entities.User, string, string, error)
 }
 
@@ -36,18 +29,17 @@ func NewAuthService(userRepo repositories.UserRepository, tokenService TokenServ
 	return &authService{userRepo, tokenService}
 }
 
-func (s *authService) Login(ctx context.Context, usernameOrEmail, password string) (string, string, error) {
-	usernameOrEmail = strings.TrimSpace(usernameOrEmail)
-	loginType := s.identifyLoginType(usernameOrEmail)
-	user, err := s.findUser(ctx, loginType, usernameOrEmail)
+func (s *authService) Login(ctx context.Context, email, password string) (string, string, error) {
+	email = strings.TrimSpace(email)
+	user, err := s.userRepo.FindByEmail(ctx, email)
 	if err != nil {
 		return "", "", err
 	}
 
 	if user == nil {
-		return "", "", apperrors.ErrInvalidCredentials("invalid username or email")
+		return "", "", apperrors.ErrInvalidCredentials("invalid email")
 	}
-	if !user.IsActive() {
+	if user.IsActive {
 		return "", "", apperrors.ErrUserInactive
 	}
 	if !security.VerifyPassword(password, *user.PasswordHash) {
@@ -66,46 +58,14 @@ func (s *authService) Login(ctx context.Context, usernameOrEmail, password strin
 	return accessToken, refreshToken, nil
 }
 
-func (s *authService) identifyLoginType(usernameOrEmail string) string {
-	if entities.IsValidEmail(usernameOrEmail) {
-		return loginTypeEmail
-	}
-	if entities.IsValidUserName(usernameOrEmail) {
-		return loginTypeUsername
-	}
-	return ""
-}
-
-func (s *authService) findUser(ctx context.Context, loginType, usernameOrEmail string) (*entities.User, error) {
-	switch loginType {
-	case loginTypeEmail:
-		return s.userRepo.FindByEmail(ctx, usernameOrEmail)
-	case loginTypeUsername:
-		return s.userRepo.FindByUsername(ctx, usernameOrEmail)
-	default:
-		return nil, apperrors.ErrInvalidCredentials("invalid username or email")
-	}
-}
-
 func (s *authService) GetUserByID(ctx context.Context, id uuid.UUID) (*entities.User, error) {
 	return s.userRepo.FindByID(ctx, id)
 }
 
-func (s *authService) GetUserByUsername(ctx context.Context, username string) (*entities.User, error) {
-	if !entities.IsValidUserName(username) {
-		return nil, apperrors.ErrInvalidCredentials("invalid username")
-	}
-	return s.userRepo.FindByUsername(ctx, username)
-}
-
-func (s *authService) Register(ctx context.Context, username, email, password string) (*entities.User, error) {
+func (s *authService) Register(ctx context.Context, email, password string) (*entities.User, error) {
 	email = strings.TrimSpace(email)
 	if !entities.IsValidEmail(email) {
 		return nil, apperrors.ErrInvalidCredentials("invalid email")
-	}
-	username = strings.TrimSpace(username)
-	if !entities.IsValidUserName(username) {
-		return nil, apperrors.ErrInvalidCredentials("invalid username")
 	}
 	if !entities.IsValidPassword(password) {
 		return nil, apperrors.ErrInvalidCredentials("invalid password")
@@ -115,7 +75,7 @@ func (s *authService) Register(ctx context.Context, username, email, password st
 		return nil, apperrors.ErrHashPassword(err)
 	}
 
-	user := entities.NewUser(username, email, passwordHash)
+	user := entities.NewUser(email, passwordHash)
 
 	if err = s.userRepo.Create(ctx, user); err != nil {
 		return nil, err
@@ -144,7 +104,7 @@ func (s *authService) HandleOAuthUser(ctx context.Context, userInfo *providers.U
 	}
 
 	if user == nil {
-		user = entities.NewOAuthUser(s.generateUsernameFromEmail(ctx, userInfo.Email), userInfo.Email, userInfo.Provider, userInfo.ProviderID)
+		user = entities.NewOAuthUser(userInfo.Email, userInfo.Provider, userInfo.ProviderID)
 		if err = s.userRepo.Create(ctx, user); err != nil {
 			return nil, "", "", err
 		}
@@ -167,22 +127,4 @@ func (s *authService) HandleOAuthUser(ctx context.Context, userInfo *providers.U
 	}
 
 	return user, accessToken, refreshToken, nil
-}
-
-func (s *authService) generateUsernameFromEmail(ctx context.Context, email string) string {
-	parts := strings.Split(email, "@")
-	baseUsername := parts[0]
-
-	for i := 0; i < 10; i++ {
-		username := baseUsername
-		if i > 0 {
-			username = fmt.Sprintf("%s%d", baseUsername, i)
-		}
-
-		if _, err := s.userRepo.FindByUsername(ctx, username); err != nil {
-			return username
-		}
-	}
-
-	return fmt.Sprintf("%s_%s", baseUsername, uuid.New().String()[:8])
 }
