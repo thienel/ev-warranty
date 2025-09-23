@@ -1,8 +1,6 @@
 package entities
 
 import (
-	"auth-service/internal/errors/apperrors"
-	"database/sql/driver"
 	"net/mail"
 	"regexp"
 	"strings"
@@ -12,21 +10,11 @@ import (
 	"gorm.io/gorm"
 )
 
-type UserStatus string
-
-const (
-	UserStatusActive    UserStatus = "active"
-	UserStatusInactive  UserStatus = "inactive"
-	UserStatusSuspended UserStatus = "suspended"
-	UserStatusPending   UserStatus = "pending"
-)
-
 type User struct {
 	ID            uuid.UUID      `gorm:"primaryKey;type:uuid;default:gen_random_uuid()"`
-	Username      string         `gorm:"uniqueIndex;size:24"`
 	Email         string         `gorm:"uniqueIndex;size:100"`
 	PasswordHash  *string        `gorm:"size:255"`
-	Status        UserStatus     `gorm:"default:pending"`
+	IsActive      bool           `gorm:"default:true"`
 	CreatedAt     time.Time      `gorm:"autoCreateTime"`
 	UpdatedAt     time.Time      `gorm:"autoUpdateTime"`
 	DeletedAt     gorm.DeletedAt `gorm:"index"`
@@ -37,18 +25,16 @@ type User struct {
 
 func NewUser(username, email, passwordHash string) *User {
 	return &User{
-		Username:     strings.TrimSpace(username),
 		Email:        strings.ToLower(strings.TrimSpace(email)),
 		PasswordHash: &passwordHash,
-		Status:       UserStatusPending,
+		IsActive:     true,
 	}
 }
 
 func NewOAuthUser(username, email, provider, oauthID string) *User {
 	return &User{
-		Username:      username,
 		Email:         strings.ToLower(strings.TrimSpace(email)),
-		Status:        UserStatusActive,
+		IsActive:      true,
 		OAuthProvider: &provider,
 		OAuthID:       &oauthID,
 	}
@@ -78,20 +64,12 @@ func IsValidPassword(password string) bool {
 	return hasLower && hasUpper && hasDigit && hasSpecial
 }
 
-func (user *User) IsActive() bool {
-	return user.Status == UserStatusActive && user.DeletedAt.Time.IsZero()
-}
-
 func (user *User) Activate() {
-	user.Status = UserStatusActive
-}
-
-func (user *User) Suspend() {
-	user.Status = UserStatusSuspended
+	user.IsActive = true
 }
 
 func (user *User) Deactivate() {
-	user.Status = UserStatusInactive
+	user.IsActive = false
 }
 
 func (user *User) IsOAuthUser() bool {
@@ -101,34 +79,4 @@ func (user *User) IsOAuthUser() bool {
 func (user *User) LinkToOAuth(oauthProvider, oauthID string) {
 	user.OAuthProvider = &oauthProvider
 	user.OAuthID = &oauthID
-}
-
-func (us UserStatus) Value() (driver.Value, error) {
-	return string(us), nil
-}
-
-func (us *UserStatus) Scan(value any) error {
-	if value == nil {
-		return nil
-	}
-
-	switch s := value.(type) {
-	case string:
-		*us = UserStatus(s)
-		return nil
-	case []byte:
-		*us = UserStatus(s)
-		return nil
-	default:
-		return apperrors.ErrScanValue
-	}
-}
-
-func (us UserStatus) IsValid() bool {
-	switch us {
-	case UserStatusActive, UserStatusInactive, UserStatusSuspended, UserStatusPending:
-		return true
-	default:
-		return false
-	}
 }
