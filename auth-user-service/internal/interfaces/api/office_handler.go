@@ -45,13 +45,12 @@ func (h *officeHandler) Create(c *gin.Context) {
 		return
 	}
 
-	officeType := entities.OfficeType(req.OfficeType)
-	if !officeType.IsValid() {
+	if !entities.IsValidOfficeType(req.OfficeType) {
 		handleError(h.logger, c, apperrors.ErrInvalidCredentials("invalid office type"), "invalid office type")
 		return
 	}
 
-	office, err := h.service.Create(ctx, req.OfficeName, officeType, req.Address, req.IsActive)
+	office, err := h.service.Create(ctx, req.OfficeName, req.OfficeType, req.Address, req.IsActive)
 	if err != nil {
 		handleError(h.logger, c, err, "error creating office")
 		return
@@ -71,7 +70,7 @@ func (h *officeHandler) GetById(c *gin.Context) {
 		return
 	}
 
-	office, err := h.service.GetOfficeByID(ctx, officeID)
+	office, err := h.service.GetByID(ctx, officeID)
 	if err != nil {
 		handleError(h.logger, c, err, "error getting office")
 		return
@@ -83,7 +82,7 @@ func (h *officeHandler) GetAll(c *gin.Context) {
 	ctx, cancel := context.WithTimeout(c.Request.Context(), requestTimeout)
 	defer cancel()
 
-	offices, err := h.service.GetAllOffices(ctx)
+	offices, err := h.service.GetAll(ctx)
 	if err != nil {
 		handleError(h.logger, c, err, "error getting offices")
 		return
@@ -103,7 +102,7 @@ func (h *officeHandler) Active(c *gin.Context) {
 		return
 	}
 
-	err = h.service.ActiveOfficeByID(ctx, officeID)
+	err = h.service.ActiveByID(ctx, officeID)
 	if err != nil {
 		handleError(h.logger, c, err, "error activating office")
 		return
@@ -123,7 +122,7 @@ func (h *officeHandler) Inactive(c *gin.Context) {
 		return
 	}
 
-	err = h.service.InactiveOfficeByID(ctx, officeID)
+	err = h.service.DeActiveByID(ctx, officeID)
 	if err != nil {
 		handleError(h.logger, c, err, "error deactivating office")
 		return
@@ -149,13 +148,12 @@ func (h *officeHandler) Update(c *gin.Context) {
 		return
 	}
 
-	officeType := entities.OfficeType(req.OfficeType)
-	if !officeType.IsValid() {
+	if !entities.IsValidOfficeType(req.OfficeType) {
 		handleError(h.logger, c, apperrors.ErrInvalidCredentials("invalid office type"), "invalid office type")
 		return
 	}
 
-	office, err := h.service.UpdateOfficeByID(ctx, officeID, req.OfficeName, officeType, req.Address)
+	office, err := h.service.UpdateByID(ctx, officeID, req.OfficeName, req.OfficeType, req.Address)
 	if err != nil {
 		handleError(h.logger, c, err, "error updating office")
 		return
@@ -175,7 +173,7 @@ func (h *officeHandler) Delete(c *gin.Context) {
 		return
 	}
 
-	err = h.service.DeleteOfficeByID(ctx, officeID)
+	err = h.service.DeleteByID(ctx, officeID)
 	if err != nil {
 		handleError(h.logger, c, err, "error deleting office")
 		return

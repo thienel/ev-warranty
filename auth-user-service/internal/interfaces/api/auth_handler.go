@@ -8,20 +8,13 @@ import (
 	"context"
 	"net/http"
 	"strings"
-	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 )
 
-const (
-	requestTimeout = 30 * time.Second
-	bearerPrefix   = "Bearer "
-)
-
 type AuthHandler interface {
 	Login(c *gin.Context)
-	Register(c *gin.Context)
 	Logout(c *gin.Context)
 	RefreshToken(c *gin.Context)
 	ValidateToken(c *gin.Context)
@@ -30,13 +23,17 @@ type AuthHandler interface {
 type authHandler struct {
 	authService  services.AuthService
 	tokenService services.TokenService
+	userService  services.UserService
 	logger       logger.Logger
 }
 
-func NewAuthHandler(authService services.AuthService, tokenService services.TokenService, logger logger.Logger) AuthHandler {
+func NewAuthHandler(logger logger.Logger, authService services.AuthService, tokenService services.TokenService,
+	userService services.UserService) AuthHandler {
+
 	return &authHandler{
 		authService:  authService,
 		tokenService: tokenService,
+		userService:  userService,
 		logger:       logger,
 	}
 }
@@ -65,7 +62,7 @@ func (h *authHandler) Login(c *gin.Context) {
 		return
 	}
 
-	user, err := h.authService.GetUserByID(ctx, userID)
+	user, err := h.userService.GetByID(ctx, userID)
 	if err != nil {
 		handleError(h.logger, c, err, "failed to get user info")
 		return
@@ -79,34 +76,6 @@ func (h *authHandler) Login(c *gin.Context) {
 
 	h.logger.Info("login successful", "user_id", userID)
 	writeSuccessResponse(c, http.StatusOK, "login successful", response)
-}
-
-func (h *authHandler) Register(c *gin.Context) {
-	ctx, cancel := context.WithTimeout(c.Request.Context(), requestTimeout)
-	defer cancel()
-
-	var req dtos.RegisterRequest
-	if err := c.ShouldBindJSON(&req); err != nil {
-		handleError(h.logger, c, apperrors.ErrInvalidJSONRequest, "invalid JSON RegisterRequest")
-		return
-	}
-
-	h.logger.Info("attempting registration", "email", req.Email)
-
-	user, err := h.authService.Register(ctx, req.Email, req.Password)
-	if err != nil {
-		handleError(h.logger, c, err, "registration failed")
-		return
-	}
-
-	response := dtos.APIResponse{
-		Success: true,
-		Message: "registration successful",
-		Data:    *dtos.GenerateUserDTO(*user),
-	}
-
-	h.logger.Info("registration successful", "user_id", user.ID)
-	writeSuccessResponse(c, http.StatusCreated, "registration successful", response)
 }
 
 func (h *authHandler) Logout(c *gin.Context) {
@@ -178,7 +147,7 @@ func (h *authHandler) ValidateToken(c *gin.Context) {
 		return
 	}
 
-	user, err := h.authService.GetUserByID(ctx, userID)
+	user, err := h.userService.GetByID(ctx, userID)
 	if err != nil {
 		handleError(h.logger, c, err, "failed to get user info")
 		return

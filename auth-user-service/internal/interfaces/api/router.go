@@ -11,7 +11,8 @@ type healthHandler struct {
 	DB *database.Database
 }
 
-func NewRouter(db *database.Database, authHandler AuthHandler, oauthHandler OAuthHandler, officeHandler OfficeHandler) *gin.Engine {
+func NewRouter(db *database.Database, authHandler AuthHandler, oauthHandler OAuthHandler,
+	officeHandler OfficeHandler, userHandler UserHandler) *gin.Engine {
 	router := gin.New()
 	router.Use(gin.Recovery(), gin.Logger())
 	healthHandler := healthHandler{DB: db}
@@ -19,23 +20,34 @@ func NewRouter(db *database.Database, authHandler AuthHandler, oauthHandler OAut
 	router.GET("/health", healthHandler.Check)
 
 	auth := router.Group("/auth")
-	auth.POST("/login", authHandler.Login)
-	auth.POST("/register", authHandler.Register)
-	auth.POST("/logout", authHandler.Logout)
-	auth.POST("/token/refresh", authHandler.RefreshToken)
-	auth.GET("/token/validate", authHandler.ValidateToken)
+	{
+		auth.POST("/login", authHandler.Login)
+		auth.POST("/logout", authHandler.Logout)
+		auth.POST("/token/refresh", authHandler.RefreshToken)
+		auth.GET("/token/validate", authHandler.ValidateToken)
 
-	auth.GET("/:provider", oauthHandler.InitiateOAuth)
-	auth.GET("/:provider/callback", oauthHandler.HandleCallback)
+		auth.GET("/:provider", oauthHandler.InitiateOAuth)
+		auth.GET("/:provider/callback", oauthHandler.HandleCallback)
+	}
+
+	users := router.Group("/users")
+	{
+		users.POST("/", userHandler.Create)
+		users.GET("/", userHandler.GetAll)
+		users.POST("/:id", userHandler.GetByID)
+		users.DELETE("/:id", userHandler.Delete)
+	}
 
 	office := router.Group("/offices")
-	office.POST("/", officeHandler.Create)
-	office.GET("/", officeHandler.GetAll)
-	office.GET("/:id", officeHandler.GetById)
-	office.PUT("/:id", officeHandler.Update)
-	office.PUT("/:id/activate", officeHandler.Active)
-	office.PUT("/:id/deactivate", officeHandler.Inactive)
-	office.DELETE("/:id", officeHandler.Delete)
+	{
+		office.POST("/", officeHandler.Create)
+		office.GET("/", officeHandler.GetAll)
+		office.GET("/:id", officeHandler.GetById)
+		office.PUT("/:id", officeHandler.Update)
+		office.PUT("/:id/activate", officeHandler.Active)
+		office.PUT("/:id/deactivate", officeHandler.Inactive)
+		office.DELETE("/:id", officeHandler.Delete)
+	}
 
 	return router
 }
