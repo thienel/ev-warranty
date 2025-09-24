@@ -21,13 +21,13 @@ type UserHandler interface {
 }
 
 type userHandler struct {
-	logger      logger.Logger
+	log         logger.Logger
 	userService services.UserService
 }
 
-func NewUserHandler(logger logger.Logger, userService services.UserService) UserHandler {
+func NewUserHandler(log logger.Logger, userService services.UserService) UserHandler {
 	return &userHandler{
-		logger:      logger,
+		log:         log,
 		userService: userService,
 	}
 }
@@ -38,11 +38,11 @@ func (h userHandler) Create(c *gin.Context) {
 
 	var req dtos.CreateUserRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		handleError(h.logger, c, apperrors.ErrInvalidJSONRequest, "invalid JSON RegisterRequest")
+		handleError(h.log, c, apperrors.ErrInvalidJSONRequest, "invalid JSON RegisterRequest")
 		return
 	}
 
-	h.logger.Info("creating user", "email", req.Email)
+	h.log.Info("creating user", "email", req.Email)
 
 	params := &services.UserCreateParams{
 		Name:     req.Name,
@@ -54,11 +54,11 @@ func (h userHandler) Create(c *gin.Context) {
 	}
 	user, err := h.userService.Create(ctx, params)
 	if err != nil {
-		handleError(h.logger, c, err, "user creation failed")
+		handleError(h.log, c, err, "user creation failed")
 		return
 	}
 
-	h.logger.Info("registration successful", "user_id", user.ID)
+	h.log.Info("registration successful", "user_id", user.ID)
 	writeSuccessResponse(c, http.StatusCreated, "registration successful", *dtos.GenerateUserDTO(*user))
 }
 
@@ -68,11 +68,11 @@ func (h userHandler) Update(c *gin.Context) {
 
 	var req dtos.UpdateUserRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		handleError(h.logger, c, apperrors.ErrInvalidJSONRequest, "invalid JSON RegisterRequest")
+		handleError(h.log, c, apperrors.ErrInvalidJSONRequest, "invalid JSON RegisterRequest")
 		return
 	}
 
-	h.logger.Info("updating user", "email", req.Email)
+	h.log.Info("updating user", "email", req.Email)
 
 	params := &services.UserUpdateParams{
 		Name:     req.Name,
@@ -83,11 +83,11 @@ func (h userHandler) Update(c *gin.Context) {
 	}
 	err := h.userService.Update(ctx, params)
 	if err != nil {
-		handleError(h.logger, c, err, "user update failed")
+		handleError(h.log, c, err, "user update failed")
 		return
 	}
 
-	h.logger.Info("registration successful", "user_id", req.ID)
+	h.log.Info("registration successful", "user_id", req.ID)
 	writeSuccessResponse(c, http.StatusOK, "user update successful", nil)
 }
 
@@ -99,13 +99,13 @@ func (h userHandler) GetByID(c *gin.Context) {
 	userID, err := uuid.Parse(userIDStr)
 	if err != nil {
 		err = apperrors.ErrInvalidCredentials("invalid id")
-		handleError(h.logger, c, err, "invalid id in get user by id")
+		handleError(h.log, c, err, "invalid id in get user by id")
 		return
 	}
 
 	user, err := h.userService.GetByID(ctx, userID)
 	if err != nil {
-		handleError(h.logger, c, err, "user not found in get user by id")
+		handleError(h.log, c, err, "user not found in get user by id")
 		return
 	}
 
@@ -118,7 +118,7 @@ func (h userHandler) GetAll(c *gin.Context) {
 
 	users, err := h.userService.GetAll(ctx)
 	if err != nil {
-		handleError(h.logger, c, err, "error getting all users")
+		handleError(h.log, c, err, "error getting all users")
 		return
 	}
 
@@ -133,13 +133,13 @@ func (h userHandler) Delete(c *gin.Context) {
 	userID, err := uuid.Parse(userIDStr)
 	if err != nil {
 		err = apperrors.ErrInvalidCredentials("invalid user id")
-		handleError(h.logger, c, err, "invalid user ID deleting user")
+		handleError(h.log, c, err, "invalid user ID deleting user")
 		return
 	}
 
 	err = h.userService.Delete(ctx, userID)
 	if err != nil {
-		handleError(h.logger, c, err, "error deleting user")
+		handleError(h.log, c, err, "error deleting user")
 		return
 	}
 

@@ -56,19 +56,29 @@ func main() {
 		Log: log,
 	}
 
-	googleProvider := providers.NewGoogleProvider(cfg.OAuth.GoogleClientID, cfg.OAuth.GoogleClientSecret, cfg.OAuth.GoogleRedirectURL)
+	app.seedDbData()
+
+	officeRepo := persistence.NewOfficeRepository(db.DB)
 	tokenRepo := persistence.NewTokenRepository(db.DB)
 	userRepo := persistence.NewUserRepository(db.DB)
-	tokenService := services.NewTokenService(app.Log, tokenRepo, cfg.AccessTokenTTL, cfg.RefreshTokenTTL, security.PrivateKey(), security.PublicKey())
+
+	officeService := services.NewOfficeService(officeRepo)
+	tokenService := services.NewTokenService(app.Log, tokenRepo,
+		cfg.AccessTokenTTL, cfg.RefreshTokenTTL, security.PrivateKey(), security.PublicKey())
 	authService := services.NewAuthService(userRepo, tokenService)
 	oauthService := oauth.NewOAuthService(userRepo)
+	userService := services.NewUserService(userRepo, officeService)
+
+	googleProvider := providers.NewGoogleProvider(
+		cfg.OAuth.GoogleClientID, cfg.OAuth.GoogleClientSecret, cfg.OAuth.GoogleRedirectURL)
 	oauthService.RegisterProvider(googleProvider)
-	authHandler := api.NewAuthHandler(authService, tokenService, log)
-	oauthHandler := api.NewOAuthHandler(app.Log, oauthService, authService)
-	officeRepo := persistence.NewOfficeRepository(db.DB)
-	officeService := services.NewOfficeService(officeRepo)
-	officeHandler := api.NewOfficeHandler(app.Log, officeService)
-	r := api.NewRouter(app.DB, authHandler, oauthHandler, officeHandler)
+
+	officeHandler := api.NewOfficeHandler(log, officeService)
+	authHandler := api.NewAuthHandler(log, authService, tokenService, userService)
+	oauthHandler := api.NewOAuthHandler(log, oauthService, authService)
+	userHandler := api.NewUserHandler(log, userService)
+
+	r := api.NewRouter(app.DB, authHandler, oauthHandler, officeHandler, userHandler)
 	log.Info("Server starting on port " + cfg.Port)
 	srv := &http.Server{
 		Addr:    ":" + cfg.Port,
