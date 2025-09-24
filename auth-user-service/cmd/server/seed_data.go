@@ -3,28 +3,27 @@ package main
 import (
 	"auth-service/internal/domain/entities"
 	"auth-service/internal/security"
-	"log"
+	"os"
 )
 
 func (app *App) seedDbData() {
-	err := app.DB.DB.AutoMigrate(&entities.Office{}, &entities.User{}, &entities.RefreshToken{})
-	if err != nil {
-		log.Fatal("failed to migrate:", err)
+	password := os.Getenv("ADMIN_PASSWORD")
+	if password == "" {
+		password = "Admin@123"
 	}
-
-	office := entities.
-		NewOffice("Head Office", entities.OfficeTypeEVM, "123 Main Street", true)
-	app.DB.DB.FirstOrCreate(&office, entities.Office{OfficeName: "Head Office"})
-
-	password := "Admin@123"
 	hashed, err := security.HashPassword(password)
 	if err != nil {
-		log.Fatal("failed to hash password:", err)
+		app.Log.Error("failed to hash password", "error", err)
+		os.Exit(1)
+		return
 	}
 
-	email := "admin@localhost"
-	admin := entities.
-		NewUser("System Admin", email, entities.UserRoleAdmin, hashed, true, office.Id)
-
-	app.DB.DB.FirstOrCreate(&admin, entities.User{Email: email})
+	email := os.Getenv("ADMIN_EMAIL")
+	if email == "" {
+		email = "admin@localhost"
+	}
+	admin := entities.NewUser("System Admin", email, entities.UserRoleAdmin, hashed, true, nil)
+	if err := app.DB.DB.FirstOrCreate(&admin, entities.User{Email: email}).Error; err != nil {
+		app.Log.Error("failed to seed admin user", "error", err)
+	}
 }
