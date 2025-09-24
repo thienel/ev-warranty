@@ -10,13 +10,13 @@ import (
 )
 
 type OfficeService interface {
-	Create(ctx context.Context, officeName string, officeType entities.OfficeType, address string, isActive bool) (*entities.Office, error)
-	GetOfficeByID(ctx context.Context, officeID uuid.UUID) (*entities.Office, error)
-	GetAllOffices(ctx context.Context) ([]*entities.Office, error)
-	ActiveOfficeByID(ctx context.Context, officeID uuid.UUID) error
-	InactiveOfficeByID(ctx context.Context, officeID uuid.UUID) error
-	UpdateOfficeByID(ctx context.Context, officeID uuid.UUID, officeName string, officeType entities.OfficeType, address string) (*entities.Office, error)
-	DeleteOfficeByID(ctx context.Context, officeID uuid.UUID) error
+	Create(ctx context.Context, officeName string, officeType string, address string, isActive bool) (*entities.Office, error)
+	GetByID(ctx context.Context, officeID uuid.UUID) (*entities.Office, error)
+	GetAll(ctx context.Context) ([]*entities.Office, error)
+	ActiveByID(ctx context.Context, officeID uuid.UUID) error
+	DeActiveByID(ctx context.Context, officeID uuid.UUID) error
+	UpdateByID(ctx context.Context, officeID uuid.UUID, officeName string, officeType string, address string) (*entities.Office, error)
+	DeleteByID(ctx context.Context, officeID uuid.UUID) error
 }
 
 type officeService struct {
@@ -27,8 +27,10 @@ func NewOfficeService(repo repositories.OfficeRepository) OfficeService {
 	return &officeService{repo}
 }
 
-func (s *officeService) Create(ctx context.Context, officeName string, officeType entities.OfficeType, address string, isActive bool) (*entities.Office, error) {
-	if !officeType.IsValid() {
+func (s *officeService) Create(ctx context.Context, officeName string, officeType string, address string, isActive bool) (
+	*entities.Office, error) {
+
+	if !entities.IsValidOfficeType(officeType) {
 		return nil, apperrors.ErrInvalidCredentials("invalid office type")
 	}
 
@@ -40,15 +42,15 @@ func (s *officeService) Create(ctx context.Context, officeName string, officeTyp
 	return office, nil
 }
 
-func (s *officeService) GetOfficeByID(ctx context.Context, officeID uuid.UUID) (*entities.Office, error) {
+func (s *officeService) GetByID(ctx context.Context, officeID uuid.UUID) (*entities.Office, error) {
 	return s.repo.FindByID(ctx, officeID)
 }
 
-func (s *officeService) GetAllOffices(ctx context.Context) ([]*entities.Office, error) {
+func (s *officeService) GetAll(ctx context.Context) ([]*entities.Office, error) {
 	return s.repo.FindAll(ctx)
 }
 
-func (s *officeService) ActiveOfficeByID(ctx context.Context, officeID uuid.UUID) error {
+func (s *officeService) ActiveByID(ctx context.Context, officeID uuid.UUID) error {
 	office, err := s.repo.FindByID(ctx, officeID)
 	if err != nil {
 		return err
@@ -58,7 +60,7 @@ func (s *officeService) ActiveOfficeByID(ctx context.Context, officeID uuid.UUID
 	return s.repo.Update(ctx, office)
 }
 
-func (s *officeService) InactiveOfficeByID(ctx context.Context, officeID uuid.UUID) error {
+func (s *officeService) DeActiveByID(ctx context.Context, officeID uuid.UUID) error {
 	office, err := s.repo.FindByID(ctx, officeID)
 	if err != nil {
 		return err
@@ -68,13 +70,13 @@ func (s *officeService) InactiveOfficeByID(ctx context.Context, officeID uuid.UU
 	return s.repo.Update(ctx, office)
 }
 
-func (s *officeService) UpdateOfficeByID(ctx context.Context, officeID uuid.UUID, officeName string, officeType entities.OfficeType, address string) (*entities.Office, error) {
+func (s *officeService) UpdateByID(ctx context.Context, officeID uuid.UUID, officeName string, officeType string, address string) (*entities.Office, error) {
 	office, err := s.repo.FindByID(ctx, officeID)
 	if err != nil {
 		return nil, err
 	}
 
-	if !officeType.IsValid() {
+	if !entities.IsValidOfficeType(officeType) {
 		return nil, apperrors.ErrInvalidCredentials("invalid office type")
 	}
 
@@ -89,6 +91,6 @@ func (s *officeService) UpdateOfficeByID(ctx context.Context, officeID uuid.UUID
 	return office, nil
 }
 
-func (s *officeService) DeleteOfficeByID(ctx context.Context, officeID uuid.UUID) error {
+func (s *officeService) DeleteByID(ctx context.Context, officeID uuid.UUID) error {
 	return s.repo.SoftDelete(ctx, officeID)
 }
