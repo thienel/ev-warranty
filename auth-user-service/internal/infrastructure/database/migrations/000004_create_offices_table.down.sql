@@ -1,2 +1,0 @@
-DROP TABLE IF EXISTS offices;
-DROP TYPE IF EXISTS office_type;
