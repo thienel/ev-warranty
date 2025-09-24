@@ -54,9 +54,21 @@ func (u *userRepository) FindByEmail(ctx context.Context, email string) (*entiti
 	return &user, nil
 }
 
+func (u *userRepository) FindAll(ctx context.Context) ([]*entities.User, error) {
+	var users []*entities.User
+	if err := u.db.WithContext(ctx).Find(&users).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, apperrors.ErrNotFound(entityUser)
+		}
+		return nil, apperrors.ErrDBOperation(err)
+	}
+	return users, nil
+}
+
 func (u *userRepository) Update(ctx context.Context, user *entities.User) error {
 	if err := u.db.WithContext(ctx).Model(user).
-		Select("email", "status", "password_hash", "oauth_provider", "oauth_id").
+		Select("name", "email", "role",
+			"password_hash", "is_active", "office_id", "oauth_provider", "oauth_id").
 		Updates(user).Error; err != nil {
 		return apperrors.ErrDBOperation(err)
 	}
