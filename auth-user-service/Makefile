@@ -22,7 +22,7 @@ confirm:
 ## run/api: run the cmd/api application
 .PHONY: run/server
 run/server:
-	go run ./cmd/server/main.go
+	go run ./cmd/server/
 
 ## db/psql: connect to the database using psql
 .PHONY: db/psql
