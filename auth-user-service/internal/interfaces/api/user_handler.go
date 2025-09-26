@@ -44,7 +44,7 @@ func (h userHandler) Create(c *gin.Context) {
 
 	h.log.Info("creating user", "email", req.Email)
 
-	params := &services.UserCreateParams{
+	params := &services.UserCreateCommand{
 		Name:     req.Name,
 		Email:    req.Email,
 		Role:     req.Role,
@@ -74,14 +74,14 @@ func (h userHandler) Update(c *gin.Context) {
 
 	h.log.Info("updating user", "email", req.Email)
 
-	params := &services.UserUpdateParams{
+	cmd := &services.UserUpdateCommand{
 		Name:     req.Name,
 		Email:    req.Email,
 		Role:     req.Role,
 		IsActive: req.IsActive,
 		OfficeID: req.OfficeID,
 	}
-	err := h.userService.Update(ctx, params)
+	err := h.userService.Update(ctx, req.ID, cmd)
 	if err != nil {
 		handleError(h.log, c, err, "user update failed")
 		return

@@ -7,7 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type healthHandler struct {
+type HealthHandler struct {
 	DB *database.Database
 }
 
@@ -15,7 +15,7 @@ func NewRouter(db *database.Database, authHandler AuthHandler, oauthHandler OAut
 	officeHandler OfficeHandler, userHandler UserHandler) *gin.Engine {
 	router := gin.New()
 	router.Use(gin.Recovery(), gin.Logger())
-	healthHandler := healthHandler{DB: db}
+	healthHandler := HealthHandler{DB: db}
 
 	router.GET("/health", healthHandler.Check)
 
@@ -34,7 +34,8 @@ func NewRouter(db *database.Database, authHandler AuthHandler, oauthHandler OAut
 	{
 		users.POST("/", userHandler.Create)
 		users.GET("/", userHandler.GetAll)
-		users.POST("/:id", userHandler.GetByID)
+		users.GET("/:id", userHandler.GetByID)
+		users.PATCH("/:id", userHandler.Update)
 		users.DELETE("/:id", userHandler.Delete)
 	}
 
@@ -43,16 +44,14 @@ func NewRouter(db *database.Database, authHandler AuthHandler, oauthHandler OAut
 		office.POST("/", officeHandler.Create)
 		office.GET("/", officeHandler.GetAll)
 		office.GET("/:id", officeHandler.GetById)
-		office.PUT("/:id", officeHandler.Update)
-		office.PUT("/:id/activate", officeHandler.Active)
-		office.PUT("/:id/deactivate", officeHandler.Inactive)
+		office.PATCH("/:id", officeHandler.Update)
 		office.DELETE("/:id", officeHandler.Delete)
 	}
 
 	return router
 }
 
-func (h *healthHandler) Check(c *gin.Context) {
+func (h *HealthHandler) Check(c *gin.Context) {
 	err := h.DB.Ping()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
