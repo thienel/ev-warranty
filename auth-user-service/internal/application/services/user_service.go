@@ -11,7 +11,7 @@ import (
 	"github.com/google/uuid"
 )
 
-type UserCreateParams struct {
+type UserCreateCommand struct {
 	Name     string
 	Email    string
 	Role     string
@@ -20,20 +20,19 @@ type UserCreateParams struct {
 	OfficeID uuid.UUID
 }
 
-type UserUpdateParams struct {
-	Id       uuid.UUID
-	Name     string
-	Email    string
-	Role     string
-	IsActive bool
-	OfficeID uuid.UUID
+type UserUpdateCommand struct {
+	Name     *string
+	Email    *string
+	Role     *string
+	IsActive *bool
+	OfficeID *uuid.UUID
 }
 
 type UserService interface {
-	Create(ctx context.Context, params *UserCreateParams) (*entities.User, error)
+	Create(ctx context.Context, cmd *UserCreateCommand) (*entities.User, error)
 	GetByID(ctx context.Context, id uuid.UUID) (*entities.User, error)
 	GetAll(ctx context.Context) ([]*entities.User, error)
-	Update(ctx context.Context, params *UserUpdateParams) error
+	Update(ctx context.Context, id uuid.UUID, cmd *UserUpdateCommand) error
 	Delete(ctx context.Context, id uuid.UUID) error
 }
 
@@ -46,36 +45,25 @@ func NewUserService(userRepo repositories.UserRepository, officeService OfficeSe
 	return &userService{userRepo, officeService}
 }
 
-func (s *userService) Create(ctx context.Context, params *UserCreateParams) (
-	*entities.User, error) {
-
-	name := params.Name
-	email := params.Email
-	role := params.Role
-	password := params.Password
-	isActive := params.IsActive
-	officeID := params.OfficeID
-
-	email = strings.TrimSpace(email)
-	if !entities.IsValidEmail(email) {
+func (s *userService) Create(ctx context.Context, cmd *UserCreateCommand) (*entities.User, error) {
+	if !entities.IsValidEmail(cmd.Email) {
 		return nil, apperrors.ErrInvalidCredentials("invalid email")
 	}
-	if !entities.IsValidPassword(password) {
+	if !entities.IsValidPassword(cmd.Password) {
 		return nil, apperrors.ErrInvalidCredentials("invalid password")
 	}
-	if !entities.IsValidUserRole(role) {
+	if !entities.IsValidUserRole(cmd.Role) {
 		return nil, apperrors.ErrInvalidCredentials("invalid role")
 	}
-	if _, err := s.officeService.GetByID(ctx, officeID); err != nil {
+	if _, err := s.officeService.GetByID(ctx, cmd.OfficeID); err != nil {
 		return nil, err
 	}
-	passwordHash, err := security.HashPassword(password)
+	passwordHash, err := security.HashPassword(cmd.Password)
 	if err != nil {
 		return nil, apperrors.ErrHashPassword(err)
 	}
 
-	name = strings.TrimSpace(name)
-	user := entities.NewUser(name, email, role, passwordHash, isActive, &officeID)
+	user := entities.NewUser(cmd.Name, cmd.Email, cmd.Role, passwordHash, cmd.IsActive, cmd.OfficeID)
 
 	if err = s.userRepo.Create(ctx, user); err != nil {
 		return nil, err
@@ -97,35 +85,45 @@ func (s *userService) GetAll(ctx context.Context) ([]*entities.User, error) {
 	return users, nil
 }
 
-func (s *userService) Update(ctx context.Context, params *UserUpdateParams) error {
-	user, err := s.userRepo.FindByID(ctx, params.Id)
+func (s *userService) Update(ctx context.Context, id uuid.UUID, cmd *UserUpdateCommand) error {
+	user, err := s.userRepo.FindByID(ctx, id)
 	if err != nil {
 		return err
 	}
 
-	name := params.Name
-	email := params.Email
-	role := params.Role
-	isActive := params.IsActive
-	officeID := params.OfficeID
-	if user, _ := s.userRepo.FindByEmail(ctx, email); user != nil {
-		return apperrors.ErrInvalidCredentials("invalid email")
-	}
-	if !entities.IsValidEmail(email) {
-		return apperrors.ErrInvalidCredentials("invalid email")
-	}
-	if !entities.IsValidUserRole(role) {
-		return apperrors.ErrInvalidCredentials("invalid role")
-	}
-	if office, err := s.officeService.GetByID(ctx, officeID); err != nil || office == nil {
-		return err
+	if cmd.Name != nil {
+		user.Name = strings.TrimSpace(*cmd.Name)
 	}
 
-	user.Name = name
-	user.Email = email
-	user.Role = role
-	user.IsActive = isActive
-	user.OfficeID = &officeID
+	if cmd.Email != nil {
+		*cmd.Email = strings.TrimSpace(*cmd.Email)
+		if !entities.IsValidEmail(*cmd.Email) {
+			return apperrors.ErrInvalidCredentials("invalid email")
+		}
+		if user, _ := s.userRepo.FindByEmail(ctx, *cmd.Email); user != nil {
+			return apperrors.ErrInvalidCredentials("email already exists")
+		}
+		user.Email = *cmd.Email
+	}
+
+	if cmd.Role != nil {
+		*cmd.Role = strings.TrimSpace(*cmd.Role)
+		if !entities.IsValidUserRole(*cmd.Role) {
+			return apperrors.ErrInvalidCredentials("invalid role")
+		}
+		user.Role = *cmd.Role
+	}
+
+	if cmd.IsActive != nil {
+		user.IsActive = *cmd.IsActive
+	}
+
+	if cmd.OfficeID != nil {
+		if office, err := s.officeService.GetByID(ctx, *cmd.OfficeID); err != nil || office == nil {
+			return err
+		}
+		user.OfficeID = *cmd.OfficeID
+	}
 
 	return s.userRepo.Update(ctx, user)
 }
