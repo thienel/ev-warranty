@@ -17,21 +17,21 @@ type CreateUserRequest struct {
 }
 
 type UpdateUserRequest struct {
+	ID       uuid.UUID  `json:"id" binding:"required"`
+	Name     *string    `json:"name"`
+	Email    *string    `json:"email" binding:"email,max=100"`
+	Role     *string    `json:"role" binding:"max=20"`
+	IsActive *bool      `json:"is_active"`
+	OfficeID *uuid.UUID `json:"office_id"`
+}
+
+type UserDTO struct {
 	ID       uuid.UUID `json:"id" binding:"required"`
 	Name     string    `json:"name" binding:"required"`
 	Email    string    `json:"email" binding:"required,email,max=100"`
 	Role     string    `json:"role" binding:"required,max=20"`
 	IsActive bool      `json:"is_active" binding:"required"`
 	OfficeID uuid.UUID `json:"office_id" binding:"required"`
-}
-
-type UserDTO struct {
-	ID       uuid.UUID  `json:"id" binding:"required"`
-	Name     string     `json:"name" binding:"required"`
-	Email    string     `json:"email" binding:"required,email,max=100"`
-	Role     string     `json:"role" binding:"required,max=20"`
-	IsActive bool       `json:"is_active" binding:"required"`
-	OfficeID *uuid.UUID `json:"office_id" binding:"required"`
 }
 
 func GenerateUserDTO(user entities.User) *UserDTO {
