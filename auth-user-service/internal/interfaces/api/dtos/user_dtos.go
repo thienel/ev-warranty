@@ -26,12 +26,12 @@ type UpdateUserRequest struct {
 }
 
 type UserDTO struct {
-	ID       uuid.UUID `json:"id" binding:"required"`
-	Name     string    `json:"name" binding:"required"`
-	Email    string    `json:"email" binding:"required,email,max=100"`
-	Role     string    `json:"role" binding:"required,max=20"`
-	IsActive bool      `json:"is_active" binding:"required"`
-	OfficeID uuid.UUID `json:"office_id" binding:"required"`
+	ID       uuid.UUID  `json:"id" binding:"required"`
+	Name     string     `json:"name" binding:"required"`
+	Email    string     `json:"email" binding:"required,email,max=100"`
+	Role     string     `json:"role" binding:"required,max=20"`
+	IsActive bool       `json:"is_active" binding:"required"`
+	OfficeID *uuid.UUID `json:"office_id" binding:"required"`
 }
 
 func GenerateUserDTO(user entities.User) *UserDTO {

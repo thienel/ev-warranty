@@ -75,7 +75,7 @@ func (s *userService) Create(ctx context.Context, params *UserCreateParams) (
 	}
 
 	name = strings.TrimSpace(name)
-	user := entities.NewUser(name, email, role, passwordHash, isActive, officeID)
+	user := entities.NewUser(name, email, role, passwordHash, isActive, &officeID)
 
 	if err = s.userRepo.Create(ctx, user); err != nil {
 		return nil, err
@@ -125,7 +125,7 @@ func (s *userService) Update(ctx context.Context, params *UserUpdateParams) erro
 	user.Email = email
 	user.Role = role
 	user.IsActive = isActive
-	user.OfficeID = officeID
+	user.OfficeID = &officeID
 
 	return s.userRepo.Update(ctx, user)
 }

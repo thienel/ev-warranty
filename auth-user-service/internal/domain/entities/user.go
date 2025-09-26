@@ -23,8 +23,8 @@ type User struct {
 	Role          string         `gorm:"not null;size:20"`
 	PasswordHash  string         `gorm:"not null;size:255"`
 	IsActive      bool           `gorm:"not null;default:true"`
-	OfficeID      uuid.UUID      `gorm:"not null;type:uuid"`
-	Office        Office         `gorm:"foreignKey:OfficeID;references:ID"`
+	OfficeID      *uuid.UUID     `gorm:"type:uuid"`
+	Office        *Office        `gorm:"foreignKey:OfficeID;references:ID"`
 	CreatedAt     time.Time      `gorm:"autoCreateTime"`
 	UpdatedAt     time.Time      `gorm:"autoUpdateTime"`
 	DeletedAt     gorm.DeletedAt `gorm:"index"`
@@ -41,7 +41,7 @@ func IsValidUserRole(userRole string) bool {
 	}
 }
 
-func NewUser(name, email, role, passwordHash string, isActive bool, officeID uuid.UUID) *User {
+func NewUser(name, email, role, passwordHash string, isActive bool, officeID *uuid.UUID) *User {
 	return &User{
 		ID:           uuid.New(),
 		Name:         name,

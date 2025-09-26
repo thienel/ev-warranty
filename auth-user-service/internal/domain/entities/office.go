@@ -13,7 +13,7 @@ const (
 )
 
 type Office struct {
-	Id         uuid.UUID       `gorm:"primaryKey;type:uuid;default:uuid_generate_v4()"`
+	ID         uuid.UUID       `gorm:"primaryKey;type:uuid;default:uuid_generate_v4()"`
 	OfficeName string          `gorm:"not null;"`
 	OfficeType string          `gorm:"not null;size:10"`
 	Address    string          `gorm:"not null"`
@@ -25,7 +25,7 @@ type Office struct {
 
 func NewOffice(officeName string, officeType string, address string, isActive bool) *Office {
 	return &Office{
-		Id:         uuid.New(),
+		ID:         uuid.New(),
 		OfficeName: officeName,
 		OfficeType: officeType,
 		Address:    address,
