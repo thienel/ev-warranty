@@ -9,6 +9,10 @@ import {
   ThunderboltOutlined,
 } from '@ant-design/icons'
 import './Login.less'
+import { useDispatch } from 'react-redux'
+import { API_ENDPOINTS } from '@constants'
+import api from '@services/api.js'
+import { loginSuccess } from '@redux/authSlice.js'
 
 const { Title } = Typography
 
@@ -17,16 +21,23 @@ const Login = ({ onLoginSuccess }) => {
   const [loading, setLoading] = useState(false)
   const [googleLoading, setGoogleLoading] = useState(false)
 
+  const dispatch = useDispatch()
+
   const onFinish = async (values) => {
     setLoading(true)
     try {
-      console.log('Login values:', values)
-      await new Promise((resolve) => setTimeout(resolve, 1000))
+      const res = await api.post(API_ENDPOINTS.AUTH.LOGIN, values)
+      const { refresh_token, access_token, user } = res.data.data
+
+      dispatch(loginSuccess({ user, token: access_token }))
+      sessionStorage.setItem('refreshToken', refresh_token)
+
       message.success('Login successful!')
       if (onLoginSuccess) {
         onLoginSuccess(values)
       }
-    } catch {
+    } catch (error) {
+      console.error(error)
       message.error('Login failed. Please check your credentials.')
     } finally {
       setLoading(false)
