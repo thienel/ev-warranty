@@ -1,9 +1,7 @@
+import AppLayout from '@components/common/Layout/index.jsx'
 
 function App() {
-  return (
-    <>
-    </>
-  )
+  return <AppLayout></AppLayout>
 }
 
 export default App

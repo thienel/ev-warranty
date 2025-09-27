@@ -1,8 +1,11 @@
-import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
+import App from '@/App.jsx'
+import { ConfigProvider } from 'antd'
+import antdTheme from '@styles/antdTheme'
+import '@styles/reset.css'
 
 createRoot(document.getElementById('root')).render(
-  <StrictMode>
+  <ConfigProvider theme={antdTheme}>
     <App />
-  </StrictMode>,
+  </ConfigProvider>
 )
