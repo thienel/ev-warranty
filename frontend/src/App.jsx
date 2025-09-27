@@ -1,17 +1,28 @@
 import React from 'react'
-import { useRoutes } from 'react-router-dom'
+import { Navigate, Outlet, useRoutes } from 'react-router-dom'
 import Home from '@pages/Home.jsx'
 import Login from '@components/Login'
+import { useSelector } from 'react-redux'
+
+export const ProtectedRoute = () => {
+  const isAuthenticated = useSelector((state) => state.auth.isAuthenticated)
+  return isAuthenticated ? <Outlet /> : <Navigate to="/login" replace />
+}
+
+export const PublicRoute = () => {
+  const isAuthenticated = useSelector((state) => state.auth.isAuthenticated)
+  return !isAuthenticated ? <Outlet /> : <Navigate to="/" replace />
+}
 
 const App = () => {
   const routes = [
     {
-      path: '/',
-      element: <Home />,
+      element: <ProtectedRoute />,
+      children: [{ path: '/', element: <Home /> }],
     },
     {
-      path: '/login',
-      element: <Login />,
+      element: <PublicRoute />,
+      children: [{ path: '/login', element: <Login /> }],
     },
   ]
 
