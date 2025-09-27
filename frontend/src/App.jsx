@@ -1,8 +1,21 @@
-import AppLayout from '@components/common/Layout/index.jsx'
-import Login from '@components/common/Login/Login.jsx'
+import React from 'react'
+import { useRoutes } from 'react-router-dom'
+import Home from '@pages/Home.jsx'
+import Login from '@components/Login'
 
-function App() {
-  return <AppLayout></AppLayout>
+const App = () => {
+  const routes = [
+    {
+      path: '/',
+      element: <Home />,
+    },
+    {
+      path: '/login',
+      element: <Login />,
+    },
+  ]
+
+  return useRoutes(routes)
 }
 
 export default App
