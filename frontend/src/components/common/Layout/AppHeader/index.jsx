@@ -46,9 +46,14 @@ const AppHeader = ({ collapsed, onToggleCollapse }) => {
 
       <div className="header-right">
         <Space className="header-actions">
-          <Button type="text" icon={<SettingOutlined />} />
-          <Button type="text" onClick={handleLogout} icon={<LogoutOutlined />} />
-          <Avatar className="ant-avatar">
+          <Button className="action-button" type="text" icon={<SettingOutlined />} />
+          <Button
+            type="text"
+            className="action-button"
+            onClick={handleLogout}
+            icon={<LogoutOutlined />}
+          />
+          <Avatar className="user-avatar">
             <UserOutlined />
           </Avatar>
         </Space>
