@@ -1,0 +1,63 @@
+@import './variables.less';
+
+// Ant Design Component Overrides
+.ant-layout-sider {
+  .ant-layout-sider-trigger {
+    display: none !important; // We use custom toggle button
+  }
+}
+
+.ant-menu-dark {
+  .ant-menu-item {
+    &:hover {
+      color: white !important;
+    }
+
+    &.ant-menu-item-selected {
+      background-color: rgba(255, 255, 255, 0.15) !important;
+
+      .anticon {
+        color: white !important;
+      }
+    }
+  }
+}
+
+.ant-layout-header {
+  line-height: @layout-header-height;
+}
+
+// Custom animations
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.logo-section {
+  animation: slideInLeft 0.6s ease-out;
+}
+
+.content-header {
+  animation: fadeInUp 0.8s ease-out;
+}
+
+.demo-content {
+  animation: fadeInUp 1s ease-out;
+}
