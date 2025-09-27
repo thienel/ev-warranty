@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { Layout } from 'antd'
 import Sidebar from './Sidebar/index.jsx'
 import AppHeader from './AppHeader/index.jsx'
-import AppContent from '@components/common/Layout/AppContent/index.jsx'
+import AppContent from './AppContent/index.jsx'
 import './Layout.less'
 
 const AppLayout = ({ children }) => {
