@@ -3,7 +3,7 @@ import { Layout } from 'antd'
 import Sidebar from './Sidebar/index.jsx'
 import AppHeader from './AppHeader/index.jsx'
 import AppContent from '@components/common/Layout/AppContent/index.jsx'
-import './layout.less'
+import './Layout.less'
 
 const AppLayout = ({ children }) => {
   const [collapsed, setCollapsed] = useState(false)
