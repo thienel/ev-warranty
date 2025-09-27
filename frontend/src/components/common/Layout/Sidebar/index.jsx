@@ -6,8 +6,8 @@ import {
   VideoCameraOutlined,
   UploadOutlined,
   SettingOutlined,
+  ThunderboltFilled,
 } from '@ant-design/icons'
-import Logo from '@components/common/Layout/Logo/index.jsx'
 import './Sidebar.less'
 
 const { Sider } = Layout
@@ -40,7 +40,12 @@ const Sidebar = ({ collapsed }) => {
       collapsedWidth={80}
       className="sidebar"
     >
-      <Logo collapsed={collapsed} />
+      <div className="sidebar-header">
+        <ThunderboltFilled />
+        <div className={`sidebar-title ${collapsed ? 'collapsed' : 'expanded'}`}>
+          EV Warranty System
+        </div>
+      </div>
       <Menu theme="dark" mode="inline" defaultSelectedKeys={['1']} items={menuItems} />
     </Sider>
   )
