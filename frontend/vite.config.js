@@ -19,6 +19,13 @@ export default defineConfig({
       '@redux': path.resolve(__dirname, './src/redux'),
     },
   },
+  css: {
+    preprocessorOptions: {
+      less: {
+        javascriptEnabled: true,
+      },
+    },
+  },
   server: {
     port: 3000,
     open: true,
