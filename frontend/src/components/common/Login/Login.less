@@ -1,0 +1,154 @@
+@import '@styles/variables.less';
+
+.login-container {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: @primary-bg;
+  padding: 20px;
+}
+
+.login-card {
+  width: 100%;
+  max-width: 420px;
+  padding: 24px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  border-radius: 12px;
+  background: #ffffff;
+
+  .ant-card-body {
+    padding: 0;
+  }
+}
+
+.login-header {
+  text-align: center;
+  margin-bottom: 32px;
+
+  .login-title {
+    color: @primary-text;
+    margin-bottom: 8px !important;
+    font-weight: 600;
+  }
+
+  .login-subtitle {
+    font-size: 16px;
+    color: #8c8c8c;
+  }
+}
+
+.login-form {
+  .ant-form-item-label {
+    padding-bottom: 4px;
+
+    > label {
+      font-weight: 500;
+      color: @primary-text;
+    }
+  }
+}
+
+.login-input {
+  border-radius: 8px;
+  border: 1px solid #d9d9d9;
+  transition: all 0.3s ease;
+
+  &:hover {
+    border-color: @primary-hover;
+  }
+
+  &:focus,
+  &.ant-input-focused {
+    border-color: @primary-color;
+    box-shadow: 0 0 0 2px fadeout(@primary-color, 80%);
+  }
+
+  .input-icon {
+    color: #8c8c8c;
+  }
+}
+
+.login-options {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+
+  .ant-checkbox-wrapper {
+    color: @primary-text;
+
+    .ant-checkbox-checked .ant-checkbox-inner {
+      background-color: @primary-color;
+      border-color: @primary-color;
+    }
+
+    &:hover .ant-checkbox-inner {
+      border-color: @primary-hover;
+    }
+  }
+
+  .forgot-password {
+    color: @primary-color;
+    padding: 0;
+
+    &:hover {
+      color: @primary-hover;
+    }
+  }
+}
+
+.login-button {
+  height: 48px;
+  border-radius: 8px;
+  background-color: @primary-color;
+  border-color: @primary-color;
+  font-weight: 500;
+  font-size: 16px;
+  margin-bottom: 24px;
+
+  &:hover,
+  &:focus {
+    background-color: @primary-hover;
+    border-color: @primary-hover;
+  }
+
+  &:active {
+    background-color: @primary-active;
+    border-color: @primary-active;
+  }
+}
+
+.login-divider {
+  margin: 24px 0;
+
+  .ant-divider-inner-text {
+    color: #8c8c8c;
+    font-size: 14px;
+  }
+}
+
+.google-login-button {
+  height: 48px;
+  border-radius: 8px;
+  border: 1px solid #dadce0;
+  background-color: #ffffff;
+  color: #3c4043;
+  font-weight: 500;
+  font-size: 16px;
+  margin-bottom: 24px;
+  transition: all 0.3s ease;
+
+  &:hover,
+  &:focus {
+    border-color: #dadce0;
+    background-color: #f8f9fa;
+    color: #3c4043;
+    box-shadow: 0 1px 3px rgba(60, 64, 67, 0.12);
+  }
+
+  .anticon {
+    color: #4285f4;
+    font-size: 18px;
+  }
+}
