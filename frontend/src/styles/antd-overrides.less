@@ -1,9 +1,8 @@
 @import './variables.less';
 
-// Ant Design Component Overrides
 .ant-layout-sider {
   .ant-layout-sider-trigger {
-    display: none !important; // We use custom toggle button
+    display: none !important;
   }
 }
 
@@ -27,7 +26,6 @@
   line-height: @layout-header-height;
 }
 
-// Custom animations
 @keyframes slideInLeft {
   from {
     opacity: 0;
@@ -48,16 +46,4 @@
     opacity: 1;
     transform: translateY(0);
   }
-}
-
-.logo-section {
-  animation: slideInLeft 0.6s ease-out;
-}
-
-.content-header {
-  animation: fadeInUp 0.8s ease-out;
-}
-
-.demo-content {
-  animation: fadeInUp 1s ease-out;
 }

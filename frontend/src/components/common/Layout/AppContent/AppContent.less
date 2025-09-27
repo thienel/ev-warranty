@@ -1,0 +1,58 @@
+@import '@styles/variables';
+@import '@styles/antd-overrides';
+
+.app-content {
+  margin: @layout-padding;
+  border-radius: @border-radius-lg;
+  overflow: auto;
+  position: relative;
+
+  .ant-layout-content {
+    padding: @layout-padding;
+    background: white;
+    border-radius: @border-radius-lg;
+    box-shadow: @box-shadow-medium;
+    min-height: calc(100vh - 112px);
+
+    .content-header {
+      margin-bottom: @layout-padding;
+
+      .content-title {
+        font-size: @font-size-xl;
+        font-weight: @font-weight-semibold;
+        margin: 0;
+      }
+    }
+
+    .demo-content {
+      height: 400px;
+      border-radius: @border-radius-lg;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px dashed fade(@primary-color, 40%);
+      background: linear-gradient(135deg, fade(@primary-color, 20%), fade(@primary-color, 10%));
+      transition: @transition-base;
+
+      &:hover {
+        border-color: fade(@primary-color, 60%);
+        background: linear-gradient(135deg, fade(@primary-color, 30%), fade(@primary-color, 15%));
+      }
+
+      .demo-text {
+        color: rgba(0, 0, 0, 0.65);
+        font-size: 16px;
+      }
+    }
+  }
+}
+
+.content-header {
+  animation: fadeInUp 0.8s ease-out;
+}
+
+.content-header {
+  animation: fadeInUp 0.8s ease-out;
+}
+
+

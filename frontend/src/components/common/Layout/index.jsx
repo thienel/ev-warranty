@@ -1,9 +1,9 @@
 import React, { useState } from 'react'
 import { Layout } from 'antd'
-import Sidebar from './Sidebar'
-import AppHeader from './AppHeader'
-import AppContent from './AppContent'
-import '@styles/main.less'
+import Sidebar from './Sidebar/index.jsx'
+import AppHeader from './AppHeader/index.jsx'
+import AppContent from '@components/common/Layout/AppContent/index.jsx'
+import './layout.less'
 
 const AppLayout = ({ children }) => {
   const [collapsed, setCollapsed] = useState(false)

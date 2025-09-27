@@ -5,12 +5,14 @@ import {
   MenuUnfoldOutlined,
   SettingOutlined,
   LogoutOutlined,
+  UserOutlined,
 } from '@ant-design/icons'
+import './AppHeader.less'
 
 const { Header } = Layout
 const { Text } = Typography
 
-const AppHeader = ({ collapsed, onToggleCollapse }) => {
+const Index = ({ collapsed, onToggleCollapse }) => {
   return (
     <Header className="app-header">
       <div className="header-left">
@@ -21,21 +23,20 @@ const AppHeader = ({ collapsed, onToggleCollapse }) => {
           className="toggle-button"
         />
 
-        <div className="header-title">
-          <Text className="title">Dashboard</Text>
-          <Text className="subtitle">Welcome back, manage your application</Text>
-        </div>
+        <Text className="header-title">Dashboard</Text>
       </div>
 
       <div className="header-right">
         <Space className="header-actions">
           <Button type="text" icon={<SettingOutlined />} />
           <Button type="text" icon={<LogoutOutlined />} />
-          <Avatar>JD</Avatar>
+          <Avatar className="ant-avatar">
+            <UserOutlined />
+          </Avatar>
         </Space>
       </div>
     </Header>
   )
 }
 
-export default AppHeader
+export default Index

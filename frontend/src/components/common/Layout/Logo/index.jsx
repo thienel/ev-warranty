@@ -1,9 +1,10 @@
 import React from 'react'
 import { Typography } from 'antd'
+import './Logo.less'
 
 const { Text } = Typography
 
-const Logo = ({ collapsed }) => {
+const Index = ({ collapsed }) => {
   return (
     <div className={`logo-section ${collapsed ? 'collapsed' : ''}`}>
       <div className="logo-icon">A</div>
@@ -12,4 +13,4 @@ const Logo = ({ collapsed }) => {
   )
 }
 
-export default Logo
+export default Index

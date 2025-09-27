@@ -1,0 +1,45 @@
+@import '@styles/variables.less';
+
+.sidebar {
+  box-shadow: @box-shadow-heavy;
+  position: relative;
+  z-index: 10;
+  background: @sidebar-bg;
+
+  .ant-layout-sider-children {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+
+  .ant-menu {
+    background-color: transparent !important;
+    border: none !important;
+    padding: 16px 8px;
+    flex: 1;
+
+    .ant-menu-item {
+      margin: 4px 0;
+      border-radius: @border-radius-base;
+      transition: @transition-base;
+
+      &:hover {
+        background: rgba(255, 255, 255, 0.1) !important;
+        transform: translateX(4px);
+      }
+
+      &.ant-menu-item-selected {
+        background: rgba(255, 255, 255, 0.15) !important;
+        color: white !important;
+
+        &::after {
+          display: none;
+        }
+      }
+
+      .ant-menu-item-icon {
+        font-size: 16px;
+      }
+    }
+  }
+}

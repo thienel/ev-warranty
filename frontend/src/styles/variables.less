@@ -1,94 +1,79 @@
-// LESS Variables based on antdTheme.js
-// === MÀUS CHÍNH ===
-@primary-color: #697565; // Sage Green - màu chính
-@primary-hover: #5a6358; // Hover đậm hơn một chút
-@primary-active: #4d5549; // Active đậm hơn
-@primary-bg: #f5f7f3; // Background rất nhạt của primary
-@primary-bg-hover: #eef2ea; // Hover background nhạt
-@primary-border: #b8c4b3; // Border nhạt hơn
-@primary-border-hover: #9fb09a; // Hover border
-@primary-text: #697565; // Text primary
-@primary-text-hover: #5a6358; // Hover text primary
-@primary-text-active: #4d5549; // Active text primary
+@primary-color: #697565;
+@primary-hover: #5a6358;
+@primary-active: #4d5549;
+@primary-bg: #f5f7f3;
+@primary-bg-hover: #eef2ea;
+@primary-border: #b8c4b3;
+@primary-border-hover: #9fb09a;
+@primary-text: #697565;
+@primary-text-hover: #5a6358;
+@primary-text-active: #4d5549;
 
-// === MÀUS THÀNH CÔNG ===
-@success-color: #4CAF50; // Xanh lá tự nhiên
+@success-color: #4CAF50;
 @success-bg: #f3f8f3;
 @success-border: #c8e6c9;
 
-// === MÀUS CẢNH BÁO ===
-@warning-color: #FF9800; // Cam ấm
+@warning-color: #FF9800;
 @warning-bg: #fff8f0;
 @warning-border: #ffcc80;
 
-// === MÀUS LỖI ===
-@error-color: #F44336; // Đỏ mềm mại hơn
+@error-color: #F44336;
 @error-bg: #fdf2f2;
 @error-border: #ffcdd2;
 
-// === MÀUS THÔNG TIN ===
-@info-color: #2196F3; // Xanh dương nhẹ nhàng
+@info-color: #2196F3;
 @info-bg: #f3f8ff;
 @info-border: #bbdefb;
 
-// === MÀUS NỀN ===
-@bg-base: #fafafa; // Background trắng xám nhẹ
-@bg-container: #ffffff; // Background container trắng tinh
-@bg-elevated: #ffffff; // Background elevated
-@bg-layout: #f5f5f5; // Background layout xám rất nhạt
-@bg-spotlight: #ffffff; // Background spotlight
-@bg-mask: rgba(60, 61, 55, 0.45); // Mask overlay từ charcoal
+@bg-base: #fafafa;
+@bg-container: #ffffff;
+@bg-elevated: #ffffff;
+@bg-layout: #f5f5f5;
+@bg-spotlight: #ffffff;
+@bg-mask: rgba(60, 61, 55, 0.45);
 
-// === MÀUS TEXT ===
-@text-color: #2c2d2a; // Text chính đậm hơn một chút từ charcoal
-@text-secondary: #5c6659; // Text phụ từ sage green đậm hơn
-@text-tertiary: #8b9788; // Text tertiary
-@text-quaternary: #bbc5b8; // Text quaternary
-@text-description: #6b7866; // Text mô tả
-@text-heading: #181c14; // Text heading giữ dark forest
-@text-label: #3c3d37; // Text label từ charcoal
-@text-placeholder: #a8b5a5; // Placeholder text
-@text-disabled: #d1dace; // Text disabled
+@text-color: #2c2d2a;
+@text-secondary: #5c6659;
+@text-tertiary: #8b9788;
+@text-quaternary: #bbc5b8;
+@text-description: #6b7866;
+@text-heading: #181c14;
+@text-label: #3c3d37;
+@text-placeholder: #a8b5a5;
+@text-disabled: #d1dace;
 
-// === MÀUS BORDER ===
-@border-color: #e0e6dd; // Border chính nhạt hơn
-@border-secondary: #eef2ea; // Border phụ rất nhạt
-@border-bg: #f5f7f3; // Border background
+@border-color: #e0e6dd;
+@border-secondary: #eef2ea;
+@border-bg: #f5f7f3;
 
-// === MÀUS FILL ===
-@fill-color: #f8faf7; // Fill nhạt nhất
-@fill-secondary: #f0f4ed; // Fill nhạt
-@fill-tertiary: #e8ede4; // Fill trung bình
-@fill-quaternary: #dfe6db; // Fill đậm nhất
+@fill-color: #f8faf7;
+@fill-secondary: #f0f4ed;
+@fill-tertiary: #e8ede4;
+@fill-quaternary: #dfe6db;
 
-// Layout Colors
 @sidebar-bg: linear-gradient(180deg, #181C14 0%, #1a1f16 100%);
 @header-bg: @bg-container;
 @content-bg: @bg-layout;
 
-// === KÍCH THƯỚC ===
-@border-radius-base: 8px; // Border radius tăng lên cho modern hơn
-@border-radius-lg: 12px; // Border radius lớn
-@border-radius-sm: 6px; // Border radius nhỏ
-@border-radius-xs: 4px; // Border radius rất nhỏ
+@border-radius-base: 8px;
+@border-radius-lg: 12px;
+@border-radius-sm: 6px;
+@border-radius-xs: 4px;
 
-// Spacing
 @layout-header-height: 64px;
 @sidebar-width: 260px;
 @sidebar-collapsed-width: 80px;
 @layout-padding: 24px;
-@padding-lg: 24px; // Padding lớn
-@padding-base: 16px; // Padding cơ bản
-@padding-sm: 12px; // Padding nhỏ
-@padding-xs: 8px; // Padding rất nhỏ
-@padding-xxs: 4px; // Padding cực nhỏ
+@padding-lg: 24px;
+@padding-base: 16px;
+@padding-sm: 12px;
+@padding-xs: 8px;
+@padding-xxs: 4px;
 
-// Shadows
 @box-shadow-light: 0 2px 8px 0 rgba(60, 61, 55, 0.06), 0 1px 4px -1px rgba(60, 61, 55, 0.04), 0 4px 8px 0 rgba(60, 61, 55, 0.04);
 @box-shadow-medium: 0 8px 24px 0 rgba(60, 61, 55, 0.12), 0 4px 8px -4px rgba(60, 61, 55, 0.16), 0 12px 32px 8px rgba(60, 61, 55, 0.08);
 @box-shadow-heavy: 2px 0 8px rgba(60, 61, 55, 0.15);
 
-// Typography
 @font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif;
 @font-size-sm: 12px;
 @font-size-base: 14px;
@@ -102,14 +87,12 @@
 @font-weight-medium: 500;
 @font-weight-semibold: 600;
 
-// Control Heights
-@control-height-base: 36px; // Tăng chiều cao cho dễ tương tác hơn
-@control-height-lg: 44px; // Chiều cao control lớn
-@control-height-sm: 28px; // Chiều cao control nhỏ
+@control-height-base: 36px;
+@control-height-lg: 44px;
+@control-height-sm: 28px;
 
-// Transitions
-@motion-duration-fast: 0.15s; // Animation tăng lên một chút
-@motion-duration-mid: 0.25s; // Animation trung bình
-@motion-duration-slow: 0.35s; // Animation chậm
+@motion-duration-fast: 0.15s;
+@motion-duration-mid: 0.25s;
+@motion-duration-slow: 0.35s;
 @transition-base: all @motion-duration-mid ease;
 @transition-fast: all @motion-duration-fast ease;

@@ -1,0 +1,68 @@
+@import '@styles/variables.less';
+
+.app-header {
+  padding: 0 @layout-padding;
+  background: @header-bg;
+  border-bottom: 1px solid #f0f0f0;
+  box-shadow: @box-shadow-light;
+  z-index: 9;
+  display: flex;
+  justify-content: space-between;
+  align-content: center;
+
+  .header-left {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    .toggle-button {
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: @border-radius-base;
+      transition: @transition-base;
+
+      &:hover {
+        background: rgba(0, 0, 0, 0.04);
+        transform: scale(1.1);
+      }
+    }
+
+    .header-title {
+      margin-left: 16px;
+
+      font-size: @font-size-lg;
+      font-weight: @font-weight-semibold;
+    }
+  }
+
+  .header-right {
+    .header-actions {
+      .ant-btn {
+        border: none;
+        box-shadow: none;
+        margin: 0 4px;
+        border-radius: @border-radius-base;
+        transition: @transition-base;
+
+        &:hover {
+          background: rgba(0, 0, 0, 0.04);
+          transform: translateY(-1px);
+        }
+      }
+
+      .ant-avatar {
+        margin-left: 8px;
+        cursor: pointer;
+        transition: @transition-base;
+        background-color: #1a1f16;
+        color: #a8b5a5;
+
+        &:hover {
+          transform: scale(1.1);
+        }
+      }
+    }
+  }
+}

@@ -7,8 +7,8 @@ import {
   UploadOutlined,
   SettingOutlined,
 } from '@ant-design/icons'
-import Logo from './Logo'
-import UserProfile from './UserProfile'
+import Logo from '@components/common/Layout/Logo/index.jsx'
+import './Sidebar.less'
 
 const { Sider } = Layout
 
@@ -41,10 +41,7 @@ const Sidebar = ({ collapsed }) => {
       className="sidebar"
     >
       <Logo collapsed={collapsed} />
-
       <Menu theme="dark" mode="inline" defaultSelectedKeys={['1']} items={menuItems} />
-
-      <UserProfile collapsed={collapsed} />
     </Sider>
   )
 }
