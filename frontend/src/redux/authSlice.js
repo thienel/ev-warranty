@@ -1,4 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit'
+import { PURGE } from 'redux-persist'
 
 const initialState = {
   user: null,
@@ -19,10 +20,14 @@ const authSlice = createSlice({
       state.user = null
       state.token = null
       state.isAuthenticated = false
+      sessionStorage.removeItem('refreshToken')
     },
     setToken: (state, action) => {
       state.token = action.payload
     },
+  },
+  extraReducers: (builder) => {
+    builder.addCase(PURGE, () => initialState)
   },
 })
 
