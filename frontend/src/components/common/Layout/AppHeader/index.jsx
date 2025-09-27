@@ -1,5 +1,5 @@
 import React from 'react'
-import { Button, Layout, Typography, Avatar, Space } from 'antd'
+import { Button, Layout, Typography, Avatar, Space, message } from 'antd'
 import {
   MenuFoldOutlined,
   MenuUnfoldOutlined,
@@ -8,11 +8,29 @@ import {
   UserOutlined,
 } from '@ant-design/icons'
 import './AppHeader.less'
+import api from '@services/api.js'
+import { API_ENDPOINTS } from '@constants'
+import { useDispatch } from 'react-redux'
+import { logout } from '@redux/authSlice.js'
 
 const { Header } = Layout
 const { Text } = Typography
 
-const Index = ({ collapsed, onToggleCollapse }) => {
+const AppHeader = ({ collapsed, onToggleCollapse }) => {
+  const dispatch = useDispatch()
+  const handleLogout = async () => {
+    try {
+      const token = sessionStorage.getItem('refreshToken')
+      const _ = await api.post(API_ENDPOINTS.AUTH.LOGOUT, { refresh_token: token })
+      dispatch(logout())
+
+      message.success('Logout successful!')
+    } catch (error) {
+      console.log(error)
+      message.error('Logout failed')
+    }
+  }
+
   return (
     <Header className="app-header">
       <div className="header-left">
@@ -29,7 +47,7 @@ const Index = ({ collapsed, onToggleCollapse }) => {
       <div className="header-right">
         <Space className="header-actions">
           <Button type="text" icon={<SettingOutlined />} />
-          <Button type="text" icon={<LogoutOutlined />} />
+          <Button type="text" onClick={handleLogout} icon={<LogoutOutlined />} />
           <Avatar className="ant-avatar">
             <UserOutlined />
           </Avatar>
@@ -39,4 +57,4 @@ const Index = ({ collapsed, onToggleCollapse }) => {
   )
 }
 
-export default Index
+export default AppHeader
