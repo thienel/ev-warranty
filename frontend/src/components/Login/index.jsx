@@ -1,15 +1,16 @@
 import React, { useState } from 'react'
-import { Form, Input, Button, Card, Divider, message, Typography, Checkbox } from 'antd'
+import { Form, Input, Button, Card, message, Typography, Checkbox } from 'antd'
 import {
   UserOutlined,
   LockOutlined,
   GoogleOutlined,
   EyeInvisibleOutlined,
   EyeTwoTone,
+  ThunderboltOutlined,
 } from '@ant-design/icons'
 import './Login.less'
 
-const { Title, Text } = Typography
+const { Title } = Typography
 
 const Login = ({ onLoginSuccess }) => {
   const [form] = Form.useForm()
@@ -19,15 +20,9 @@ const Login = ({ onLoginSuccess }) => {
   const onFinish = async (values) => {
     setLoading(true)
     try {
-      // Simulate API call - replace with actual login API
       console.log('Login values:', values)
-
-      // Mock successful login
       await new Promise((resolve) => setTimeout(resolve, 1000))
-
       message.success('Login successful!')
-
-      // Call success callback if provided
       if (onLoginSuccess) {
         onLoginSuccess(values)
       }
@@ -41,14 +36,9 @@ const Login = ({ onLoginSuccess }) => {
   const handleGoogleLogin = async () => {
     setGoogleLoading(true)
     try {
-      // Implement Google OAuth login here
       console.log('Google login initiated')
-
-      // Mock Google login
       await new Promise((resolve) => setTimeout(resolve, 1000))
-
       message.success('Google login successful!')
-
       if (onLoginSuccess) {
         onLoginSuccess({ loginType: 'google' })
       }
@@ -65,113 +55,129 @@ const Login = ({ onLoginSuccess }) => {
   }
 
   return (
-    <div className="login-container">
+    <div className={`login-container ${loading ? 'login-loading' : ''}`}>
       <Card className="login-card">
         <div className="login-header">
+          <div className="login-logo">
+            <ThunderboltOutlined />
+          </div>
           <Title level={2} className="login-title">
             EV Warranty System
           </Title>
-          <Text type="secondary" className="login-subtitle">
-            Sign in to your account
-          </Text>
         </div>
 
-        <Form
-          form={form}
-          name="login"
-          className="login-form"
-          initialValues={{
-            remember: true,
-          }}
-          onFinish={onFinish}
-          onFinishFailed={onFinishFailed}
-          autoComplete="off"
-          layout="vertical"
-        >
-          <Form.Item
-            label="Email"
-            name="email"
-            rules={[
-              {
-                required: true,
-                message: 'Please input your email!',
-              },
-              {
-                type: 'email',
-                message: 'Please enter a valid email address!',
-              },
-            ]}
+        <div className="login-body">
+          <Form
+            form={form}
+            name="login"
+            className="login-form"
+            initialValues={{
+              remember: true,
+            }}
+            onFinish={onFinish}
+            onFinishFailed={onFinishFailed}
+            autoComplete="off"
+            layout="vertical"
           >
-            <Input
-              prefix={<UserOutlined className="input-icon" />}
-              placeholder="Enter your email"
-              size="large"
-              className="login-input"
-            />
-          </Form.Item>
+            <Form.Item
+              label="Email"
+              name="email"
+              validateFirst
+              validateTrigger="onBlur"
+              rules={[
+                {
+                  required: true,
+                  message: 'Please input your email!',
+                },
+                {
+                  type: 'email',
+                  message: 'Please enter a valid email address!',
+                },
+              ]}
+            >
+              <Input prefix={<UserOutlined />} placeholder="Enter your email" size="large" />
+            </Form.Item>
 
-          <Form.Item
-            label="Password"
-            name="password"
-            rules={[
-              {
-                required: true,
-                message: 'Please input your password!',
-              },
-              {
-                min: 6,
-                message: 'Password must be at least 6 characters long!',
-              },
-            ]}
-          >
-            <Input.Password
-              prefix={<LockOutlined className="input-icon" />}
-              placeholder="Enter your password"
-              size="large"
-              className="login-input"
-              iconRender={(visible) => (visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />)}
-            />
-          </Form.Item>
+            <Form.Item
+              label="Password"
+              name="password"
+              validateFirst
+              validateTrigger="onBlur"
+              rules={[
+                {
+                  required: true,
+                  message: 'Please input your password!',
+                },
+                {
+                  min: 8,
+                  message: 'Password must be at least 8 characters long!',
+                },
+                {
+                  pattern: /[a-z]/,
+                  message: 'Password must contain at least one lowercase letter!',
+                },
+                {
+                  pattern: /[A-Z]/,
+                  message: 'Password must contain at least one uppercase letter!',
+                },
+                {
+                  pattern: /\d/,
+                  message: 'Password must contain at least one digit!',
+                },
+                {
+                  pattern: /[^A-Za-z0-9]/,
+                  message: 'Password must contain at least one special character!',
+                },
+              ]}
+            >
+              <Input.Password
+                prefix={<LockOutlined />}
+                placeholder="Enter your password"
+                size="large"
+                iconRender={(visible) => (visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />)}
+              />
+            </Form.Item>
 
-          <Form.Item>
-            <div className="login-options">
+            <div className="form-options">
               <Form.Item name="remember" valuePropName="checked" noStyle>
                 <Checkbox>Remember me</Checkbox>
               </Form.Item>
-              <Button type="link" className="forgot-password">
+              <a href="#" className="forgot-password">
                 Forgot password?
+              </a>
+            </div>
+
+            <Form.Item>
+              <Button
+                type="primary"
+                htmlType="submit"
+                loading={loading}
+                size="large"
+                block
+                className="login-button"
+              >
+                {loading ? 'Signing in...' : 'Sign In'}
+              </Button>
+            </Form.Item>
+
+            <div className="divider">
+              <span className="divider-text">or</span>
+            </div>
+
+            <div className="social-login">
+              <Button
+                icon={<GoogleOutlined />}
+                onClick={handleGoogleLogin}
+                loading={googleLoading}
+                size="large"
+                block
+                className="social-button"
+              >
+                {googleLoading ? 'Connecting...' : 'Continue with Google'}
               </Button>
             </div>
-          </Form.Item>
-
-          <Form.Item>
-            <Button
-              type="primary"
-              htmlType="submit"
-              loading={loading}
-              size="large"
-              className="login-button"
-              block
-            >
-              {loading ? 'Signing in...' : 'Sign In'}
-            </Button>
-          </Form.Item>
-        </Form>
-
-        <Divider className="login-divider">
-          <Text type="secondary">or</Text>
-        </Divider>
-
-        <Button
-          icon={<GoogleOutlined />}
-          onClick={handleGoogleLogin}
-          loading={googleLoading}
-          size="large"
-          className="google-login-button"
-          block
-        >
-          {googleLoading ? 'Connecting...' : 'Continue with Google'}
-        </Button>
+          </Form>
+        </div>
       </Card>
     </div>
   )
