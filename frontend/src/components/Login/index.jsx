@@ -13,6 +13,7 @@ import { useDispatch } from 'react-redux'
 import { API_ENDPOINTS } from '@constants'
 import api from '@services/api.js'
 import { loginSuccess } from '@redux/authSlice.js'
+import Logo from '@components/Login/Logo/index.jsx'
 
 const { Title } = Typography
 
@@ -69,9 +70,7 @@ const Login = ({ onLoginSuccess }) => {
     <div className={`login-container ${loading ? 'login-loading' : ''}`}>
       <Card className="login-card">
         <div className="login-header">
-          <div className="login-logo">
-            <ThunderboltOutlined />
-          </div>
+          <Logo />
           <Title level={2} className="login-title">
             EV Warranty System
           </Title>
