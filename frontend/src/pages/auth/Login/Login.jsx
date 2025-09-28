@@ -29,8 +29,7 @@ const Login = ({ onLoginSuccess }) => {
       const res = await api.post(API_ENDPOINTS.AUTH.LOGIN, values)
       const { refresh_token, access_token, user } = res.data.data
 
-      dispatch(loginSuccess({ user, token: access_token }))
-      sessionStorage.setItem('refreshToken', refresh_token)
+      dispatch(loginSuccess({ user, token: token }))
 
       message.success('Login successful!')
       if (onLoginSuccess) {

@@ -20,10 +20,8 @@ const AppHeader = ({ collapsed, onToggleCollapse }) => {
   const dispatch = useDispatch()
   const handleLogout = async () => {
     try {
-      const token = sessionStorage.getItem('refreshToken')
-      const _ = await api.post(API_ENDPOINTS.AUTH.LOGOUT, { refresh_token: token })
+      const _ = await api.post(API_ENDPOINTS.AUTH.LOGOUT, {}, { withCredentials: true })
       dispatch(logout())
-
       message.success('Logout successful!')
     } catch (error) {
       console.log(error)

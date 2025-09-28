@@ -5,11 +5,13 @@ export const USER_ROLES = {
   EVM_STAFF: 'evm staff',
 }
 
+export const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost/api/v1'
+
 export const API_ENDPOINTS = {
   AUTH: {
     LOGIN: '/auth/login',
     LOGOUT: '/auth/logout',
-    REFRESH: '/auth/refresh',
     GOOGLE: '/auth/google',
+    TOKEN: '/auth/token',
   },
 }

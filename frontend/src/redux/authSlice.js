@@ -35,7 +35,6 @@ const authSlice = createSlice({
       state.token = null
       state.isAuthenticated = false
       state.isLoading = false
-      sessionStorage.removeItem('refreshToken')
     },
     setToken: (state, action) => {
       state.token = action.payload
