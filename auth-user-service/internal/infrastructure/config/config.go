@@ -6,9 +6,10 @@ import (
 )
 
 type OAuthConfig struct {
-	GoogleClientID     string `mapstructure:"GOOGLE_CLIENT_ID"`
-	GoogleClientSecret string `mapstructure:"GOOGLE_CLIENT_SECRET"`
-	GoogleRedirectURL  string `mapstructure:"GOOGLE_REDIRECT_URL"`
+	GoogleClientID     string
+	GoogleClientSecret string
+	GoogleRedirectURL  string
+	FrontendBaseURL    string
 }
 
 type Config struct {
@@ -19,7 +20,7 @@ type Config struct {
 	PrivateKeyPath  string
 	AccessTokenTTL  time.Duration
 	RefreshTokenTTL time.Duration
-	OAuth           OAuthConfig `mapstructure:",squash"`
+	OAuth           OAuthConfig
 }
 
 func Load() *Config {
@@ -45,9 +46,10 @@ func Load() *Config {
 		AccessTokenTTL:  accessTokenTTL,
 		RefreshTokenTTL: refreshTokenTTL,
 		OAuth: OAuthConfig{
-			GoogleClientID:     getEnv("GOOGLE_CLIENT_ID", ""),
-			GoogleClientSecret: getEnv("GOOGLE_CLIENT_SECRET", ""),
-			GoogleRedirectURL:  getEnv("GOOGLE_REDIRECT_URL", "http://localhost:8080/api/v1/oauth/google/callback"),
+			GoogleClientID:     ggClientID,
+			GoogleClientSecret: ggClientSecret,
+			GoogleRedirectURL:  getEnv("GOOGLE_REDIRECT_URL", "http://localhost/api/v1/oauth/google/callback"),
+			FrontendBaseURL:    getEnv("FRONTEND_BASE_URL", "http://localhost:3000"),
 		},
 	}
 }

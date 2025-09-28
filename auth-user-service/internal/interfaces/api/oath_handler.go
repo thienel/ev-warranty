@@ -2,7 +2,6 @@ package api
 
 import (
 	"auth-service/internal/application/services"
-	"auth-service/internal/errors/apperrors"
 	"auth-service/internal/infrastructure/oauth"
 	"auth-service/pkg/logger"
 	"fmt"
@@ -17,16 +16,18 @@ type OAuthHandler interface {
 }
 
 type oauthHandler struct {
-	log          logger.Logger
-	oauthService oauth.OAuthService
-	authService  services.AuthService
+	log             logger.Logger
+	frontendBaseURL string
+	oauthService    oauth.OAuthService
+	authService     services.AuthService
 }
 
-func NewOAuthHandler(log logger.Logger, oauthService oauth.OAuthService, authService services.AuthService) OAuthHandler {
+func NewOAuthHandler(log logger.Logger, frontendBaseURL string, oauthService oauth.OAuthService, authService services.AuthService) OAuthHandler {
 	return &oauthHandler{
-		log:          log,
-		oauthService: oauthService,
-		authService:  authService,
+		log:             log,
+		frontendBaseURL: frontendBaseURL,
+		oauthService:    oauthService,
+		authService:     authService,
 	}
 }
 
@@ -42,35 +43,40 @@ func (h *oauthHandler) InitiateOAuth(c *gin.Context) {
 }
 
 func (h *oauthHandler) HandleCallback(c *gin.Context) {
+	errMsg := "Error while login with Google, please try again!"
 	provider := c.Param("provider")
 	state := c.Query("state")
 	if state == "" {
-		err := apperrors.ErrInvalidCredentials("Missing state in callback")
-		handleError(h.log, c, err, err.Error())
+		h.log.Error("Missing state in callback")
+		c.Redirect(http.StatusFound, fmt.Sprintf("%s/login?error=%s", h.frontendBaseURL, errMsg))
 		return
 	}
 
 	errParam := c.Query("error")
 	if errParam != "" {
+		h.log.Error("error in oauth callback: ", "error", errParam)
 		h.oauthService.HandleCallbackError(c.Request.Context(), state)
-		c.Redirect(http.StatusFound, "http://localhost:3000/login")
+		c.Redirect(http.StatusFound, fmt.Sprintf("%s/login?error=%s", h.frontendBaseURL, errMsg))
+		return
 	}
 
 	code := c.Query("code")
 	if code == "" {
-		err := apperrors.ErrInvalidCredentials("Missing code or state in callback")
-		handleError(h.log, c, err, err.Error())
+		h.log.Error("Missing code in callback")
+		c.Redirect(http.StatusFound, fmt.Sprintf("%s/login?error=%s", h.frontendBaseURL, errMsg))
 		return
 	}
 
 	userInfo, err := h.oauthService.HandleCallback(c.Request.Context(), provider, code, state)
 	if err != nil {
-		handleError(h.log, c, err, "Failed to handle callback")
+		h.log.Error("error in handle oauth callback: ", "error", err)
+		c.Redirect(http.StatusFound, fmt.Sprintf("%s/login?error=%s", h.frontendBaseURL, errMsg))
 		return
 	}
 	accessToken, refreshToken, err := h.authService.HandleOAuthUser(c.Request.Context(), userInfo)
 	if err != nil {
-		handleError(h.log, c, err, "Failed to handle OAuth user")
+		h.log.Error("error in handle oauth user: ", "error", err)
+		c.Redirect(http.StatusFound, fmt.Sprintf("%s/login?error=%s", h.frontendBaseURL, errMsg))
 		return
 	}
 
@@ -84,5 +90,5 @@ func (h *oauthHandler) HandleCallback(c *gin.Context) {
 		true,
 	)
 
-	c.Redirect(http.StatusFound, fmt.Sprintf("http://localhost:3000/auth/callback?token=%s", accessToken))
+	c.Redirect(http.StatusFound, fmt.Sprintf("%s/auth/callback?token=%s", h.frontendBaseURL, accessToken))
 }
