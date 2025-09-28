@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Form, Input, Button, Card, message, Typography, Checkbox } from 'antd'
 import {
   UserOutlined,
@@ -14,6 +14,7 @@ import api from '@services/api.js'
 import { loginSuccess, loginFailure } from '@redux/authSlice.js'
 import Logo from '@pages/auth/Login/Logo/Logo.jsx'
 import { useDelay } from '@/hooks/index.js'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 
 const { Title } = Typography
 
@@ -21,9 +22,18 @@ const Login = () => {
   const [form] = Form.useForm()
   const [loginLoading, setLoginLoading] = useState(false)
   const [googleLoading, setGoogleLoading] = useState(false)
+  const navigate = useNavigate()
+  const dispatch = useDispatch()
+  const [searchParams] = useSearchParams()
   const delay = useDelay(500)
 
-  const dispatch = useDispatch()
+  useEffect(() => {
+    const error = searchParams.get('error')
+    if (error) {
+      navigate('/login')
+      message.error(error)
+    }
+  }, [])
 
   const handleLogin = async (values) => {
     setLoginLoading(true)
@@ -31,8 +41,8 @@ const Login = () => {
       try {
         const res = await api.post(API_ENDPOINTS.AUTH.LOGIN, values)
         const { token, user } = res.data.data
-        dispatch(loginSuccess({ user, token: token }))
         message.success('Login successful!')
+        dispatch(loginSuccess({ user, token: token }))
       } catch (error) {
         console.error(error.response.data)
         dispatch(loginFailure())
