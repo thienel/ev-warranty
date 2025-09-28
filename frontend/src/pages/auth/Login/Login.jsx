@@ -8,51 +8,50 @@ import {
   EyeTwoTone,
 } from '@ant-design/icons'
 import './Login.less'
-import { useDispatch, useSelector } from 'react-redux'
+import { useDispatch } from 'react-redux'
 import { API_BASE_URL, API_ENDPOINTS } from '@constants'
 import api from '@services/api.js'
-import { loginStart, loginSuccess, loginFailure } from '@redux/authSlice.js'
+import { loginSuccess, loginFailure } from '@redux/authSlice.js'
 import Logo from '@pages/auth/Login/Logo/Logo.jsx'
+import { useDelay } from '@/hooks/index.js'
 
 const { Title } = Typography
 
 const Login = () => {
   const [form] = Form.useForm()
+  const [loginLoading, setLoginLoading] = useState(false)
   const [googleLoading, setGoogleLoading] = useState(false)
+  const delay = useDelay(500)
 
   const dispatch = useDispatch()
-  const { isLoading } = useSelector((state) => state.auth)
 
-  const onFinish = async (values) => {
-    dispatch(loginStart())
-    try {
-      const res = await api.post(API_ENDPOINTS.AUTH.LOGIN, values)
-      const { token, user } = res.data.data
-
-      dispatch(loginSuccess({ user, token: token }))
-
-      message.success('Login successful!')
-    } catch (error) {
-      console.error(error)
-      dispatch(loginFailure())
-      message.error('Login failed. Please check your credentials.')
-    }
+  const handleLogin = async (values) => {
+    setLoginLoading(true)
+    delay(async () => {
+      try {
+        const res = await api.post(API_ENDPOINTS.AUTH.LOGIN, values)
+        const { token, user } = res.data.data
+        dispatch(loginSuccess({ user, token: token }))
+        message.success('Login successful!')
+      } catch (error) {
+        console.error(error.response.data)
+        dispatch(loginFailure())
+        message.error('Login failed. Please check your credentials.')
+      } finally {
+        setLoginLoading(false)
+      }
+    })
   }
 
   const handleGoogleLogin = async () => {
     setGoogleLoading(true)
-    setTimeout(() => {
+    delay(() => {
       window.location.href = `${API_BASE_URL}${API_ENDPOINTS.AUTH.GOOGLE}`
-    }, 250)
-  }
-
-  const onFinishFailed = (errorInfo) => {
-    console.log('Failed:', errorInfo)
-    message.error('Please fill in all required fields correctly.')
+    })
   }
 
   return (
-    <div className={`login-container ${isLoading ? 'login-loading' : ''}`}>
+    <div className={`login-container ${loginLoading ? 'login-loading' : ''}`}>
       <Card className="login-card">
         <div className="login-header">
           <Logo />
@@ -69,8 +68,7 @@ const Login = () => {
             initialValues={{
               remember: true,
             }}
-            onFinish={onFinish}
-            onFinishFailed={onFinishFailed}
+            onFinish={handleLogin}
             autoComplete="off"
             layout="vertical"
           >
@@ -146,12 +144,12 @@ const Login = () => {
               <Button
                 type="primary"
                 htmlType="submit"
-                loading={isLoading}
+                loading={loginLoading}
                 size="large"
                 block
                 className="login-button"
               >
-                {isLoading ? 'Signing in...' : 'Sign In'}
+                {loginLoading ? 'Signing in...' : 'Sign In'}
               </Button>
             </Form.Item>
 
