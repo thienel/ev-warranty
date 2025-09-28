@@ -1,8 +1,8 @@
 import React, { useState } from 'react'
 import { Layout } from 'antd'
-import Sidebar from './Sidebar/index.jsx'
-import AppHeader from './AppHeader/index.jsx'
-import AppContent from './AppContent/index.jsx'
+import Sidebar from './Sidebar/Sidebar.jsx'
+import AppHeader from './AppHeader/AppHeader.jsx'
+import AppContent from './AppContent/AppContent.jsx'
 import './Layout.less'
 
 const AppLayout = ({ children }) => {

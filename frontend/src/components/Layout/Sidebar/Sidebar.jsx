@@ -14,21 +14,11 @@ const { Sider } = Layout
 
 const Sidebar = ({ collapsed }) => {
   const menuItems = [
-    {
-      key: '1',
-      icon: <DashboardOutlined />,
-      label: 'Dashboard',
-      style: { marginTop: '8px' },
-    },
+    { key: '1', icon: <DashboardOutlined />, label: 'Dashboard' },
     { key: '2', icon: <UserOutlined />, label: 'Users' },
     { key: '3', icon: <VideoCameraOutlined />, label: 'Media' },
     { key: '4', icon: <UploadOutlined />, label: 'Uploads' },
-    {
-      key: '5',
-      icon: <SettingOutlined />,
-      label: 'Settings',
-      style: { marginTop: 'auto' },
-    },
+    { key: '5', icon: <SettingOutlined />, label: 'Settings' },
   ]
 
   return (

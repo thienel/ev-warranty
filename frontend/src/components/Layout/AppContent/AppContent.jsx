@@ -1,11 +1,10 @@
 import React from 'react'
-import { Layout, Typography } from 'antd'
+import { Layout } from 'antd'
 import './AppContent.less'
 
 const { Content } = Layout
-const { Text } = Typography
 
-const Index = ({ children }) => {
+const AppContent = ({ children }) => {
   return (
     <div className="app-content">
       <Content>{children}</Content>
@@ -13,4 +12,4 @@ const Index = ({ children }) => {
   )
 }
 
-export default Index
+export default AppContent
