@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react'
 import { Navigate, Outlet, useRoutes } from 'react-router-dom'
 import Home from '@pages/Home.jsx'
-import Login from '@pages/Login'
+import Login from '@pages/Login/Login.jsx'
 import { useSelector, useDispatch } from 'react-redux'
 import { setInitialized } from '@redux/authSlice.js'
 import LoadingOverlay from '@components/LoadingOverlay/LoadingOverlay.jsx'

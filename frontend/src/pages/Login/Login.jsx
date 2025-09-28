@@ -6,26 +6,25 @@ import {
   GoogleOutlined,
   EyeInvisibleOutlined,
   EyeTwoTone,
-  ThunderboltOutlined,
 } from '@ant-design/icons'
 import './Login.less'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { API_ENDPOINTS } from '@constants'
 import api from '@services/api.js'
-import { loginSuccess } from '@redux/authSlice.js'
-import Logo from '@components/Login/Logo/index.jsx'
+import { loginStart, loginSuccess, loginFailure } from '@redux/authSlice.js'
+import Logo from '@pages/Login/Logo/Logo.jsx'
 
 const { Title } = Typography
 
 const Login = ({ onLoginSuccess }) => {
   const [form] = Form.useForm()
-  const [loading, setLoading] = useState(false)
   const [googleLoading, setGoogleLoading] = useState(false)
 
   const dispatch = useDispatch()
+  const { isLoading } = useSelector((state) => state.auth)
 
   const onFinish = async (values) => {
-    setLoading(true)
+    dispatch(loginStart())
     try {
       const res = await api.post(API_ENDPOINTS.AUTH.LOGIN, values)
       const { refresh_token, access_token, user } = res.data.data
@@ -39,9 +38,8 @@ const Login = ({ onLoginSuccess }) => {
       }
     } catch (error) {
       console.error(error)
+      dispatch(loginFailure())
       message.error('Login failed. Please check your credentials.')
-    } finally {
-      setLoading(false)
     }
   }
 
@@ -67,7 +65,7 @@ const Login = ({ onLoginSuccess }) => {
   }
 
   return (
-    <div className={`login-container ${loading ? 'login-loading' : ''}`}>
+    <div className={`login-container ${isLoading ? 'login-loading' : ''}`}>
       <Card className="login-card">
         <div className="login-header">
           <Logo />
@@ -161,12 +159,12 @@ const Login = ({ onLoginSuccess }) => {
               <Button
                 type="primary"
                 htmlType="submit"
-                loading={loading}
+                loading={isLoading}
                 size="large"
                 block
                 className="login-button"
               >
-                {loading ? 'Signing in...' : 'Sign In'}
+                {isLoading ? 'Signing in...' : 'Sign In'}
               </Button>
             </Form.Item>
 
