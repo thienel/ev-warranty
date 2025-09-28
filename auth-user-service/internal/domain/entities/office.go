@@ -13,14 +13,14 @@ const (
 )
 
 type Office struct {
-	ID         uuid.UUID       `gorm:"primaryKey;type:uuid;default:uuid_generate_v4()"`
-	OfficeName string          `gorm:"not null;"`
-	OfficeType string          `gorm:"not null;size:10"`
-	Address    string          `gorm:"not null"`
-	IsActive   bool            `gorm:"not null;"`
-	CreatedAt  time.Time       `gorm:"autoCreateTime"`
-	UpdatedAt  time.Time       `gorm:"autoUpdateTime"`
-	DeletedAt  *gorm.DeletedAt `gorm:"index"`
+	ID         uuid.UUID       `gorm:"primaryKey;type:uuid;default:uuid_generate_v4()" json:"id"`
+	OfficeName string          `gorm:"not null;" json:"office_name"`
+	OfficeType string          `gorm:"not null;size:10" json:"office_type"`
+	Address    string          `gorm:"not null" json:"address"`
+	IsActive   bool            `gorm:"not null;" json:"is_active"`
+	CreatedAt  time.Time       `gorm:"autoCreateTime" json:"created_at"`
+	UpdatedAt  time.Time       `gorm:"autoUpdateTime" json:"updated_at"`
+	DeletedAt  *gorm.DeletedAt `gorm:"index" json:"deleted_at"`
 }
 
 func NewOffice(officeName string, officeType string, address string, isActive bool) *Office {
