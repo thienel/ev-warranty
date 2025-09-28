@@ -171,6 +171,9 @@ func (h *authHandler) ValidateToken(c *gin.Context) {
 		"user":  dtos.GenerateUserDTO(*user),
 	}
 
+	c.Header("X-User-ID", userID.String())
+	c.Header("X-User-Role", user.Role)
+
 	h.log.Info("token validation successful", "user_id", userID)
 	writeSuccessResponse(c, http.StatusOK, "token is valid", response)
 }
