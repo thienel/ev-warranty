@@ -2,8 +2,7 @@ import axios from 'axios'
 import { message } from 'antd'
 import store from '@/redux/store'
 import { setToken, logout } from '@/redux/authSlice'
-
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost/api/v1'
+import { API_BASE_URL, API_ENDPOINTS } from '@constants'
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -31,8 +30,8 @@ api.interceptors.response.use(
     if (status === 401 && !originalRequest._retry) {
       originalRequest._retry = true
       try {
-        const res = await axios.post(`${API_BASE_URL}/auth/refresh`, {}, { withCredentials: true })
-        const newToken = res.data.accessToken
+        const res = await axios.post(API_ENDPOINTS.AUTH.TOKEN, {}, { withCredentials: true })
+        const newToken = res.data.access_token
 
         store.dispatch(setToken(newToken))
 

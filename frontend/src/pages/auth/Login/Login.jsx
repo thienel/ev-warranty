@@ -9,14 +9,14 @@ import {
 } from '@ant-design/icons'
 import './Login.less'
 import { useDispatch, useSelector } from 'react-redux'
-import { API_ENDPOINTS } from '@constants'
+import { API_BASE_URL, API_ENDPOINTS } from '@constants'
 import api from '@services/api.js'
 import { loginStart, loginSuccess, loginFailure } from '@redux/authSlice.js'
-import Logo from '@pages/Login/Logo/Logo.jsx'
+import Logo from '@pages/auth/Login/Logo/Logo.jsx'
 
 const { Title } = Typography
 
-const Login = ({ onLoginSuccess }) => {
+const Login = () => {
   const [form] = Form.useForm()
   const [googleLoading, setGoogleLoading] = useState(false)
 
@@ -27,14 +27,11 @@ const Login = ({ onLoginSuccess }) => {
     dispatch(loginStart())
     try {
       const res = await api.post(API_ENDPOINTS.AUTH.LOGIN, values)
-      const { refresh_token, access_token, user } = res.data.data
+      const { token, user } = res.data.data
 
       dispatch(loginSuccess({ user, token: token }))
 
       message.success('Login successful!')
-      if (onLoginSuccess) {
-        onLoginSuccess(values)
-      }
     } catch (error) {
       console.error(error)
       dispatch(loginFailure())
@@ -44,18 +41,9 @@ const Login = ({ onLoginSuccess }) => {
 
   const handleGoogleLogin = async () => {
     setGoogleLoading(true)
-    try {
-      console.log('Google login initiated')
-      await new Promise((resolve) => setTimeout(resolve, 1000))
-      message.success('Google login successful!')
-      if (onLoginSuccess) {
-        onLoginSuccess({ loginType: 'google' })
-      }
-    } catch {
-      message.error('Google login failed. Please try again.')
-    } finally {
-      setGoogleLoading(false)
-    }
+    setTimeout(() => {
+      window.location.href = `${API_BASE_URL}${API_ENDPOINTS.AUTH.GOOGLE}`
+    }, 250)
   }
 
   const onFinishFailed = (errorInfo) => {
