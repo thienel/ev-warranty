@@ -14,6 +14,7 @@ type OAuthService interface {
 	RegisterProvider(provider providers.Provider)
 	GenerateAuthURL(providerName string) (string, error)
 	HandleCallback(ctx context.Context, providerName, code, state string) (*providers.UserInfo, error)
+	HandleCallbackError(ctx context.Context, state string)
 }
 
 type oauthService struct {
@@ -64,6 +65,10 @@ func (s *oauthService) HandleCallback(ctx context.Context, providerName, code, s
 	}
 
 	return provider.GetUserInfo(ctx, token)
+}
+
+func (s *oauthService) HandleCallbackError(ctx context.Context, state string) {
+	delete(s.states, state)
 }
 
 func (s *oauthService) generateState() string {
