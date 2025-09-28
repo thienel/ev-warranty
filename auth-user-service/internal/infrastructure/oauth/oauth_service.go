@@ -12,7 +12,7 @@ import (
 
 type OAuthService interface {
 	RegisterProvider(provider providers.Provider)
-	GenerateAuthURL(providerName string) (string, string, error)
+	GenerateAuthURL(providerName string) (string, error)
 	HandleCallback(ctx context.Context, providerName, code, state string) (*providers.UserInfo, error)
 }
 
@@ -34,17 +34,17 @@ func (s *oauthService) RegisterProvider(provider providers.Provider) {
 	s.providers[provider.Name()] = provider
 }
 
-func (s *oauthService) GenerateAuthURL(providerName string) (string, string, error) {
+func (s *oauthService) GenerateAuthURL(providerName string) (string, error) {
 	provider, exists := s.providers[providerName]
 	if !exists {
-		return "", "", apperrors.ErrNotFound(fmt.Sprintf("provider %s", providerName))
+		return "", apperrors.ErrNotFound(fmt.Sprintf("provider %s", providerName))
 	}
 
 	state := s.generateState()
 	s.states[state] = true
 
 	authURL := provider.GetAuthURL(state)
-	return authURL, state, nil
+	return authURL, nil
 }
 
 func (s *oauthService) HandleCallback(ctx context.Context, providerName, code, state string) (*providers.UserInfo, error) {

@@ -1,7 +1,6 @@
 package services
 
 import (
-	"auth-service/internal/domain/entities"
 	"auth-service/internal/domain/repositories"
 	"auth-service/internal/errors/apperrors"
 	"auth-service/internal/infrastructure/oauth/providers"
@@ -13,7 +12,7 @@ import (
 type AuthService interface {
 	Login(ctx context.Context, email, password string) (string, string, error)
 	Logout(ctx context.Context, token string) error
-	HandleOAuthUser(ctx context.Context, userInfo *providers.UserInfo) (*entities.User, string, string, error)
+	HandleOAuthUser(ctx context.Context, userInfo *providers.UserInfo) (string, string, error)
 }
 
 type authService struct {
@@ -62,13 +61,13 @@ func (s *authService) Logout(ctx context.Context, token string) error {
 	return nil
 }
 
-func (s *authService) HandleOAuthUser(ctx context.Context, userInfo *providers.UserInfo) (*entities.User, string, string, error) {
+func (s *authService) HandleOAuthUser(ctx context.Context, userInfo *providers.UserInfo) (string, string, error) {
 	user, err := s.userRepo.FindByOAuth(ctx, userInfo.Provider, userInfo.ProviderID)
 	if err != nil {
 		if err.Error() == "user not found" {
 			user, err = s.userRepo.FindByEmail(ctx, userInfo.Email)
 			if err != nil {
-				return nil, "", "", err
+				return "", "", err
 			}
 		}
 	}
@@ -76,18 +75,19 @@ func (s *authService) HandleOAuthUser(ctx context.Context, userInfo *providers.U
 	if !user.IsOAuthUser() {
 		user.LinkToOAuth(userInfo.Provider, userInfo.ProviderID)
 		if err = s.userRepo.Update(ctx, user); err != nil {
-			return nil, "", "", err
+			return "", "", err
 		}
 	}
 
 	accessToken, err := s.tokenService.GenerateAccessToken(ctx, user.ID)
 	if err != nil {
-		return nil, "", "", err
-	}
-	refreshToken, err := s.tokenService.GenerateRefreshToken(ctx, user.ID)
-	if err != nil {
-		return nil, "", "", err
+		return "", "", err
 	}
 
-	return user, accessToken, refreshToken, nil
+	refreshToken, err := s.tokenService.GenerateRefreshToken(ctx, user.ID)
+	if err != nil {
+		return "", "", err
+	}
+
+	return accessToken, refreshToken, nil
 }

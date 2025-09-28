@@ -4,8 +4,8 @@ import (
 	"auth-service/internal/application/services"
 	"auth-service/internal/errors/apperrors"
 	"auth-service/internal/infrastructure/oauth"
-	"auth-service/internal/interfaces/api/dtos"
 	"auth-service/pkg/logger"
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -32,16 +32,13 @@ func NewOAuthHandler(log logger.Logger, oauthService oauth.OAuthService, authSer
 
 func (h *oauthHandler) InitiateOAuth(c *gin.Context) {
 	provider := c.Param("provider")
-	authURL, state, err := h.oauthService.GenerateAuthURL(provider)
+	authURL, err := h.oauthService.GenerateAuthURL(provider)
 	if err != nil {
 		handleError(h.log, c, err, "Failed to generate auth URL")
 		return
 	}
 
-	c.JSON(http.StatusOK, dtos.OAuthInitiateResponse{
-		AuthURL: authURL,
-		State:   state,
-	})
+	c.Redirect(http.StatusFound, authURL)
 }
 
 func (h *oauthHandler) HandleCallback(c *gin.Context) {
@@ -60,7 +57,7 @@ func (h *oauthHandler) HandleCallback(c *gin.Context) {
 		handleError(h.log, c, err, "Failed to handle callback")
 		return
 	}
-	user, accessToken, refreshToken, err := h.authService.HandleOAuthUser(c.Request.Context(), userInfo)
+	accessToken, refreshToken, err := h.authService.HandleOAuthUser(c.Request.Context(), userInfo)
 	if err != nil {
 		handleError(h.log, c, err, "Failed to handle OAuth user")
 		return
@@ -71,4 +68,5 @@ func (h *oauthHandler) HandleCallback(c *gin.Context) {
 		RefreshToken: refreshToken,
 		User:         *dtos.GenerateUserDTO(*user),
 	})
+	c.Redirect(http.StatusFound, fmt.Sprintf("http://localhost:3000/auth/callback?token=%s", accessToken))
 }
