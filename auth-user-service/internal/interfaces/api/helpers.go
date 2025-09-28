@@ -6,8 +6,14 @@ import (
 	"auth-service/pkg/logger"
 	"errors"
 	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
+)
+
+const (
+	requestTimeout = 30 * time.Second
+	bearerPrefix   = "Bearer "
 )
 
 func handleError(log logger.Logger, c *gin.Context, err error, message string) {

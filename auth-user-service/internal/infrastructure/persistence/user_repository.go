@@ -12,7 +12,7 @@ import (
 	"gorm.io/gorm"
 )
 
-const entityUserName = "user"
+const entityUser = "user"
 
 type userRepository struct {
 	db *gorm.DB
@@ -36,7 +36,7 @@ func (u *userRepository) FindByID(ctx context.Context, id uuid.UUID) (*entities.
 	var user entities.User
 	if err := u.db.WithContext(ctx).Where("id = ?", id).First(&user).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, apperrors.ErrNotFound(entityUserName)
+			return nil, apperrors.ErrNotFound(entityUser)
 		}
 		return nil, apperrors.ErrDBOperation(err)
 	}
@@ -47,27 +47,28 @@ func (u *userRepository) FindByEmail(ctx context.Context, email string) (*entiti
 	var user entities.User
 	if err := u.db.WithContext(ctx).Where("email = ?", email).First(&user).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, apperrors.ErrNotFound(entityUserName)
+			return nil, apperrors.ErrNotFound(entityUser)
 		}
 		return nil, apperrors.ErrDBOperation(err)
 	}
 	return &user, nil
 }
 
-func (u *userRepository) FindByUsername(ctx context.Context, username string) (*entities.User, error) {
-	var user entities.User
-	if err := u.db.WithContext(ctx).Where("username = ?", username).First(&user).Error; err != nil {
+func (u *userRepository) FindAll(ctx context.Context) ([]*entities.User, error) {
+	var users []*entities.User
+	if err := u.db.WithContext(ctx).Find(&users).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, apperrors.ErrNotFound(entityUserName)
+			return nil, apperrors.ErrNotFound(entityUser)
 		}
 		return nil, apperrors.ErrDBOperation(err)
 	}
-	return &user, nil
+	return users, nil
 }
 
 func (u *userRepository) Update(ctx context.Context, user *entities.User) error {
 	if err := u.db.WithContext(ctx).Model(user).
-		Select("username", "email", "status", "password_hash", "oauth_provider", "oauth_id").
+		Select("name", "email", "role",
+			"password_hash", "is_active", "office_id", "oauth_provider", "oauth_id").
 		Updates(user).Error; err != nil {
 		return apperrors.ErrDBOperation(err)
 	}
@@ -85,7 +86,7 @@ func (u *userRepository) FindByOAuth(ctx context.Context, provider, oauthID stri
 	var user entities.User
 	if err := u.db.WithContext(ctx).Where("oauth_provider = ? AND oauth_id = ?", provider, oauthID).First(&user).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, apperrors.ErrNotFound(entityUserName)
+			return nil, apperrors.ErrNotFound(entityUser)
 		}
 	}
 	return &user, nil

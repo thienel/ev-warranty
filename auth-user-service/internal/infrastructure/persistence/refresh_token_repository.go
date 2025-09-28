@@ -64,7 +64,7 @@ func (t *refreshTokenRepository) FindByToken(ctx context.Context, tokenStr strin
 	var token entities.RefreshToken
 	if err := t.db.WithContext(ctx).Where("token = ?", tokenStr).First(&token).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, apperrors.ErrNotFound(entityUserName)
+			return nil, apperrors.ErrNotFound(entityUser)
 		}
 		return nil, apperrors.ErrDBOperation(err)
 	}

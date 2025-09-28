@@ -8,6 +8,7 @@ import (
 	"auth-service/pkg/logger"
 	"context"
 	"net/http"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -17,20 +18,18 @@ type OfficeHandler interface {
 	Create(c *gin.Context)
 	GetById(c *gin.Context)
 	GetAll(c *gin.Context)
-	Active(c *gin.Context)
-	Inactive(c *gin.Context)
 	Update(c *gin.Context)
 	Delete(c *gin.Context)
 }
 
 type officeHandler struct {
-	logger  logger.Logger
+	log     logger.Logger
 	service services.OfficeService
 }
 
 func NewOfficeHandler(log logger.Logger, service services.OfficeService) OfficeHandler {
 	return &officeHandler{
-		logger:  log,
+		log:     log,
 		service: service,
 	}
 }
@@ -41,19 +40,25 @@ func (h *officeHandler) Create(c *gin.Context) {
 
 	var req dtos.CreateOfficeRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		handleError(h.logger, c, apperrors.ErrInvalidJSONRequest, "invalid JSON request")
+		handleError(h.log, c, apperrors.ErrInvalidJSONRequest, "invalid JSON request")
 		return
 	}
 
-	officeType := entities.OfficeType(req.OfficeType)
-	if !officeType.IsValid() {
-		handleError(h.logger, c, apperrors.ErrInvalidCredentials("invalid office type"), "invalid office type")
+	if !entities.IsValidOfficeType(req.OfficeType) {
+		handleError(h.log, c, apperrors.ErrInvalidCredentials("invalid office type"), "invalid office type")
 		return
 	}
 
-	office, err := h.service.Create(ctx, req.OfficeName, officeType, req.Address, req.IsActive)
+	cmd := &services.CreateOfficeCommand{
+		OfficeName: strings.TrimSpace(req.OfficeName),
+		OfficeType: strings.TrimSpace(req.OfficeType),
+		Address:    strings.TrimSpace(req.Address),
+		IsActive:   req.IsActive,
+	}
+
+	office, err := h.service.Create(ctx, cmd)
 	if err != nil {
-		handleError(h.logger, c, err, "error creating office")
+		handleError(h.log, c, err, "error creating office")
 		return
 	}
 
@@ -67,13 +72,13 @@ func (h *officeHandler) GetById(c *gin.Context) {
 	officeIDStr := c.Param("id")
 	officeID, err := uuid.Parse(officeIDStr)
 	if err != nil {
-		handleError(h.logger, c, apperrors.ErrInvalidCredentials("invalid office ID"), "invalid office ID format")
+		handleError(h.log, c, apperrors.ErrInvalidCredentials("invalid office ID"), "invalid office ID format")
 		return
 	}
 
-	office, err := h.service.GetOfficeByID(ctx, officeID)
+	office, err := h.service.GetByID(ctx, officeID)
 	if err != nil {
-		handleError(h.logger, c, err, "error getting office")
+		handleError(h.log, c, err, "error getting office")
 		return
 	}
 	writeSuccessResponse(c, http.StatusOK, "office retrieved", office)
@@ -83,85 +88,46 @@ func (h *officeHandler) GetAll(c *gin.Context) {
 	ctx, cancel := context.WithTimeout(c.Request.Context(), requestTimeout)
 	defer cancel()
 
-	offices, err := h.service.GetAllOffices(ctx)
+	offices, err := h.service.GetAll(ctx)
 	if err != nil {
-		handleError(h.logger, c, err, "error getting offices")
+		handleError(h.log, c, err, "error getting offices")
 		return
 	}
 
 	writeSuccessResponse(c, http.StatusOK, "offices retrieved", offices)
 }
 
-func (h *officeHandler) Active(c *gin.Context) {
-	ctx, cancel := context.WithTimeout(c.Request.Context(), requestTimeout)
-	defer cancel()
-
-	officeIDStr := c.Param("id")
-	officeID, err := uuid.Parse(officeIDStr)
-	if err != nil {
-		handleError(h.logger, c, apperrors.ErrInvalidCredentials("invalid office ID"), "invalid office ID format")
-		return
-	}
-
-	err = h.service.ActiveOfficeByID(ctx, officeID)
-	if err != nil {
-		handleError(h.logger, c, err, "error activating office")
-		return
-	}
-
-	writeSuccessResponse(c, http.StatusOK, "office activated", nil)
-}
-
-func (h *officeHandler) Inactive(c *gin.Context) {
-	ctx, cancel := context.WithTimeout(c.Request.Context(), requestTimeout)
-	defer cancel()
-
-	officeIDStr := c.Param("id")
-	officeID, err := uuid.Parse(officeIDStr)
-	if err != nil {
-		handleError(h.logger, c, apperrors.ErrInvalidCredentials("invalid office ID"), "invalid office ID format")
-		return
-	}
-
-	err = h.service.InactiveOfficeByID(ctx, officeID)
-	if err != nil {
-		handleError(h.logger, c, err, "error deactivating office")
-		return
-	}
-
-	writeSuccessResponse(c, http.StatusOK, "office deactivated", nil)
-}
-
 func (h *officeHandler) Update(c *gin.Context) {
 	ctx, cancel := context.WithTimeout(c.Request.Context(), requestTimeout)
 	defer cancel()
 
-	officeIDStr := c.Param("id")
-	officeID, err := uuid.Parse(officeIDStr)
+	idStr := c.Param("id")
+	id, err := uuid.Parse(idStr)
 	if err != nil {
-		handleError(h.logger, c, apperrors.ErrInvalidCredentials("invalid office ID"), "invalid office ID format")
+		handleError(h.log, c, apperrors.ErrInvalidCredentials("invalid office ID"), "invalid office ID format")
 		return
 	}
 
 	var req dtos.UpdateOfficeRequest
-	if err := c.ShouldBindJSON(&req); err != nil {
-		handleError(h.logger, c, apperrors.ErrInvalidJSONRequest, "invalid JSON request")
+	if err = c.ShouldBindJSON(&req); err != nil {
+		handleError(h.log, c, apperrors.ErrInvalidJSONRequest, "invalid JSON request")
 		return
 	}
 
-	officeType := entities.OfficeType(req.OfficeType)
-	if !officeType.IsValid() {
-		handleError(h.logger, c, apperrors.ErrInvalidCredentials("invalid office type"), "invalid office type")
-		return
+	cmd := &services.UpdateOfficeCommand{
+		OfficeName: req.OfficeName,
+		OfficeType: req.OfficeType,
+		Address:    req.Address,
+		IsActive:   req.IsActive,
 	}
 
-	office, err := h.service.UpdateOfficeByID(ctx, officeID, req.OfficeName, officeType, req.Address)
+	err = h.service.Update(ctx, id, cmd)
 	if err != nil {
-		handleError(h.logger, c, err, "error updating office")
+		handleError(h.log, c, err, "error updating office")
 		return
 	}
 
-	writeSuccessResponse(c, http.StatusOK, "office updated", office)
+	writeSuccessResponse(c, http.StatusNoContent, "office updated", nil)
 }
 
 func (h *officeHandler) Delete(c *gin.Context) {
@@ -171,13 +137,13 @@ func (h *officeHandler) Delete(c *gin.Context) {
 	officeIDStr := c.Param("id")
 	officeID, err := uuid.Parse(officeIDStr)
 	if err != nil {
-		handleError(h.logger, c, apperrors.ErrInvalidCredentials("invalid office ID"), "invalid office ID format")
+		handleError(h.log, c, apperrors.ErrInvalidCredentials("invalid office ID"), "invalid office ID format")
 		return
 	}
 
-	err = h.service.DeleteOfficeByID(ctx, officeID)
+	err = h.service.DeleteByID(ctx, officeID)
 	if err != nil {
-		handleError(h.logger, c, err, "error deleting office")
+		handleError(h.log, c, err, "error deleting office")
 		return
 	}
 
