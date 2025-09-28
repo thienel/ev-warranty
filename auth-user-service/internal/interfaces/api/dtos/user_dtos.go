@@ -7,7 +7,6 @@ import (
 )
 
 type CreateUserRequest struct {
-	ID       uuid.UUID `json:"id" binding:"required"`
 	Name     string    `json:"name" binding:"required"`
 	Email    string    `json:"email" binding:"required,email,max=100"`
 	Password string    `json:"password" binding:"required"`
