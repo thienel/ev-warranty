@@ -7,7 +7,6 @@ import (
 	_ "github.com/lib/pq"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
-	"gorm.io/gorm/logger"
 )
 
 type Database struct {
@@ -15,9 +14,7 @@ type Database struct {
 }
 
 func New(databaseURL string) (*Database, error) {
-	gormConfig := &gorm.Config{
-		Logger: logger.Default.LogMode(logger.Info),
-	}
+	gormConfig := &gorm.Config{}
 
 	db, err := gorm.Open(postgres.Open(databaseURL), gormConfig)
 	if err != nil {
