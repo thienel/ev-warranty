@@ -8,9 +8,9 @@ import LoadingOverlay from '@components/LoadingOverlay/LoadingOverlay.jsx'
 import AuthCallBack from '@pages/auth/AuthCallBack.jsx'
 
 export const ProtectedRoute = () => {
-  const { isAuthenticated, isLoading, isInitialized } = useSelector((state) => state.auth)
+  const { isAuthenticated, isInitialized } = useSelector((state) => state.auth)
 
-  if (!isInitialized || isLoading) {
+  if (!isInitialized) {
     return <LoadingOverlay loading={true} children={null} />
   }
 
@@ -18,9 +18,9 @@ export const ProtectedRoute = () => {
 }
 
 export const PublicRoute = () => {
-  const { isAuthenticated, isLoading, isInitialized } = useSelector((state) => state.auth)
+  const { isAuthenticated, isInitialized } = useSelector((state) => state.auth)
 
-  if (!isInitialized || isLoading) {
+  if (!isInitialized) {
     return <LoadingOverlay loading={true} children={null} />
   }
 
