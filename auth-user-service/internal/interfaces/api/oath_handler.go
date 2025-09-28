@@ -43,10 +43,21 @@ func (h *oauthHandler) InitiateOAuth(c *gin.Context) {
 
 func (h *oauthHandler) HandleCallback(c *gin.Context) {
 	provider := c.Param("provider")
-	code := c.Query("code")
 	state := c.Query("state")
+	if state == "" {
+		err := apperrors.ErrInvalidCredentials("Missing state in callback")
+		handleError(h.log, c, err, err.Error())
+		return
+	}
 
-	if code == "" || state == "" {
+	errParam := c.Query("error")
+	if errParam != "" {
+		h.oauthService.HandleCallbackError(c.Request.Context(), state)
+		c.Redirect(http.StatusFound, "http://localhost:3000/login")
+	}
+
+	code := c.Query("code")
+	if code == "" {
 		err := apperrors.ErrInvalidCredentials("Missing code or state in callback")
 		handleError(h.log, c, err, err.Error())
 		return
