@@ -1,0 +1,136 @@
+.sidebar {
+  background: @dark-bg;
+  box-shadow: @box-shadow-heavy;
+  position: relative;
+  z-index: 99;
+  height: 100%;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+
+  .sidebar-header {
+    height: @layout-header-height;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    gap: @padding-sm;
+    padding-top: @padding-lg;
+    .anticon{
+      font-size: @font-size-heading-3;
+    }
+
+    .sidebar-title {
+      font-size: @font-size-heading-4;
+      text-align: center;
+      overflow: hidden;
+      white-space: nowrap;
+
+      &.collapsed {
+        display: none;
+        opacity: 0;
+      }
+
+      &.expanded {
+        opacity: 1;
+      }
+    }
+
+  }
+
+  .ant-menu {
+    border: none !important;
+    flex: 1;
+    padding: 0 @padding-base;
+
+    .ant-menu-item {
+      border-radius: @border-radius-base;
+      transition: @transition-base;
+      margin: @padding-base 0!important;
+      padding: 0 @padding-sm;
+      color: rgba(255, 255, 255, 0.85);
+      height: 44px;
+      width: 100%;
+      line-height: 44px;
+      display: flex;
+      align-items: center;
+      position: relative;
+      overflow: hidden;
+
+      &:hover {
+        background: rgba(255, 255, 255, 0.1) !important;
+        color: #ffffff !important;
+
+        &::before {
+          width: 100%;
+        }
+
+        .ant-menu-item-icon {
+          transform: scale(1.05);
+        }
+      }
+
+      &.ant-menu-item-selected {
+        background: @primary-text !important;
+        color: #ffffff !important;
+        font-weight: @font-weight-medium;
+
+        .ant-menu-item-icon {
+          color: #ffffff;
+        }
+      }
+
+      .ant-menu-item-icon {
+        font-size: @font-size-xl;
+        min-width: 16px;
+        margin-right: @padding-sm;
+        transition: @transition-base;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .ant-menu-title-content {
+        flex: 1;
+        font-size: @font-size-lg;
+        font-weight: @font-weight-normal;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        transition: @transition-base;
+      }
+
+    }
+  }
+
+  &.ant-layout-sider-collapsed {
+    .ant-menu {
+      .ant-menu-item,
+      .ant-menu-submenu-title {
+        padding: 0;
+        justify-content: center;
+
+        .ant-menu-item-icon {
+          margin-right: 0;
+        }
+
+        .ant-menu-title-content {
+          display: none;
+        }
+
+        .menu-badge {
+          display: none;
+        }
+      }
+
+      .ant-menu-item-group {
+        display: none;
+      }
+
+      .ant-menu-divider {
+        margin: @padding-sm 0;
+      }
+    }
+  }
+}

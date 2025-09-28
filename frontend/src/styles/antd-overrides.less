@@ -1,0 +1,1879 @@
+// ===== GLOBAL OVERRIDES =====
+body {
+  font-family: @font-family !important;
+  color: @text-color !important;
+  background-color: @bg-base !important;
+}
+
+// ===== LINK & HOVER OVERRIDES =====
+a {
+  color: @primary-text !important;
+  text-decoration: none !important;
+  transition: @transition-base !important;
+
+  &:hover,
+  &:focus {
+    color: @primary-text-hover !important;
+    text-decoration: none !important;
+  }
+
+  &:active {
+    color: @primary-text-active !important;
+  }
+}
+
+// Global hover effects for interactive elements
+.ant-btn,
+.ant-input,
+.ant-select-selector,
+.ant-checkbox-wrapper,
+.ant-radio-wrapper,
+.ant-switch,
+.ant-upload,
+.ant-rate,
+.ant-slider,
+.ant-mentions,
+.ant-cascader-picker,
+.ant-time-picker,
+.ant-picker {
+  transition: @transition-base !important;
+}
+
+// ===== TYPOGRAPHY & LINK OVERRIDES =====
+h1, h2, h3, h4, h5, h6 {
+  color: @text-heading !important;
+  font-weight: @font-weight-semibold !important;
+
+  a {
+    color: inherit !important;
+
+    &:hover {
+      color: @primary-text-hover !important;
+    }
+  }
+}
+
+p {
+  color: @text-color !important;
+
+  a {
+    color: @primary-text !important;
+
+    &:hover {
+      color: @primary-text-hover !important;
+      text-decoration: underline !important;
+    }
+  }
+}
+
+// Ant Design Typography component
+.ant-typography {
+  color: @text-color !important;
+
+  h1, h2, h3, h4, h5 {
+    color: @text-heading !important;
+  }
+
+  a {
+    color: @primary-text !important;
+
+    &:hover {
+      color: @primary-text-hover !important;
+    }
+
+    &:active {
+      color: @primary-text-active !important;
+    }
+  }
+
+  &-caption {
+    color: @text-secondary !important;
+  }
+
+  &-paragraph {
+    color: @text-color !important;
+  }
+
+  &-title {
+    color: @text-heading !important;
+  }
+}
+
+// Text selections
+::selection {
+  background: fade(@primary-color, 20%) !important;
+  color: @text-heading !important;
+}
+
+// ===== LAYOUT OVERRIDES =====
+.ant-layout {
+  background: @bg-layout !important;
+
+  &-header {
+    background: @header-bg !important;
+    height: @layout-header-height !important;
+    line-height: @layout-header-height !important;
+    padding: 0 @layout-padding !important;
+    border-bottom: 1px solid @border-color !important;
+    box-shadow: @box-shadow-light !important;
+  }
+
+  &-content {
+    background: @content-bg !important;
+    padding: @layout-padding !important;
+    color: @text-color !important;
+  }
+
+  &-sider {
+    background: @dark-bg !important;
+    width: @sidebar-width !important;
+    max-width: @sidebar-width !important;
+    min-width: @sidebar-width !important;
+    flex: 0 0 @sidebar-width !important;
+
+    &.ant-layout-sider-collapsed {
+      width: @sidebar-collapsed-width !important;
+      max-width: @sidebar-collapsed-width !important;
+      min-width: @sidebar-collapsed-width !important;
+      flex: 0 0 @sidebar-collapsed-width !important;
+    }
+  }
+
+  &-footer {
+    background: @bg-container !important;
+    border-top: 1px solid @border-color !important;
+    color: @text-secondary !important;
+  }
+}
+
+// ===== BUTTON OVERRIDES =====
+.ant-btn {
+  border-radius: @border-radius-base !important;
+  height: @control-height-base !important;
+  font-weight: @font-weight-medium !important;
+  transition: @transition-base !important;
+  font-size: @font-size-base !important;
+
+  &-primary {
+    background: @primary-color !important;
+    border-color: @primary-color !important;
+    color: #ffffff !important;
+
+    &:hover {
+      background: @primary-hover !important;
+      border-color: @primary-hover !important;
+    }
+
+    &:active {
+      background: @primary-active !important;
+      border-color: @primary-active !important;
+    }
+
+    &:disabled {
+      background: @fill-quaternary !important;
+      border-color: @border-color !important;
+      color: @text-disabled !important;
+    }
+  }
+
+  &-default {
+    background: @bg-container !important;
+    border-color: @border-color !important;
+    color: @text-color !important;
+
+    &:hover {
+      background: @primary-bg-hover !important;
+      border-color: @primary-border-hover !important;
+      color: @primary-text-hover !important;
+    }
+  }
+
+  &-text {
+    color: @primary-text !important;
+    border: none !important;
+    background: transparent !important;
+
+    &:hover {
+      background: @primary-bg-hover !important;
+      color: @primary-text-hover !important;
+    }
+
+    &:active {
+      background: @primary-bg !important;
+      color: @primary-text-active !important;
+    }
+
+    &:focus {
+      background: @primary-bg-hover !important;
+      color: @primary-text-hover !important;
+    }
+  }
+
+  &-link {
+    color: @primary-text !important;
+    border: none !important;
+    background: transparent !important;
+    padding: 4px 0 !important;
+    height: auto !important;
+    text-decoration: none !important;
+
+    &:hover,
+    &:focus {
+      color: @primary-text-hover !important;
+      background: transparent !important;
+      border-color: transparent !important;
+      text-decoration: underline !important;
+      text-underline-offset: 2px !important;
+    }
+
+    &:active {
+      color: @primary-text-active !important;
+      background: transparent !important;
+      border-color: transparent !important;
+    }
+
+    &[disabled],
+    &.ant-btn-disabled {
+      color: @text-disabled !important;
+      background: transparent !important;
+      border-color: transparent !important;
+      text-decoration: none !important;
+
+      &:hover,
+      &:focus,
+      &:active {
+        color: @text-disabled !important;
+        background: transparent !important;
+        border-color: transparent !important;
+        text-decoration: none !important;
+      }
+    }
+
+    &-sm {
+      font-size: @font-size-sm !important;
+      padding: 2px 0 !important;
+    }
+
+    &-lg {
+      font-size: @font-size-lg !important;
+      padding: 6px 0 !important;
+    }
+
+    // Button link trong table
+    .ant-table & {
+      color: @primary-text !important;
+      padding: 0 !important;
+
+      &:hover {
+        color: @primary-text-hover !important;
+      }
+    }
+
+    // Button link trong card
+    .ant-card & {
+      color: @primary-text !important;
+
+      &:hover {
+        color: @primary-text-hover !important;
+      }
+    }
+
+    // Button link danger
+    &.ant-btn-dangerous {
+      color: @error-color !important;
+
+      &:hover,
+      &:focus {
+        color: lighten(@error-color, 10%) !important;
+      }
+
+      &:active {
+        color: darken(@error-color, 10%) !important;
+      }
+    }
+  }
+
+  &-lg {
+    height: @control-height-lg !important;
+    font-size: @font-size-lg !important;
+    border-radius: @border-radius-lg !important;
+  }
+
+  &-sm {
+    height: @control-height-sm !important;
+    font-size: @font-size-sm !important;
+    border-radius: @border-radius-sm !important;
+  }
+}
+
+// ===== INPUT OVERRIDES =====
+.ant-input {
+  border-radius: @border-radius-base !important;
+  border-color: @border-color !important;
+  height: @control-height-base !important;
+  color: @text-color !important;
+  font-size: @font-size-base !important;
+
+  &:hover {
+    border-color: @primary-border-hover !important;
+  }
+
+  &:focus {
+    border-color: @primary-color !important;
+    box-shadow: 0 0 0 2px fade(@primary-color, 20%) !important;
+  }
+
+  &::placeholder {
+    color: @text-placeholder !important;
+  }
+
+  &-lg {
+    height: @control-height-lg !important;
+    font-size: @font-size-lg !important;
+    border-radius: @border-radius-lg !important;
+  }
+
+  &-sm {
+    height: @control-height-sm !important;
+    font-size: @font-size-sm !important;
+    border-radius: @border-radius-sm !important;
+  }
+}
+
+.ant-input-affix-wrapper {
+  border-radius: @border-radius-base !important;
+  border-color: @border-color !important;
+
+  &:hover {
+    border-color: @primary-border-hover !important;
+  }
+
+  &:focus-within {
+    border-color: @primary-color !important;
+    box-shadow: 0 0 0 2px fade(@primary-color, 20%) !important;
+  }
+}
+
+// ===== SELECT OVERRIDES =====
+.ant-select {
+  &:not(.ant-select-customize-input) .ant-select-selector {
+    border-radius: @border-radius-base !important;
+    border-color: @border-color !important;
+    height: @control-height-base !important;
+
+    &:hover {
+      border-color: @primary-border-hover !important;
+    }
+  }
+
+  &-focused {
+    .ant-select-selector {
+      border-color: @primary-color !important;
+      box-shadow: 0 0 0 2px fade(@primary-color, 20%) !important;
+    }
+  }
+
+  &-lg .ant-select-selector {
+    height: @control-height-lg !important;
+    border-radius: @border-radius-lg !important;
+  }
+
+  &-sm .ant-select-selector {
+    height: @control-height-sm !important;
+    border-radius: @border-radius-sm !important;
+  }
+}
+
+.ant-select-dropdown {
+  border-radius: @border-radius-base !important;
+  box-shadow: @box-shadow-medium !important;
+  border: 1px solid @border-color !important;
+
+  .ant-select-item {
+    &-option-selected {
+      background: @primary-bg !important;
+      color: @primary-text !important;
+    }
+
+    &-option-active {
+      background: @primary-bg-hover !important;
+    }
+  }
+}
+
+// ===== TABLE OVERRIDES =====
+.ant-table {
+  background: @bg-container !important;
+  border-radius: @border-radius-base !important;
+
+  &-thead > tr > th {
+    background: @fill-color !important;
+    border-bottom: 1px solid @border-color !important;
+    color: @text-heading !important;
+    font-weight: @font-weight-semibold !important;
+
+    a {
+      color: @text-heading !important;
+
+      &:hover {
+        color: @primary-text-hover !important;
+      }
+    }
+
+    .ant-table-column-sorter {
+      color: @text-tertiary !important;
+
+      &:hover {
+        color: @primary-text-hover !important;
+      }
+    }
+  }
+
+  &-tbody > tr {
+    &:hover > td {
+      background: @primary-bg-hover !important;
+    }
+
+    > td {
+      border-bottom: 1px solid @border-secondary !important;
+      color: @text-color !important;
+
+      a {
+        color: @primary-text !important;
+
+        &:hover {
+          color: @primary-text-hover !important;
+        }
+      }
+    }
+  }
+
+  &-pagination {
+    margin: @padding-base 0 !important;
+  }
+
+  // Row selection hover
+  &-row-selected {
+    background: @primary-bg !important;
+
+    &:hover {
+      background: @primary-bg-hover !important;
+    }
+  }
+
+  // Expandable row trigger
+  &-row-expand-icon {
+    color: @text-tertiary !important;
+    border-color: @border-color !important;
+
+    &:hover {
+      color: @primary-text-hover !important;
+      border-color: @primary-border-hover !important;
+    }
+  }
+}
+
+// ===== CARD OVERRIDES =====
+.ant-card {
+  background: @bg-container !important;
+  border-radius: @border-radius-lg !important;
+  border: 1px solid @border-color !important;
+  box-shadow: @box-shadow-light !important;
+
+  &-head {
+    border-bottom: 1px solid @border-color !important;
+    color: @text-heading !important;
+    font-weight: @font-weight-semibold !important;
+  }
+
+  &-body {
+    color: @text-color !important;
+  }
+}
+
+// ===== MENU OVERRIDES =====
+.ant-menu {
+  background: transparent !important;
+  border: none !important;
+  color: rgba(255, 255, 255, 0.85) !important;
+
+  &-item {
+    margin: 4px 8px !important;
+    border-radius: @border-radius-base !important;
+    transition: @transition-base !important;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.1) !important;
+      color: #ffffff !important;
+    }
+
+    &:active {
+      background: rgba(255, 255, 255, 0.15) !important;
+    }
+
+    &.ant-menu-item-selected {
+      background: @primary-color !important;
+      color: #ffffff !important;
+
+      &::after {
+        display: none !important;
+      }
+
+      &:hover {
+        background: @primary-hover !important;
+      }
+    }
+
+    a {
+      color: inherit !important;
+      text-decoration: none !important;
+
+      &:hover {
+        color: inherit !important;
+      }
+    }
+  }
+
+  &-submenu {
+    &-title {
+      margin: 4px 8px !important;
+      border-radius: @border-radius-base !important;
+      transition: @transition-base !important;
+
+      &:hover {
+        background: rgba(255, 255, 255, 0.1) !important;
+        color: #ffffff !important;
+      }
+
+      &:active {
+        background: rgba(255, 255, 255, 0.15) !important;
+      }
+    }
+
+    &-arrow {
+      color: rgba(255, 255, 255, 0.65) !important;
+    }
+  }
+
+  // Light theme menu (for non-sidebar menus)
+  &-light {
+    background: @bg-container !important;
+    color: @text-color !important;
+
+    .ant-menu-item {
+      color: @text-color !important;
+
+      &:hover {
+        background: @primary-bg-hover !important;
+        color: @primary-text-hover !important;
+      }
+
+      &.ant-menu-item-selected {
+        background: @primary-bg !important;
+        color: @primary-color !important;
+
+        &:hover {
+          background: @primary-bg-hover !important;
+          color: @primary-text-hover !important;
+        }
+      }
+
+      a {
+        color: inherit !important;
+
+        &:hover {
+          color: inherit !important;
+        }
+      }
+    }
+
+    .ant-menu-submenu-title {
+      color: @text-color !important;
+
+      &:hover {
+        background: @primary-bg-hover !important;
+        color: @primary-text-hover !important;
+      }
+    }
+  }
+
+  // Horizontal menu
+  &-horizontal {
+    border-bottom: 1px solid @border-color !important;
+
+    .ant-menu-item {
+      margin: 0 @padding-xs !important;
+      padding: 0 @padding-base !important;
+      border-radius: @border-radius-base @border-radius-base 0 0 !important;
+
+      &::after {
+        display: none !important;
+      }
+
+      &.ant-menu-item-selected {
+        border-bottom: 2px solid @primary-color !important;
+        background: transparent !important;
+        color: @primary-color !important;
+      }
+    }
+  }
+}
+
+// ===== MODAL OVERRIDES =====
+.ant-modal {
+  &-content {
+    border-radius: @border-radius-lg !important;
+    box-shadow: @box-shadow-heavy !important;
+  }
+
+  &-header {
+    border-bottom: 1px solid @border-color !important;
+    border-radius: @border-radius-lg @border-radius-lg 0 0 !important;
+
+    .ant-modal-title {
+      color: @text-heading !important;
+      font-weight: @font-weight-semibold !important;
+    }
+  }
+
+  &-body {
+    color: @text-color !important;
+  }
+
+  &-footer {
+    border-top: 1px solid @border-color !important;
+    border-radius: 0 0 @border-radius-lg @border-radius-lg !important;
+  }
+
+  &-mask {
+    background: @bg-mask !important;
+  }
+}
+
+// ===== FORM OVERRIDES =====
+.ant-form {
+  &-item-label > label {
+    color: @text-label !important;
+    font-weight: @font-weight-medium !important;
+  }
+
+  &-item-explain-error {
+    color: @error-color !important;
+  }
+
+  &-item-has-error {
+    .ant-input,
+    .ant-select-selector {
+      border-color: @error-color !important;
+
+      &:hover {
+        border-color: @error-color !important;
+      }
+
+      &:focus {
+        border-color: @error-color !important;
+        box-shadow: 0 0 0 2px fade(@error-color, 20%) !important;
+      }
+    }
+  }
+}
+
+// ===== NOTIFICATION OVERRIDES =====
+.ant-notification {
+  &-notice {
+    border-radius: @border-radius-base !important;
+    box-shadow: @box-shadow-medium !important;
+
+    &-success {
+      background: @success-bg !important;
+      border-left: 4px solid @success-color !important;
+
+      .ant-notification-notice-icon {
+        color: @success-color !important;
+      }
+    }
+
+    &-error {
+      background: @error-bg !important;
+      border-left: 4px solid @error-color !important;
+
+      .ant-notification-notice-icon {
+        color: @error-color !important;
+      }
+    }
+
+    &-warning {
+      background: @warning-bg !important;
+      border-left: 4px solid @warning-color !important;
+
+      .ant-notification-notice-icon {
+        color: @warning-color !important;
+      }
+    }
+
+    &-info {
+      background: @info-bg !important;
+      border-left: 4px solid @info-color !important;
+
+      .ant-notification-notice-icon {
+        color: @info-color !important;
+      }
+    }
+  }
+}
+
+// ===== MESSAGE OVERRIDES =====
+.ant-message {
+  &-notice-content {
+    border-radius: @border-radius-base !important;
+    box-shadow: @box-shadow-medium !important;
+  }
+
+  &-success .anticon {
+    color: @success-color !important;
+  }
+
+  &-error .anticon {
+    color: @error-color !important;
+  }
+
+  &-warning .anticon {
+    color: @warning-color !important;
+  }
+
+  &-info .anticon {
+    color: @info-color !important;
+  }
+}
+
+// ===== TABS OVERRIDES =====
+.ant-tabs {
+  &-tab {
+    color: @text-secondary !important;
+    font-weight: @font-weight-medium !important;
+
+    &:hover {
+      color: @primary-text-hover !important;
+    }
+
+    &.ant-tabs-tab-active {
+      color: @primary-color !important;
+
+      .ant-tabs-tab-btn {
+        color: @primary-color !important;
+      }
+    }
+  }
+
+  &-ink-bar {
+    background: @primary-color !important;
+  }
+
+  &-content-holder {
+    border-top: 1px solid @border-color !important;
+  }
+}
+
+// ===== PAGINATION OVERRIDES =====
+.ant-pagination {
+  &-item {
+    border-radius: @border-radius-base !important;
+    border-color: @border-color !important;
+
+    &:hover {
+      border-color: @primary-color !important;
+      color: @primary-color !important;
+    }
+
+    &.ant-pagination-item-active {
+      background: @primary-color !important;
+      border-color: @primary-color !important;
+
+      a {
+        color: #ffffff !important;
+      }
+    }
+  }
+
+  &-prev,
+  &-next {
+    .ant-pagination-item-link {
+      border-radius: @border-radius-base !important;
+      border-color: @border-color !important;
+
+      &:hover {
+        border-color: @primary-color !important;
+        color: @primary-color !important;
+      }
+    }
+  }
+}
+
+// ===== CHECKBOX OVERRIDES =====
+.ant-checkbox {
+  &-wrapper {
+    color: @text-color !important;
+    transition: @transition-base !important;
+
+    &:hover {
+      color: @primary-text-hover !important;
+    }
+
+    &-disabled {
+      color: @text-disabled !important;
+
+      &:hover {
+        color: @text-disabled !important;
+      }
+    }
+  }
+
+  &-inner {
+    border-radius: @border-radius-xs !important;
+    border-color: @border-color !important;
+    background-color: @bg-container !important;
+    transition: @transition-base !important;
+  }
+
+  &:hover .ant-checkbox-inner {
+    border-color: @primary-color !important;
+  }
+
+  &-checked {
+    .ant-checkbox-inner {
+      background-color: @primary-color !important;
+      border-color: @primary-color !important;
+
+      &:after {
+        border-color: #ffffff !important;
+      }
+    }
+
+    &:hover .ant-checkbox-inner {
+      background-color: @primary-hover !important;
+      border-color: @primary-hover !important;
+    }
+
+    &:active .ant-checkbox-inner {
+      background-color: @primary-active !important;
+      border-color: @primary-active !important;
+    }
+  }
+
+  &-input:focus + .ant-checkbox-inner {
+    border-color: @primary-color !important;
+    box-shadow: 0 0 0 3px fade(@primary-color, 12%) !important;
+  }
+
+  &-indeterminate {
+    .ant-checkbox-inner {
+      background-color: @primary-color !important;
+      border-color: @primary-color !important;
+
+      &:after {
+        background-color: #ffffff !important;
+      }
+    }
+
+    &:hover .ant-checkbox-inner {
+      background-color: @primary-hover !important;
+      border-color: @primary-hover !important;
+    }
+  }
+
+  &-disabled {
+    .ant-checkbox-inner {
+      background-color: @fill-quaternary !important;
+      border-color: @border-color !important;
+
+      &:after {
+        border-color: @text-disabled !important;
+      }
+    }
+
+    &.ant-checkbox-checked .ant-checkbox-inner {
+      background-color: @fill-quaternary !important;
+
+      &:after {
+        border-color: @text-disabled !important;
+      }
+    }
+  }
+
+  // Checkbox group
+  &-group {
+    color: @text-color !important;
+
+    &-item {
+      margin-right: @padding-base !important;
+
+      &:hover {
+        color: @primary-text-hover !important;
+      }
+    }
+  }
+}
+
+// ===== RADIO OVERRIDES =====
+.ant-radio {
+  &-wrapper {
+    color: @text-color !important;
+  }
+
+  &-checked .ant-radio-inner {
+    border-color: @primary-color !important;
+
+    &:after {
+      background-color: @primary-color !important;
+    }
+  }
+
+  &:hover .ant-radio-inner {
+    border-color: @primary-color !important;
+  }
+
+  &-input:focus + .ant-radio-inner {
+    border-color: @primary-color !important;
+    box-shadow: 0 0 0 3px fade(@primary-color, 12%) !important;
+  }
+}
+
+// ===== SWITCH OVERRIDES =====
+.ant-switch {
+  background: @fill-tertiary !important;
+
+  &-checked {
+    background: @primary-color !important;
+  }
+
+  &:hover {
+    background: @fill-quaternary !important;
+
+    &.ant-switch-checked {
+      background: @primary-hover !important;
+    }
+  }
+}
+
+// ===== TOOLTIP OVERRIDES =====
+.ant-tooltip {
+  &-inner {
+    background: @text-heading !important;
+    border-radius: @border-radius-base !important;
+    color: #ffffff !important;
+  }
+
+  &-arrow-content {
+    background: @text-heading !important;
+  }
+}
+
+// ===== POPOVER OVERRIDES =====
+.ant-popover {
+  &-inner {
+    border-radius: @border-radius-base !important;
+    box-shadow: @box-shadow-medium !important;
+  }
+
+  &-title {
+    color: @text-heading !important;
+    font-weight: @font-weight-semibold !important;
+    border-bottom: 1px solid @border-color !important;
+  }
+
+  &-inner-content {
+    color: @text-color !important;
+  }
+}
+
+// ===== DRAWER OVERRIDES =====
+.ant-drawer {
+  &-content-wrapper {
+    box-shadow: @box-shadow-heavy !important;
+  }
+
+  &-header {
+    border-bottom: 1px solid @border-color !important;
+
+    .ant-drawer-title {
+      color: @text-heading !important;
+      font-weight: @font-weight-semibold !important;
+    }
+  }
+
+  &-body {
+    color: @text-color !important;
+  }
+
+  &-mask {
+    background: @bg-mask !important;
+  }
+}
+
+// ===== BREADCRUMB OVERRIDES =====
+.ant-breadcrumb {
+  color: @text-secondary !important;
+
+  a {
+    color: @primary-text !important;
+
+    &:hover {
+      color: @primary-text-hover !important;
+    }
+  }
+
+  &-separator {
+    color: @text-tertiary !important;
+  }
+}
+
+// ===== STEPS OVERRIDES =====
+.ant-steps {
+  &-item {
+    &-process .ant-steps-item-icon {
+      background: @primary-color !important;
+      border-color: @primary-color !important;
+    }
+
+    &-finish .ant-steps-item-icon {
+      background: @bg-container !important;
+      border-color: @primary-color !important;
+
+      .ant-steps-icon {
+        color: @primary-color !important;
+      }
+    }
+
+    &-title {
+      color: @text-color !important;
+    }
+
+    &-description {
+      color: @text-secondary !important;
+    }
+  }
+}
+
+// ===== PROGRESS OVERRIDES =====
+.ant-progress {
+  &-bg {
+    background: @primary-color !important;
+  }
+
+  &-text {
+    color: @text-color !important;
+  }
+}
+
+// ===== ALERT OVERRIDES =====
+.ant-alert {
+  border-radius: @border-radius-base !important;
+
+  &-success {
+    background: @success-bg !important;
+    border: 1px solid @success-border !important;
+
+    .ant-alert-icon {
+      color: @success-color !important;
+    }
+  }
+
+  &-error {
+    background: @error-bg !important;
+    border: 1px solid @error-border !important;
+
+    .ant-alert-icon {
+      color: @error-color !important;
+    }
+  }
+
+  &-warning {
+    background: @warning-bg !important;
+    border: 1px solid @warning-border !important;
+
+    .ant-alert-icon {
+      color: @warning-color !important;
+    }
+  }
+
+  &-info {
+    background: @info-bg !important;
+    border: 1px solid @info-border !important;
+
+    .ant-alert-icon {
+      color: @info-color !important;
+    }
+  }
+
+  &-message {
+    color: @text-heading !important;
+    font-weight: @font-weight-medium !important;
+  }
+
+  &-description {
+    color: @text-color !important;
+  }
+}
+
+// ===== TAG OVERRIDES =====
+.ant-tag {
+  border-radius: @border-radius-sm !important;
+  border: 1px solid @border-color !important;
+  background: @fill-color !important;
+  color: @text-color !important;
+
+  &-blue {
+    background: @info-bg !important;
+    border-color: @info-border !important;
+    color: @info-color !important;
+  }
+
+  &-green {
+    background: @success-bg !important;
+    border-color: @success-border !important;
+    color: @success-color !important;
+  }
+
+  &-orange {
+    background: @warning-bg !important;
+    border-color: @warning-border !important;
+    color: @warning-color !important;
+  }
+
+  &-red {
+    background: @error-bg !important;
+    border-color: @error-border !important;
+    color: @error-color !important;
+  }
+}
+
+// ===== BADGE OVERRIDES =====
+.ant-badge {
+  &-count {
+    background: @error-color !important;
+    box-shadow: 0 0 0 1px @bg-container !important;
+  }
+
+  &-dot {
+    background: @error-color !important;
+  }
+}
+
+// ===== CALENDAR OVERRIDES =====
+.ant-picker-calendar {
+  background: @bg-container !important;
+  border-radius: @border-radius-lg !important;
+
+  .ant-picker-calendar-date-today {
+    border-color: @primary-color !important;
+  }
+
+  .ant-picker-calendar-date-selected {
+    .ant-picker-calendar-date-value {
+      background: @primary-color !important;
+      color: #ffffff !important;
+    }
+  }
+}
+
+// ===== LIST OVERRIDES =====
+.ant-list {
+  &-item {
+    padding: @padding-base !important;
+    border-bottom: 1px solid @border-secondary !important;
+
+    &:hover {
+      background: @fill-color !important;
+    }
+
+    &-meta {
+      &-title {
+        color: @text-heading !important;
+
+        a {
+          color: @text-heading !important;
+
+          &:hover {
+            color: @primary-text-hover !important;
+          }
+        }
+      }
+
+      &-description {
+        color: @text-secondary !important;
+      }
+    }
+
+    &-action {
+      li {
+        a {
+          color: @primary-text !important;
+
+          &:hover {
+            color: @primary-text-hover !important;
+          }
+        }
+      }
+    }
+  }
+
+  &-item-selected {
+    background: @primary-bg !important;
+
+    &:hover {
+      background: @primary-bg-hover !important;
+    }
+  }
+}
+
+// ===== ANCHOR OVERRIDES =====
+.ant-anchor {
+  &-link {
+    padding: @padding-xxs 0 @padding-xxs @padding-base !important;
+
+    &-title {
+      color: @text-color !important;
+      transition: @transition-base !important;
+
+      &:hover {
+        color: @primary-text-hover !important;
+      }
+    }
+
+    &-active > .ant-anchor-link-title {
+      color: @primary-color !important;
+    }
+  }
+
+  &-ink {
+    &::before {
+      background-color: @border-color !important;
+    }
+
+    &-ball {
+      background-color: @primary-color !important;
+      border-color: @primary-color !important;
+    }
+  }
+}
+
+// ===== BACK TOP OVERRIDES =====
+.ant-back-top {
+  &-content {
+    background: @primary-color !important;
+    color: #ffffff !important;
+    border-radius: @border-radius-base !important;
+    transition: @transition-base !important;
+
+    &:hover {
+      background: @primary-hover !important;
+    }
+  }
+}
+
+// ===== AFFIX OVERRIDES =====
+.ant-affix {
+  z-index: 10 !important;
+}
+
+// ===== DATE PICKER OVERRIDES =====
+.ant-picker {
+  border-radius: @border-radius-base !important;
+  border-color: @border-color !important;
+
+  &:hover {
+    border-color: @primary-border-hover !important;
+  }
+
+  &-focused {
+    border-color: @primary-color !important;
+    box-shadow: 0 0 0 2px fade(@primary-color, 20%) !important;
+  }
+}
+
+.ant-picker-dropdown {
+  .ant-picker-cell {
+    &:hover {
+      .ant-picker-cell-inner {
+        background: @primary-bg-hover !important;
+      }
+    }
+
+    &-selected {
+      .ant-picker-cell-inner {
+        background: @primary-color !important;
+        color: #ffffff !important;
+      }
+    }
+
+    &-today {
+      .ant-picker-cell-inner {
+        border: 1px solid @primary-color !important;
+        color: @primary-color !important;
+      }
+    }
+  }
+}
+
+// ===== DROPDOWN OVERRIDES =====
+.ant-dropdown {
+  border-radius: @border-radius-base !important;
+  box-shadow: @box-shadow-medium !important;
+
+  &-menu {
+    border-radius: @border-radius-base !important;
+    border: 1px solid @border-color !important;
+    background: @bg-container !important;
+
+    &-item {
+      color: @text-color !important;
+      transition: @transition-fast !important;
+
+      &:hover {
+        background: @primary-bg-hover !important;
+        color: @primary-text-hover !important;
+      }
+
+      &:active {
+        background: @primary-bg !important;
+      }
+
+      a {
+        color: inherit !important;
+        text-decoration: none !important;
+
+        &:hover {
+          color: inherit !important;
+        }
+      }
+
+      &-disabled {
+        color: @text-disabled !important;
+
+        &:hover {
+          background: transparent !important;
+          color: @text-disabled !important;
+        }
+      }
+
+      &-selected {
+        background: @primary-bg !important;
+        color: @primary-color !important;
+
+        &:hover {
+          background: @primary-bg-hover !important;
+          color: @primary-text-hover !important;
+        }
+      }
+
+      &-danger {
+        color: @error-color !important;
+
+        &:hover {
+          background: @error-bg !important;
+          color: @error-color !important;
+        }
+      }
+    }
+
+    &-submenu-title {
+      color: @text-color !important;
+
+      &:hover {
+        background: @primary-bg-hover !important;
+        color: @primary-text-hover !important;
+      }
+    }
+
+    &-item-group-title {
+      color: @text-secondary !important;
+    }
+
+    &-item-divider {
+      background: @border-color !important;
+    }
+  }
+}
+
+// ===== AUTO COMPLETE OVERRIDES =====
+.ant-select-auto-complete {
+  .ant-select-selector {
+    &:hover {
+      border-color: @primary-border-hover !important;
+    }
+  }
+
+  &.ant-select-focused .ant-select-selector {
+    border-color: @primary-color !important;
+    box-shadow: 0 0 0 2px fade(@primary-color, 20%) !important;
+  }
+}
+
+// ===== CASCADER OVERRIDES =====
+.ant-cascader {
+  &-picker {
+    border-radius: @border-radius-base !important;
+    border-color: @border-color !important;
+
+    &:hover {
+      border-color: @primary-border-hover !important;
+    }
+
+    &-focused {
+      border-color: @primary-color !important;
+      box-shadow: 0 0 0 2px fade(@primary-color, 20%) !important;
+    }
+  }
+
+  &-menu {
+    border-radius: @border-radius-base !important;
+
+    &-item {
+      color: @text-color !important;
+
+      &:hover {
+        background: @primary-bg-hover !important;
+      }
+
+      &-active {
+        background: @primary-bg !important;
+        color: @primary-color !important;
+      }
+    }
+  }
+}
+
+// ===== MENTIONS OVERRIDES =====
+.ant-mentions {
+  border-radius: @border-radius-base !important;
+  border-color: @border-color !important;
+
+  &:hover {
+    border-color: @primary-border-hover !important;
+  }
+
+  &-focused {
+    border-color: @primary-color !important;
+    box-shadow: 0 0 0 2px fade(@primary-color, 20%) !important;
+  }
+
+  &-dropdown {
+    &-menu {
+      &-item {
+        color: @text-color !important;
+
+        &:hover {
+          background: @primary-bg-hover !important;
+        }
+
+        &-active {
+          background: @primary-bg !important;
+          color: @primary-color !important;
+        }
+      }
+    }
+  }
+}
+
+// ===== RATE OVERRIDES =====
+.ant-rate {
+  color: @text-quaternary !important;
+
+  &-star {
+    &:hover {
+      transform: scale(1.1) !important;
+      transition: @transition-fast !important;
+    }
+
+    &-full {
+      color: @warning-color !important;
+    }
+
+    &-half {
+      .ant-rate-star-second {
+        color: @warning-color !important;
+      }
+    }
+  }
+
+  &:hover .ant-rate-star {
+    &:not(.ant-rate-star-full):not(.ant-rate-star-half) {
+      color: @text-tertiary !important;
+    }
+  }
+}
+
+// ===== SLIDER OVERRIDES =====
+.ant-slider {
+  &-track {
+    background: @primary-color !important;
+  }
+
+  &-handle {
+    border: 2px solid @primary-color !important;
+    background: @bg-container !important;
+
+    &:hover {
+      border-color: @primary-hover !important;
+    }
+
+    &:focus {
+      border-color: @primary-color !important;
+      box-shadow: 0 0 0 5px fade(@primary-color, 12%) !important;
+    }
+  }
+
+  &-rail {
+    background: @fill-tertiary !important;
+  }
+
+  &-dot {
+    background: @border-color !important;
+    border-color: @border-color !important;
+
+    &-active {
+      background: @primary-color !important;
+      border-color: @primary-color !important;
+    }
+  }
+
+  &:hover {
+    .ant-slider-track {
+      background: @primary-hover !important;
+    }
+
+    .ant-slider-handle {
+      border-color: @primary-hover !important;
+    }
+  }
+}
+
+// ===== TRANSFER OVERRIDES =====
+.ant-transfer {
+  &-list {
+    border-radius: @border-radius-base !important;
+    border-color: @border-color !important;
+
+    &-header {
+      background: @fill-color !important;
+      border-bottom: 1px solid @border-color !important;
+      border-radius: @border-radius-base @border-radius-base 0 0 !important;
+
+      .ant-checkbox-wrapper {
+        color: @text-heading !important;
+      }
+    }
+
+    &-content-item {
+      color: @text-color !important;
+      transition: @transition-base !important;
+
+      &:hover {
+        background: @primary-bg-hover !important;
+        color: @primary-text-hover !important;
+      }
+
+      &-checked {
+        background: @primary-bg !important;
+        color: @primary-color !important;
+      }
+
+      &-disabled {
+        color: @text-disabled !important;
+
+        &:hover {
+          background: transparent !important;
+          color: @text-disabled !important;
+        }
+      }
+    }
+  }
+
+  &-operation {
+    .ant-btn {
+      &:hover:not(:disabled) {
+        background: @primary-hover !important;
+        border-color: @primary-hover !important;
+      }
+    }
+  }
+}
+
+// ===== TREE OVERRIDES =====
+.ant-tree {
+  background: @bg-container !important;
+  color: @text-color !important;
+
+  .ant-tree-node-content-wrapper {
+    color: @text-color !important;
+    border-radius: @border-radius-xs !important;
+    transition: @transition-base !important;
+
+    &:hover {
+      background: @primary-bg-hover !important;
+      color: @primary-text-hover !important;
+    }
+
+    &.ant-tree-node-selected {
+      background: @primary-bg !important;
+      color: @primary-color !important;
+    }
+  }
+
+  .ant-tree-switcher {
+    color: @text-tertiary !important;
+
+    &:hover {
+      background: @fill-color !important;
+    }
+
+    &-icon {
+      color: @text-tertiary !important;
+
+      &:hover {
+        color: @primary-text-hover !important;
+      }
+    }
+  }
+
+  .ant-tree-checkbox {
+    .ant-checkbox-inner {
+      &:hover {
+        border-color: @primary-color !important;
+      }
+    }
+
+    &-checked .ant-checkbox-inner {
+      background: @primary-color !important;
+      border-color: @primary-color !important;
+    }
+  }
+
+  .ant-tree-title {
+    color: inherit !important;
+  }
+}
+
+// ===== TREE SELECT OVERRIDES =====
+.ant-tree-select {
+  .ant-select-selector {
+    &:hover {
+      border-color: @primary-border-hover !important;
+    }
+  }
+
+  &.ant-select-focused .ant-select-selector {
+    border-color: @primary-color !important;
+    box-shadow: 0 0 0 2px fade(@primary-color, 20%) !important;
+  }
+}
+
+// ===== UPLOAD OVERRIDES =====
+.ant-upload {
+  &-drag {
+    border: 2px dashed @border-color !important;
+    border-radius: @border-radius-base !important;
+    background: @bg-container !important;
+    transition: @transition-base !important;
+
+    &:hover {
+      border-color: @primary-border-hover !important;
+      background: @primary-bg-hover !important;
+    }
+
+    &.ant-upload-drag-hover {
+      border-color: @primary-color !important;
+      background: @primary-bg !important;
+    }
+  }
+
+  &-select {
+    &:hover .ant-upload {
+      color: @primary-text-hover !important;
+    }
+  }
+
+  &-list {
+    &-item {
+      border-radius: @border-radius-base !important;
+
+      &:hover {
+        background: @fill-color !important;
+      }
+
+      &-name {
+        color: @text-color !important;
+
+        a {
+          color: @primary-text !important;
+
+          &:hover {
+            color: @primary-text-hover !important;
+          }
+        }
+      }
+
+      &-actions {
+        .anticon {
+          color: @text-tertiary !important;
+
+          &:hover {
+            color: @primary-text-hover !important;
+          }
+        }
+      }
+    }
+
+    &-item-error {
+      border-color: @error-color !important;
+
+      .ant-upload-list-item-name {
+        color: @error-color !important;
+      }
+    }
+  }
+
+  &-btn {
+    color: @primary-text !important;
+
+    &:hover {
+      color: @primary-text-hover !important;
+    }
+  }
+}
+
+// ===== SPIN OVERRIDES =====
+.ant-spin {
+  color: @primary-color !important;
+
+  &-dot {
+    &-item {
+      background-color: @primary-color !important;
+    }
+  }
+
+  &-text {
+    color: @text-color !important;
+  }
+}
+
+// ===== EMPTY OVERRIDES =====
+.ant-empty {
+  &-description {
+    color: @text-secondary !important;
+  }
+
+  &-image {
+    opacity: 0.6 !important;
+  }
+}
+
+// ===== SKELETON OVERRIDES =====
+.ant-skeleton {
+  &-title {
+    background: linear-gradient(90deg, @fill-secondary 25%, @fill-color 50%, @fill-secondary 75%) !important;
+    background-size: 200% 100% !important;
+  }
+
+  &-paragraph > li {
+    background: linear-gradient(90deg, @fill-secondary 25%, @fill-color 50%, @fill-secondary 75%) !important;
+    background-size: 200% 100% !important;
+  }
+
+  &-avatar {
+    background: linear-gradient(90deg, @fill-secondary 25%, @fill-color 50%, @fill-secondary 75%) !important;
+    background-size: 200% 100% !important;
+  }
+}
+
+// ===== RESULT OVERRIDES =====
+.ant-result {
+  &-title {
+    color: @text-heading !important;
+  }
+
+  &-subtitle {
+    color: @text-secondary !important;
+  }
+
+  &-icon {
+    &-success .anticon {
+      color: @success-color !important;
+    }
+
+    &-error .anticon {
+      color: @error-color !important;
+    }
+
+    &-info .anticon {
+      color: @info-color !important;
+    }
+
+    &-warning .anticon {
+      color: @warning-color !important;
+    }
+  }
+}
+
+// ===== TIME PICKER OVERRIDES =====
+.ant-picker-time-panel {
+  .ant-picker-time-panel-column > li {
+    color: @text-color !important;
+
+    &:hover {
+      background: @primary-bg-hover !important;
+    }
+
+    &.ant-picker-time-panel-cell-selected {
+      background: @primary-bg !important;
+      color: @primary-color !important;
+    }
+  }
+}
+
+// ===== INPUT NUMBER OVERRIDES =====
+.ant-input-number {
+  border-radius: @border-radius-base !important;
+  border-color: @border-color !important;
+
+  &:hover {
+    border-color: @primary-border-hover !important;
+  }
+
+  &:focus-within {
+    border-color: @primary-color !important;
+    box-shadow: 0 0 0 2px fade(@primary-color, 20%) !important;
+  }
+
+  &-handler {
+    color: @text-tertiary !important;
+
+    &:hover {
+      color: @primary-text-hover !important;
+    }
+  }
+
+  &-input {
+    color: @text-color !important;
+  }
+}
+
+// ===== STATISTIC OVERRIDES =====
+.ant-statistic {
+  &-title {
+    color: @text-secondary !important;
+  }
+
+  &-content {
+    color: @text-heading !important;
+  }
+
+  &-content-value {
+    color: @text-heading !important;
+  }
+
+  &-content-suffix,
+  &-content-prefix {
+    color: @text-color !important;
+  }
+}
