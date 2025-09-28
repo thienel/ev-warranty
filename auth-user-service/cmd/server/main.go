@@ -75,7 +75,7 @@ func main() {
 
 	officeHandler := api.NewOfficeHandler(log, officeService)
 	authHandler := api.NewAuthHandler(log, authService, tokenService, userService)
-	oauthHandler := api.NewOAuthHandler(log, oauthService, authService)
+	oauthHandler := api.NewOAuthHandler(log, cfg.OAuth.FrontendBaseURL, oauthService, authService)
 	userHandler := api.NewUserHandler(log, userService)
 
 	r := api.NewRouter(app.DB, authHandler, oauthHandler, officeHandler, userHandler)
