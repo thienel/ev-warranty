@@ -5,10 +5,11 @@ import { PersistGate } from 'redux-persist/integration/react'
 import App from '@/App.jsx'
 import 'antd/dist/reset.css'
 import store, { persistor } from '@redux/store.js'
+import LoadingOverlay from '@components/LoadingOverlay/LoadingOverlay.jsx'
 
 createRoot(document.getElementById('root')).render(
   <Provider store={store}>
-    <PersistGate loading={null} persistor={persistor}>
+    <PersistGate loading={<LoadingOverlay loading={true} children={null} />} persistor={persistor}>
       <BrowserRouter>
         <App />
       </BrowserRouter>
