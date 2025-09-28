@@ -68,10 +68,19 @@ func (h *authHandler) Login(c *gin.Context) {
 		return
 	}
 
+	c.SetCookie(
+		"refreshToken",
+		refreshToken,
+		60*60*24*7,
+		"/",
+		"localhost",
+		false,
+		true,
+	)
+
 	response := dtos.LoginResponse{
-		AccessToken:  accessToken,
-		RefreshToken: refreshToken,
-		User:         *dtos.GenerateUserDTO(*user),
+		Token: accessToken,
+		User:  *dtos.GenerateUserDTO(*user),
 	}
 
 	h.log.Info("login successful", "user_id", userID)
@@ -82,14 +91,16 @@ func (h *authHandler) Logout(c *gin.Context) {
 	ctx, cancel := context.WithTimeout(c.Request.Context(), requestTimeout)
 	defer cancel()
 
-	refreshToken := h.extractRefreshTokenFromBody(c)
-	if refreshToken == "" {
+	token, err := c.Cookie("refreshToken")
+	if err != nil {
+		err = apperrors.NewUnauthorized("refresh token not found")
+		handleError(h.log, c, err, "refresh token not found in cookie")
 		return
 	}
 
 	h.log.Info("attempting logout")
 
-	if err := h.authService.Logout(ctx, refreshToken); err != nil {
+	if err = h.authService.Logout(ctx, token); err != nil {
 		handleError(h.log, c, err, "logout failed")
 		return
 	}
@@ -102,8 +113,10 @@ func (h *authHandler) RefreshToken(c *gin.Context) {
 	ctx, cancel := context.WithTimeout(c.Request.Context(), requestTimeout)
 	defer cancel()
 
-	refreshToken := h.extractRefreshTokenFromBody(c)
-	if refreshToken == "" {
+	refreshToken, err := c.Cookie("refreshToken")
+	if err != nil {
+		err = apperrors.NewUnauthorized("refresh token not found")
+		handleError(h.log, c, err, "refresh token not found in cookie")
 		return
 	}
 
@@ -168,19 +181,6 @@ func (h *authHandler) extractBearerToken(c *gin.Context) string {
 		return ""
 	}
 	return strings.TrimPrefix(authHeader, bearerPrefix)
-}
-
-func (h *authHandler) extractRefreshTokenFromBody(c *gin.Context) string {
-	var tokenReq struct {
-		RefreshToken string `json:"refresh_token" binding:"required"`
-	}
-
-	err := c.ShouldBindJSON(&tokenReq)
-	if err != nil {
-		return ""
-	}
-
-	return tokenReq.RefreshToken
 }
 
 func (h *authHandler) extractUserIDFromToken(ctx context.Context, accessToken string) (uuid.UUID, error) {

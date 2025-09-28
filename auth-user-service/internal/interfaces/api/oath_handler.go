@@ -63,10 +63,15 @@ func (h *oauthHandler) HandleCallback(c *gin.Context) {
 		return
 	}
 
-	writeSuccessResponse(c, http.StatusOK, "OAuth login successful", dtos.LoginResponse{
-		AccessToken:  accessToken,
-		RefreshToken: refreshToken,
-		User:         *dtos.GenerateUserDTO(*user),
-	})
+	c.SetCookie(
+		"refreshToken",
+		refreshToken,
+		60*60*24*7,
+		"/",
+		"localhost",
+		false,
+		true,
+	)
+
 	c.Redirect(http.StatusFound, fmt.Sprintf("http://localhost:3000/auth/callback?token=%s", accessToken))
 }
