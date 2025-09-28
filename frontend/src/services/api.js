@@ -1,5 +1,4 @@
 import axios from 'axios'
-import { message } from 'antd'
 import store from '@/redux/store'
 import { setToken, logout } from '@/redux/authSlice'
 import { API_BASE_URL, API_ENDPOINTS } from '@constants'
@@ -44,7 +43,7 @@ api.interceptors.response.use(
       }
     }
 
-    message.error(error.response?.data?.message || 'Unexpected error occurred')
+    console.log(error.response.data || 'Unexpected error occurred')
     return Promise.reject(error)
   }
 )
