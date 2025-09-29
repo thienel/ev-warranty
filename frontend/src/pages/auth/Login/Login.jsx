@@ -11,7 +11,7 @@ import './Login.less'
 import { useDispatch } from 'react-redux'
 import { API_BASE_URL, API_ENDPOINTS } from '@constants'
 import api from '@services/api.js'
-import { loginSuccess, loginFailure } from '@redux/authSlice.js'
+import { loginSuccess} from '@redux/authSlice.js'
 import Logo from '@pages/auth/Login/Logo/Logo.jsx'
 import { useDelay } from '@/hooks/index.js'
 import { useNavigate, useSearchParams } from 'react-router-dom'
@@ -42,10 +42,9 @@ const Login = () => {
         const res = await api.post(API_ENDPOINTS.AUTH.LOGIN, values)
         const { token, user } = res.data.data
         message.success('Login successful!')
-        dispatch(loginSuccess({ user, token: token }))
+        dispatch(loginSuccess({ user, token: token, remember: values.remember }))
       } catch (error) {
         console.error(error.response.data)
-        dispatch(loginFailure())
         message.error('Login failed. Please check your credentials.')
       } finally {
         setLoginLoading(false)
@@ -76,7 +75,7 @@ const Login = () => {
             name="login"
             className="login-form"
             initialValues={{
-              remember: true,
+              remember: false,
             }}
             onFinish={handleLogin}
             autoComplete="off"

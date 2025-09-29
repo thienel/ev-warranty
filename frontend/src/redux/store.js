@@ -1,12 +1,12 @@
 import { configureStore } from '@reduxjs/toolkit'
 import { persistStore, persistReducer } from 'redux-persist'
-import storage from 'redux-persist/lib/storage'
 import authReducer from './authSlice.js'
+import storageSwitcher from '@redux/storageSwitcher.js'
 
 const persistConfig = {
   key: 'auth',
-  storage,
-  whitelist: ['user', 'token', 'isAuthenticated', 'isInitialized'],
+  storage: storageSwitcher,
+  whitelist: ['user', 'token', 'isAuthenticated', 'remember'],
 }
 
 const persistedAuthReducer = persistReducer(persistConfig, authReducer)
