@@ -37,8 +37,9 @@ services:
       - GOOGLE_REDIRECT_URL=http://localhost/api/v1/auth/google/callback
       - PRIVATE_PEM=${PRIVATE_PEM}
       - PUBLIC_PEM=${PUBLIC_PEM}
-      - ADMIN_EMAIL={ADMIN_EMAIL}
-      - ADMIN_PASSWORD={ADMIN_PASSWORD}
+      - ADMIN_EMAIL=${ADMIN_EMAIL}
+      - ADMIN_PASSWORD=${ADMIN_PASSWORD}
+      - FRONTEND_BASE_URL=${FRONTEND_BASE_URL}
     entrypoint: ["./entrypoint.sh"]
     ports:
       - "8888:8888"
