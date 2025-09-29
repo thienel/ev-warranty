@@ -42,7 +42,7 @@ const Login = () => {
         const res = await api.post(API_ENDPOINTS.AUTH.LOGIN, values)
         const { token, user } = res.data.data
         message.success('Login successful!')
-        dispatch(loginSuccess({ user, token: token }))
+        dispatch(loginSuccess({ user, token: token, remember: values.remember }))
       } catch (error) {
         console.error(error.response.data)
         message.error('Login failed. Please check your credentials.')
@@ -75,7 +75,7 @@ const Login = () => {
             name="login"
             className="login-form"
             initialValues={{
-              remember: true,
+              remember: false,
             }}
             onFinish={handleLogin}
             autoComplete="off"
