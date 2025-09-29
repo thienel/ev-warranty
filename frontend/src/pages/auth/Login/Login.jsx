@@ -1,20 +1,14 @@
 import React, { useEffect, useState } from 'react'
-import { Form, Input, Button, Card, message, Typography, Checkbox } from 'antd'
-import {
-  UserOutlined,
-  LockOutlined,
-  GoogleOutlined,
-  EyeInvisibleOutlined,
-  EyeTwoTone,
-} from '@ant-design/icons'
+import { Form, Card, message, Typography } from 'antd'
 import './Login.less'
 import { useDispatch } from 'react-redux'
 import { API_BASE_URL, API_ENDPOINTS } from '@constants'
 import api from '@services/api.js'
-import { loginSuccess} from '@redux/authSlice.js'
+import { loginSuccess } from '@redux/authSlice.js'
 import Logo from '@pages/auth/Login/Logo/Logo.jsx'
 import { useDelay } from '@/hooks/index.js'
 import { useNavigate, useSearchParams } from 'react-router-dom'
+import LoginForm from '@pages/auth/Login/LoginForm/LoginForm.jsx'
 
 const { Title } = Typography
 
@@ -70,115 +64,13 @@ const Login = () => {
         </div>
 
         <div className="login-body">
-          <Form
+          <LoginForm
             form={form}
-            name="login"
-            className="login-form"
-            initialValues={{
-              remember: false,
-            }}
-            onFinish={handleLogin}
-            autoComplete="off"
-            layout="vertical"
-          >
-            <Form.Item
-              label="Email"
-              name="email"
-              validateFirst
-              validateTrigger="onBlur"
-              rules={[
-                {
-                  required: true,
-                  message: 'Please input your email!',
-                },
-                {
-                  type: 'email',
-                  message: 'Please enter a valid email address!',
-                },
-              ]}
-            >
-              <Input prefix={<UserOutlined />} placeholder="Enter your email" size="large" />
-            </Form.Item>
-
-            <Form.Item
-              label="Password"
-              name="password"
-              validateFirst
-              validateTrigger="onBlur"
-              rules={[
-                {
-                  required: true,
-                  message: 'Please input your password!',
-                },
-                {
-                  min: 8,
-                  message: 'Password must be at least 8 characters long!',
-                },
-                {
-                  pattern: /[a-z]/,
-                  message: 'Password must contain at least one lowercase letter!',
-                },
-                {
-                  pattern: /[A-Z]/,
-                  message: 'Password must contain at least one uppercase letter!',
-                },
-                {
-                  pattern: /\d/,
-                  message: 'Password must contain at least one digit!',
-                },
-                {
-                  pattern: /[^A-Za-z0-9]/,
-                  message: 'Password must contain at least one special character!',
-                },
-              ]}
-            >
-              <Input.Password
-                prefix={<LockOutlined />}
-                placeholder="Enter your password"
-                size="large"
-                iconRender={(visible) => (visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />)}
-              />
-            </Form.Item>
-
-            <div className="form-options">
-              <Form.Item name="remember" valuePropName="checked" noStyle>
-                <Checkbox>Remember me</Checkbox>
-              </Form.Item>
-              <a href="#" className="forgot-password">
-                Forgot password?
-              </a>
-            </div>
-
-            <Form.Item>
-              <Button
-                type="primary"
-                htmlType="submit"
-                loading={loginLoading}
-                size="large"
-                block
-                className="login-button"
-              >
-                {loginLoading ? 'Signing in...' : 'Sign In'}
-              </Button>
-            </Form.Item>
-
-            <div className="divider">
-              <span className="divider-text">or</span>
-            </div>
-
-            <div className="social-login">
-              <Button
-                icon={<GoogleOutlined />}
-                onClick={handleGoogleLogin}
-                loading={googleLoading}
-                size="large"
-                block
-                className="social-button"
-              >
-                {googleLoading ? 'Connecting...' : 'Continue with Google'}
-              </Button>
-            </div>
-          </Form>
+            onLogin={handleLogin}
+            onGoogleLogin={handleGoogleLogin}
+            loginLoading={loginLoading}
+            googleLoading={googleLoading}
+          />
         </div>
       </Card>
     </div>
