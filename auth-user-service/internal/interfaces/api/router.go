@@ -3,9 +3,7 @@ package api
 import (
 	"auth-service/internal/infrastructure/database"
 	"net/http"
-	"time"
 
-	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )
 
@@ -16,18 +14,6 @@ type HealthHandler struct {
 func NewRouter(db *database.Database, authHandler AuthHandler, oauthHandler OAuthHandler,
 	officeHandler OfficeHandler, userHandler UserHandler) *gin.Engine {
 	router := gin.New()
-
-	router.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{"http://localhost:3000"},
-		AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
-		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization"},
-		ExposeHeaders:    []string{"Content-Length"},
-		AllowCredentials: true,
-		MaxAge:           12 * time.Hour,
-	}))
-	router.OPTIONS("/*path", func(c *gin.Context) {
-		c.Status(http.StatusNoContent)
-	})
 
 	router.Use(gin.Recovery(), gin.Logger())
 	healthHandler := HealthHandler{DB: db}
