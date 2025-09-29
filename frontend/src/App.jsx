@@ -1,45 +1,24 @@
-import React, { useEffect } from 'react'
+import React from 'react'
 import { Navigate, Outlet, useRoutes } from 'react-router-dom'
 import Home from '@pages/Home.jsx'
 import Login from '@pages/auth/Login/Login.jsx'
-import { useSelector, useDispatch } from 'react-redux'
-import { setInitialized } from '@redux/authSlice.js'
-import LoadingOverlay from '@components/LoadingOverlay/LoadingOverlay.jsx'
+import { useSelector} from 'react-redux'
 import AuthCallBack from '@pages/auth/AuthCallBack.jsx'
 
 export const ProtectedRoute = () => {
-  const { isAuthenticated, isInitialized } = useSelector((state) => state.auth)
-
-  if (!isInitialized) {
-    return <LoadingOverlay loading={true} children={null} />
-  }
+  const { isAuthenticated} = useSelector((state) => state.auth)
 
   return isAuthenticated ? <Outlet /> : <Navigate to="/login" replace />
 }
 
 export const PublicRoute = () => {
-  const { isAuthenticated, isInitialized } = useSelector((state) => state.auth)
+  const { isAuthenticated} = useSelector((state) => state.auth)
 
-  if (!isInitialized) {
-    return <LoadingOverlay loading={true} children={null} />
-  }
 
   return !isAuthenticated ? <Outlet /> : <Navigate to="/" replace />
 }
 
 const App = () => {
-  const dispatch = useDispatch()
-  const { isInitialized } = useSelector((state) => state.auth)
-
-  useEffect(() => {
-    if (!isInitialized) {
-      const timer = setTimeout(() => {
-        dispatch(setInitialized())
-      }, 100)
-      return () => clearTimeout(timer)
-    }
-  }, [dispatch, isInitialized])
-
   const routes = [
     {
       element: <ProtectedRoute />,

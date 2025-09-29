@@ -11,7 +11,7 @@ import './Login.less'
 import { useDispatch } from 'react-redux'
 import { API_BASE_URL, API_ENDPOINTS } from '@constants'
 import api from '@services/api.js'
-import { loginSuccess, loginFailure } from '@redux/authSlice.js'
+import { loginSuccess} from '@redux/authSlice.js'
 import Logo from '@pages/auth/Login/Logo/Logo.jsx'
 import { useDelay } from '@/hooks/index.js'
 import { useNavigate, useSearchParams } from 'react-router-dom'
@@ -45,7 +45,6 @@ const Login = () => {
         dispatch(loginSuccess({ user, token: token }))
       } catch (error) {
         console.error(error.response.data)
-        dispatch(loginFailure())
         message.error('Login failed. Please check your credentials.')
       } finally {
         setLoginLoading(false)
