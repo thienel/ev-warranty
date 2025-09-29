@@ -10,6 +10,10 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+const (
+	errMsg = "Error while login with Google, please try again!"
+)
+
 type OAuthHandler interface {
 	InitiateOAuth(c *gin.Context)
 	HandleCallback(c *gin.Context)
@@ -35,7 +39,8 @@ func (h *oauthHandler) InitiateOAuth(c *gin.Context) {
 	provider := c.Param("provider")
 	authURL, err := h.oauthService.GenerateAuthURL(provider)
 	if err != nil {
-		handleError(h.log, c, err, "Failed to generate auth URL")
+		h.log.Error("Failed to generate auth URL")
+		c.Redirect(http.StatusFound, fmt.Sprintf("%s/login?error=%s", h.frontendBaseURL, errMsg))
 		return
 	}
 
@@ -43,7 +48,6 @@ func (h *oauthHandler) InitiateOAuth(c *gin.Context) {
 }
 
 func (h *oauthHandler) HandleCallback(c *gin.Context) {
-	errMsg := "Error while login with Google, please try again!"
 	provider := c.Param("provider")
 	state := c.Query("state")
 	if state == "" {
@@ -55,7 +59,6 @@ func (h *oauthHandler) HandleCallback(c *gin.Context) {
 	errParam := c.Query("error")
 	if errParam != "" {
 		h.log.Error("error in oauth callback: ", "error", errParam)
-		h.oauthService.HandleCallbackError(c.Request.Context(), state)
 		c.Redirect(http.StatusFound, fmt.Sprintf("%s/login?error=%s", h.frontendBaseURL, errMsg))
 		return
 	}
