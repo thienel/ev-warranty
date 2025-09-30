@@ -32,7 +32,7 @@ const UserTable = ({
         total: users.length,
       }))
     }
-  }, [isReset])
+  }, [users, isReset])
 
   const filteredUsers = useMemo(() => {
     if (!searchText) return users
@@ -57,10 +57,9 @@ const UserTable = ({
     try {
       const response = await api.delete(`${API_ENDPOINTS.USER}${userId}`)
 
-      if (response.data.success) {
-        message.success('User deleted successfully')
-        onRefresh()
-      }
+      console.log(response)
+      message.success('User deleted successfully')
+      onRefresh()
     } catch (error) {
       message.error(error.response?.data?.message || 'Failed to delete user')
       console.error('Error deleting user:', error)
@@ -71,7 +70,7 @@ const UserTable = ({
 
   const getOfficeName = (officeId) => {
     const office = offices.find((o) => o.id === officeId)
-    return office ? office.name : 'N/A'
+    return office ? office.office_name : 'N/A'
   }
 
   const columns = GenerateColumns(
@@ -91,7 +90,6 @@ const UserTable = ({
       pagination={{
         ...pagination,
         total: filteredUsers.length,
-        showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} users`,
         showSizeChanger: true,
         showQuickJumper: true,
         pageSizeOptions: ['10', '20', '50', '100'],

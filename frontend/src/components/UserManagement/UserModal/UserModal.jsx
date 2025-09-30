@@ -1,18 +1,24 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect } from 'react'
 import { Modal, Button, Form, Input, message, Select, Space, Switch } from 'antd'
 import { HomeOutlined, LockOutlined, MailOutlined, UserOutlined } from '@ant-design/icons'
 import { API_ENDPOINTS, PASSWORD_RULES, ROLE_LABELS, USER_ROLES } from '@constants'
 import api from '@services/api.js'
 
-const UserModal = ({ loading, setLoading, onClose, user = null, opened = false, offices }) => {
+const UserModal = ({
+  loading,
+  setLoading,
+  onClose,
+  user = null,
+  opened = false,
+  offices,
+  isUpdate,
+}) => {
   const [form] = Form.useForm()
-  const [isUpdate, setIsUpdate] = useState(false)
 
   const { Option } = Select
 
   useEffect(() => {
     if (user) {
-      setIsUpdate(true)
       form.setFieldsValue({
         ...user,
         password: '',
@@ -166,7 +172,7 @@ const UserModal = ({ loading, setLoading, onClose, user = null, opened = false, 
               <Option key={office.id} value={office.id}>
                 <Space>
                   <HomeOutlined />
-                  {office.name}
+                  {office.office_name}
                 </Space>
               </Option>
             ))}
