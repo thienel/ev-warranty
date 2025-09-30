@@ -4,17 +4,7 @@ import api from '@services/api.js'
 import { API_ENDPOINTS, ROLE_LABELS } from '@constants'
 import GenerateColumns from '@components/UserManagement/UserTable/userTableColumns.jsx'
 
-const UserTable = ({
-  loading,
-  setLoading,
-  isReset,
-  setIsReset,
-  searchText,
-  users,
-  offices,
-  handleOpenModal,
-  onRefresh,
-}) => {
+const UserTable = ({ loading, setLoading, searchText, users, offices, onOpenModal, onRefresh }) => {
   const [filteredInfo, setFilteredInfo] = useState({})
   const [sortedInfo, setSortedInfo] = useState({})
   const [pagination, setPagination] = useState({
@@ -24,21 +14,18 @@ const UserTable = ({
   })
 
   useEffect(() => {
-    if (isReset) {
-      setFilteredInfo({})
-      setSortedInfo({})
-      setPagination((prev) => ({
-        ...prev,
-        total: users.length,
-      }))
-    }
-  }, [users, isReset])
+    setFilteredInfo({})
+    setSortedInfo({})
+    setPagination((prev) => ({
+      ...prev,
+      total: users.length,
+    }))
+  }, [users])
 
   const filteredUsers = useMemo(() => {
     if (!searchText) return users
 
-    setIsReset(false)
-    const searchLower = searchText.toLowerCase()
+    const searchLower = searchText.trim().toLowerCase()
     return users.filter(
       (user) =>
         user.name?.toLowerCase().includes(searchLower) ||
@@ -55,9 +42,7 @@ const UserTable = ({
   const handleDelete = async (userId) => {
     setLoading(true)
     try {
-      const response = await api.delete(`${API_ENDPOINTS.USER}${userId}`)
-
-      console.log(response)
+      await api.delete(`${API_ENDPOINTS.USER}${userId}`)
       message.success('User deleted successfully')
       onRefresh()
     } catch (error) {
@@ -76,17 +61,19 @@ const UserTable = ({
   const columns = GenerateColumns(
     sortedInfo,
     filteredInfo,
-    handleOpenModal,
+    onOpenModal,
     handleDelete,
     getOfficeName
   )
 
   return (
     <Table
+      size={'middle'}
       columns={columns}
       rowKey="id"
       loading={loading}
       dataSource={filteredUsers}
+      showSorterTooltip={false}
       pagination={{
         ...pagination,
         total: filteredUsers.length,

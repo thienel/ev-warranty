@@ -124,18 +124,20 @@ const UserModal = ({
           />
         </Form.Item>
 
-        <Form.Item
-          label={isUpdate ? 'Password (leave blank to keep current)' : 'Password'}
-          name="password"
-          validateFirst
-          rules={[{ required: true, message: 'Please enter password' }, ...PASSWORD_RULES]}
-        >
-          <Input.Password
-            placeholder={isUpdate ? 'Enter new password (optional)' : 'Enter password'}
-            prefix={<LockOutlined />}
-            size="large"
-          />
-        </Form.Item>
+        {!isUpdate && (
+          <Form.Item
+            label="Password"
+            name="password"
+            validateFirst
+            rules={[{ required: true, message: 'Please enter password' }, ...PASSWORD_RULES]}
+          >
+            <Input.Password
+              placeholder={isUpdate ? 'Enter new password (optional)' : 'Enter password'}
+              prefix={<LockOutlined />}
+              size="large"
+            />
+          </Form.Item>
+        )}
 
         <Form.Item
           label="Role"
