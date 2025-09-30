@@ -42,9 +42,8 @@ const UserModal = ({
         return
       }
 
-      if (isUpdate && !payload.password) {
-        delete payload.password
-      }
+      delete payload.password
+      delete payload.email
 
       if (isUpdate) {
         response = await api.patch(`${API_ENDPOINTS.USER}${user.id}`, payload)
