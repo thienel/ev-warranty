@@ -25,7 +25,6 @@ const UserModal = ({
       })
     } else {
       form.resetFields()
-      form.setFieldsValue({ is_active: true })
     }
   })
 
@@ -42,10 +41,9 @@ const UserModal = ({
         return
       }
 
-      delete payload.password
-      delete payload.email
-
       if (isUpdate) {
+        delete payload.password
+        delete payload.email
         response = await api.put(`${API_ENDPOINTS.USER}${user.id}`, payload)
 
         if (response.data.success) {
