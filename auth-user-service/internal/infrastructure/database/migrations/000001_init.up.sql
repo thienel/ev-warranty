@@ -36,7 +36,7 @@ CREATE TABLE IF NOT EXISTS refresh_tokens (
     user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     token TEXT NOT NULL,
     expires_at TIMESTAMP NOT NULL,
-    is_revoked BOOLEAN NOT NULL DEFAULT TRUE,
+    is_revoked BOOLEAN NOT NULL DEFAULT FALSE,
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMP NOT NULL DEFAULT NOW()
 );

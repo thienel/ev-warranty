@@ -12,7 +12,7 @@ type RefreshToken struct {
 	User      User      `gorm:"foreignKey:UserID;references:ID;constraint:OnDelete:CASCADE"`
 	Token     string    `gorm:"not null;index"`
 	ExpiresAt time.Time `gorm:"not null"`
-	IsRevoked bool      `gorm:"not null;default:true"`
+	IsRevoked bool      `gorm:"not null;default:false"`
 	CreatedAt time.Time `gorm:"autoCreateTime"`
 	UpdatedAt time.Time `gorm:"autoUpdateTime"`
 }
