@@ -16,12 +16,10 @@ type CreateUserRequest struct {
 }
 
 type UpdateUserRequest struct {
-	ID       uuid.UUID  `json:"id" binding:"required"`
-	Name     *string    `json:"name"`
-	Email    *string    `json:"email" binding:"email,max=100"`
-	Role     *string    `json:"role" binding:"max=20"`
-	IsActive *bool      `json:"is_active"`
-	OfficeID *uuid.UUID `json:"office_id"`
+	Name     string    `json:"name"`
+	Role     string    `json:"role"`
+	IsActive bool      `json:"is_active"`
+	OfficeID uuid.UUID `json:"office_id"`
 }
 
 type UserDTO struct {

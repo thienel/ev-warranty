@@ -5,7 +5,6 @@ import (
 	"auth-service/internal/domain/repositories"
 	"auth-service/internal/errors/apperrors"
 	"context"
-	"strings"
 
 	"github.com/google/uuid"
 )
@@ -18,10 +17,10 @@ type CreateOfficeCommand struct {
 }
 
 type UpdateOfficeCommand struct {
-	OfficeName *string
-	OfficeType *string
-	Address    *string
-	IsActive   *bool
+	OfficeName string
+	OfficeType string
+	Address    string
+	IsActive   bool
 }
 
 type OfficeService interface {
@@ -67,25 +66,13 @@ func (s *officeService) Update(ctx context.Context, id uuid.UUID, cmd *UpdateOff
 		return err
 	}
 
-	if cmd.OfficeName != nil {
-		office.OfficeName = strings.TrimSpace(*cmd.OfficeName)
+	if !entities.IsValidOfficeType(cmd.OfficeType) {
+		return apperrors.ErrInvalidCredentials("invalid office type")
 	}
-
-	if cmd.OfficeType != nil {
-		*cmd.OfficeType = strings.TrimSpace(*cmd.OfficeType)
-		if !entities.IsValidOfficeType(*cmd.OfficeType) {
-			return apperrors.ErrInvalidCredentials("invalid office type")
-		}
-		office.OfficeType = *cmd.OfficeType
-	}
-
-	if cmd.Address != nil {
-		office.Address = strings.TrimSpace(*cmd.Address)
-	}
-
-	if cmd.IsActive != nil {
-		office.IsActive = *cmd.IsActive
-	}
+	office.OfficeName = cmd.OfficeName
+	office.OfficeType = cmd.OfficeType
+	office.Address = cmd.Address
+	office.IsActive = cmd.IsActive
 
 	if err = s.repo.Update(ctx, office); err != nil {
 		return err

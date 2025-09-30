@@ -6,7 +6,6 @@ import (
 	"auth-service/internal/errors/apperrors"
 	"auth-service/internal/security"
 	"context"
-	"strings"
 
 	"github.com/google/uuid"
 )
@@ -21,11 +20,10 @@ type UserCreateCommand struct {
 }
 
 type UserUpdateCommand struct {
-	Name     *string
-	Email    *string
-	Role     *string
-	IsActive *bool
-	OfficeID *uuid.UUID
+	Name     string
+	Role     string
+	IsActive bool
+	OfficeID uuid.UUID
 }
 
 type UserService interface {
@@ -91,39 +89,17 @@ func (s *userService) Update(ctx context.Context, id uuid.UUID, cmd *UserUpdateC
 		return err
 	}
 
-	if cmd.Name != nil {
-		user.Name = strings.TrimSpace(*cmd.Name)
+	if !entities.IsValidUserRole(cmd.Role) {
+		return apperrors.ErrInvalidCredentials("invalid role")
 	}
+	user.Role = cmd.Role
+	user.Name = cmd.Name
+	user.IsActive = cmd.IsActive
 
-	if cmd.Email != nil {
-		*cmd.Email = strings.TrimSpace(*cmd.Email)
-		if !entities.IsValidEmail(*cmd.Email) {
-			return apperrors.ErrInvalidCredentials("invalid email")
-		}
-		if user, _ := s.userRepo.FindByEmail(ctx, *cmd.Email); user != nil {
-			return apperrors.ErrInvalidCredentials("email already exists")
-		}
-		user.Email = *cmd.Email
+	if office, err := s.officeService.GetByID(ctx, cmd.OfficeID); err != nil || office == nil {
+		return err
 	}
-
-	if cmd.Role != nil {
-		*cmd.Role = strings.TrimSpace(*cmd.Role)
-		if !entities.IsValidUserRole(*cmd.Role) {
-			return apperrors.ErrInvalidCredentials("invalid role")
-		}
-		user.Role = *cmd.Role
-	}
-
-	if cmd.IsActive != nil {
-		user.IsActive = *cmd.IsActive
-	}
-
-	if cmd.OfficeID != nil {
-		if office, err := s.officeService.GetByID(ctx, *cmd.OfficeID); err != nil || office == nil {
-			return err
-		}
-		user.OfficeID = *cmd.OfficeID
-	}
+	user.OfficeID = cmd.OfficeID
 
 	return s.userRepo.Update(ctx, user)
 }

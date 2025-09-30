@@ -7,6 +7,7 @@ import (
 	"auth-service/pkg/logger"
 	"context"
 	"net/http"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -66,28 +67,34 @@ func (h userHandler) Update(c *gin.Context) {
 	ctx, cancel := context.WithTimeout(c.Request.Context(), requestTimeout)
 	defer cancel()
 
+	idStr := c.Param("id")
+	id, err := uuid.Parse(idStr)
+	if err != nil {
+		handleError(h.log, c, apperrors.ErrInvalidCredentials("invalid user id"), "invalid user id")
+		return
+	}
+
 	var req dtos.UpdateUserRequest
-	if err := c.ShouldBindJSON(&req); err != nil {
+	if err = c.ShouldBindJSON(&req); err != nil {
 		handleError(h.log, c, apperrors.ErrInvalidJSONRequest, "invalid JSON RegisterRequest")
 		return
 	}
 
-	h.log.Info("updating user", "email", req.Email)
+	h.log.Info("updating user", "ID", id)
 
 	cmd := &services.UserUpdateCommand{
-		Name:     req.Name,
-		Email:    req.Email,
-		Role:     req.Role,
+		Name:     strings.TrimSpace(req.Name),
+		Role:     strings.TrimSpace(req.Role),
 		IsActive: req.IsActive,
 		OfficeID: req.OfficeID,
 	}
-	err := h.userService.Update(ctx, req.ID, cmd)
+	err = h.userService.Update(ctx, id, cmd)
 	if err != nil {
 		handleError(h.log, c, err, "user update failed")
 		return
 	}
 
-	h.log.Info("registration successful", "user_id", req.ID)
+	h.log.Info("registration successful", "user_id", id)
 	writeSuccessResponse(c, http.StatusOK, "user update successful", nil)
 }
 

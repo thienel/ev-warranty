@@ -115,9 +115,9 @@ func (h *officeHandler) Update(c *gin.Context) {
 	}
 
 	cmd := &services.UpdateOfficeCommand{
-		OfficeName: req.OfficeName,
-		OfficeType: req.OfficeType,
-		Address:    req.Address,
+		OfficeName: strings.TrimSpace(req.OfficeName),
+		OfficeType: strings.TrimSpace(req.OfficeType),
+		Address:    strings.TrimSpace(req.Address),
 		IsActive:   req.IsActive,
 	}
 
