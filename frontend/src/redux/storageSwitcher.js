@@ -10,10 +10,7 @@ const storageSwitcher = {
   },
   setItem: (key, value) => {
     const state = JSON.parse(value)
-    const remember = state?.remember ?? false
-
-    console.log("state", state)
-    console.log("remember", remember)
+    const remember = state?.remember === true || state?.remember === 'true'
 
     if (remember) {
       return localStorage.setItem(key, value)
@@ -22,10 +19,7 @@ const storageSwitcher = {
     }
   },
   removeItem: (key) => {
-    return Promise.all([
-      localStorage.removeItem(key),
-      sessionStorage.removeItem(key),
-    ])
+    return Promise.all([localStorage.removeItem(key), sessionStorage.removeItem(key)])
   },
 }
 
