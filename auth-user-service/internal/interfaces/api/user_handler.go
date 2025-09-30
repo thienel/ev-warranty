@@ -59,7 +59,7 @@ func (h userHandler) Create(c *gin.Context) {
 	}
 
 	h.log.Info("registration successful", "user_id", user.ID)
-	writeSuccessResponse(c, http.StatusCreated, "registration successful", *dtos.GenerateUserDTO(*user))
+	writeSuccessResponse(c, http.StatusCreated, "registration successful", *dtos.GenerateUserDTO(user))
 }
 
 func (h userHandler) Update(c *gin.Context) {
@@ -122,7 +122,9 @@ func (h userHandler) GetAll(c *gin.Context) {
 		return
 	}
 
-	writeSuccessResponse(c, http.StatusOK, "users retrieve successfully", users)
+	usersDto := dtos.GenerateUserDTOList(users)
+
+	writeSuccessResponse(c, http.StatusOK, "users retrieve successfully", usersDto)
 }
 
 func (h userHandler) Delete(c *gin.Context) {

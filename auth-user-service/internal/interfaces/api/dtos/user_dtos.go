@@ -33,7 +33,7 @@ type UserDTO struct {
 	OfficeID uuid.UUID `json:"office_id" binding:"required"`
 }
 
-func GenerateUserDTO(user entities.User) *UserDTO {
+func GenerateUserDTO(user *entities.User) *UserDTO {
 	return &UserDTO{
 		ID:       user.ID,
 		Name:     user.Name,
@@ -42,4 +42,12 @@ func GenerateUserDTO(user entities.User) *UserDTO {
 		IsActive: user.IsActive,
 		OfficeID: user.OfficeID,
 	}
+}
+
+func GenerateUserDTOList(user []*entities.User) []*UserDTO {
+	users := make([]*UserDTO, len(user))
+	for i, u := range user {
+		users[i] = GenerateUserDTO(u)
+	}
+	return users
 }

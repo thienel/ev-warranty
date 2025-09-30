@@ -80,7 +80,7 @@ func (h *authHandler) Login(c *gin.Context) {
 
 	response := dtos.LoginResponse{
 		Token: accessToken,
-		User:  *dtos.GenerateUserDTO(*user),
+		User:  *dtos.GenerateUserDTO(user),
 	}
 
 	h.log.Info("login successful", "user_id", userID)
@@ -168,7 +168,7 @@ func (h *authHandler) ValidateToken(c *gin.Context) {
 
 	response := map[string]any{
 		"valid": true,
-		"user":  dtos.GenerateUserDTO(*user),
+		"user":  dtos.GenerateUserDTO(user),
 	}
 
 	c.Header("X-User-ID", userID.String())
