@@ -27,7 +27,7 @@ const Login = () => {
       navigate('/login')
       message.error(error)
     }
-  }, [])
+  }, [navigate, searchParams])
 
   const handleLogin = async (values) => {
     setLoginLoading(true)
