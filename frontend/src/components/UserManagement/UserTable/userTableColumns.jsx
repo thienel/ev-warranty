@@ -102,7 +102,11 @@ const GenerateColumns = (
       render: (_, record) => (
         <Space size="small">
           <Tooltip title="Edit">
-            <Button type="text" icon={<EditOutlined />} onClick={() => handleOpenModal(record)} />
+            <Button
+              type="text"
+              icon={<EditOutlined />}
+              onClick={() => handleOpenModal(record, true)}
+            />
           </Tooltip>
           <Popconfirm
             title="Delete user"

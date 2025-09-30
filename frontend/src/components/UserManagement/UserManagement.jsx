@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { message } from 'antd'
 import api from '@services/api'
 import { API_ENDPOINTS } from '@constants'
@@ -14,19 +14,15 @@ const UserManagement = () => {
   const [searchText, setSearchText] = useState('')
 
   const [updateUser, setUpdateUser] = useState(null)
+  const [isUpdate, setIsUpdate] = useState(false)
   const [isOpenModal, setIsOpenModal] = useState(false)
 
-  const [isResetTable, setIsResetTable] = useState(true)
+  const [isReset, setIsReset] = useState(true)
 
-  const handleOpenModal = (user = null) => {
+  const handleOpenModal = (user = null, isUpdate = false) => {
     setUpdateUser(user)
+    setIsUpdate(isUpdate)
     setIsOpenModal(true)
-  }
-
-  const handleCloseModal = () => {
-    setIsOpenModal(false)
-    setUpdateUser(null)
-    fetchUsers()
   }
 
   const fetchUsers = async () => {
@@ -37,7 +33,6 @@ const UserManagement = () => {
       if (response.data.success) {
         const userData = response.data.data || []
         setUsers(userData)
-        setIsResetTable(true)
       }
     } catch (error) {
       message.error(error.response?.data?.message || 'Failed to load users')
@@ -50,7 +45,6 @@ const UserManagement = () => {
   const fetchOffices = async () => {
     try {
       const response = await api.get(API_ENDPOINTS.OFFICE)
-
       if (response.data.success) {
         setOffices(response.data.data || [])
       }
@@ -67,7 +61,11 @@ const UserManagement = () => {
 
   const handleReset = () => {
     setSearchText('')
-    setIsResetTable(true)
+    setIsReset(true)
+    setIsOpenModal(false)
+    setUpdateUser(null)
+    fetchUsers()
+    fetchOffices()
   }
 
   return (
@@ -83,8 +81,8 @@ const UserManagement = () => {
       <UserTable
         loading={loading}
         setLoading={setLoading}
-        isReset={isResetTable}
-        setIsReset={setIsResetTable}
+        isReset={isReset}
+        setIsReset={setIsReset}
         users={users}
         offices={offices}
         handleOpenModal={handleOpenModal}
@@ -94,10 +92,11 @@ const UserManagement = () => {
       <UserModal
         loading={loading}
         setLoading={setLoading}
-        onClose={handleCloseModal}
+        onClose={handleReset}
         user={updateUser}
         opened={isOpenModal}
         offices={offices}
+        isUpdate={isUpdate}
       />
     </>
   )
