@@ -1,5 +1,5 @@
 import { ROLE_LABELS, USER_ROLES } from '@constants'
-import { Button, Popconfirm, Space, Tag } from 'antd'
+import { Button, Popconfirm, Space, Tag, Tooltip } from 'antd'
 import {
   CheckCircleOutlined,
   CloseCircleOutlined,
@@ -10,33 +10,36 @@ import {
   UserOutlined,
 } from '@ant-design/icons'
 
-const GenerateColumns = (sortedInfo, filteredInfo, onOpenModal, onDelete, getOfficeName) => {
+const GenerateColumns = (
+  sortedInfo,
+  filteredInfo,
+  handleOpenModal,
+  handleDelete,
+  getOfficeName
+) => {
   return [
     {
-      title: <span style={{ padding: '0 14px', display: 'inline-block' }}>Name</span>,
+      title: 'Name',
       dataIndex: 'name',
       key: 'name',
-      width: '20%',
       sorter: (a, b) => (a.name || '').localeCompare(b.name || ''),
       sortOrder: sortedInfo.columnKey === 'name' ? sortedInfo.order : null,
       render: (text) => (
-        <Space style={{ padding: '0 14px', whiteSpace: 'normal', wordBreak: 'break-word' }}>
-          <UserOutlined style={{ color: '#697565' }} />
+        <Space>
+          <UserOutlined style={{ color: '#1890ff' }} />
           <span>{text || 'N/A'}</span>
         </Space>
       ),
     },
     {
-      title: <span style={{ padding: '0 14px', display: 'inline-block' }}>Email</span>,
+      title: 'Email',
       dataIndex: 'email',
       key: 'email',
-      width: '22%',
       sorter: (a, b) => (a.email || '').localeCompare(b.email || ''),
       sortOrder: sortedInfo.columnKey === 'email' ? sortedInfo.order : null,
-      ellipsis: true,
       render: (text) => (
-        <Space style={{ padding: '0 14px' }}>
-          <MailOutlined style={{ color: '#697565' }} />
+        <Space>
+          <MailOutlined style={{ color: '#52c41a' }} />
           <span>{text || 'N/A'}</span>
         </Space>
       ),
@@ -45,8 +48,6 @@ const GenerateColumns = (sortedInfo, filteredInfo, onOpenModal, onDelete, getOff
       title: 'Role',
       dataIndex: 'role',
       key: 'role',
-      align: 'center',
-      width: '15%',
       filters: Object.values(USER_ROLES).map((role) => ({
         text: ROLE_LABELS[role],
         value: role,
@@ -54,18 +55,22 @@ const GenerateColumns = (sortedInfo, filteredInfo, onOpenModal, onDelete, getOff
       filteredValue: filteredInfo.role || null,
       onFilter: (value, record) => record.role === value,
       render: (role) => {
-        return <Space>{ROLE_LABELS[role] || role}</Space>
+        const colors = {
+          [USER_ROLES.ADMIN]: 'red',
+          [USER_ROLES.SC_STAFF]: 'blue',
+          [USER_ROLES.SC_TECHNICIAN]: 'green',
+          [USER_ROLES.EVM_STAFF]: 'orange',
+        }
+        return <Tag color={colors[role] || 'default'}>{ROLE_LABELS[role] || role}</Tag>
       },
     },
     {
       title: 'Office',
       dataIndex: 'office_id',
       key: 'office_id',
-      align: 'center',
-      width: '20%',
       render: (officeId) => (
         <Space>
-          <HomeOutlined style={{ color: '#697565' }} />
+          <HomeOutlined style={{ color: '#722ed1' }} />
           <span>{getOfficeName(officeId)}</span>
         </Space>
       ),
@@ -74,8 +79,6 @@ const GenerateColumns = (sortedInfo, filteredInfo, onOpenModal, onDelete, getOff
       title: 'Status',
       dataIndex: 'is_active',
       key: 'is_active',
-      align: 'center',
-      width: '13%',
       filters: [
         { text: 'Active', value: true },
         { text: 'Inactive', value: false },
@@ -85,7 +88,7 @@ const GenerateColumns = (sortedInfo, filteredInfo, onOpenModal, onDelete, getOff
       render: (isActive) => (
         <Tag
           icon={isActive ? <CheckCircleOutlined /> : <CloseCircleOutlined />}
-          color={isActive ? 'green' : 'red'}
+          color={isActive ? 'success' : 'default'}
         >
           {isActive ? 'Active' : 'Inactive'}
         </Tag>
@@ -95,20 +98,23 @@ const GenerateColumns = (sortedInfo, filteredInfo, onOpenModal, onDelete, getOff
       title: 'Actions',
       key: 'action',
       fixed: 'right',
-      align: 'center',
-      width: '10%',
+      width: 120,
       render: (_, record) => (
         <Space size="small">
-          <Button type="text" icon={<EditOutlined />} onClick={() => onOpenModal(record, true)} />
+          <Tooltip title="Edit">
+            <Button type="text" icon={<EditOutlined />} onClick={() => handleOpenModal(record)} />
+          </Tooltip>
           <Popconfirm
             title="Delete user"
             description="Are you sure you want to delete this user?"
-            onConfirm={() => onDelete(record.id)}
+            onConfirm={() => handleDelete(record.id)}
             okText="Delete"
             cancelText="Cancel"
             okButtonProps={{ danger: true }}
           >
-            <Button type="text" danger icon={<DeleteOutlined />} />
+            <Tooltip title="Delete">
+              <Button type="text" danger icon={<DeleteOutlined />} />
+            </Tooltip>
           </Popconfirm>
         </Space>
       ),

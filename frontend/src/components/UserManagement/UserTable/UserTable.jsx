@@ -4,7 +4,17 @@ import api from '@services/api.js'
 import { API_ENDPOINTS, ROLE_LABELS } from '@constants'
 import GenerateColumns from '@components/UserManagement/UserTable/userTableColumns.jsx'
 
-const UserTable = ({ loading, setLoading, searchText, users, offices, onOpenModal, onRefresh }) => {
+const UserTable = ({
+  loading,
+  setLoading,
+  isReset,
+  setIsReset,
+  searchText,
+  users,
+  offices,
+  handleOpenModal,
+  onRefresh,
+}) => {
   const [filteredInfo, setFilteredInfo] = useState({})
   const [sortedInfo, setSortedInfo] = useState({})
   const [pagination, setPagination] = useState({
@@ -14,18 +24,21 @@ const UserTable = ({ loading, setLoading, searchText, users, offices, onOpenModa
   })
 
   useEffect(() => {
-    setFilteredInfo({})
-    setSortedInfo({})
-    setPagination((prev) => ({
-      ...prev,
-      total: users.length,
-    }))
-  }, [users])
+    if (isReset) {
+      setFilteredInfo({})
+      setSortedInfo({})
+      setPagination((prev) => ({
+        ...prev,
+        total: users.length,
+      }))
+    }
+  }, [isReset])
 
   const filteredUsers = useMemo(() => {
     if (!searchText) return users
 
-    const searchLower = searchText.trim().toLowerCase()
+    setIsReset(false)
+    const searchLower = searchText.toLowerCase()
     return users.filter(
       (user) =>
         user.name?.toLowerCase().includes(searchLower) ||
@@ -42,9 +55,12 @@ const UserTable = ({ loading, setLoading, searchText, users, offices, onOpenModa
   const handleDelete = async (userId) => {
     setLoading(true)
     try {
-      await api.delete(`${API_ENDPOINTS.USER}${userId}`)
-      message.success('User deleted successfully')
-      onRefresh()
+      const response = await api.delete(`${API_ENDPOINTS.USER}${userId}`)
+
+      if (response.data.success) {
+        message.success('User deleted successfully')
+        onRefresh()
+      }
     } catch (error) {
       message.error(error.response?.data?.message || 'Failed to delete user')
       console.error('Error deleting user:', error)
@@ -55,32 +71,30 @@ const UserTable = ({ loading, setLoading, searchText, users, offices, onOpenModa
 
   const getOfficeName = (officeId) => {
     const office = offices.find((o) => o.id === officeId)
-    return office ? office.office_name : 'N/A'
+    return office ? office.name : 'N/A'
   }
 
   const columns = GenerateColumns(
     sortedInfo,
     filteredInfo,
-    onOpenModal,
+    handleOpenModal,
     handleDelete,
     getOfficeName
   )
 
   return (
     <Table
-      size={'middle'}
       columns={columns}
       rowKey="id"
       loading={loading}
       dataSource={filteredUsers}
-      showSorterTooltip={false}
       pagination={{
         ...pagination,
         total: filteredUsers.length,
+        showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} users`,
         showSizeChanger: true,
         showQuickJumper: true,
         pageSizeOptions: ['10', '20', '50', '100'],
-        size: 'default',
       }}
       onChange={handleTableChange}
       scroll={{ x: 1000 }}

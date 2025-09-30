@@ -1,28 +1,25 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Modal, Button, Form, Input, message, Select, Space, Switch } from 'antd'
 import { HomeOutlined, LockOutlined, MailOutlined, UserOutlined } from '@ant-design/icons'
 import { API_ENDPOINTS, PASSWORD_RULES, ROLE_LABELS, USER_ROLES } from '@constants'
 import api from '@services/api.js'
 
-const UserModal = ({
-  loading,
-  setLoading,
-  onClose,
-  user = null,
-  opened = false,
-  offices,
-  isUpdate,
-}) => {
+const UserModal = ({ loading, setLoading, onClose, user = null, opened = false, offices }) => {
   const [form] = Form.useForm()
+  const [isUpdate, setIsUpdate] = useState(false)
+
   const { Option } = Select
 
   useEffect(() => {
     if (user) {
+      setIsUpdate(true)
       form.setFieldsValue({
         ...user,
+        password: '',
       })
     } else {
       form.resetFields()
+      form.setFieldsValue({ is_active: true })
     }
   })
 
@@ -39,10 +36,12 @@ const UserModal = ({
         return
       }
 
-      if (isUpdate) {
+      if (isUpdate && !payload.password) {
         delete payload.password
-        delete payload.email
-        response = await api.put(`${API_ENDPOINTS.USER}${user.id}`, payload)
+      }
+
+      if (isUpdate) {
+        response = await api.patch(`${API_ENDPOINTS.USER}${user.id}`, payload)
 
         if (response.data.success) {
           message.success('User updated successfully')
@@ -70,34 +69,38 @@ const UserModal = ({
 
   return (
     <Modal
-      title={<Space style={{ margin: '14px 0' }}>{isUpdate ? 'Edit User' : 'Add New User'}</Space>}
+      title={
+        <Space>
+          <UserOutlined />
+          {isUpdate ? 'Edit User' : 'Add New User'}
+        </Space>
+      }
       open={opened}
       onCancel={() => {
         form.resetFields()
         onClose()
       }}
-      style={{ margin: 'auto' }}
       footer={null}
-      width={500}
+      width={600}
       destroyOnHidden
     >
       <Form form={form} layout="vertical" onFinish={handleSubmit} autoComplete="off">
         <Form.Item
           label="Full Name"
           name="name"
-          validateFirst
           rules={[
             { required: true, message: 'Please enter full name' },
             { min: 2, message: 'Name must be at least 2 characters' },
-            { max: 50, message: 'Name cannot exceed 50 characters' },
+            { max: 100, message: 'Name cannot exceed 100 characters' },
             {
-              pattern: /^[\p{L}\s'-]+$/u,
-              message: 'Name can only contain letters, spaces, apostrophes or hyphens',
+              pattern: /^[a-zA-ZÀ-ỹ\s]+$/,
+              message: 'Name can only contain letters and spaces',
             },
           ]}
         >
           <Input placeholder="Enter full name" prefix={<UserOutlined />} size="large" />
         </Form.Item>
+
         <Form.Item
           label="Email"
           name="email"
@@ -115,11 +118,18 @@ const UserModal = ({
           />
         </Form.Item>
 
-        {!isUpdate && (
-          <Form.Item label="Password" name="password" validateFirst rules={PASSWORD_RULES}>
-            <Input.Password placeholder="Enter password" prefix={<LockOutlined />} size="large" />
-          </Form.Item>
-        )}
+        <Form.Item
+          label={isUpdate ? 'Password (leave blank to keep current)' : 'Password'}
+          name="password"
+          validateFirst
+          rules={[{ required: true, message: 'Please enter password' }, ...PASSWORD_RULES]}
+        >
+          <Input.Password
+            placeholder={isUpdate ? 'Enter new password (optional)' : 'Enter password'}
+            prefix={<LockOutlined />}
+            size="large"
+          />
+        </Form.Item>
 
         <Form.Item
           label="Role"
@@ -156,7 +166,7 @@ const UserModal = ({
               <Option key={office.id} value={office.id}>
                 <Space>
                   <HomeOutlined />
-                  {office.office_name}
+                  {office.name}
                 </Space>
               </Option>
             ))}
