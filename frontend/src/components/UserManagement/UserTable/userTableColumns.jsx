@@ -95,9 +95,7 @@ const GenerateColumns = (sortedInfo, filteredInfo, onOpenModal, onDelete, getOff
       width: 100,
       render: (_, record) => (
         <Space size="small">
-          <Tooltip title="Edit">
-            <Button type="text" icon={<EditOutlined />} onClick={() => onOpenModal(record, true)} />
-          </Tooltip>
+          <Button type="text" icon={<EditOutlined />} onClick={() => onOpenModal(record, true)} />
           <Popconfirm
             title="Delete user"
             description="Are you sure you want to delete this user?"
@@ -106,9 +104,7 @@ const GenerateColumns = (sortedInfo, filteredInfo, onOpenModal, onDelete, getOff
             cancelText="Cancel"
             okButtonProps={{ danger: true }}
           >
-            <Tooltip title="Delete">
-              <Button type="text" danger icon={<DeleteOutlined />} />
-            </Tooltip>
+            <Button type="text" danger icon={<DeleteOutlined />} />
           </Popconfirm>
         </Space>
       ),
