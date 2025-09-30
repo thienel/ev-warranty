@@ -5,6 +5,7 @@ import { API_ENDPOINTS } from '@constants'
 import UserModal from '@components/UserManagement/UserModal/UserModal.jsx'
 import UserTable from '@components/UserManagement/UserTable/UserTable.jsx'
 import UserActionBar from '@components/UserManagement/UserActionBar/UserActionBar.jsx'
+import { useDelay } from '@/hooks/index.js'
 
 const UserManagement = () => {
   const [users, setUsers] = useState([])
@@ -17,8 +18,6 @@ const UserManagement = () => {
   const [isUpdate, setIsUpdate] = useState(false)
   const [isOpenModal, setIsOpenModal] = useState(false)
 
-  const [isReset, setIsReset] = useState(true)
-
   const handleOpenModal = (user = null, isUpdate = false) => {
     setUpdateUser(user)
     setIsUpdate(isUpdate)
@@ -26,7 +25,6 @@ const UserManagement = () => {
   }
 
   const fetchUsers = async () => {
-    setLoading(true)
     try {
       const response = await api.get(API_ENDPOINTS.USER)
 
@@ -37,8 +35,6 @@ const UserManagement = () => {
     } catch (error) {
       message.error(error.response?.data?.message || 'Failed to load users')
       console.error('Error fetching users:', error)
-    } finally {
-      setLoading(false)
     }
   }
 
@@ -59,13 +55,18 @@ const UserManagement = () => {
     fetchOffices()
   }, [])
 
-  const handleReset = () => {
-    setSearchText('')
-    setIsReset(true)
-    setIsOpenModal(false)
-    setUpdateUser(null)
-    fetchUsers()
-    fetchOffices()
+  const delay = useDelay(300)
+
+  const handleReset = async () => {
+    setLoading(true)
+    delay(async () => {
+      setSearchText('')
+      setIsOpenModal(false)
+      setUpdateUser(null)
+      await fetchUsers()
+      await fetchOffices()
+      setLoading(false)
+    })
   }
 
   return (
@@ -81,11 +82,10 @@ const UserManagement = () => {
       <UserTable
         loading={loading}
         setLoading={setLoading}
-        isReset={isReset}
-        setIsReset={setIsReset}
         users={users}
         offices={offices}
-        handleOpenModal={handleOpenModal}
+        searchText={searchText}
+        onOpenModal={handleOpenModal}
         onRefresh={handleReset}
       />
 

@@ -10,13 +10,7 @@ import {
   UserOutlined,
 } from '@ant-design/icons'
 
-const GenerateColumns = (
-  sortedInfo,
-  filteredInfo,
-  handleOpenModal,
-  handleDelete,
-  getOfficeName
-) => {
+const GenerateColumns = (sortedInfo, filteredInfo, onOpenModal, onDelete, getOfficeName) => {
   return [
     {
       title: 'Name',
@@ -25,8 +19,8 @@ const GenerateColumns = (
       sorter: (a, b) => (a.name || '').localeCompare(b.name || ''),
       sortOrder: sortedInfo.columnKey === 'name' ? sortedInfo.order : null,
       render: (text) => (
-        <Space>
-          <UserOutlined style={{ color: '#1890ff' }} />
+        <Space style={{ padding: '0 14px' }}>
+          <UserOutlined style={{ color: '#697565' }} />
           <span>{text || 'N/A'}</span>
         </Space>
       ),
@@ -38,8 +32,8 @@ const GenerateColumns = (
       sorter: (a, b) => (a.email || '').localeCompare(b.email || ''),
       sortOrder: sortedInfo.columnKey === 'email' ? sortedInfo.order : null,
       render: (text) => (
-        <Space>
-          <MailOutlined style={{ color: '#52c41a' }} />
+        <Space style={{ padding: '0 14px' }}>
+          <MailOutlined style={{ color: '#697565' }} />
           <span>{text || 'N/A'}</span>
         </Space>
       ),
@@ -48,6 +42,8 @@ const GenerateColumns = (
       title: 'Role',
       dataIndex: 'role',
       key: 'role',
+      align: 'center',
+      width: 150,
       filters: Object.values(USER_ROLES).map((role) => ({
         text: ROLE_LABELS[role],
         value: role,
@@ -55,22 +51,17 @@ const GenerateColumns = (
       filteredValue: filteredInfo.role || null,
       onFilter: (value, record) => record.role === value,
       render: (role) => {
-        const colors = {
-          [USER_ROLES.ADMIN]: 'red',
-          [USER_ROLES.SC_STAFF]: 'blue',
-          [USER_ROLES.SC_TECHNICIAN]: 'green',
-          [USER_ROLES.EVM_STAFF]: 'orange',
-        }
-        return <Tag color={colors[role] || 'default'}>{ROLE_LABELS[role] || role}</Tag>
+        return <Space>{ROLE_LABELS[role] || role}</Space>
       },
     },
     {
       title: 'Office',
       dataIndex: 'office_id',
       key: 'office_id',
+      align: 'center',
       render: (officeId) => (
         <Space>
-          <HomeOutlined style={{ color: '#722ed1' }} />
+          <HomeOutlined style={{ color: '#697565' }} />
           <span>{getOfficeName(officeId)}</span>
         </Space>
       ),
@@ -79,6 +70,8 @@ const GenerateColumns = (
       title: 'Status',
       dataIndex: 'is_active',
       key: 'is_active',
+      align: 'center',
+      width: 125,
       filters: [
         { text: 'Active', value: true },
         { text: 'Inactive', value: false },
@@ -88,7 +81,7 @@ const GenerateColumns = (
       render: (isActive) => (
         <Tag
           icon={isActive ? <CheckCircleOutlined /> : <CloseCircleOutlined />}
-          color={isActive ? 'success' : 'default'}
+          color={isActive ? 'green' : 'red'}
         >
           {isActive ? 'Active' : 'Inactive'}
         </Tag>
@@ -98,20 +91,17 @@ const GenerateColumns = (
       title: 'Actions',
       key: 'action',
       fixed: 'right',
-      width: 120,
+      align: 'center',
+      width: 100,
       render: (_, record) => (
         <Space size="small">
           <Tooltip title="Edit">
-            <Button
-              type="text"
-              icon={<EditOutlined />}
-              onClick={() => handleOpenModal(record, true)}
-            />
+            <Button type="text" icon={<EditOutlined />} onClick={() => onOpenModal(record, true)} />
           </Tooltip>
           <Popconfirm
             title="Delete user"
             description="Are you sure you want to delete this user?"
-            onConfirm={() => handleDelete(record.id)}
+            onConfirm={() => onDelete(record.id)}
             okText="Delete"
             cancelText="Cancel"
             okButtonProps={{ danger: true }}
