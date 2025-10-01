@@ -80,6 +80,7 @@ const UserTable = ({ loading, setLoading, searchText, users, offices, onOpenModa
         showSizeChanger: true,
         showQuickJumper: true,
         pageSizeOptions: ['10', '20', '50', '100'],
+        size: 'default',
       }}
       onChange={handleTableChange}
       scroll={{ x: 1000 }}
