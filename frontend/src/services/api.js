@@ -1,5 +1,5 @@
 import axios from 'axios'
-import store from '@/redux/store'
+import store, { persistor } from '@/redux/store'
 import { setToken, logout } from '@/redux/authSlice'
 import { API_BASE_URL, API_ENDPOINTS } from '@constants'
 
@@ -42,7 +42,7 @@ api.interceptors.response.use(
         return api(originalRequest)
       } catch (err) {
         store.dispatch(logout())
-        window.location.href = '/login'
+        await persistor.purge()
         return Promise.reject(err)
       }
     }
