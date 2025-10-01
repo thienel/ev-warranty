@@ -49,9 +49,9 @@ func (h userHandler) Create(c *gin.Context) {
 	h.log.Info("creating user", "email", req.Email, "role", req.Role)
 
 	params := &services.UserCreateCommand{
-		Name:     req.Name,
-		Email:    req.Email,
-		Role:     req.Role,
+		Name:     strings.TrimSpace(req.Name),
+		Email:    strings.TrimSpace(req.Email),
+		Role:     strings.TrimSpace(req.Role),
 		Password: req.Password,
 		IsActive: req.IsActive,
 		OfficeID: req.OfficeID,

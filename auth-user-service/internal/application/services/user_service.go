@@ -44,6 +44,9 @@ func NewUserService(userRepo repositories.UserRepository, officeService OfficeSe
 }
 
 func (s *userService) Create(ctx context.Context, cmd *UserCreateCommand) (*entities.User, error) {
+	if !entities.IsValidName(cmd.Name) {
+		return nil, apperrors.ErrInvalidCredentials("invalid name")
+	}
 	if !entities.IsValidEmail(cmd.Email) {
 		return nil, apperrors.ErrInvalidCredentials("invalid email")
 	}
@@ -89,6 +92,9 @@ func (s *userService) Update(ctx context.Context, id uuid.UUID, cmd *UserUpdateC
 		return err
 	}
 
+	if !entities.IsValidName(cmd.Name) {
+		return apperrors.ErrInvalidCredentials("invalid name")
+	}
 	if !entities.IsValidUserRole(cmd.Role) {
 		return apperrors.ErrInvalidCredentials("invalid role")
 	}

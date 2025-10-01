@@ -18,7 +18,7 @@ const (
 
 type User struct {
 	ID            uuid.UUID      `gorm:"primaryKey;type:uuid;default:gen_random_uuid()"`
-	Name          string         `gorm:"not null;size:30"`
+	Name          string         `gorm:"not null;size:50"`
 	Email         string         `gorm:"not null;uniqueIndex;size:100"`
 	Role          string         `gorm:"not null;size:20"`
 	PasswordHash  string         `gorm:"not null;size:255"`
@@ -51,6 +51,14 @@ func NewUser(name, email, role, passwordHash string, isActive bool, officeID uui
 		IsActive:     isActive,
 		OfficeID:     officeID,
 	}
+}
+
+func IsValidName(name string) bool {
+	if len(name) < 2 || len(name) > 50 {
+		return false
+	}
+	regex := regexp.MustCompile(`^[\p{L}][\p{L}\s'-]*[\p{L}]$`)
+	return regex.MatchString(name)
 }
 
 func IsValidEmail(email string) bool {
