@@ -14,14 +14,12 @@ const UserModal = ({
   isUpdate,
 }) => {
   const [form] = Form.useForm()
-
   const { Option } = Select
 
   useEffect(() => {
     if (user) {
       form.setFieldsValue({
         ...user,
-        password: '',
       })
     } else {
       form.resetFields()
@@ -72,19 +70,15 @@ const UserModal = ({
 
   return (
     <Modal
-      title={
-        <Space>
-          <UserOutlined />
-          {isUpdate ? 'Edit User' : 'Add New User'}
-        </Space>
-      }
+      title={<Space style={{ margin: '14px 0' }}>{isUpdate ? 'Edit User' : 'Add New User'}</Space>}
       open={opened}
       onCancel={() => {
         form.resetFields()
         onClose()
       }}
+      style={{ margin: 'auto' }}
       footer={null}
-      width={600}
+      width={500}
       destroyOnHidden
     >
       <Form form={form} layout="vertical" onFinish={handleSubmit} autoComplete="off">
@@ -122,17 +116,8 @@ const UserModal = ({
         </Form.Item>
 
         {!isUpdate && (
-          <Form.Item
-            label="Password"
-            name="password"
-            validateFirst
-            rules={[{ required: true, message: 'Please enter password' }, ...PASSWORD_RULES]}
-          >
-            <Input.Password
-              placeholder={isUpdate ? 'Enter new password (optional)' : 'Enter password'}
-              prefix={<LockOutlined />}
-              size="large"
-            />
+          <Form.Item label="Password" name="password" validateFirst rules={PASSWORD_RULES}>
+            <Input.Password placeholder="Enter password" prefix={<LockOutlined />} size="large" />
           </Form.Item>
         )}
 
