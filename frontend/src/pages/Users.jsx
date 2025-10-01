@@ -4,7 +4,7 @@ import UserManagement from '@components/UserManagement/UserManagement.jsx'
 
 const Users = () => {
   return (
-    <AppLayout>
+    <AppLayout title={'Users Management'}>
       <UserManagement />
     </AppLayout>
   )
