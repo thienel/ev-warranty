@@ -43,7 +43,7 @@ const Sidebar = ({ collapsed }) => {
       <Menu
         theme="dark"
         mode="inline"
-        defaultSelectedKeys={['1']}
+        defaultSelectedKeys={['2']}
         items={menuItems}
         onClick={({ key }) => {
           switch (key) {

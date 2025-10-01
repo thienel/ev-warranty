@@ -17,7 +17,7 @@ import { persistor } from '@redux/store.js'
 const { Header } = Layout
 const { Text } = Typography
 
-const AppHeader = ({ collapsed, onToggleCollapse }) => {
+const AppHeader = ({ collapsed, onToggleCollapse, title }) => {
   const dispatch = useDispatch()
   const handleLogout = async () => {
     try {
@@ -41,7 +41,7 @@ const AppHeader = ({ collapsed, onToggleCollapse }) => {
           className="toggle-button"
         />
 
-        <Text className="header-title">Dashboard</Text>
+        <Text className="header-title">{title}</Text>
       </div>
 
       <div className="header-right">
