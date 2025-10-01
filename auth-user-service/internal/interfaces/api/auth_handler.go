@@ -42,48 +42,46 @@ func (h *authHandler) Login(c *gin.Context) {
 	ctx, cancel := context.WithTimeout(c.Request.Context(), requestTimeout)
 	defer cancel()
 
+	h.log.Info("login request", "remote_addr", c.ClientIP())
+
 	var req dtos.LoginRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
+		h.log.Error("invalid login request", "error", err.Error())
 		handleError(h.log, c, apperrors.ErrInvalidJSONRequest, "invalid JSON LoginRequest")
 		return
 	}
 
-	h.log.Info("attempting login", "username_or_email", req.Email)
+	h.log.Info("attempting login", "email", req.Email)
 
 	accessToken, refreshToken, err := h.authService.Login(ctx, req.Email, req.Password)
 	if err != nil {
+		h.log.Error("login failed", "email", req.Email, "error", err.Error())
 		handleError(h.log, c, err, "login failed")
 		return
 	}
 
 	userID, err := h.extractUserIDFromToken(ctx, accessToken)
 	if err != nil {
+		h.log.Error("failed to extract user ID", "error", err.Error())
 		handleError(h.log, c, err, "failed to extract user info")
 		return
 	}
 
 	user, err := h.userService.GetByID(ctx, userID)
 	if err != nil {
+		h.log.Error("failed to get user", "user_id", userID, "error", err.Error())
 		handleError(h.log, c, err, "failed to get user info")
 		return
 	}
 
-	c.SetCookie(
-		"refreshToken",
-		refreshToken,
-		60*60*24*7,
-		"/",
-		"localhost",
-		false,
-		true,
-	)
+	c.SetCookie("refreshToken", refreshToken, 60*60*24*7, "/", "localhost", false, true)
 
 	response := dtos.LoginResponse{
 		Token: accessToken,
-		User:  *dtos.GenerateUserDTO(*user),
+		User:  *dtos.GenerateUserDTO(user),
 	}
 
-	h.log.Info("login successful", "user_id", userID)
+	h.log.Info("login successful", "user_id", userID, "email", user.Email)
 	writeSuccessResponse(c, http.StatusOK, "login successful", response)
 }
 
@@ -91,16 +89,18 @@ func (h *authHandler) Logout(c *gin.Context) {
 	ctx, cancel := context.WithTimeout(c.Request.Context(), requestTimeout)
 	defer cancel()
 
+	h.log.Info("logout request", "remote_addr", c.ClientIP())
+
 	token, err := c.Cookie("refreshToken")
 	if err != nil {
+		h.log.Error("refresh token not found", "error", err.Error())
 		err = apperrors.NewUnauthorized("refresh token not found")
 		handleError(h.log, c, err, "refresh token not found in cookie")
 		return
 	}
 
-	h.log.Info("attempting logout")
-
 	if err = h.authService.Logout(ctx, token); err != nil {
+		h.log.Error("logout failed", "error", err.Error())
 		handleError(h.log, c, err, "logout failed")
 		return
 	}
@@ -113,24 +113,24 @@ func (h *authHandler) RefreshToken(c *gin.Context) {
 	ctx, cancel := context.WithTimeout(c.Request.Context(), requestTimeout)
 	defer cancel()
 
+	h.log.Info("token refresh request", "remote_addr", c.ClientIP())
+
 	refreshToken, err := c.Cookie("refreshToken")
 	if err != nil {
+		h.log.Error("refresh token not found", "error", err.Error())
 		err = apperrors.NewUnauthorized("refresh token not found")
 		handleError(h.log, c, err, "refresh token not found in cookie")
 		return
 	}
 
-	h.log.Info("attempting token refresh")
-
 	newAccessToken, err := h.tokenService.RefreshAccessToken(ctx, refreshToken)
 	if err != nil {
+		h.log.Error("token refresh failed", "error", err.Error())
 		handleError(h.log, c, err, "token refresh failed")
 		return
 	}
 
-	response := map[string]string{
-		"access_token": newAccessToken,
-	}
+	response := map[string]string{"access_token": newAccessToken}
 
 	h.log.Info("token refresh successful")
 	writeSuccessResponse(c, http.StatusOK, "token refreshed successfully", response)
@@ -140,41 +140,45 @@ func (h *authHandler) ValidateToken(c *gin.Context) {
 	ctx, cancel := context.WithTimeout(c.Request.Context(), requestTimeout)
 	defer cancel()
 
+	h.log.Info("token validation request", "remote_addr", c.ClientIP())
+
 	token := h.extractBearerToken(c)
 	if token == "" {
+		h.log.Error("missing authorization header")
 		handleError(h.log, c, apperrors.ErrInvalidAuthenticationHeader, "missing or invalid authorization header")
 		return
 	}
 
-	h.log.Info("attempting token validation")
-
 	claims, err := h.tokenService.ValidateAccessToken(ctx, token)
 	if err != nil {
+		h.log.Error("token validation failed", "error", err.Error())
 		handleError(h.log, c, err, "token validation failed")
 		return
 	}
 
 	userID, err := uuid.Parse(claims.UserID)
 	if err != nil {
+		h.log.Error("invalid user ID in token", "user_id", claims.UserID, "error", err.Error())
 		handleError(h.log, c, apperrors.ErrInvalidCredentials("invalid user ID"), "invalid user ID in token")
 		return
 	}
 
 	user, err := h.userService.GetByID(ctx, userID)
 	if err != nil {
+		h.log.Error("failed to get user", "user_id", userID, "error", err.Error())
 		handleError(h.log, c, err, "failed to get user info")
 		return
 	}
 
 	response := map[string]any{
 		"valid": true,
-		"user":  dtos.GenerateUserDTO(*user),
+		"user":  dtos.GenerateUserDTO(user),
 	}
 
 	c.Header("X-User-ID", userID.String())
 	c.Header("X-User-Role", user.Role)
 
-	h.log.Info("token validation successful", "user_id", userID)
+	h.log.Info("token validation successful", "user_id", userID, "role", user.Role)
 	writeSuccessResponse(c, http.StatusOK, "token is valid", response)
 }
 

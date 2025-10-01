@@ -63,7 +63,7 @@ func main() {
 	userRepo := persistence.NewUserRepository(db.DB)
 
 	officeService := services.NewOfficeService(officeRepo)
-	tokenService := services.NewTokenService(app.Log, tokenRepo,
+	tokenService := services.NewTokenService(tokenRepo,
 		cfg.AccessTokenTTL, cfg.RefreshTokenTTL, security.PrivateKey(), security.PublicKey())
 	authService := services.NewAuthService(userRepo, tokenService)
 	oauthService := oauth.NewOAuthService(userRepo)
