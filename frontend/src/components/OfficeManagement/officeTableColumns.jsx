@@ -43,8 +43,7 @@ const GenerateColumns = (sortedInfo, filteredInfo, onOpenModal, onDelete) => {
       onFilter: (value, record) => record.office_type === value,
       render: (office_type) => {
         const label = OFFICE_TYPE_LABELS[office_type] || office_type
-        const color = office_type === 'evm' ? 'blue' : 'green'
-        return <Tag color={color}>{label}</Tag>
+        return <span>{label}</span>
       },
     },
     {
@@ -75,7 +74,7 @@ const GenerateColumns = (sortedInfo, filteredInfo, onOpenModal, onDelete) => {
       filteredValue: filteredInfo.is_active || null,
       onFilter: (value, record) => record.is_active === value,
       render: (is_active) => {
-        const color = is_active ? 'success' : 'error'
+        const color = is_active ? 'green' : 'red'
         const icon = is_active ? <CheckCircleOutlined /> : <CloseCircleOutlined />
         const text = is_active ? 'Active' : 'Inactive'
         return (
