@@ -1,10 +1,21 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { message, Table } from 'antd'
 import api from '@services/api.js'
-import { API_ENDPOINTS, ROLE_LABELS } from '@constants'
-import GenerateColumns from '@components/UserManagement/UserTable/userTableColumns.jsx'
 
-const UserTable = ({ loading, setLoading, searchText, users, offices, onOpenModal, onRefresh }) => {
+const GenericTable = ({
+  loading,
+  setLoading,
+  searchText,
+  data,
+  onOpenModal,
+  onRefresh,
+  generateColumns,
+  searchFields = [],
+  deleteEndpoint,
+  deleteSuccessMessage = 'Item deleted successfully',
+  deleteErrorMessage = 'Failed to delete item',
+  additionalProps = {},
+}) => {
   const [filteredInfo, setFilteredInfo] = useState({})
   const [sortedInfo, setSortedInfo] = useState({})
   const [pagination, setPagination] = useState({
@@ -18,52 +29,55 @@ const UserTable = ({ loading, setLoading, searchText, users, offices, onOpenModa
     setSortedInfo({})
     setPagination((prev) => ({
       ...prev,
-      total: users.length,
+      total: data.length,
     }))
-  }, [users])
+  }, [data])
 
-  const filteredUsers = useMemo(() => {
-    if (!searchText) return users
+  const filteredData = useMemo(() => {
+    if (!searchText) return data
 
     const searchLower = searchText.trim().toLowerCase()
-    return users.filter(
-      (user) =>
-        user.name?.toLowerCase().includes(searchLower) ||
-        user.email?.toLowerCase().includes(searchLower) ||
-        ROLE_LABELS[user.role]?.toLowerCase().includes(searchLower)
+    return data.filter((item) =>
+      searchFields.some((field) => {
+        let value
+        if (typeof field === 'function') {
+          value = field(item)
+        } else if (field.includes('.')) {
+          value = field.split('.').reduce((obj, key) => obj?.[key], item)
+        } else {
+          value = item[field]
+        }
+        return value?.toString().toLowerCase().includes(searchLower)
+      })
     )
-  }, [users, searchText])
+  }, [data, searchText, searchFields])
 
   const handleTableChange = (newPagination, filters, sorter) => {
     setPagination(newPagination)
     setFilteredInfo(filters)
     setSortedInfo(sorter)
   }
-  const handleDelete = async (userId) => {
+
+  const handleDelete = async (itemId) => {
     setLoading(true)
     try {
-      await api.delete(`${API_ENDPOINTS.USER}${userId}`)
-      message.success('User deleted successfully')
+      await api.delete(`${deleteEndpoint}${itemId}`)
+      message.success(deleteSuccessMessage)
       onRefresh()
     } catch (error) {
-      message.error(error.response?.data?.message || 'Failed to delete user')
-      console.error('Error deleting user:', error)
+      message.error(error.response?.data?.message || deleteErrorMessage)
+      console.error('Error deleting item:', error)
     } finally {
       setLoading(false)
     }
   }
 
-  const getOfficeName = (officeId) => {
-    const office = offices.find((o) => o.id === officeId)
-    return office ? office.office_name : 'N/A'
-  }
-
-  const columns = GenerateColumns(
+  const columns = generateColumns(
     sortedInfo,
     filteredInfo,
     onOpenModal,
     handleDelete,
-    getOfficeName
+    additionalProps
   )
 
   return (
@@ -72,11 +86,11 @@ const UserTable = ({ loading, setLoading, searchText, users, offices, onOpenModa
       columns={columns}
       rowKey="id"
       loading={loading}
-      dataSource={filteredUsers}
+      dataSource={filteredData}
       showSorterTooltip={false}
       pagination={{
         ...pagination,
-        total: filteredUsers.length,
+        total: filteredData.length,
         showSizeChanger: true,
         showQuickJumper: true,
         pageSizeOptions: ['10', '20', '50', '100'],
@@ -89,4 +103,4 @@ const UserTable = ({ loading, setLoading, searchText, users, offices, onOpenModa
   )
 }
 
-export default UserTable
+export default GenericTable

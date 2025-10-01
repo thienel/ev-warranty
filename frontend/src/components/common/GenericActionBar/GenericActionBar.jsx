@@ -1,14 +1,23 @@
 import React from 'react'
 import { Button, Col, Input, Row } from 'antd'
 import { PlusOutlined, ReloadOutlined, SearchOutlined } from '@ant-design/icons'
-import './UserActionBar.less'
+import './GenericActionBar.less'
 
-const UserActionBar = ({ searchText, setSearchText, onReset, onOpenModal, loading }) => {
+const GenericActionBar = ({
+  searchText,
+  setSearchText,
+  onReset,
+  onOpenModal,
+  loading,
+  searchPlaceholder = 'Search...',
+  addButtonText = 'Add Item',
+  className = 'generic-action-bar',
+}) => {
   return (
-    <Row gutter={[16, 16]} className={'user-action-bar'}>
+    <Row gutter={[16, 16]} className={className}>
       <Col lg={18}>
         <Input
-          placeholder="Search by name, email or role..."
+          placeholder={searchPlaceholder}
           prefix={<SearchOutlined />}
           value={searchText}
           onChange={(e) => setSearchText(e.target.value)}
@@ -24,7 +33,7 @@ const UserActionBar = ({ searchText, setSearchText, onReset, onOpenModal, loadin
           </Col>
           <Col lg={12}>
             <Button type="primary" icon={<PlusOutlined />} onClick={onOpenModal}>
-              Add User
+              {addButtonText}
             </Button>
           </Col>
         </Row>
@@ -33,4 +42,4 @@ const UserActionBar = ({ searchText, setSearchText, onReset, onOpenModal, loadin
   )
 }
 
-export default UserActionBar
+export default GenericActionBar

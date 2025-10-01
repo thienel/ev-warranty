@@ -1,42 +1,28 @@
 import React, { useEffect, useState } from 'react'
 import { message } from 'antd'
 import api from '@services/api'
-import { API_ENDPOINTS } from '@constants'
+import { API_ENDPOINTS, ROLE_LABELS } from '@constants'
 import UserModal from '@components/UserManagement/UserModal/UserModal.jsx'
-import UserTable from '@components/UserManagement/UserTable/UserTable.jsx'
-import UserActionBar from '@components/UserManagement/UserActionBar/UserActionBar.jsx'
-import { useDelay } from '@/hooks/index.js'
+import useManagement from '@/hooks/useManagement.js'
+import GenericActionBar from '@components/common/GenericActionBar/GenericActionBar.jsx'
+import GenericTable from '@components/common/GenericTable/GenericTable.jsx'
+import GenerateColumns from './userTableColumns.jsx'
 
 const UserManagement = () => {
-  const [users, setUsers] = useState([])
+  const {
+    items: users,
+    loading,
+    setLoading,
+    searchText,
+    setSearchText,
+    updateItem: updateUser,
+    isUpdate,
+    isOpenModal,
+    handleOpenModal,
+    handleReset,
+  } = useManagement(API_ENDPOINTS.USER, 'user')
+
   const [offices, setOffices] = useState([])
-
-  const [loading, setLoading] = useState(false)
-  const [searchText, setSearchText] = useState('')
-
-  const [updateUser, setUpdateUser] = useState(null)
-  const [isUpdate, setIsUpdate] = useState(false)
-  const [isOpenModal, setIsOpenModal] = useState(false)
-
-  const handleOpenModal = (user = null, isUpdate = false) => {
-    setUpdateUser(user)
-    setIsUpdate(isUpdate)
-    setIsOpenModal(true)
-  }
-
-  const fetchUsers = async () => {
-    try {
-      const response = await api.get(API_ENDPOINTS.USER)
-
-      if (response.data.success) {
-        const userData = response.data.data || []
-        setUsers(userData)
-      }
-    } catch (error) {
-      message.error(error.response?.data?.message || 'Failed to load users')
-      console.error('Error fetching users:', error)
-    }
-  }
 
   const fetchOffices = async () => {
     try {
@@ -51,42 +37,42 @@ const UserManagement = () => {
   }
 
   useEffect(() => {
-    fetchUsers()
     fetchOffices()
   }, [])
 
-  const delay = useDelay(300)
-
-  const handleReset = async () => {
-    setLoading(true)
-    delay(async () => {
-      setSearchText('')
-      setIsOpenModal(false)
-      setUpdateUser(null)
-      await fetchUsers()
-      await fetchOffices()
-      setLoading(false)
-    })
+  const getOfficeName = (officeId) => {
+    const office = offices.find((o) => o.id === officeId)
+    return office ? office.office_name : 'N/A'
   }
+
+  const searchFields = ['name', 'email']
+  const searchFieldsWithRole = [...searchFields, (user) => ROLE_LABELS[user.role]]
 
   return (
     <>
-      <UserActionBar
+      <GenericActionBar
         searchText={searchText}
         setSearchText={setSearchText}
         onReset={handleReset}
         onOpenModal={handleOpenModal}
         loading={loading}
+        searchPlaceholder="Search by name, email or role..."
+        addButtonText="Add User"
       />
 
-      <UserTable
+      <GenericTable
         loading={loading}
         setLoading={setLoading}
-        users={users}
-        offices={offices}
         searchText={searchText}
+        data={users}
         onOpenModal={handleOpenModal}
         onRefresh={handleReset}
+        generateColumns={GenerateColumns}
+        searchFields={searchFieldsWithRole}
+        deleteEndpoint={API_ENDPOINTS.USER}
+        deleteSuccessMessage="User deleted successfully"
+        deleteErrorMessage="Failed to delete user"
+        additionalProps={{ getOfficeName }}
       />
 
       <UserModal

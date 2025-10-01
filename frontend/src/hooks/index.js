@@ -27,3 +27,5 @@ export const useDelay = (ms = 1000) => {
 
   return run
 }
+
+export { default as useManagement } from './useManagement.js'

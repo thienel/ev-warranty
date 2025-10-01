@@ -5,6 +5,7 @@ import { useSelector } from 'react-redux'
 import AuthCallBack from '@pages/auth/AuthCallBack.jsx'
 import Users from '@pages/Users.jsx'
 import AppLayout from '@components/Layout/Layout.jsx'
+import Offices from '@pages/Offices.jsx'
 
 export const ProtectedRoute = () => {
   const { isAuthenticated } = useSelector((state) => state.auth)
@@ -27,6 +28,10 @@ const App = () => {
         {
           path: '/users',
           element: <Users />,
+        },
+        {
+          path: '/offices',
+          element: <Offices />,
         },
       ],
     },
