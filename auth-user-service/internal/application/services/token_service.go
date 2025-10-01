@@ -4,7 +4,6 @@ import (
 	"auth-service/internal/domain/entities"
 	"auth-service/internal/domain/repositories"
 	"auth-service/internal/errors/apperrors"
-	"auth-service/pkg/logger"
 	"context"
 	"crypto/rand"
 	"crypto/rsa"
@@ -29,7 +28,6 @@ type TokenService interface {
 }
 
 type tokenService struct {
-	log              logger.Logger
 	repoRefreshToken repositories.RefreshTokenRepository
 	accessTTL        time.Duration
 	refreshTTL       time.Duration
@@ -37,9 +35,8 @@ type tokenService struct {
 	publicKey        *rsa.PublicKey
 }
 
-func NewTokenService(log logger.Logger, repoRefreshToken repositories.RefreshTokenRepository, accessTokenTTL, refreshTokenTTL time.Duration, pri *rsa.PrivateKey, pub *rsa.PublicKey) TokenService {
+func NewTokenService(repoRefreshToken repositories.RefreshTokenRepository, accessTokenTTL, refreshTokenTTL time.Duration, pri *rsa.PrivateKey, pub *rsa.PublicKey) TokenService {
 	return &tokenService{
-		log:              log,
 		repoRefreshToken: repoRefreshToken,
 		accessTTL:        accessTokenTTL,
 		refreshTTL:       refreshTokenTTL,
@@ -97,17 +94,13 @@ func (t *tokenService) GenerateRefreshToken(ctx context.Context, userID uuid.UUI
 		return "", apperrors.ErrFailedGenerateRefreshToken(err)
 	}
 
-	if err := t.repoRefreshToken.RevokeAllByUserID(ctx, userID); err != nil {
-		t.log.Warn("failed to revoke existing tokens", "user_id", userID, "error", err)
-	}
-
 	rfToken := &entities.RefreshToken{
 		UserID:    userID,
 		Token:     hashedToken,
 		ExpiresAt: time.Now().UTC().Add(t.refreshTTL),
 	}
 
-	if err := t.repoRefreshToken.Create(ctx, rfToken); err != nil {
+	if err = t.repoRefreshToken.Create(ctx, rfToken); err != nil {
 		return "", apperrors.ErrFailedGenerateRefreshToken(err)
 	}
 
@@ -174,7 +167,7 @@ func (t *tokenService) ValidateRefreshToken(ctx context.Context, token string) (
 		return nil, fmt.Errorf("failed to hash token: %w", err)
 	}
 
-	rfToken, err := t.repoRefreshToken.FindByToken(ctx, hashedToken)
+	rfToken, err := t.repoRefreshToken.Find(ctx, hashedToken)
 	if err != nil {
 		return nil, apperrors.ErrInvalidRefreshToken
 	}
@@ -202,7 +195,7 @@ func (t *tokenService) RevokeRefreshToken(ctx context.Context, token string) err
 		return fmt.Errorf("failed to hash token: %w", err)
 	}
 
-	return t.repoRefreshToken.RevokeByToken(ctx, hashedToken)
+	return t.repoRefreshToken.Revoke(ctx, hashedToken)
 }
 
 func (t *tokenService) RefreshAccessToken(ctx context.Context, refreshToken string) (string, error) {
