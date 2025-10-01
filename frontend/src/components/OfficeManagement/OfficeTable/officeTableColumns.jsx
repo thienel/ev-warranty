@@ -13,7 +13,7 @@ const OFFICE_TYPE_LABELS = {
   sc: 'Service Center',
 }
 
-const GenerateColumns = (sortedInfo, filteredInfo, onOpenModal, onDelete) => {
+const GenerateColumns = (sortedInfo, filteredInfo, onOpenModal, onDelete, additionalProps) => {
   return [
     {
       title: <span style={{ padding: '0 14px', display: 'inline-block' }}>Office Name</span>,

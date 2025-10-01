@@ -5,38 +5,23 @@ import { API_ENDPOINTS } from '@constants'
 import UserModal from '@components/UserManagement/UserModal/UserModal.jsx'
 import UserTable from '@components/UserManagement/UserTable/UserTable.jsx'
 import UserActionBar from '@components/UserManagement/UserActionBar/UserActionBar.jsx'
-import { useDelay } from '@/hooks/index.js'
+import useManagement from '@/hooks/useManagement.js'
 
 const UserManagement = () => {
-  const [users, setUsers] = useState([])
+  const {
+    items: users,
+    loading,
+    setLoading,
+    searchText,
+    setSearchText,
+    updateItem: updateUser,
+    isUpdate,
+    isOpenModal,
+    handleOpenModal,
+    handleReset,
+  } = useManagement(API_ENDPOINTS.USER, 'user')
+
   const [offices, setOffices] = useState([])
-
-  const [loading, setLoading] = useState(false)
-  const [searchText, setSearchText] = useState('')
-
-  const [updateUser, setUpdateUser] = useState(null)
-  const [isUpdate, setIsUpdate] = useState(false)
-  const [isOpenModal, setIsOpenModal] = useState(false)
-
-  const handleOpenModal = (user = null, isUpdate = false) => {
-    setUpdateUser(user)
-    setIsUpdate(isUpdate)
-    setIsOpenModal(true)
-  }
-
-  const fetchUsers = async () => {
-    try {
-      const response = await api.get(API_ENDPOINTS.USER)
-
-      if (response.data.success) {
-        const userData = response.data.data || []
-        setUsers(userData)
-      }
-    } catch (error) {
-      message.error(error.response?.data?.message || 'Failed to load users')
-      console.error('Error fetching users:', error)
-    }
-  }
 
   const fetchOffices = async () => {
     try {
@@ -51,23 +36,8 @@ const UserManagement = () => {
   }
 
   useEffect(() => {
-    fetchUsers()
     fetchOffices()
   }, [])
-
-  const delay = useDelay(300)
-
-  const handleReset = async () => {
-    setLoading(true)
-    delay(async () => {
-      setSearchText('')
-      setIsOpenModal(false)
-      setUpdateUser(null)
-      await fetchUsers()
-      await fetchOffices()
-      setLoading(false)
-    })
-  }
 
   return (
     <>

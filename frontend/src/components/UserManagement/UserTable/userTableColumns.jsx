@@ -10,7 +10,9 @@ import {
   UserOutlined,
 } from '@ant-design/icons'
 
-const GenerateColumns = (sortedInfo, filteredInfo, onOpenModal, onDelete, getOfficeName) => {
+const GenerateColumns = (sortedInfo, filteredInfo, onOpenModal, onDelete, additionalProps) => {
+  const { getOfficeName } = additionalProps
+
   return [
     {
       title: <span style={{ padding: '0 14px', display: 'inline-block' }}>Name</span>,
