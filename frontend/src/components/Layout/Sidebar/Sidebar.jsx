@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { Layout, Menu } from 'antd'
 import {
   UserOutlined,
@@ -9,21 +9,41 @@ import {
   BarChartOutlined,
 } from '@ant-design/icons'
 import './Sidebar.less'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 
 const { Sider } = Layout
 
 const Sidebar = ({ collapsed }) => {
+  const navigate = useNavigate()
+  const location = useLocation()
+
   const menuItems = [
-    { key: '1', icon: <BarChartOutlined />, label: 'Reports' },
-    { key: '2', icon: <UserOutlined />, label: 'Users' },
-    { key: '3', icon: <BankOutlined />, label: 'Offices' },
-    { key: '4', icon: <UserOutlined />, label: 'Customers' },
-    { key: '5', icon: <CarOutlined />, label: 'Vehicles' },
-    { key: '6', icon: <ContainerOutlined />, label: 'Warranty claims' },
+    { key: 'reports', icon: <BarChartOutlined />, label: 'Reports', path: '/reports' },
+    { key: 'users', icon: <UserOutlined />, label: 'Users', path: '/users' },
+    { key: 'offices', icon: <BankOutlined />, label: 'Offices', path: '/offices' },
+    { key: 'customers', icon: <UserOutlined />, label: 'Customers', path: '/customers' },
+    { key: 'vehicles', icon: <CarOutlined />, label: 'Vehicles', path: '/vehicles' },
+    { key: 'claims', icon: <ContainerOutlined />, label: 'Warranty claims', path: '/claims' },
   ]
 
-  const navigate = useNavigate()
+  const getCurrentKey = () => {
+    const currentItem = menuItems.find((item) => item.path === location.pathname)
+    return currentItem ? currentItem.key : 'users'
+  }
+
+  const [selectedKey, setSelectedKey] = useState(getCurrentKey())
+
+  useEffect(() => {
+    setSelectedKey(getCurrentKey())
+  }, [location.pathname])
+
+  const handleMenuClick = ({ key }) => {
+    const menuItem = menuItems.find((item) => item.key === key)
+    if (menuItem) {
+      setSelectedKey(key)
+      navigate(menuItem.path)
+    }
+  }
 
   return (
     <Sider
@@ -43,32 +63,9 @@ const Sidebar = ({ collapsed }) => {
       <Menu
         theme="dark"
         mode="inline"
-        defaultSelectedKeys={['2']}
+        selectedKeys={[selectedKey]}
         items={menuItems}
-        onClick={({ key }) => {
-          switch (key) {
-            case '1':
-              navigate('/reports')
-              break
-            case '2':
-              navigate('/users')
-              break
-            case '3':
-              navigate('/offices')
-              break
-            case '4':
-              navigate('/customers')
-              break
-            case '5':
-              navigate('/vehicles')
-              break
-            case '6':
-              navigate('/claims')
-              break
-            default:
-              break
-          }
-        }}
+        onClick={handleMenuClick}
       />
     </Sider>
   )
