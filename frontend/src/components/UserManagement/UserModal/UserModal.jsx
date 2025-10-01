@@ -85,19 +85,19 @@ const UserModal = ({
         <Form.Item
           label="Full Name"
           name="name"
+          validateFirst
           rules={[
             { required: true, message: 'Please enter full name' },
             { min: 2, message: 'Name must be at least 2 characters' },
-            { max: 100, message: 'Name cannot exceed 100 characters' },
+            { max: 50, message: 'Name cannot exceed 50 characters' },
             {
-              pattern: /^[a-zA-ZÀ-ỹ\s]+$/,
-              message: 'Name can only contain letters and spaces',
+              pattern: /^[\p{L}\s'-]+$/u,
+              message: 'Name can only contain letters, spaces, apostrophes or hyphens',
             },
           ]}
         >
           <Input placeholder="Enter full name" prefix={<UserOutlined />} size="large" />
         </Form.Item>
-
         <Form.Item
           label="Email"
           name="email"
