@@ -1,9 +1,10 @@
 import React from 'react'
 import { API_ENDPOINTS } from '@constants'
 import OfficeModal from '@components/OfficeManagement/OfficeModal/OfficeModal.jsx'
-import OfficeTable from '@components/OfficeManagement/OfficeTable/OfficeTable.jsx'
-import OfficeActionBar from '@components/OfficeManagement/OfficeActionBar/OfficeActionBar.jsx'
 import useManagement from '@/hooks/useManagement.js'
+import GenericActionBar from '@components/common/GenericActionBar/GenericActionBar.jsx'
+import GenericTable from '@components/common/GenericTable/GenericTable.jsx'
+import GenerateColumns from './officeTableColumns.jsx'
 
 const OfficeManagement = () => {
   const {
@@ -19,23 +20,32 @@ const OfficeManagement = () => {
     handleReset,
   } = useManagement(API_ENDPOINTS.OFFICE, 'office')
 
+  const searchFields = ['office_name', 'office_type', 'address']
+
   return (
     <>
-      <OfficeActionBar
+      <GenericActionBar
         searchText={searchText}
         setSearchText={setSearchText}
         onReset={handleReset}
         onOpenModal={handleOpenModal}
         loading={loading}
+        searchPlaceholder="Search by office name, type or address..."
+        addButtonText="Add Office"
       />
 
-      <OfficeTable
+      <GenericTable
         loading={loading}
         setLoading={setLoading}
-        offices={offices}
         searchText={searchText}
+        data={offices}
         onOpenModal={handleOpenModal}
         onRefresh={handleReset}
+        generateColumns={GenerateColumns}
+        searchFields={searchFields}
+        deleteEndpoint={API_ENDPOINTS.OFFICE}
+        deleteSuccessMessage="Office deleted successfully"
+        deleteErrorMessage="Failed to delete office"
       />
 
       <OfficeModal

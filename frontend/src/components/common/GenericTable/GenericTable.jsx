@@ -14,7 +14,7 @@ const GenericTable = ({
   deleteEndpoint,
   deleteSuccessMessage = 'Item deleted successfully',
   deleteErrorMessage = 'Failed to delete item',
-  additionalProps = {}, // For passing extra props like offices to columns
+  additionalProps = {},
 }) => {
   const [filteredInfo, setFilteredInfo] = useState({})
   const [sortedInfo, setSortedInfo] = useState({})
