@@ -1,5 +1,5 @@
 import { ROLE_LABELS, USER_ROLES } from '@constants'
-import { Button, Popconfirm, Space, Tag, Tooltip } from 'antd'
+import { Button, Popconfirm, Space, Tag } from 'antd'
 import {
   CheckCircleOutlined,
   CloseCircleOutlined,
@@ -13,24 +13,27 @@ import {
 const GenerateColumns = (sortedInfo, filteredInfo, onOpenModal, onDelete, getOfficeName) => {
   return [
     {
-      title: 'Name',
+      title: <span style={{ padding: '0 14px', display: 'inline-block' }}>Name</span>,
       dataIndex: 'name',
       key: 'name',
+      width: '20%',
       sorter: (a, b) => (a.name || '').localeCompare(b.name || ''),
       sortOrder: sortedInfo.columnKey === 'name' ? sortedInfo.order : null,
       render: (text) => (
-        <Space style={{ padding: '0 14px' }}>
+        <Space style={{ padding: '0 14px', whiteSpace: 'normal', wordBreak: 'break-word' }}>
           <UserOutlined style={{ color: '#697565' }} />
           <span>{text || 'N/A'}</span>
         </Space>
       ),
     },
     {
-      title: 'Email',
+      title: <span style={{ padding: '0 14px', display: 'inline-block' }}>Email</span>,
       dataIndex: 'email',
       key: 'email',
+      width: '22%',
       sorter: (a, b) => (a.email || '').localeCompare(b.email || ''),
       sortOrder: sortedInfo.columnKey === 'email' ? sortedInfo.order : null,
+      ellipsis: true,
       render: (text) => (
         <Space style={{ padding: '0 14px' }}>
           <MailOutlined style={{ color: '#697565' }} />
@@ -43,7 +46,7 @@ const GenerateColumns = (sortedInfo, filteredInfo, onOpenModal, onDelete, getOff
       dataIndex: 'role',
       key: 'role',
       align: 'center',
-      width: 150,
+      width: '15%',
       filters: Object.values(USER_ROLES).map((role) => ({
         text: ROLE_LABELS[role],
         value: role,
@@ -59,6 +62,7 @@ const GenerateColumns = (sortedInfo, filteredInfo, onOpenModal, onDelete, getOff
       dataIndex: 'office_id',
       key: 'office_id',
       align: 'center',
+      width: '20%',
       render: (officeId) => (
         <Space>
           <HomeOutlined style={{ color: '#697565' }} />
@@ -71,7 +75,7 @@ const GenerateColumns = (sortedInfo, filteredInfo, onOpenModal, onDelete, getOff
       dataIndex: 'is_active',
       key: 'is_active',
       align: 'center',
-      width: 125,
+      width: '13%',
       filters: [
         { text: 'Active', value: true },
         { text: 'Inactive', value: false },
@@ -92,7 +96,7 @@ const GenerateColumns = (sortedInfo, filteredInfo, onOpenModal, onDelete, getOff
       key: 'action',
       fixed: 'right',
       align: 'center',
-      width: 100,
+      width: '10%',
       render: (_, record) => (
         <Space size="small">
           <Button type="text" icon={<EditOutlined />} onClick={() => onOpenModal(record, true)} />
