@@ -16,15 +16,9 @@ namespace CustomerVehicleService.Infrastructure.Repositories
         Task<TEntity> FirstOrDefaultAsync(Expression<Func<TEntity, bool>> predicate);
         Task<bool> ExistsAsync(Expression<Func<TEntity, bool>> predicate);
 
-        // Query access for flexibility
-        IQueryable<TEntity> Query(); // AI them chu chua biet lam gi =)?
-
         // Command operations
         Task AddAsync(TEntity entity);
-        Task AddRangeAsync(IEnumerable<TEntity> entities);
         void Update(TEntity entity);
-        void UpdateRange(IEnumerable<TEntity> entities); //???
         void Remove(TEntity entity);
-        void RemoveRange(IEnumerable<TEntity> entities); //???
     }
 }
