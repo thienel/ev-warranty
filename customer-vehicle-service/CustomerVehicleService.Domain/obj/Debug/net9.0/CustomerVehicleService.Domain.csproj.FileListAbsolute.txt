@@ -1,0 +1,15 @@
+A:\SE_\[5]_SWP\ev-warranty\customer-vehicle-service\CustomerVehicleService.Domain\obj\Debug\net9.0\CustomerVehicleService.Domain.GeneratedMSBuildEditorConfig.editorconfig
+A:\SE_\[5]_SWP\ev-warranty\customer-vehicle-service\CustomerVehicleService.Domain\obj\Debug\net9.0\CustomerVehicleService.Domain.AssemblyInfoInputs.cache
+A:\SE_\[5]_SWP\ev-warranty\customer-vehicle-service\CustomerVehicleService.Domain\obj\Debug\net9.0\CustomerVehicleService.Domain.AssemblyInfo.cs
+A:\SE_\[5]_SWP\ev-warranty\customer-vehicle-service\CustomerVehicleService.Domain\obj\Debug\net9.0\CustomerVehicleService.Domain.csproj.CoreCompileInputs.cache
+A:\SE_\[5]_SWP\ev-warranty\customer-vehicle-service\CustomerVehicleService.Domain\obj\Debug\net9.0\CustomerVehicleService.Domain.sourcelink.json
+A:\SE_\[5]_SWP\ev-warranty\customer-vehicle-service\CustomerVehicleService.Domain\bin\Debug\net9.0\CustomerVehicleService.Domain.deps.json
+A:\SE_\[5]_SWP\ev-warranty\customer-vehicle-service\CustomerVehicleService.Domain\bin\Debug\net9.0\CustomerVehicleService.Domain.runtimeconfig.json
+A:\SE_\[5]_SWP\ev-warranty\customer-vehicle-service\CustomerVehicleService.Domain\bin\Debug\net9.0\CustomerVehicleService.Domain.dll
+A:\SE_\[5]_SWP\ev-warranty\customer-vehicle-service\CustomerVehicleService.Domain\bin\Debug\net9.0\CustomerVehicleService.Domain.pdb
+A:\SE_\[5]_SWP\ev-warranty\customer-vehicle-service\CustomerVehicleService.Domain\obj\Debug\net9.0\CustomerVehicleService.Domain.csproj.AssemblyReference.cache
+A:\SE_\[5]_SWP\ev-warranty\customer-vehicle-service\CustomerVehicleService.Domain\obj\Debug\net9.0\CustomerVehicleService.Domain.dll
+A:\SE_\[5]_SWP\ev-warranty\customer-vehicle-service\CustomerVehicleService.Domain\obj\Debug\net9.0\refint\CustomerVehicleService.Domain.dll
+A:\SE_\[5]_SWP\ev-warranty\customer-vehicle-service\CustomerVehicleService.Domain\obj\Debug\net9.0\CustomerVehicleService.Domain.pdb
+A:\SE_\[5]_SWP\ev-warranty\customer-vehicle-service\CustomerVehicleService.Domain\obj\Debug\net9.0\CustomerVehicleService.Domain.genruntimeconfig.cache
+A:\SE_\[5]_SWP\ev-warranty\customer-vehicle-service\CustomerVehicleService.Domain\obj\Debug\net9.0\ref\CustomerVehicleService.Domain.dll

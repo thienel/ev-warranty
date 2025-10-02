@@ -1,0 +1,9 @@
+A:\SE_\[5]_SWP\ev-warranty\customer-vehicle-service\CustomerVehicleService.API\obj\Debug\net9.0\CustomerVehicleService.API.csproj.AssemblyReference.cache
+A:\SE_\[5]_SWP\ev-warranty\customer-vehicle-service\CustomerVehicleService.API\obj\Debug\net9.0\rpswa.dswa.cache.json
+A:\SE_\[5]_SWP\ev-warranty\customer-vehicle-service\CustomerVehicleService.API\obj\Debug\net9.0\CustomerVehicleService.API.GeneratedMSBuildEditorConfig.editorconfig
+A:\SE_\[5]_SWP\ev-warranty\customer-vehicle-service\CustomerVehicleService.API\obj\Debug\net9.0\CustomerVehicleService.API.AssemblyInfoInputs.cache
+A:\SE_\[5]_SWP\ev-warranty\customer-vehicle-service\CustomerVehicleService.API\obj\Debug\net9.0\CustomerVehicleService.API.AssemblyInfo.cs
+A:\SE_\[5]_SWP\ev-warranty\customer-vehicle-service\CustomerVehicleService.API\obj\Debug\net9.0\CustomerVehicleService.API.csproj.CoreCompileInputs.cache
+A:\SE_\[5]_SWP\ev-warranty\customer-vehicle-service\CustomerVehicleService.API\obj\Debug\net9.0\CustomerVehicleService.API.MvcApplicationPartsAssemblyInfo.cs
+A:\SE_\[5]_SWP\ev-warranty\customer-vehicle-service\CustomerVehicleService.API\obj\Debug\net9.0\CustomerVehicleService.API.MvcApplicationPartsAssemblyInfo.cache
+A:\SE_\[5]_SWP\ev-warranty\customer-vehicle-service\CustomerVehicleService.API\obj\Debug\net9.0\CustomerVehicleService.API.sourcelink.json
