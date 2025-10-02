@@ -1,6 +1,7 @@
 {
   "runtimeOptions": {
     "tfm": "net9.0",
+<<<<<<< HEAD
     "frameworks": [
       {
         "name": "Microsoft.NETCore.App",
@@ -11,6 +12,12 @@
         "version": "9.0.0"
       }
     ],
+=======
+    "framework": {
+      "name": "Microsoft.NETCore.App",
+      "version": "9.0.0"
+    },
+>>>>>>> 640e6ba ([customer-vehicle-service] feat: init service)
     "configProperties": {
       "System.Reflection.NullabilityInfoContext.IsSupported": true,
       "System.Runtime.Serialization.EnableUnsafeBinaryFormatterSerialization": false

@@ -12,7 +12,6 @@ namespace CustomerVehicleService.Domain.Entities
         public string Email { get; private set; }
         public string Address { get; private set; }
         public string FullName => $"{FirstName} {LastName}";
-
         public DateTime? DeletedAt { get; private set; }
         public bool IsDeleted => DeletedAt.HasValue;
 

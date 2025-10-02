@@ -1,4 +1,4 @@
-﻿using CustomerVehicleService.Application.Interfaces.Data;
+using CustomerVehicleService.Application.Interfaces.Data;
 using CustomerVehicleService.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
