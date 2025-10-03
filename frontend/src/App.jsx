@@ -6,6 +6,7 @@ import AuthCallBack from '@pages/auth/AuthCallBack.jsx'
 import Users from '@pages/Users.jsx'
 import AppLayout from '@components/Layout/Layout.jsx'
 import Offices from '@pages/Offices.jsx'
+import NotFound from '@pages/NotFound/NotFound.jsx'
 
 export const ProtectedRoute = () => {
   const { isAuthenticated } = useSelector((state) => state.auth)
@@ -42,6 +43,10 @@ const App = () => {
         { path: '/auth/callback', element: <AuthCallBack /> },
       ],
     },
+    {
+      path: "*",
+      element: <NotFound />
+    }
   ]
 
   return useRoutes(routes)
