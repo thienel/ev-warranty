@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { message } from 'antd'
 import api from '@services/api'
-import { useDelay } from '@/hooks/index.js'
+import useDelay from '@/hooks/useDelay.js'
 
 const useManagement = (apiEndpoint, itemName = 'item') => {
   const [items, setItems] = useState([])
