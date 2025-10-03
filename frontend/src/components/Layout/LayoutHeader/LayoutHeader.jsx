@@ -7,7 +7,7 @@ import {
   LogoutOutlined,
   UserOutlined,
 } from '@ant-design/icons'
-import './AppHeader.less'
+import './LayoutHeader.less'
 import api from '@services/api.js'
 import { API_ENDPOINTS } from '@constants'
 import { useDispatch } from 'react-redux'
@@ -17,7 +17,7 @@ import { persistor } from '@redux/store.js'
 const { Header } = Layout
 const { Text } = Typography
 
-const AppHeader = ({ collapsed, onToggleCollapse, title }) => {
+const LayoutHeader = ({ collapsed, onToggleCollapse, title }) => {
   const dispatch = useDispatch()
   const handleLogout = async () => {
     try {
@@ -62,4 +62,4 @@ const AppHeader = ({ collapsed, onToggleCollapse, title }) => {
   )
 }
 
-export default AppHeader
+export default LayoutHeader

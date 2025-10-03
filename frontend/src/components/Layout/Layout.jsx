@@ -1,8 +1,8 @@
 import React, { useState } from 'react'
 import { Layout } from 'antd'
 import Sidebar from './Sidebar/Sidebar.jsx'
-import AppHeader from './AppHeader/AppHeader.jsx'
-import AppContent from './AppContent/AppContent.jsx'
+import LayoutHeader from './LayoutHeader/LayoutHeader.jsx'
+import LayoutContent from './LayoutContent/LayoutContent.jsx'
 import './Layout.less'
 
 const AppLayout = ({ children, title }) => {
@@ -17,8 +17,8 @@ const AppLayout = ({ children, title }) => {
       <Sidebar collapsed={collapsed} />
 
       <Layout style={{ height: '100vh', overflow: 'hidden' }}>
-        <AppHeader collapsed={collapsed} onToggleCollapse={handleToggleCollapse} title={title} />
-        <AppContent>{children}</AppContent>
+        <LayoutHeader collapsed={collapsed} onToggleCollapse={handleToggleCollapse} title={title} />
+        <LayoutContent>{children}</LayoutContent>
       </Layout>
     </Layout>
   )
