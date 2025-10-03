@@ -1,8 +1,8 @@
 import React from 'react'
 import { Navigate, Outlet, useRoutes } from 'react-router-dom'
-import Login from '@pages/auth/Login/Login.jsx'
+import Login from '@pages/Login/Login.jsx'
 import { useSelector } from 'react-redux'
-import AuthCallBack from '@pages/auth/AuthCallBack.jsx'
+import CallBack from '@pages/CallBack.jsx'
 import Users from '@pages/Users.jsx'
 import AppLayout from '@components/Layout/Layout.jsx'
 import Offices from '@pages/Offices.jsx'
@@ -40,7 +40,7 @@ const App = () => {
       element: <PublicRoute />,
       children: [
         { path: '/login', element: <Login /> },
-        { path: '/auth/callback', element: <AuthCallBack /> },
+        { path: '/callback', element: <CallBack /> },
       ],
     },
     {
