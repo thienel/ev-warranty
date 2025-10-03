@@ -1,9 +1,10 @@
 import React from 'react'
 import { Button, Result } from 'antd'
 import { useNavigate } from 'react-router-dom'
-import './NotFound.less'
+import './Error.less'
+import { ERROR_MESSAGES } from '@constants'
 
-const NotFound = () => {
+const Error = ({ code = 404 }) => {
   const navigate = useNavigate()
 
   const handleGoHome = () => {
@@ -11,17 +12,17 @@ const NotFound = () => {
   }
 
   const handleGoBack = () => {
-    navigate(-1)
+    code === 403 ? navigate(-3) : navigate(-1)
   }
 
   return (
-    <div className="not-found-container">
+    <div className="error-container">
       <Result
-        status="404"
-        title="404"
-        subTitle="Sorry, the page you visited does not exist."
+        status={code}
+        title={code}
+        subTitle={ERROR_MESSAGES[code]}
         extra={
-          <div className="not-found-actions">
+          <div className="error-actions">
             <Button type="primary" onClick={handleGoHome}>
               Back Home
             </Button>
@@ -33,4 +34,4 @@ const NotFound = () => {
   )
 }
 
-export default NotFound
+export default Error
