@@ -6,7 +6,7 @@ import CallBack from '@pages/CallBack.jsx'
 import Users from '@pages/Users.jsx'
 import AppLayout from '@components/Layout/Layout.jsx'
 import Offices from '@pages/Offices.jsx'
-import NotFound from '@pages/NotFound/NotFound.jsx'
+import Error from '@components/common/Error/Error.jsx'
 
 export const ProtectedRoute = () => {
   const { isAuthenticated } = useSelector((state) => state.auth)
@@ -44,9 +44,17 @@ const App = () => {
       ],
     },
     {
-      path: "*",
-      element: <NotFound />
-    }
+      path: '/unauthorized',
+      element: <Error code={403} />,
+    },
+    {
+      path: '/servererror',
+      element: <Error code={500} />,
+    },
+    {
+      path: '*',
+      element: <Error code={404} />,
+    },
   ]
 
   return useRoutes(routes)
