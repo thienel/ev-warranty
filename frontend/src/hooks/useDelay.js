@@ -1,11 +1,6 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 
-/**
- * useDelay - custom hook để delay thực thi một function
- * @param {number} ms - số mili giây delay
- * @returns {function} run - function để trigger delay
- */
-export const useDelay = (ms = 1000) => {
+const useDelay = (ms = 1000) => {
   const [timer, setTimer] = useState(null)
 
   const run = useCallback(
@@ -28,4 +23,4 @@ export const useDelay = (ms = 1000) => {
   return run
 }
 
-export { default as useManagement } from './useManagement.js'
+export default  useDelay
