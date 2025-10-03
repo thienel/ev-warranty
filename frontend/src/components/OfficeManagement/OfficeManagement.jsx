@@ -1,12 +1,15 @@
 import React from 'react'
-import { API_ENDPOINTS } from '@constants'
+import { API_ENDPOINTS, USER_ROLES } from '@constants'
 import OfficeModal from '@components/OfficeManagement/OfficeModal/OfficeModal.jsx'
 import useManagement from '@/hooks/useManagement.js'
 import GenericActionBar from '@components/common/GenericActionBar/GenericActionBar.jsx'
 import GenericTable from '@components/common/GenericTable/GenericTable.jsx'
 import GenerateColumns from './officeTableColumns.jsx'
+import useCheckRole from '@/hooks/useCheckRole.js'
 
 const OfficeManagement = () => {
+  useCheckRole([USER_ROLES.ADMIN])
+
   const {
     items: offices,
     loading,

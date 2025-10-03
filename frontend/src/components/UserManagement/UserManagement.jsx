@@ -1,14 +1,17 @@
 import React, { useEffect, useState } from 'react'
 import { message } from 'antd'
 import api from '@services/api'
-import { API_ENDPOINTS, ROLE_LABELS } from '@constants'
+import { API_ENDPOINTS, ROLE_LABELS, USER_ROLES } from '@constants'
 import UserModal from '@components/UserManagement/UserModal/UserModal.jsx'
 import useManagement from '@/hooks/useManagement.js'
 import GenericActionBar from '@components/common/GenericActionBar/GenericActionBar.jsx'
 import GenericTable from '@components/common/GenericTable/GenericTable.jsx'
 import GenerateColumns from './userTableColumns.jsx'
+import useCheckRole from '@/hooks/useCheckRole.js'
 
 const UserManagement = () => {
+  useCheckRole([USER_ROLES.ADMIN])
+
   const {
     items: users,
     loading,
