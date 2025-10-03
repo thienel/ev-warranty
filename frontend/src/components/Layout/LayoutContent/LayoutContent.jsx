@@ -1,10 +1,10 @@
 import React from 'react'
 import { Layout } from 'antd'
-import './AppContent.less'
+import './LayoutContent.less'
 
 const { Content } = Layout
 
-const AppContent = ({ children }) => {
+const LayoutContent = ({ children }) => {
   return (
     <div className="app-content">
       <Content>{children}</Content>
@@ -12,4 +12,4 @@ const AppContent = ({ children }) => {
   )
 }
 
-export default AppContent
+export default LayoutContent
