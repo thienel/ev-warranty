@@ -50,6 +50,12 @@ export const ROLE_LABELS = {
   [USER_ROLES.EVM_STAFF]: 'EVM Staff',
 }
 
+export const ERROR_MESSAGES = {
+  [403]: 'Sorry, you are not authorized to access this page.',
+  [500]: 'Sorry, something went wrong on the server.',
+  [404]: 'Sorry, the page you visited does not exist.',
+}
+
 export const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost/api/v1'
 
 export const API_ENDPOINTS = {
