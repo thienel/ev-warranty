@@ -11,8 +11,6 @@ const useCheckRole = (rolesAllowed = []) => {
       navigate('/unauthorized')
     }
   }, [rolesAllowed, navigate, user])
-
-  return user
 }
 
 export default useCheckRole
