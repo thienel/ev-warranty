@@ -6,7 +6,7 @@ import CallBack from '@pages/CallBack.jsx'
 import Users from '@pages/Users.jsx'
 import AppLayout from '@components/Layout/Layout.jsx'
 import Offices from '@pages/Offices.jsx'
-import Error from '@components/common/Error/Error.jsx'
+import Error from '@pages/Error/Error.jsx'
 
 export const ProtectedRoute = () => {
   const { isAuthenticated } = useSelector((state) => state.auth)
