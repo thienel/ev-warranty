@@ -10,13 +10,13 @@ go-test:
 	cd auth-user-service && go test ./... -v
 
 dotnet-restore:
-	cd vehicle-customer-service && dotnet restore
+	cd customer-vehicle-service && dotnet restore
 
 dotnet-build:
-	cd vehicle-customer-service && dotnet build --no-restore --configuration Release
+	cd customer-vehicle-service && dotnet build --no-restore --configuration Release
 
 dotnet-test:
-	cd vehicle-customer-service && dotnet test --no-build --verbosity normal
+	cd customer-vehicle-service && dotnet test --no-build --verbosity normal
 
 docker-compose-down:
 	docker compose down --remove-orphans || true
