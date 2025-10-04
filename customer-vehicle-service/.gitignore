@@ -1,6 +1,6 @@
 ## Build results
-bin/
-obj/
+**/bin/
+**/obj/
 [Ll]og/
 *.log
 
@@ -16,6 +16,7 @@ Thumbs.db
 
 ## Visual Studio Code
 .vscode/
+.vs/
 
 ## Rider
 .idea/
