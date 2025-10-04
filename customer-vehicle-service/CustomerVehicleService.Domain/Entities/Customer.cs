@@ -1,12 +1,6 @@
 ﻿using CustomerVehicleService.Domain.Abstractions;
 using CustomerVehicleService.Domain.Exceptions;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace CustomerVehicleService.Domain.Entities
 {
@@ -18,15 +12,13 @@ namespace CustomerVehicleService.Domain.Entities
         public string Email { get; private set; }
         public string Address { get; private set; }
         public string FullName => $"{FirstName} {LastName}";
-        
+
         public DateTime? DeletedAt { get; private set; }
         public bool IsDeleted => DeletedAt.HasValue;
 
         // Navigation property
         public virtual ICollection<Vehicle> Vehicles { get; private set; }
 
-
-        // EF Core constructor
         private Customer()
         {
             Vehicles = new List<Vehicle>();
@@ -37,41 +29,66 @@ namespace CustomerVehicleService.Domain.Entities
         {
             SetFirstName(firstName);
             SetLastName(lastName);
-            Email = email;
-            PhoneNumber = phoneNumber;
-            Address = address;
+            SetEmail(email);
+            SetPhoneNumber(phoneNumber);
+            SetAddress(address);
         }
 
-        //public void UpdatePersonalInfo(string firstName, string lastName, string phoneNumber = null,
-        //    string email = null, string address = null)
-        //{
-        //    SetFirstName(firstName);
-        //    SetLastName(lastName);
-        //    SetPhoneNumber(phoneNumber);
-        //    SetEmail(email);
-        //    SetAddress(address);
-        //    SetUpdatedAt();
-        //}
+        // BEHAVIOUR METHODS
+        public void UpdateProfile(string firstName, string lastName, string? email, string? phoneNumber, string? address)
+        {
+            SetFirstName(firstName);
+            SetLastName(lastName);
+            SetEmail(email);
+            SetPhoneNumber(phoneNumber);
+            SetAddress(address);
+            SetUpdatedAt();
+        }
 
-        //public void AddVehicle(Vehicle vehicle)
-        //{
-        //    if (vehicle == null)
-        //        throw new BusinessRuleViolationException("Vehicle cannot be null");
+        public void ChangePhoneNumber(string phoneNumber)
+        {
+            SetPhoneNumber(phoneNumber);
+            SetUpdatedAt();
+        }
 
-        //    if (_vehicles.Any(v => v.Vin == vehicle.Vin))
-        //        throw new InvalidOwnerException(vehicle.Vin);
+        public void ChangeEmail(string email)
+        {
+            SetEmail(email);
+            SetUpdatedAt();
+        }
 
-        //    _vehicles.Add(vehicle);
-        //    SetUpdatedAt();
-        //}
+        public void ChangeAddress(string address)
+        {
+            SetAddress(address);
+            SetUpdatedAt();
+        }
 
+        public void AddVehicle(Vehicle vehicle)
+        {
+            if (vehicle == null) throw new ArgumentNullException(nameof(vehicle));
+
+            if (Vehicles.Any(v => v.Id == vehicle.Id))
+                throw new BusinessRuleViolationException("Vehicle already exists for this customer");
+
+            Vehicles.Add(vehicle);
+            SetUpdatedAt();
+        }
+
+        public void RemoveVehicle(Guid vehicleId)
+        {
+            var vehicle = Vehicles.FirstOrDefault(v => v.Id == vehicleId);
+            if (vehicle == null)
+                throw new BusinessRuleViolationException("Vehicle not found for this customer");
+
+            Vehicles.Remove(vehicle);
+            SetUpdatedAt();
+        }
+
+        // 
         public void Delete()
         {
             if (IsDeleted)
                 throw new BusinessRuleViolationException("Customer is already deleted");
-
-            //if (_vehicles.Any(v => !v.IsDeleted))
-            //    throw new BusinessRuleViolationException("Cannot delete customer with active vehicles");
 
             DeletedAt = DateTime.UtcNow;
             SetUpdatedAt();

@@ -21,7 +21,6 @@ namespace CustomerVehicleService.Domain.Entities
         {
             Vehicles = new List<Vehicle>();
         }
-        
 
         public VehicleModel(string brand, string modelName, int year)
         {
@@ -30,6 +29,34 @@ namespace CustomerVehicleService.Domain.Entities
             SetYear(year);
         }
 
+        // BEHAVIOUR METHODS
+        public void UpdateModel(string brand, string modelName, int year)
+        {
+            SetBrand(brand);
+            SetModelName(modelName);
+            SetYear(year);
+            SetUpdatedAt();
+        }
+
+        public void ChangeBrand(string brand)
+        {
+            SetBrand(brand);
+            SetUpdatedAt();
+        }
+
+        public void ChangeModelName(string modelName)
+        {
+            SetModelName(modelName);
+            SetUpdatedAt();
+        }
+
+        public void ChangeYear(int year)
+        {
+            SetYear(year);
+            SetUpdatedAt();
+        }
+
+        // PRIVATE SETTERS
         private void SetBrand(string brand)
         {
             if (string.IsNullOrWhiteSpace(brand))

@@ -34,6 +34,39 @@ namespace CustomerVehicleService.Domain.Entities
             SetPurchaseDate(purchaseDate);
         }
 
+        // BEHAVIOUR METHODS
+        public void UpdateVehicle(string vin, Guid customerId, Guid modelId, string licensePlate, DateTime? purchaseDate)
+        {
+            SetVin(vin);
+            CustomerId = customerId;
+            ModelId = modelId;
+            SetLicensePlate(licensePlate);
+            SetPurchaseDate(purchaseDate);
+            SetUpdatedAt();
+        }
+
+        public void ChangeLicensePlate(string licensePlate)
+        {
+            SetLicensePlate(licensePlate);
+            SetUpdatedAt();
+        }
+
+        public void ChangePurchaseDate(DateTime? purchaseDate)
+        {
+            SetPurchaseDate(purchaseDate);
+            SetUpdatedAt();
+        }
+
+        public void TransferToCustomer(Guid newCustomerId)
+        {
+            if (newCustomerId == Guid.Empty)
+                throw new BusinessRuleViolationException("New customer ID is invalid");
+
+            CustomerId = newCustomerId;
+            SetUpdatedAt();
+        }
+
+        // PRIVATE SETTERS
         private void SetVin(string vin)
         {
             if (string.IsNullOrWhiteSpace(vin))
@@ -72,6 +105,5 @@ namespace CustomerVehicleService.Domain.Entities
             var vinRegex = new Regex(@"^[A-HJ-NPR-Z0-9]{17}$", RegexOptions.Compiled);
             return vinRegex.IsMatch(vin);
         }
-
     }
 }
