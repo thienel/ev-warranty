@@ -1,13 +1,6 @@
-﻿using CustomerVehicleService.Domain.Entities;
-using CustomerVehicleService.Infrastructure.Data.Context;
-using CustomerVehicleService.Infrastructure.Repositories;
+﻿using CustomerVehicleService.Application.Interfaces.Data;
+using CustomerVehicleService.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CustomerVehicleService.Infrastructure.Data.Repositories
 {
@@ -15,7 +8,7 @@ namespace CustomerVehicleService.Infrastructure.Data.Repositories
     {
         public CustomerRepository(DbContext context) : base(context) { }
 
-        public async Task<Customer> GetByEmailAsync(string email)
+        public async Task<Customer?> GetByEmailAsync(string email)
         {
             return await _dbSet
                 .Where(c => !c.IsDeleted)
@@ -34,7 +27,7 @@ namespace CustomerVehicleService.Infrastructure.Data.Repositories
             return await query.AnyAsync();
         }
 
-        public async Task<Customer> GetWithVehiclesAsync(Guid customerId)
+        public async Task<Customer?> GetWithVehiclesAsync(Guid customerId)
         {
             return await _dbSet
                 .Where(c => !c.IsDeleted)
@@ -58,7 +51,7 @@ namespace CustomerVehicleService.Infrastructure.Data.Repositories
                 .ToListAsync();
         }
 
-        public async Task<Customer> GetByIdIncludingDeletedAsync(Guid id)
+        public async Task<Customer?> GetByIdIncludingDeletedAsync(Guid id)
         {
             return await _dbSet
                 .IgnoreQueryFilters()
@@ -74,7 +67,7 @@ namespace CustomerVehicleService.Infrastructure.Data.Repositories
         }
 
         // Override to exclude soft-deleted customers by default
-        public override async Task<Customer> GetByIdAsync(Guid id)
+        public override async Task<Customer?> GetByIdAsync(Guid id)
         {
             return await _dbSet
                 .Where(c => !c.IsDeleted)

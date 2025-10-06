@@ -1,11 +1,6 @@
-﻿using CustomerVehicleService.Infrastructure.Repositories;
+﻿using CustomerVehicleService.Application.Interfaces.Data;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CustomerVehicleService.Infrastructure.Data.Repositories
 {
@@ -20,7 +15,7 @@ namespace CustomerVehicleService.Infrastructure.Data.Repositories
             _dbSet = context.Set<TEntity>();
         }
 
-        public virtual async Task<TEntity> GetByIdAsync(Guid id)
+        public virtual async Task<TEntity?> GetByIdAsync(Guid id)
         {
             return await _dbSet.FindAsync(id);
         }
@@ -35,7 +30,7 @@ namespace CustomerVehicleService.Infrastructure.Data.Repositories
             return await _dbSet.Where(predicate).ToListAsync();
         }
 
-        public virtual async Task<TEntity> FirstOrDefaultAsync(Expression<Func<TEntity, bool>> predicate)
+        public virtual async Task<TEntity?> FirstOrDefaultAsync(Expression<Func<TEntity, bool>> predicate)
         {
             return await _dbSet.FirstOrDefaultAsync(predicate);
         }

@@ -1,11 +1,6 @@
-﻿using CustomerVehicleService.Domain.Entities;
-using CustomerVehicleService.Infrastructure.Repositories;
+﻿using CustomerVehicleService.Application.Interfaces.Data;
+using CustomerVehicleService.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CustomerVehicleService.Infrastructure.Data.Repositories
 {
@@ -13,7 +8,7 @@ namespace CustomerVehicleService.Infrastructure.Data.Repositories
     {
         public VehicleRepository(DbContext context) : base(context) { }
 
-        public async Task<Vehicle> GetByVinAsync(string vin)
+        public async Task<Vehicle?> GetByVinAsync(string vin)
         {
             return await _dbSet
                 .FirstOrDefaultAsync(v => v.Vin.ToLower() == vin.ToLower());
@@ -31,7 +26,7 @@ namespace CustomerVehicleService.Infrastructure.Data.Repositories
             return await query.AnyAsync();
         }
 
-        public async Task<Vehicle> GetByLicensePlateAsync(string licensePlate)
+        public async Task<Vehicle?> GetByLicensePlateAsync(string licensePlate)
         {
             return await _dbSet
                 .FirstOrDefaultAsync(v => v.LicensePlate.ToLower() == licensePlate.ToLower());
@@ -55,7 +50,7 @@ namespace CustomerVehicleService.Infrastructure.Data.Repositories
                 .ToListAsync();
         }
 
-        public async Task<Vehicle> GetWithDetailsAsync(Guid vehicleId)
+        public async Task<Vehicle?> GetWithDetailsAsync(Guid vehicleId)
         {
             return await _dbSet
                 .Include(v => v.Customer)

@@ -1,13 +1,6 @@
-﻿using CustomerVehicleService.Domain.Entities;
-using CustomerVehicleService.Infrastructure.Data.Context;
-using CustomerVehicleService.Infrastructure.Repositories;
+﻿using CustomerVehicleService.Application.Interfaces.Data;
+using CustomerVehicleService.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CustomerVehicleService.Infrastructure.Data.Repositories
 {
@@ -15,7 +8,7 @@ namespace CustomerVehicleService.Infrastructure.Data.Repositories
     {
         public VehicleModelRepository(DbContext context) : base(context) { }
 
-        public async Task<VehicleModel> GetByBrandModelYearAsync(string brand, string modelName, int year)
+        public async Task<VehicleModel?> GetByBrandModelYearAsync(string brand, string modelName, int year)
         {
             return await _dbSet
                 .FirstOrDefaultAsync(vm =>
