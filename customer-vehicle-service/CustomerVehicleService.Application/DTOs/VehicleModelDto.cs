@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CustomerVehicleService.Domain.Entities;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -60,7 +61,7 @@ namespace CustomerVehicleService.Application.DTOs
             public DateTime CreatedAt { get; set; }
             public DateTime? UpdatedAt { get; set; }
 
-            // Display helper for UI dropdowns
+            // Display for UI
             public string DisplayName => $"{Brand} {ModelName} {Year}";
         }
 
@@ -81,7 +82,48 @@ namespace CustomerVehicleService.Application.DTOs
 
             // Display helpers
             public string DisplayName => $"{Brand} {ModelName} {Year}";
-            public bool CanBeDeleted => VehicleCount == 0;
+            public bool CanBeDeleted => VehicleCount == 0; // yet supported
         }
     }
+
+    public static class VehicleModelMapper
+    {
+        public static VehicleModel ToEntity(this VehicleModelDto.CreateVehicleModelRequest request)
+        {
+            return new VehicleModel(request.Brand, request.ModelName, request.Year);
+        }
+
+        public static void ApplyToEntity(this VehicleModelDto.UpdateVehicleModelRequest request, VehicleModel entity)
+        {
+            entity.UpdateModel(request.Brand, request.ModelName, request.Year);
+        }
+
+        public static VehicleModelDto.VehicleModelResponse ToResponse(this VehicleModel entity)
+        {
+            return new VehicleModelDto.VehicleModelResponse
+            {
+                Id = entity.Id,
+                Brand = entity.Brand,
+                ModelName = entity.ModelName,
+                Year = entity.Year,
+                CreatedAt = entity.CreatedAt,
+                UpdatedAt = entity.UpdatedAt
+            };
+        }
+
+        public static VehicleModelDto.VehicleModelWithStatsResponse ToStatsResponse(this VehicleModel entity)
+        {
+            return new VehicleModelDto.VehicleModelWithStatsResponse
+            {
+                Id = entity.Id,
+                Brand = entity.Brand,
+                ModelName = entity.ModelName,
+                Year = entity.Year,
+                CreatedAt = entity.CreatedAt,
+                UpdatedAt = entity.UpdatedAt,
+                VehicleCount = entity.Vehicles?.Count ?? 0
+            };
+        }
+    }
+
 }

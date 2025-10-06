@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CustomerVehicleService.Domain.Entities;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -121,6 +122,72 @@ namespace CustomerVehicleService.Application.DTOs
             public int? VehicleAgeYears => PurchaseDate.HasValue
                 ? DateTime.UtcNow.Year - PurchaseDate.Value.Year
                 : null;
+        }
+    }
+
+    // !!! should unify to Mapper(suggest)
+    public static class VehicleMapper
+    {
+        public static Vehicle ToEntity(this VehicleDto.CreateVehicleRequest request)
+        {
+            return new Vehicle(
+                request.Vin,
+                request.CustomerId,
+                request.ModelId,
+                request.LicensePlate,
+                request.PurchaseDate
+            );
+        }
+
+        public static void ApplyToEntity(this VehicleDto.UpdateVehicleRequest request, Vehicle entity)
+        {
+            entity.UpdateVehicle(
+                request.Vin,
+                request.CustomerId,
+                request.ModelId,
+                request.LicensePlate,
+                request.PurchaseDate
+            );
+        }
+
+        public static void ApplyTransfer(this VehicleDto.TransferVehicleCommand request, Vehicle entity)
+        {
+            entity.TransferToCustomer(request.NewCustomerId);
+        }
+
+        public static void ApplyLicensePlateUpdate(this VehicleDto.UpdateLicensePlateCommand request, Vehicle entity)
+        {
+            entity.ChangeLicensePlate(request.LicensePlate);
+        }
+
+        public static VehicleDto.VehicleResponse ToResponse(this Vehicle entity)
+        {
+            return new VehicleDto.VehicleResponse
+            {
+                Id = entity.Id,
+                Vin = entity.Vin,
+                LicensePlate = entity.LicensePlate,
+                CustomerId = entity.CustomerId,
+                ModelId = entity.ModelId,
+                PurchaseDate = entity.PurchaseDate,
+                CreatedAt = entity.CreatedAt,
+                UpdatedAt = entity.UpdatedAt
+            };
+        }
+
+        public static VehicleDto.VehicleDetailResponse ToDetailResponse(this Vehicle entity)
+        {
+            return new VehicleDto.VehicleDetailResponse
+            {
+                Id = entity.Id,
+                Vin = entity.Vin,
+                LicensePlate = entity.LicensePlate,
+                PurchaseDate = entity.PurchaseDate,
+                CreatedAt = entity.CreatedAt,
+                UpdatedAt = entity.UpdatedAt,
+                Owner = entity.Customer.ToResponse(),   // mapping CustomerResponse
+                Model = entity.Model.ToResponse()      // mapping VehicleModelResponse
+            };
         }
     }
 }

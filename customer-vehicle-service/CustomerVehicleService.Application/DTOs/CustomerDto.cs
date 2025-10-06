@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CustomerVehicleService.Domain.Entities;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -105,6 +106,66 @@ namespace CustomerVehicleService.Application.DTOs
             // Display helpers
             public string FullName => $"{FirstName} {LastName}";
             public int TotalVehicles => Vehicles.Count;
+        }
+    }
+
+    public static class CustomerMapper
+    {
+        public static Customer ToEntity(this CustomerDto.CreateCustomerRequest request)
+        {
+            return new Customer(
+                request.FirstName,
+                request.LastName,
+                request.Email,
+                request.PhoneNumber,
+                request.Address
+            );
+        }
+
+        public static void ApplyToEntity(this CustomerDto.UpdateCustomerRequest request, Customer customer)
+        {
+            customer.UpdateProfile(
+                request.FirstName,
+                request.LastName,
+                request.Email,
+                request.PhoneNumber,
+                request.Address
+            );
+        }
+
+        public static CustomerDto.CustomerResponse ToResponse(this Customer customer)
+        {
+            return new CustomerDto.CustomerResponse
+            {
+                Id = customer.Id,
+                FirstName = customer.FirstName,
+                LastName = customer.LastName,
+                PhoneNumber = customer.PhoneNumber,
+                Email = customer.Email,
+                Address = customer.Address,
+                CreatedAt = customer.CreatedAt,
+                UpdatedAt = customer.UpdatedAt,
+                DeletedAt = customer.DeletedAt,
+                IsDeleted = customer.IsDeleted
+            };
+        }
+
+        public static CustomerDto.CustomerWithVehiclesResponse ToWithVehiclesResponse(this Customer customer)
+        {
+            return new CustomerDto.CustomerWithVehiclesResponse
+            {
+                Id = customer.Id,
+                FirstName = customer.FirstName,
+                LastName = customer.LastName,
+                PhoneNumber = customer.PhoneNumber,
+                Email = customer.Email,
+                Address = customer.Address,
+                CreatedAt = customer.CreatedAt,
+                UpdatedAt = customer.UpdatedAt,
+                DeletedAt = customer.DeletedAt,
+                IsDeleted = customer.IsDeleted,
+                Vehicles = customer.Vehicles.Select(VehicleMapper.ToResponse).ToList()
+            };
         }
     }
 }
