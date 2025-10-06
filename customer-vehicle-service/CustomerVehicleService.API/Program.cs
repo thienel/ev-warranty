@@ -1,3 +1,5 @@
+using CustomerVehicleService.Infrastructure;
+
 namespace CustomerVehicleService.API
 {
     public class Program
@@ -12,6 +14,18 @@ namespace CustomerVehicleService.API
             // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
             builder.Services.AddOpenApi();
 
+            builder.Services.AddInfrastructure(builder.Configuration);
+
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("AllowFrontEnd", builder =>
+                {
+                    builder.AllowAnyOrigin()
+                          .AllowAnyMethod()
+                          .AllowAnyHeader();
+                });
+            });
+
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
@@ -22,8 +36,9 @@ namespace CustomerVehicleService.API
 
             app.UseHttpsRedirection();
 
-            app.UseAuthorization();
+            app.UseCors("AllowFrontEnd");
 
+            app.UseAuthorization();
 
             app.MapControllers();
 
