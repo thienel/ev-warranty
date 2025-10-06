@@ -25,7 +25,7 @@ namespace CustomerVehicleService.Domain.Entities
         }
 
         public Customer(string firstName, string lastName, string? email = null,
-                       string? phoneNumber = null, string? address = null) : this()
+                       string phoneNumber = null, string? address = null) : this()
         {
             SetFirstName(firstName);
             SetLastName(lastName);
@@ -35,7 +35,7 @@ namespace CustomerVehicleService.Domain.Entities
         }
 
         // BEHAVIOUR METHODS
-        public void UpdateProfile(string firstName, string lastName, string? email, string? phoneNumber, string? address)
+        public void UpdateProfile(string firstName, string lastName, string? email, string phoneNumber, string? address)
         {
             SetFirstName(firstName);
             SetLastName(lastName);
@@ -133,7 +133,7 @@ namespace CustomerVehicleService.Domain.Entities
                     throw new BusinessRuleViolationException("Phone number cannot exceed 20 characters");
             }
 
-            PhoneNumber = phoneNumber?.Trim();
+            PhoneNumber = phoneNumber.Trim();
         }
 
         private void SetEmail(string email)
@@ -147,12 +147,12 @@ namespace CustomerVehicleService.Domain.Entities
                     throw new BusinessRuleViolationException("Email cannot exceed 255 characters");
             }
 
-            Email = email?.Trim().ToLowerInvariant();
+            Email = email.Trim().ToLowerInvariant();
         }
 
         private void SetAddress(string address)
         {
-            Address = address?.Trim();
+            Address = address.Trim();
         }
 
         private static bool IsValidEmail(string email)

@@ -86,7 +86,7 @@ namespace CustomerVehicleService.Domain.Entities
                     throw new BusinessRuleViolationException("License plate cannot exceed 20 characters");
             }
 
-            LicensePlate = licensePlate?.Trim().ToUpperInvariant();
+            LicensePlate = licensePlate.Trim().ToUpperInvariant();
         }
 
         private void SetPurchaseDate(DateTime? purchaseDate)
