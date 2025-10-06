@@ -12,20 +12,19 @@ namespace CustomerVehicleService.Infrastructure.Data.Context
 {
     public class CustomerVehicleDbContext : DbContext
     {
+        public DbSet<Customer> Customers { get; set; }
+        public DbSet<Vehicle> Vehicles { get; set; }
+        public DbSet<VehicleModel> VehicleModels { get; set; }
+
         public CustomerVehicleDbContext(DbContextOptions<CustomerVehicleDbContext> options)
             : base(options)
         {
         }
 
-        public DbSet<Customer> Customers { get; set; }
-        public DbSet<Vehicle> Vehicles { get; set; }
-        public DbSet<VehicleModel> VehicleModels { get; set; }
-
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
 
-            // Apply configurations from the same assembly
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(CustomerVehicleDbContext).Assembly);
         }
 
