@@ -10,26 +10,26 @@ import (
 )
 
 const (
-	UserRoleAdmin        = "admin"
-	UserRoleEvmStaff     = "evm staff"
-	UserRoleScStaff      = "sc staff"
-	UserRoleScTechnician = "sc technician"
+	UserRoleAdmin        = "ADMIN"
+	UserRoleEvmStaff     = "EVM_STAFF"
+	UserRoleScStaff      = "SC_STAFF"
+	UserRoleScTechnician = "SC_TECHNICIAN"
 )
 
 type User struct {
 	ID            uuid.UUID      `gorm:"primaryKey;type:uuid;default:gen_random_uuid()"`
-	Name          string         `gorm:"not null;size:50"`
-	Email         string         `gorm:"not null;uniqueIndex;size:100"`
-	Role          string         `gorm:"not null;size:20"`
-	PasswordHash  string         `gorm:"not null;size:255"`
+	Name          string         `gorm:"not null"`
+	Email         string         `gorm:"not null;uniqueIndex;"`
+	Role          string         `gorm:"not null"`
+	PasswordHash  string         `gorm:"not null"`
 	IsActive      bool           `gorm:"not null;default:true"`
 	OfficeID      uuid.UUID      `gorm:"not null;type:uuid"`
 	Office        Office         `gorm:"foreignKey:OfficeID;references:ID"`
+	OAuthProvider *string        `gorm:"column:oauth_provider"`
+	OAuthID       *string        `gorm:"column:oauth_id"`
 	CreatedAt     time.Time      `gorm:"autoCreateTime"`
 	UpdatedAt     time.Time      `gorm:"autoUpdateTime"`
 	DeletedAt     gorm.DeletedAt `gorm:"index"`
-	OAuthProvider *string        `gorm:"size:32;column:oauth_provider"`
-	OAuthID       *string        `gorm:"size:64;column:oauth_id"`
 }
 
 func IsValidUserRole(userRole string) bool {
