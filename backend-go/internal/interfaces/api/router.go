@@ -33,8 +33,8 @@ func NewRouter(db *database.Database, authHandler AuthHandler, oauthHandler OAut
 
 	users := router.Group("/users")
 	{
-		users.POST("/", userHandler.Create)
-		users.GET("/", userHandler.GetAll)
+		users.POST("", userHandler.Create)
+		users.GET("", userHandler.GetAll)
 		users.GET("/:id", userHandler.GetByID)
 		users.PUT("/:id", userHandler.Update)
 		users.DELETE("/:id", userHandler.Delete)
@@ -42,8 +42,8 @@ func NewRouter(db *database.Database, authHandler AuthHandler, oauthHandler OAut
 
 	office := router.Group("/offices")
 	{
-		office.POST("/", officeHandler.Create)
-		office.GET("/", officeHandler.GetAll)
+		office.POST("", officeHandler.Create)
+		office.GET("", officeHandler.GetAll)
 		office.GET("/:id", officeHandler.GetById)
 		office.PUT("/:id", officeHandler.Update)
 		office.DELETE("/:id", officeHandler.Delete)
@@ -57,7 +57,7 @@ func (h *HealthHandler) Check(c *gin.Context) {
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"status":  "unhealthy",
-			"service": "auth-service",
+			"service": "backend-go",
 			"db":      "down",
 		})
 		return
@@ -65,7 +65,7 @@ func (h *HealthHandler) Check(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{
 		"status":  "healthy",
-		"service": "auth-service",
+		"service": "backend-go",
 		"db":      "up",
 	})
 }
