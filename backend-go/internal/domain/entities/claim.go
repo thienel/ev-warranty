@@ -8,13 +8,14 @@ import (
 )
 
 const (
-	ClaimStatusDraft       = "DRAFT"
-	ClaimStatusSubmitted   = "SUBMITTED"
-	ClaimStatusReviewing   = "REVIEWING"
-	ClaimStatusApproved    = "APPROVED"
-	ClaimStatusRejected    = "REJECTED"
-	ClaimStatusCancelled   = "CANCELLED"
-	ClaimStatusRequestInfo = "REQUEST_INFO"
+	ClaimStatusDraft             = "DRAFT"
+	ClaimStatusSubmitted         = "SUBMITTED"
+	ClaimStatusReviewing         = "REVIEWING"
+	ClaimStatusRequestInfo       = "REQUEST_INFO"
+	ClaimStatusApproved          = "APPROVED"
+	ClaimStatusPartiallyApproved = "PARTIALLY_APPROVED"
+	ClaimStatusRejected          = "REJECTED"
+	ClaimStatusCancelled         = "CANCELLED"
 )
 
 type Claim struct {
@@ -43,8 +44,8 @@ func NewClaim(vehicleID, customerID uuid.UUID, description, status string, appro
 
 func IsValidClaimStatus(status string) bool {
 	switch status {
-	case ClaimStatusDraft, ClaimStatusSubmitted, ClaimStatusApproved, ClaimStatusCancelled,
-		ClaimStatusReviewing, ClaimStatusRequestInfo, ClaimStatusRejected:
+	case ClaimStatusDraft, ClaimStatusSubmitted, ClaimStatusApproved, ClaimStatusPartiallyApproved,
+		ClaimStatusCancelled, ClaimStatusReviewing, ClaimStatusRequestInfo, ClaimStatusRejected:
 		return true
 	default:
 		return false
