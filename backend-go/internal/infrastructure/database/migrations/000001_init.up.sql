@@ -3,8 +3,8 @@ CREATE EXTENSION IF NOT EXISTS "pgcrypto";
 
 CREATE TABLE IF NOT EXISTS offices (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    office_name VARCHAR NOT NULL,
-    office_type VARCHAR(10) NOT NULL,
+    office_name TEXT NOT NULL,
+    office_type TEXT NOT NULL,
     address TEXT NOT NULL,
     is_active BOOLEAN NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
@@ -17,16 +17,16 @@ CREATE INDEX IF NOT EXISTS idx_offices_deleted_at ON offices (deleted_at);
 CREATE TABLE IF NOT EXISTS users (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     office_id UUID REFERENCES offices(id),
-    name VARCHAR(50) NOT NULL,
-    email VARCHAR(100) NOT NULL UNIQUE,
-    role VARCHAR(20) NOT NULL,
-    password_hash VARCHAR(255) NOT NULL,
+    name TEXT NOT NULL,
+    email TEXT NOT NULL UNIQUE,
+    role TEXT NOT NULL,
+    password_hash TEXT NOT NULL,
     is_active BOOLEAN NOT NULL DEFAULT TRUE,
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
     deleted_at TIMESTAMP NULL,
-    oauth_provider VARCHAR(32),
-    oauth_id VARCHAR(64)
+    oauth_provider TEXT,
+    oauth_id TEXT
 );
 
 CREATE INDEX IF NOT EXISTS idx_users_deleted_at ON users (deleted_at);
