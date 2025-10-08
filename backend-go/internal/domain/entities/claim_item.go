@@ -27,7 +27,7 @@ type ClaimItem struct {
 	ReplacementPartID *uuid.UUID      `gorm:"type:uuid" json:"replacement_part_id"`
 	IssueDescription  string          `gorm:"not null;type:text" json:"issue_description"`
 	LineStatus        string          `gorm:"not null" json:"line_status"`
-	LineType          string          `gorm:"not null" json:"line_type"`
+	Type              string          `gorm:"not null" json:"type"`
 	Cost              float64         `json:"cost"`
 	CreatedAt         time.Time       `gorm:"autoCreateTime" json:"created_at"`
 	UpdatedAt         time.Time       `gorm:"autoUpdateTime" json:"updated_at"`
@@ -35,7 +35,7 @@ type ClaimItem struct {
 }
 
 func NewClaimItem(claimID uuid.UUID, partCategoryID int, faultyPartID uuid.UUID, replacementPartID *uuid.UUID,
-	IssueDescription, lineStatus, lineType string, cost float64) *ClaimItem {
+	IssueDescription, lineStatus, claimItemType string, cost float64) *ClaimItem {
 
 	return &ClaimItem{
 		ID:                uuid.New(),
@@ -45,7 +45,7 @@ func NewClaimItem(claimID uuid.UUID, partCategoryID int, faultyPartID uuid.UUID,
 		ReplacementPartID: replacementPartID,
 		IssueDescription:  IssueDescription,
 		LineStatus:        lineStatus,
-		LineType:          lineType,
+		Type:              claimItemType,
 		Cost:              cost,
 	}
 }
@@ -59,8 +59,8 @@ func IsValidClaimItemStatus(status string) bool {
 	}
 }
 
-func IsValidClaimItemType(lineStatus string) bool {
-	switch lineStatus {
+func IsValidClaimItemType(claimItemType string) bool {
+	switch claimItemType {
 	case ClaimItemTypeReplacement, ClaimItemTypeRepair:
 		return true
 	default:

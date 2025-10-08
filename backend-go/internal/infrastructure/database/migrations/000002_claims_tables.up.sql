@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXISTS claim_items (
     replacement_part_id UUID,
     issue_description TEXT NOT NULL,
     line_status TEXT NOT NULL,
-    line_type TEXT NOT NULL,
+    type TEXT NOT NULL,
     cost DECIMAL(15, 2) DEFAULT 0,
     created_at TIMESTAMP WITH TIME ZONE NOT NULL,
     updated_at TIMESTAMP WITH TIME ZONE NOT NULL,
