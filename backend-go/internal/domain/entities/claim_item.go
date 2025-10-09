@@ -21,7 +21,7 @@ const (
 type ClaimItem struct {
 	ID                uuid.UUID       `gorm:"primaryKey;type:uuid;default:uuid_generate_v4()" json:"id"`
 	ClaimID           uuid.UUID       `gorm:"not null;type:uuid" json:"claim_id"`
-	Claim             Claim           `gorm:"foreignKey:ClaimID;references:ID;constrains:OnDelete:CASCADE" json:"-"`
+	Claim             Claim           `gorm:"foreignKey:ClaimID;references:ID;constraint:OnDelete:CASCADE" json:"-"`
 	PartCategoryID    int             `gorm:"not null" json:"part_category_id"`
 	FaultyPartID      uuid.UUID       `gorm:"not null;type:uuid" json:"faulty_part_id"`
 	ReplacementPartID *uuid.UUID      `gorm:"type:uuid" json:"replacement_part_id"`
