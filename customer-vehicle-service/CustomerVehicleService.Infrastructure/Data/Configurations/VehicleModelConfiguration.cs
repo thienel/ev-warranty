@@ -38,15 +38,15 @@ namespace CustomerVehicleService.Infrastructure.Data.Configurations
                 .HasColumnType("integer")
                 .IsRequired();
 
-            // Timestamps
+            // DateTime
             builder.Property(vm => vm.CreatedAt)
                 .HasColumnName("created_at")
-                .HasColumnType("timestamp")
+                .HasColumnType("datetime2")
                 .IsRequired();
 
             builder.Property(vm => vm.UpdatedAt)
                 .HasColumnName("updated_at")
-                .HasColumnType("timestamp")
+                .HasColumnType("datetime2")
                 .IsRequired(false);
 
             // Indexes - Composite unique index

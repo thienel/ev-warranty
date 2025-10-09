@@ -33,13 +33,12 @@ namespace CustomerVehicleService.Infrastructure.Migrations
                         .HasColumnType("text")
                         .HasColumnName("address");
 
-                    b.Property<byte[]>("CreatedAt")
-                        .IsRequired()
-                        .HasColumnType("timestamp")
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2")
                         .HasColumnName("created_at");
 
-                    b.Property<byte[]>("DeletedAt")
-                        .HasColumnType("timestamp")
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2")
                         .HasColumnName("deleted_at");
 
                     b.Property<string>("Email")
@@ -61,8 +60,8 @@ namespace CustomerVehicleService.Infrastructure.Migrations
                         .HasColumnType("varchar(20)")
                         .HasColumnName("phone_number");
 
-                    b.Property<byte[]>("UpdatedAt")
-                        .HasColumnType("timestamp")
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2")
                         .HasColumnName("updated_at");
 
                     b.HasKey("Id");
@@ -83,9 +82,8 @@ namespace CustomerVehicleService.Infrastructure.Migrations
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("id");
 
-                    b.Property<byte[]>("CreatedAt")
-                        .IsRequired()
-                        .HasColumnType("timestamp")
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2")
                         .HasColumnName("created_at");
 
                     b.Property<Guid>("CustomerId")
@@ -104,8 +102,8 @@ namespace CustomerVehicleService.Infrastructure.Migrations
                         .HasColumnType("date")
                         .HasColumnName("purchase_date");
 
-                    b.Property<byte[]>("UpdatedAt")
-                        .HasColumnType("timestamp")
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2")
                         .HasColumnName("updated_at");
 
                     b.Property<string>("Vin")
@@ -143,9 +141,8 @@ namespace CustomerVehicleService.Infrastructure.Migrations
                         .HasColumnType("varchar(100)")
                         .HasColumnName("brand");
 
-                    b.Property<byte[]>("CreatedAt")
-                        .IsRequired()
-                        .HasColumnType("timestamp")
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2")
                         .HasColumnName("created_at");
 
                     b.Property<string>("ModelName")
@@ -153,8 +150,8 @@ namespace CustomerVehicleService.Infrastructure.Migrations
                         .HasColumnType("varchar(100)")
                         .HasColumnName("model_name");
 
-                    b.Property<byte[]>("UpdatedAt")
-                        .HasColumnType("timestamp")
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2")
                         .HasColumnName("updated_at");
 
                     b.Property<int>("Year")

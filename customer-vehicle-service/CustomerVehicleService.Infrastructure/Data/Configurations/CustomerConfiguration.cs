@@ -48,20 +48,20 @@ namespace CustomerVehicleService.Infrastructure.Data.Configurations
                 .HasColumnType("text")
                 .IsRequired(false);
 
-            // Timestamps
+            // datetime2s
             builder.Property(c => c.CreatedAt)
                 .HasColumnName("created_at")
-                .HasColumnType("timestamp")
+                .HasColumnType("datetime2")
                 .IsRequired();
 
             builder.Property(c => c.UpdatedAt)
                 .HasColumnName("updated_at")
-                .HasColumnType("timestamp")
+                .HasColumnType("datetime2")
                 .IsRequired(false);
 
             builder.Property(c => c.DeletedAt)
                 .HasColumnName("deleted_at")
-                .HasColumnType("timestamp")
+                .HasColumnType("datetime2")
                 .IsRequired(false);
 
             // Computed column (not mapped to database)
