@@ -18,12 +18,21 @@ namespace CustomerVehicleService.Infrastructure
             this IServiceCollection services,
             IConfiguration configuration)
         {
-            services.AddDbContext<CustomerVehicleDbContext>(options => options.UseSqlServer(configuration.GetConnectionString("SqlServer")));
+            services.AddDbContext<AppDbContext>(options => options.UseSqlServer(configuration.GetConnectionString("SqlServer")));
 
-            services.AddScoped<ICustomerRepository, CustomerRepository>();
-            services.AddScoped<IVehicleRepository, VehicleRepository>();
-            services.AddScoped<IVehicleModelRepository, VehicleModelRepository>();
-            services.AddScoped(typeof(IRepository<>), typeof(BaseRepository<>));
+            //services.AddDbContext<AppDbContext>(options =>
+            //{
+            //    var connectionString = configuration.GetConnectionString("SqlServer")
+            //        ?? throw new InvalidOperationException("Connection string 'SqlServer' not found.");
+
+            //});
+
+            services.AddScoped<IUnitOfWork, UnitOfWork>();
+
+            //services.AddScoped<ICustomerRepository, CustomerRepository>();
+            //services.AddScoped<IVehicleRepository, VehicleRepository>();
+            //services.AddScoped<IVehicleModelRepository, VehicleModelRepository>();
+            //services.AddScoped(typeof(IRepository<>), typeof(BaseRepository<>));
 
             services.AddScoped<ICustomerService, CustomerService>();
             services.AddScoped<IVehicleService, VehicleService>();
