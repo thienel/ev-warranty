@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace CustomerVehicleService.Application.DTOs
@@ -16,14 +17,17 @@ namespace CustomerVehicleService.Application.DTOs
         /// </summary>
         public class CreateVehicleModelRequest
         {
+            [JsonPropertyName("brand")]
             [Required(ErrorMessage = "Brand is required")]
             [StringLength(100, MinimumLength = 1, ErrorMessage = "Brand must be between 1 and 100 characters")]
             public string Brand { get; set; } = string.Empty;
 
+            [JsonPropertyName("model_name")]
             [Required(ErrorMessage = "Model name is required")]
             [StringLength(100, MinimumLength = 1, ErrorMessage = "Model name must be between 1 and 100 characters")]
             public string ModelName { get; set; } = string.Empty;
 
+            [JsonPropertyName("year")]
             [Required(ErrorMessage = "Year is required")]
             [Range(2000, 2100, ErrorMessage = "Year must be between 2000 and 2100")]
             public int Year { get; set; }
@@ -35,14 +39,17 @@ namespace CustomerVehicleService.Application.DTOs
         /// </summary>
         public class UpdateVehicleModelRequest
         {
+            [JsonPropertyName("brand")]
             [Required(ErrorMessage = "Brand is required")]
             [StringLength(100, MinimumLength = 1, ErrorMessage = "Brand must be between 1 and 100 characters")]
             public string Brand { get; set; } = string.Empty;
 
+            [JsonPropertyName("model_name")]
             [Required(ErrorMessage = "Model name is required")]
             [StringLength(100, MinimumLength = 1, ErrorMessage = "Model name must be between 1 and 100 characters")]
             public string ModelName { get; set; } = string.Empty;
 
+            [JsonPropertyName("year")]
             [Required(ErrorMessage = "Year is required")]
             [Range(2000, 2100, ErrorMessage = "Year must be between 2000 and 2100")]
             public int Year { get; set; }
@@ -54,15 +61,23 @@ namespace CustomerVehicleService.Application.DTOs
         /// </summary>
         public class VehicleModelResponse
         {
+            [JsonPropertyName("id")]
             public Guid Id { get; set; }
-            public string Brand { get; set; } = string.Empty;
-            public string ModelName { get; set; } = string.Empty;
-            public int Year { get; set; }
-            public DateTime CreatedAt { get; set; }
-            public DateTime? UpdatedAt { get; set; }
 
-            // Display for UI
-            public string DisplayName => $"{Brand} {ModelName} {Year}";
+            [JsonPropertyName("brand")]
+            public string Brand { get; set; } = string.Empty;
+
+            [JsonPropertyName("model_name")]
+            public string ModelName { get; set; } = string.Empty;
+
+            [JsonPropertyName("year")]
+            public int Year { get; set; }
+
+            [JsonPropertyName("created_at")]
+            public DateTime CreatedAt { get; set; }
+
+            [JsonPropertyName("updated_at")]
+            public DateTime? UpdatedAt { get; set; }
         }
 
         /// <summary>
@@ -71,18 +86,26 @@ namespace CustomerVehicleService.Application.DTOs
         /// </summary>
         public class VehicleModelWithStatsResponse
         {
+            [JsonPropertyName("id")]
             public Guid Id { get; set; }
+
+            [JsonPropertyName("brand")]
             public string Brand { get; set; } = string.Empty;
+
+            [JsonPropertyName("model_name")]
             public string ModelName { get; set; } = string.Empty;
+
+            [JsonPropertyName("year")]
             public int Year { get; set; }
+
+            [JsonPropertyName("created_at")]
             public DateTime CreatedAt { get; set; }
+
+            [JsonPropertyName("updated_at")]
             public DateTime? UpdatedAt { get; set; }
 
+            [JsonPropertyName("vehicle_count")]
             public int VehicleCount { get; set; }
-
-            // Display helpers
-            public string DisplayName => $"{Brand} {ModelName} {Year}";
-            public bool CanBeDeleted => VehicleCount == 0; // yet supported
         }
     }
 

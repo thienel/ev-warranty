@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using static CustomerVehicleService.Application.DTOs.VehicleDto;
 
@@ -17,22 +18,27 @@ namespace CustomerVehicleService.Application.DTOs
         /// </summary>
         public class CreateCustomerRequest
         {
+            [JsonPropertyName("first_name")]
             [Required(ErrorMessage = "First name is required")]
             [StringLength(100, MinimumLength = 1, ErrorMessage = "First name must be between 1 and 100 characters")]
             public string FirstName { get; set; } = string.Empty;
 
+            [JsonPropertyName("last_name")]
             [Required(ErrorMessage = "Last name is required")]
             [StringLength(100, MinimumLength = 1, ErrorMessage = "Last name must be between 1 and 100 characters")]
             public string LastName { get; set; } = string.Empty;
 
+            [JsonPropertyName("email")]
             [EmailAddress(ErrorMessage = "Invalid email format")]
             [StringLength(255, ErrorMessage = "Email cannot exceed 255 characters")]
             public string? Email { get; set; }
 
+            [JsonPropertyName("phone_number")]
             [Phone(ErrorMessage = "Invalid phone number format")]
             [StringLength(20, ErrorMessage = "Phone number cannot exceed 20 characters")]
             public string? PhoneNumber { get; set; }
 
+            [JsonPropertyName("address")]
             [StringLength(500, ErrorMessage = "Address cannot exceed 500 characters")]
             public string? Address { get; set; }
         }
@@ -43,22 +49,27 @@ namespace CustomerVehicleService.Application.DTOs
         /// </summary>
         public class UpdateCustomerRequest
         {
+            [JsonPropertyName("first_name")]
             [Required(ErrorMessage = "First name is required")]
             [StringLength(100, MinimumLength = 1, ErrorMessage = "First name must be between 1 and 100 characters")]
             public string FirstName { get; set; } = string.Empty;
 
+            [JsonPropertyName("last_name")]
             [Required(ErrorMessage = "Last name is required")]
             [StringLength(100, MinimumLength = 1, ErrorMessage = "Last name must be between 1 and 100 characters")]
             public string LastName { get; set; } = string.Empty;
 
+            [JsonPropertyName("email")]
             [EmailAddress(ErrorMessage = "Invalid email format")]
             [StringLength(255, ErrorMessage = "Email cannot exceed 255 characters")]
             public string? Email { get; set; }
 
+            [JsonPropertyName("phone_number")]
             [Phone(ErrorMessage = "Invalid phone number format")]
             [StringLength(20, ErrorMessage = "Phone number cannot exceed 20 characters")]
             public string? PhoneNumber { get; set; }
 
+            [JsonPropertyName("address")]
             [StringLength(500, ErrorMessage = "Address cannot exceed 500 characters")]
             public string? Address { get; set; }
         }
@@ -69,18 +80,38 @@ namespace CustomerVehicleService.Application.DTOs
         /// </summary>
         public class CustomerResponse
         {
+            [JsonPropertyName("id")]
             public Guid Id { get; set; }
+
+            [JsonPropertyName("first_name")]
             public string FirstName { get; set; } = string.Empty;
+
+            [JsonPropertyName("last_name")]
             public string LastName { get; set; } = string.Empty;
+
+            [JsonPropertyName("phone_number")]
             public string? PhoneNumber { get; set; }
+
+            [JsonPropertyName("email")]
             public string? Email { get; set; }
+
+            [JsonPropertyName("address")]
             public string? Address { get; set; }
+
+            [JsonPropertyName("created_at")]
             public DateTime CreatedAt { get; set; }
+
+            [JsonPropertyName("updated_at")]
             public DateTime? UpdatedAt { get; set; }
+
+            [JsonPropertyName("deleted_at")]
             public DateTime? DeletedAt { get; set; }
+
+            [JsonPropertyName("is_deleted")]
             public bool IsDeleted { get; set; }
 
             // Display helper
+            [JsonPropertyName("full_name")]
             public string FullName => $"{FirstName} {LastName}";
         }
 
@@ -90,22 +121,42 @@ namespace CustomerVehicleService.Application.DTOs
         /// </summary>
         public class CustomerWithVehiclesResponse
         {
+            [JsonPropertyName("id")]
             public Guid Id { get; set; }
+
+            [JsonPropertyName("first_name")]
             public string FirstName { get; set; } = string.Empty;
+
+            [JsonPropertyName("last_name")]
             public string LastName { get; set; } = string.Empty;
+
+            [JsonPropertyName("phone_number")]
             public string? PhoneNumber { get; set; }
+
+            [JsonPropertyName("email")]
             public string? Email { get; set; }
+
+            [JsonPropertyName("address")]
             public string? Address { get; set; }
+
+            [JsonPropertyName("created_at")]
             public DateTime CreatedAt { get; set; }
+
+            [JsonPropertyName("updated_at")]
             public DateTime? UpdatedAt { get; set; }
+
+            [JsonPropertyName("deleted_at")]
             public DateTime? DeletedAt { get; set; }
+
+            [JsonPropertyName("is_deleted")]
             public bool IsDeleted { get; set; }
 
+            [JsonPropertyName("properties")]
             public List<VehicleResponse> Vehicles { get; set; } = new();
 
             // Display helpers
+            [JsonPropertyName("full_name")]
             public string FullName => $"{FirstName} {LastName}";
-            public int TotalVehicles => Vehicles.Count;
         }
     }
 

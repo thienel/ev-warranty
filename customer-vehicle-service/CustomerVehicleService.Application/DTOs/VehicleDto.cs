@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using static CustomerVehicleService.Application.DTOs.CustomerDto;
 using static CustomerVehicleService.Application.DTOs.VehicleModelDto;
@@ -18,21 +19,26 @@ namespace CustomerVehicleService.Application.DTOs
         /// </summary>
         public class CreateVehicleRequest
         {
+            [JsonPropertyName("vin")]
             [Required(ErrorMessage = "VIN is required")]
             [StringLength(17, MinimumLength = 17, ErrorMessage = "VIN must be exactly 17 characters")]
             [RegularExpression(@"^[A-HJ-NPR-Z0-9]{17}$",
                 ErrorMessage = "Invalid VIN format. Must be 17 characters (letters and numbers, excluding I, O, Q)")]
             public string Vin { get; set; } = string.Empty;
 
+            [JsonPropertyName("license_plate")]
             [StringLength(20, ErrorMessage = "License plate cannot exceed 20 characters")]
             public string? LicensePlate { get; set; }
 
+            [JsonPropertyName("customer_id")]
             [Required(ErrorMessage = "Customer ID is required")]
             public Guid CustomerId { get; set; }
 
+            [JsonPropertyName("model_id")]
             [Required(ErrorMessage = "Vehicle model ID is required")]
             public Guid ModelId { get; set; }
 
+            [JsonPropertyName("purchase_date")]
             [DataType(DataType.Date)]
             public DateTime? PurchaseDate { get; set; }
         }
@@ -43,21 +49,26 @@ namespace CustomerVehicleService.Application.DTOs
         /// </summary>
         public class UpdateVehicleRequest
         {
+            [JsonPropertyName("vin")]
             [Required(ErrorMessage = "VIN is required")]
             [StringLength(17, MinimumLength = 17, ErrorMessage = "VIN must be exactly 17 characters")]
             [RegularExpression(@"^[A-HJ-NPR-Z0-9]{17}$",
                 ErrorMessage = "Invalid VIN format. Must be 17 characters (letters and numbers, excluding I, O, Q)")]
             public string Vin { get; set; } = string.Empty;
 
+            [JsonPropertyName("license_plate")]
             [StringLength(20, ErrorMessage = "License plate cannot exceed 20 characters")]
             public string? LicensePlate { get; set; }
 
+            [JsonPropertyName("customer_id")]
             [Required(ErrorMessage = "Customer ID is required")]
             public Guid CustomerId { get; set; }
 
+            [JsonPropertyName("model_id")]
             [Required(ErrorMessage = "Vehicle model ID is required")]
             public Guid ModelId { get; set; }
 
+            [JsonPropertyName("purchase_date")]
             [DataType(DataType.Date)]
             public DateTime? PurchaseDate { get; set; }
         }
@@ -69,6 +80,7 @@ namespace CustomerVehicleService.Application.DTOs
         /// </summary>
         public class TransferVehicleCommand
         {
+            [JsonPropertyName("new_customer_id")]
             [Required(ErrorMessage = "New customer ID is required")]
             public Guid NewCustomerId { get; set; }
         }
@@ -79,6 +91,7 @@ namespace CustomerVehicleService.Application.DTOs
         /// </summary>
         public class UpdateLicensePlateCommand
         {
+            [JsonPropertyName("license_plate")]
             [StringLength(20, ErrorMessage = "License plate cannot exceed 20 characters")]
             public string? LicensePlate { get; set; }
         }
@@ -89,13 +102,28 @@ namespace CustomerVehicleService.Application.DTOs
         /// </summary>
         public class VehicleResponse
         {
+            [JsonPropertyName("id")]
             public Guid Id { get; set; }
+
+            [JsonPropertyName("vin")]
             public string Vin { get; set; } = string.Empty;
+
+            [JsonPropertyName("license_plate")]
             public string? LicensePlate { get; set; }
+
+            [JsonPropertyName("customer_id")]
             public Guid CustomerId { get; set; }
+
+            [JsonPropertyName("model_id")]
             public Guid ModelId { get; set; }
+
+            [JsonPropertyName("purchase_id")]
             public DateTime? PurchaseDate { get; set; }
+
+            [JsonPropertyName("created_at")]
             public DateTime CreatedAt { get; set; }
+
+            [JsonPropertyName("updated_at")]
             public DateTime? UpdatedAt { get; set; }
         }
 
@@ -105,20 +133,36 @@ namespace CustomerVehicleService.Application.DTOs
         /// </summary>
         public class VehicleDetailResponse
         {
+            [JsonPropertyName("id")]
             public Guid Id { get; set; }
+
+            [JsonPropertyName("vin")]
             public string Vin { get; set; } = string.Empty;
+
+            [JsonPropertyName("license_plate")]
             public string? LicensePlate { get; set; }
+
+            [JsonPropertyName("purchase_id")]
             public DateTime? PurchaseDate { get; set; }
+
+            [JsonPropertyName("created_at")]
             public DateTime CreatedAt { get; set; }
+
+            [JsonPropertyName("updated_at")]
             public DateTime? UpdatedAt { get; set; }
 
             // Related entities - needed for warranty processing
+            [JsonPropertyName("owner")]
             public CustomerResponse Owner { get; set; } = null!;
+
+            [JsonPropertyName("model")]
             public VehicleModelResponse Model { get; set; } = null!;
 
             // Display helpers for UI
-            public string DisplayName => $"{Model.DisplayName} - {Vin}";
+            [JsonPropertyName("owner_name")]
             public string OwnerName => Owner.FullName;
+
+            [JsonPropertyName("vehicle_years_lifetime")]
             public int? VehicleAgeYears => PurchaseDate.HasValue
                 ? DateTime.UtcNow.Year - PurchaseDate.Value.Year
                 : null;
