@@ -21,9 +21,9 @@ namespace CustomerVehicleService.Infrastructure.Migrations
                     phone_number = table.Column<string>(type: "varchar(20)", nullable: false),
                     email = table.Column<string>(type: "varchar(255)", nullable: true),
                     address = table.Column<string>(type: "text", nullable: true),
-                    deleted_at = table.Column<byte[]>(type: "timestamp", nullable: true),
-                    created_at = table.Column<byte[]>(type: "timestamp", nullable: false),
-                    updated_at = table.Column<byte[]>(type: "timestamp", nullable: true)
+                    deleted_at = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    created_at = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    updated_at = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -38,8 +38,8 @@ namespace CustomerVehicleService.Infrastructure.Migrations
                     brand = table.Column<string>(type: "varchar(100)", nullable: false),
                     model_name = table.Column<string>(type: "varchar(100)", nullable: false),
                     year = table.Column<int>(type: "integer", nullable: false),
-                    created_at = table.Column<byte[]>(type: "timestamp", nullable: false),
-                    updated_at = table.Column<byte[]>(type: "timestamp", nullable: true)
+                    created_at = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    updated_at = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -56,8 +56,8 @@ namespace CustomerVehicleService.Infrastructure.Migrations
                     customer_id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     model_id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     purchase_date = table.Column<DateTime>(type: "date", nullable: true),
-                    created_at = table.Column<byte[]>(type: "timestamp", nullable: false),
-                    updated_at = table.Column<byte[]>(type: "timestamp", nullable: true)
+                    created_at = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    updated_at = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
                 constraints: table =>
                 {
