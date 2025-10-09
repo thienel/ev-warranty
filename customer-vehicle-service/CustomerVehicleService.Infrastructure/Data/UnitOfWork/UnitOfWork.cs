@@ -9,7 +9,7 @@ namespace CustomerVehicleService.Infrastructure.Data.UnitOfWork
 {
     public class UnitOfWork : IUnitOfWork
     {
-        private readonly CustomerVehicleDbContext _context;
+        private readonly AppDbContext _context;
         private readonly ILogger<UnitOfWork>? _logger;
         private IDbContextTransaction? _transaction;
         private bool _disposed;
@@ -20,7 +20,7 @@ namespace CustomerVehicleService.Infrastructure.Data.UnitOfWork
         private IVehicleModelRepository? _vehicleModels;
 
         public UnitOfWork(
-            CustomerVehicleDbContext context,
+            AppDbContext context,
             ILogger<UnitOfWork>? logger = null)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));

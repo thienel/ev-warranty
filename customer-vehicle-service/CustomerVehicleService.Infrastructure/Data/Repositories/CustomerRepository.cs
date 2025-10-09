@@ -1,5 +1,6 @@
 using CustomerVehicleService.Application.Interfaces.Data;
 using CustomerVehicleService.Domain.Entities;
+using CustomerVehicleService.Infrastructure.Data.Context;
 using Microsoft.EntityFrameworkCore;
 
 namespace CustomerVehicleService.Infrastructure.Data.Repositories

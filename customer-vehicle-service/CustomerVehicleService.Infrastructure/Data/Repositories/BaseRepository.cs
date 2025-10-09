@@ -1,4 +1,5 @@
 using CustomerVehicleService.Application.Interfaces.Data;
+using CustomerVehicleService.Infrastructure.Data.Context;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 
