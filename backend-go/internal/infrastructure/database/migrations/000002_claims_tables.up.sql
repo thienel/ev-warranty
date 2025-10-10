@@ -50,3 +50,18 @@ CREATE TABLE IF NOT EXISTS claim_attachments (
 CREATE INDEX IF NOT EXISTS idx_claim_attachments_deleted_at ON claim_attachments(deleted_at);
 CREATE INDEX IF NOT EXISTS idx_claim_attachments_claim_id ON claim_attachments(claim_id);
 CREATE INDEX IF NOT EXISTS idx_claim_attachments_type ON claim_attachments(attachment_type);
+
+CREATE TABLE IF NOT EXISTS claim_histories (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    claim_id UUID NOT NULL,
+    status TEXT NOT NULL,
+    changed_by UUID NOT NULL,
+    changed_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+    CONSTRAINT fk_claim_histories_claim FOREIGN KEY (claim_id)
+    REFERENCES claims(id) ON DELETE CASCADE
+);
+
+CREATE INDEX IF NOT EXISTS idx_claim_histories_claim_id ON claim_histories(claim_id);
+CREATE INDEX IF NOT EXISTS idx_claim_histories_status ON claim_histories(status);
+CREATE INDEX IF NOT EXISTS idx_claim_histories_changed_by ON claim_histories(changed_by);
+CREATE INDEX IF NOT EXISTS idx_claim_histories_changed_at ON claim_histories(changed_at);
