@@ -10,6 +10,7 @@ import (
 type CreateClaimCommand struct {
 	VehicleID   uuid.UUID
 	CustomerID  uuid.UUID
+	CreatorID   uuid.UUID
 	Description string
 }
 
