@@ -3,9 +3,10 @@ package persistence
 import (
 	"context"
 	"errors"
+	"ev-warranty-go/internal/apperrors"
+	"ev-warranty-go/internal/application"
 	"ev-warranty-go/internal/application/repositories"
 	"ev-warranty-go/internal/domain/entities"
-	"ev-warranty-go/internal/errors/apperrors"
 
 	"github.com/google/uuid"
 	"gorm.io/gorm"
@@ -21,11 +22,28 @@ func NewClaimAttachmentRepository(db *gorm.DB) repositories.ClaimAttachmentRepos
 	return &claimAttachmentRepository{db: db}
 }
 
-func (c *claimAttachmentRepository) Create(ctx context.Context, attachment *entities.ClaimAttachment) error {
-	if err := c.db.WithContext(ctx).Create(attachment).Error; err != nil {
+func (c *claimAttachmentRepository) Create(tx application.Transaction, attachment *entities.ClaimAttachment) error {
+	db := tx.GetTx().(*gorm.DB)
+	if err := db.Create(attachment).Error; err != nil {
 		if dup := getDuplicateKeyConstraint(err); dup != "" {
 			return apperrors.ErrDuplicateKey(dup)
 		}
+		return apperrors.ErrDBOperation(err)
+	}
+	return nil
+}
+
+func (c *claimAttachmentRepository) HardDelete(tx application.Transaction, id uuid.UUID) error {
+	db := tx.GetTx().(*gorm.DB)
+	if err := db.Unscoped().Delete(&entities.ClaimAttachment{}, "id = ?", id).Error; err != nil {
+		return apperrors.ErrDBOperation(err)
+	}
+	return nil
+}
+
+func (c *claimAttachmentRepository) SoftDeleteByClaimID(tx application.Transaction, claimID uuid.UUID) error {
+	db := tx.GetTx().(*gorm.DB)
+	if err := db.Delete(&entities.ClaimAttachment{}, "claim_id = ?", claimID).Error; err != nil {
 		return apperrors.ErrDBOperation(err)
 	}
 	return nil
@@ -51,25 +69,6 @@ func (c *claimAttachmentRepository) FindByClaimID(ctx context.Context, claimID u
 		return nil, apperrors.ErrDBOperation(err)
 	}
 	return attachments, nil
-}
-
-func (c *claimAttachmentRepository) HardDelete(ctx context.Context, id uuid.UUID) error {
-	if err := c.db.WithContext(ctx).Unscoped().
-		Delete(&entities.ClaimAttachment{}, "id = ?", id).Error; err != nil {
-
-		return apperrors.ErrDBOperation(err)
-	}
-	return nil
-}
-
-func (c *claimAttachmentRepository) SoftDeleteByClaimID(ctx context.Context, claimID uuid.UUID) error {
-	if err := c.db.WithContext(ctx).
-		Delete(&entities.ClaimAttachment{}, "claim_id = ?", claimID).
-		Error; err != nil {
-
-		return apperrors.ErrDBOperation(err)
-	}
-	return nil
 }
 
 func (c *claimAttachmentRepository) CountByClaimID(ctx context.Context, claimID uuid.UUID) (int64, error) {

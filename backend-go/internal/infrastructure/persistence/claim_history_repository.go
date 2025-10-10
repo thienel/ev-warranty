@@ -3,9 +3,10 @@ package persistence
 import (
 	"context"
 	"errors"
+	"ev-warranty-go/internal/apperrors"
+	"ev-warranty-go/internal/application"
 	"ev-warranty-go/internal/application/repositories"
 	"ev-warranty-go/internal/domain/entities"
-	"ev-warranty-go/internal/errors/apperrors"
 	"time"
 
 	"github.com/google/uuid"
@@ -22,11 +23,20 @@ func NewClaimHistoryRepository(db *gorm.DB) repositories.ClaimHistoryRepository 
 	return &claimHistoryRepository{db: db}
 }
 
-func (c *claimHistoryRepository) Create(ctx context.Context, history *entities.ClaimHistory) error {
-	if err := c.db.WithContext(ctx).Create(history).Error; err != nil {
+func (c *claimHistoryRepository) Create(tx application.Transaction, history *entities.ClaimHistory) error {
+	db := tx.GetTx().(*gorm.DB)
+	if err := db.Create(history).Error; err != nil {
 		if dup := getDuplicateKeyConstraint(err); dup != "" {
 			return apperrors.ErrDuplicateKey(dup)
 		}
+		return apperrors.ErrDBOperation(err)
+	}
+	return nil
+}
+
+func (c *claimHistoryRepository) SoftDeleteByClaimID(tx application.Transaction, claimID uuid.UUID) error {
+	db := tx.GetTx().(*gorm.DB)
+	if err := db.Delete(&entities.ClaimHistory{}, "claim_id = ?", claimID).Error; err != nil {
 		return apperrors.ErrDBOperation(err)
 	}
 	return nil
@@ -66,14 +76,4 @@ func (c *claimHistoryRepository) FindByDateRange(ctx context.Context, claimID uu
 		return nil, apperrors.ErrDBOperation(err)
 	}
 	return histories, nil
-}
-
-func (c *claimHistoryRepository) SoftDeleteByClaimID(ctx context.Context, claimID uuid.UUID) error {
-	if err := c.db.WithContext(ctx).
-		Delete(&entities.ClaimHistory{}, "claim_id = ?", claimID).
-		Error; err != nil {
-
-		return apperrors.ErrDBOperation(err)
-	}
-	return nil
 }
