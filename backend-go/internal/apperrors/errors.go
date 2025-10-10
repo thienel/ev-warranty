@@ -138,3 +138,17 @@ func NewFailedHashToken() *AppError {
 func NewUnexpectedSigningMethod(method any) *AppError {
 	return New(http.StatusUnauthorized, ErrorCodeUnexpectedSigningMethod, errors.New(fmt.Sprintf("unexpected signing method: %v", method)))
 }
+
+func NewInvalidClaimStatus() *AppError {
+	return New(http.StatusConflict, ErrorCodeClaimInvalidStatus, errors.New("invalid claim status"))
+}
+
+func NewNotAllowUpdateClaim() *AppError {
+	return New(http.StatusConflict, ErrorCodeClaimStatusNotAllowedUpdate,
+		errors.New("current claim's status does not allow to update"))
+}
+
+func NewNotAllowDeleteClaim() *AppError {
+	return New(http.StatusConflict, ErrorCodeClaimStatusNotAllowedDelete,
+		errors.New("current claim's status does not allow to delete"))
+}
