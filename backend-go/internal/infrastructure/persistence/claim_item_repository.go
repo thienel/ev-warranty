@@ -3,9 +3,10 @@ package persistence
 import (
 	"context"
 	"errors"
+	"ev-warranty-go/internal/apperrors"
+	"ev-warranty-go/internal/application"
 	"ev-warranty-go/internal/application/repositories"
 	"ev-warranty-go/internal/domain/entities"
-	"ev-warranty-go/internal/errors/apperrors"
 
 	"github.com/google/uuid"
 	"gorm.io/gorm"
@@ -21,11 +22,49 @@ func NewClaimItemRepository(db *gorm.DB) repositories.ClaimItemRepository {
 	return &claimItemRepository{db: db}
 }
 
-func (c *claimItemRepository) Create(ctx context.Context, item *entities.ClaimItem) error {
-	if err := c.db.WithContext(ctx).Create(item).Error; err != nil {
+func (c *claimItemRepository) Create(tx application.Transaction, item *entities.ClaimItem) error {
+	db := tx.GetTx().(*gorm.DB)
+	if err := db.Create(item).Error; err != nil {
 		if dup := getDuplicateKeyConstraint(err); dup != "" {
 			return apperrors.ErrDuplicateKey(dup)
 		}
+		return apperrors.ErrDBOperation(err)
+	}
+	return nil
+}
+
+func (c *claimItemRepository) Update(tx application.Transaction, item *entities.ClaimItem) error {
+	db := tx.GetTx().(*gorm.DB)
+	if err := db.Model(item).
+		Select("part_category_id", "faulty_part_id", "replacement_part_id",
+			"issue_description", "line_status", "type", "cost").
+		Updates(item).Error; err != nil {
+		return apperrors.ErrDBOperation(err)
+	}
+	return nil
+}
+
+func (c *claimItemRepository) HardDelete(tx application.Transaction, id uuid.UUID) error {
+	db := tx.GetTx().(*gorm.DB)
+	if err := db.Unscoped().Delete(&entities.ClaimItem{}, "id = ?", id).Error; err != nil {
+		return apperrors.ErrDBOperation(err)
+	}
+	return nil
+}
+
+func (c *claimItemRepository) SoftDeleteByClaimID(tx application.Transaction, claimID uuid.UUID) error {
+	db := tx.GetTx().(*gorm.DB)
+	if err := db.Delete(&entities.ClaimItem{}, "claim_id = ?", claimID).Error; err != nil {
+		return apperrors.ErrDBOperation(err)
+	}
+	return nil
+}
+
+func (c *claimItemRepository) UpdateStatus(tx application.Transaction, id uuid.UUID, status string) error {
+	db := tx.GetTx().(*gorm.DB)
+	if err := db.Model(&entities.ClaimItem{}).Where("id = ?", id).
+		Update("line_status", status).Error; err != nil {
+
 		return apperrors.ErrDBOperation(err)
 	}
 	return nil
@@ -51,44 +90,6 @@ func (c *claimItemRepository) FindByClaimID(ctx context.Context, claimID uuid.UU
 		return nil, apperrors.ErrDBOperation(err)
 	}
 	return items, nil
-}
-
-func (c *claimItemRepository) Update(ctx context.Context, item *entities.ClaimItem) error {
-	if err := c.db.WithContext(ctx).Model(item).
-		Select("part_category_id", "faulty_part_id", "replacement_part_id",
-			"issue_description", "line_status", "type", "cost").
-		Updates(item).Error; err != nil {
-		return apperrors.ErrDBOperation(err)
-	}
-	return nil
-}
-
-func (c *claimItemRepository) HardDelete(ctx context.Context, id uuid.UUID) error {
-	if err := c.db.WithContext(ctx).Unscoped().
-		Delete(&entities.ClaimItem{}, "id = ?", id).Error; err != nil {
-
-		return apperrors.ErrDBOperation(err)
-	}
-	return nil
-}
-
-func (c *claimItemRepository) SoftDeleteByClaimID(ctx context.Context, claimID uuid.UUID) error {
-	if err := c.db.WithContext(ctx).
-		Delete(&entities.ClaimItem{}, "claim_id = ?", claimID).
-		Error; err != nil {
-
-		return apperrors.ErrDBOperation(err)
-	}
-	return nil
-}
-
-func (c *claimItemRepository) UpdateStatus(ctx context.Context, id uuid.UUID, status string) error {
-	if err := c.db.WithContext(ctx).Model(&entities.ClaimItem{}).
-		Where("id = ?", id).
-		Update("line_status", status).Error; err != nil {
-		return apperrors.ErrDBOperation(err)
-	}
-	return nil
 }
 
 func (c *claimItemRepository) CountByClaimID(ctx context.Context, claimID uuid.UUID) (int64, error) {
