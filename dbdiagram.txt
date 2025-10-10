@@ -1,22 +1,31 @@
 Table users {
     id uuid [pk]
+    name varchar [not null]
     email varchar [not null, unique]
-    password_hash varchar
+    role varchar [not null]
+    password_hash varchar [not null]
+    is_active boolean [not null, default: true]
+    office_id uuid [not null, ref: > offices.id]
     oauth_provider varchar
-    oauth_id varchar [unique]
+    oauth_id varchar
     created_at timestamp [default: `now()`]
     updated_at timestamp [default: `now()`]
     deleted_at timestamp
 }
 
-Table tokens {
-    id int [pk, increment]
+Table refresh_tokens {
+    id uuid [pk]
     user_id uuid [ref: > users.id, not null]
     token varchar [not null]
     expires_at timestamp [not null]
-    is_revoked boolean [default: false]
+    is_revoked boolean [not null, default: false]
     created_at timestamp [default: `now()`]
-    updated_at timestamp
+    updated_at timestamp [default: `now()`]
+
+    indexes {
+        user_id
+        token
+    }
 }
 
 Table offices {
@@ -24,20 +33,9 @@ Table offices {
     office_name varchar [not null]
     office_type varchar [not null]
     address text [not null]
+    is_active boolean [not null]
     created_at timestamp [default: `now()`]
-    updated_at timestamp
-}
-
-Table employees {
-    id uuid [pk]
-    employee_code varchar [not null, unique]
-    first_name varchar [not null]
-    last_name varchar [not null]
-    job_title varchar [not null]
-    user_id uuid [ref: > users.id, unique]
-    office_id uuid [ref: > offices.id, not null]
-    created_at timestamp [default: `now()`]
-    updated_at timestamp
+    updated_at timestamp [default: `now()`]
     deleted_at timestamp
 }
 
@@ -72,7 +70,6 @@ Table vehicles {
     license_plate varchar
     customer_id uuid [ref: > customers.id]
     model_id uuid [ref: > vehicle_models.id]
-    warrant_policy_id uuid [ref: > warranty_policies.id]
     purchase_date date
     created_at timestamp [default: `now()`]
     updated_at timestamp
@@ -125,49 +122,51 @@ Table warranty_claims {
     id uuid [pk]
     vehicle_id uuid [ref: > vehicles.id, not null]
     customer_id uuid [ref: > customers.id, not null]
-    claim_date date [not null]
-    claim_description text [not null]
-    claim_status varchar [default: 'draft']
+    description text [not null]
+    status varchar [not null, default: 'draft']
     total_cost decimal(10,2)
-    approved_by uuid [ref: > employees.id]
+    approved_by uuid [ref: > users.id]
     created_at timestamp [default: `now()`]
-    updated_at timestamp
+    updated_at timestamp [default: `now()`]
+    deleted_at timestamp
 }
 
 Table claim_attachments {
-    id int [pk, increment]
-    warranty_claim_id uuid [ref: > warranty_claims.id, not null]
-    type varchar
-    extension varchar
-    url text
+    id uuid [pk]
+    claim_id uuid [ref: > warranty_claims.id, not null]
+    attachment_type varchar [not null]
+    url text [not null]
+    created_at timestamp [default: `now()`]
+    deleted_at timestamp
 }
 
 Table claim_status_history {
-    id int [pk, increment]
+    id uuid [pk]
     claim_id uuid [ref: > warranty_claims.id, not null]
-    status varchar
-    status_reason text
-    changed_by uuid [ref: > employees.id, not null]
+    status varchar [not null]
+    changed_by uuid [ref: > users.id, not null]
     changed_at timestamp [default: `now()`]
 }
 
 Table claim_line_items {
-    id int [pk, increment]
+    id uuid [pk]
     claim_id uuid [ref: > warranty_claims.id, not null]
     part_category_id int [ref: > part_categories.id, not null]
-    faulty_part_id uuid [ref: > parts.id]
+    faulty_part_id uuid [ref: > parts.id, not null]
     replacement_part_id uuid [ref: > parts.id]
     issue_description text [not null]
-    part_cost decimal(10,2) [default: 0.00]
-    line_status varchar [default: 'pending'] // pending, approved, rejected
+    line_status varchar [not null]
+    type varchar [not null]
+    cost decimal(10,2)
     created_at timestamp [default: `now()`]
-    updated_at timestamp
+    updated_at timestamp [default: `now()`]
+    deleted_at timestamp
 }
 
 Table work_orders {
     id uuid [pk]
     claim_id uuid [ref: > warranty_claims.id, not null]
-    assigned_technician_id uuid [ref: > employees.id, not null]
+    assigned_technician_id uuid [ref: > users.id, not null]
     work_order_status varchar [default: 'assigned'] // assigned, in_progress, completed
     scheduled_date date
     completed_date date
@@ -186,6 +185,8 @@ Table work_order_tasks {
     created_at timestamp [default: `now()`]
     updated_at timestamp
 }
+
+Ref: "parts"."id" < "parts"."category_id"
 
 User & Identity Service: users, tokens, employees, offices
 Đăng ký/đăng nhập (email, OAuth).
