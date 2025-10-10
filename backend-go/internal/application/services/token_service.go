@@ -11,7 +11,6 @@ import (
 	"ev-warranty-go/internal/apperrors"
 	"ev-warranty-go/internal/application/repositories"
 	"ev-warranty-go/internal/domain/entities"
-	"fmt"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -19,7 +18,7 @@ import (
 )
 
 type TokenService interface {
-	GenerateAccessToken(ctx context.Context, userID uuid.UUID) (string, error)
+	GenerateAccessToken(userID uuid.UUID) (string, error)
 	GenerateRefreshToken(ctx context.Context, userID uuid.UUID) (string, error)
 	ValidateAccessToken(ctx context.Context, token string) (*CustomClaims, error)
 	ValidateRefreshToken(ctx context.Context, token string) (*entities.RefreshToken, error)
@@ -45,7 +44,7 @@ func NewTokenService(repoRefreshToken repositories.RefreshTokenRepository, acces
 	}
 }
 
-func (t *tokenService) GenerateAccessToken(ctx context.Context, userID uuid.UUID) (string, error) {
+func (t *tokenService) GenerateAccessToken(userID uuid.UUID) (string, error) {
 	now := time.Now().UTC()
 	exp := now.Add(t.accessTTL)
 
@@ -61,37 +60,25 @@ func (t *tokenService) GenerateAccessToken(ctx context.Context, userID uuid.UUID
 		},
 	}
 
-	select {
-	case <-ctx.Done():
-		return "", apperrors.ErrRequestTimeout(ctx.Err())
-	default:
-	}
-
 	token := jwt.NewWithClaims(jwt.SigningMethodRS256, claims)
 	signedToken, err := token.SignedString(t.privateKey)
 	if err != nil {
-		return "", apperrors.ErrFailedSignAccessToken(err)
+		return "", apperrors.NewFailedSignAccessToken(err)
 	}
 
 	return signedToken, nil
 }
 
 func (t *tokenService) GenerateRefreshToken(ctx context.Context, userID uuid.UUID) (string, error) {
-	select {
-	case <-ctx.Done():
-		return "", apperrors.ErrRequestTimeout(ctx.Err())
-	default:
-	}
-
 	bytes := make([]byte, 32)
 	if _, err := rand.Read(bytes); err != nil {
-		return "", apperrors.ErrFailedGenerateRefreshToken(err)
+		return "", apperrors.NewFailedGenerateRefreshToken(err)
 	}
 
 	rawToken := base64.URLEncoding.WithPadding(base64.NoPadding).EncodeToString(bytes)
 	hashedToken, err := hashToken(rawToken)
 	if err != nil {
-		return "", apperrors.ErrFailedGenerateRefreshToken(err)
+		return "", apperrors.NewFailedGenerateRefreshToken(err)
 	}
 
 	rfToken := &entities.RefreshToken{
@@ -101,7 +88,7 @@ func (t *tokenService) GenerateRefreshToken(ctx context.Context, userID uuid.UUI
 	}
 
 	if err = t.repoRefreshToken.Create(ctx, rfToken); err != nil {
-		return "", apperrors.ErrFailedGenerateRefreshToken(err)
+		return "", apperrors.NewFailedGenerateRefreshToken(err)
 	}
 
 	return rawToken, nil
@@ -113,15 +100,9 @@ type CustomClaims struct {
 }
 
 func (t *tokenService) ValidateAccessToken(ctx context.Context, tokenStr string) (*CustomClaims, error) {
-	select {
-	case <-ctx.Done():
-		return nil, apperrors.ErrRequestTimeout(ctx.Err())
-	default:
-	}
-
 	token, err := jwt.ParseWithClaims(tokenStr, &CustomClaims{}, func(token *jwt.Token) (any, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodRSA); !ok {
-			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
+			return nil, apperrors.NewUnexpectedSigningMethod(token.Header["alg"])
 		}
 		return t.publicKey, nil
 	})
@@ -129,70 +110,58 @@ func (t *tokenService) ValidateAccessToken(ctx context.Context, tokenStr string)
 	if err != nil {
 		switch {
 		case errors.Is(err, jwt.ErrTokenExpired):
-			return nil, apperrors.ErrExpiredAccessToken
+			return nil, apperrors.NewExpiredAccessToken()
 		case errors.Is(err, jwt.ErrTokenNotValidYet):
-			return nil, apperrors.ErrInvalidAccessToken
+			return nil, apperrors.NewInvalidAccessToken()
 		case errors.Is(err, jwt.ErrTokenMalformed):
-			return nil, apperrors.ErrInvalidAccessToken
+			return nil, apperrors.NewInvalidAccessToken()
 		default:
-			return nil, apperrors.ErrInvalidAccessToken
+			return nil, apperrors.NewInvalidAccessToken()
 		}
 	}
 
 	if token == nil || !token.Valid {
-		return nil, apperrors.ErrInvalidAccessToken
+		return nil, apperrors.NewInvalidAccessToken()
 	}
 
 	claims, ok := token.Claims.(*CustomClaims)
 	if !ok {
-		return nil, apperrors.ErrInvalidAccessToken
+		return nil, apperrors.NewInvalidAccessToken()
 	}
 
 	if claims.UserID == "" {
-		return nil, apperrors.ErrInvalidAccessToken
+		return nil, apperrors.NewInvalidAccessToken()
 	}
 
 	return claims, nil
 }
 
 func (t *tokenService) ValidateRefreshToken(ctx context.Context, token string) (*entities.RefreshToken, error) {
-	select {
-	case <-ctx.Done():
-		return nil, ctx.Err()
-	default:
-	}
-
 	hashedToken, err := hashToken(token)
 	if err != nil {
-		return nil, fmt.Errorf("failed to hash token: %w", err)
+		return nil, apperrors.NewFailedHashToken()
 	}
 
 	rfToken, err := t.repoRefreshToken.Find(ctx, hashedToken)
 	if err != nil {
-		return nil, apperrors.ErrInvalidRefreshToken
+		return nil, apperrors.NewInvalidRefreshToken()
 	}
 
 	if rfToken.IsExpired() {
-		return nil, apperrors.ErrExpiredRefreshToken
+		return nil, apperrors.NewExpiredRefreshToken()
 	}
 
 	if rfToken.IsRevoked {
-		return nil, apperrors.ErrRevokedRefreshToken
+		return nil, apperrors.NewRevokedRefreshToken()
 	}
 
 	return rfToken, nil
 }
 
 func (t *tokenService) RevokeRefreshToken(ctx context.Context, token string) error {
-	select {
-	case <-ctx.Done():
-		return ctx.Err()
-	default:
-	}
-
 	hashedToken, err := hashToken(token)
 	if err != nil {
-		return fmt.Errorf("failed to hash token: %w", err)
+		return apperrors.NewFailedHashToken()
 	}
 
 	return t.repoRefreshToken.Revoke(ctx, hashedToken)
@@ -204,9 +173,9 @@ func (t *tokenService) RefreshAccessToken(ctx context.Context, refreshToken stri
 		return "", err
 	}
 
-	accessToken, err := t.GenerateAccessToken(ctx, rfToken.UserID)
+	accessToken, err := t.GenerateAccessToken(rfToken.UserID)
 	if err != nil {
-		return "", fmt.Errorf("failed to generate access token: %w", err)
+		return "", err
 	}
 
 	return accessToken, nil

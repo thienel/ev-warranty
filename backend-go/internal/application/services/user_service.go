@@ -44,24 +44,18 @@ func NewUserService(userRepo repositories.UserRepository, officeService OfficeSe
 }
 
 func (s *userService) Create(ctx context.Context, cmd *UserCreateCommand) (*entities.User, error) {
-	if !entities.IsValidName(cmd.Name) {
-		return nil, apperrors.ErrInvalidCredentials("invalid name")
+	if !entities.IsValidName(cmd.Name) || !entities.IsValidEmail(cmd.Email) ||
+		!entities.IsValidPassword(cmd.Password) || !entities.IsValidUserRole(cmd.Role) {
+		return nil, apperrors.NewInvalidCredentials()
 	}
-	if !entities.IsValidEmail(cmd.Email) {
-		return nil, apperrors.ErrInvalidCredentials("invalid email")
-	}
-	if !entities.IsValidPassword(cmd.Password) {
-		return nil, apperrors.ErrInvalidCredentials("invalid password")
-	}
-	if !entities.IsValidUserRole(cmd.Role) {
-		return nil, apperrors.ErrInvalidCredentials("invalid role")
-	}
+
 	if _, err := s.officeService.GetByID(ctx, cmd.OfficeID); err != nil {
 		return nil, err
 	}
+
 	passwordHash, err := security.HashPassword(cmd.Password)
 	if err != nil {
-		return nil, apperrors.ErrHashPassword(err)
+		return nil, apperrors.NewHashPasswordError(err)
 	}
 
 	user := entities.NewUser(cmd.Name, cmd.Email, cmd.Role, passwordHash, cmd.IsActive, cmd.OfficeID)
@@ -92,11 +86,8 @@ func (s *userService) Update(ctx context.Context, id uuid.UUID, cmd *UserUpdateC
 		return err
 	}
 
-	if !entities.IsValidName(cmd.Name) {
-		return apperrors.ErrInvalidCredentials("invalid name")
-	}
-	if !entities.IsValidUserRole(cmd.Role) {
-		return apperrors.ErrInvalidCredentials("invalid role")
+	if !entities.IsValidName(cmd.Name) || !entities.IsValidUserRole(cmd.Role) {
+		return apperrors.NewInvalidCredentials()
 	}
 	user.Role = cmd.Role
 	user.Name = cmd.Name

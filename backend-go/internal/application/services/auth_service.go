@@ -32,16 +32,16 @@ func (s *authService) Login(ctx context.Context, email, password string) (string
 	}
 
 	if user == nil {
-		return "", "", apperrors.ErrInvalidCredentials("invalid email")
+		return "", "", apperrors.NewInvalidCredentials()
 	}
 	if !user.IsActive {
-		return "", "", apperrors.ErrUserInactive
+		return "", "", apperrors.NewUserInactive()
 	}
 	if !security.VerifyPassword(password, user.PasswordHash) {
-		return "", "", apperrors.ErrInvalidCredentials("invalid password")
+		return "", "", apperrors.NewUserPasswordInvalid()
 	}
 
-	accessToken, err := s.tokenService.GenerateAccessToken(ctx, user.ID)
+	accessToken, err := s.tokenService.GenerateAccessToken(user.ID)
 	if err != nil {
 		return "", "", err
 	}
@@ -79,7 +79,7 @@ func (s *authService) HandleOAuthUser(ctx context.Context, userInfo *providers.U
 		}
 	}
 
-	accessToken, err := s.tokenService.GenerateAccessToken(ctx, user.ID)
+	accessToken, err := s.tokenService.GenerateAccessToken(user.ID)
 	if err != nil {
 		return "", "", err
 	}
