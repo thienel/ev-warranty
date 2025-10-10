@@ -13,4 +13,5 @@ type ClaimHistoryRepository interface {
 	FindByClaimID(ctx context.Context, claimID uuid.UUID) ([]*entities.ClaimHistory, error)
 	FindLatestByClaimID(ctx context.Context, claimID uuid.UUID) (*entities.ClaimHistory, error)
 	FindByDateRange(ctx context.Context, claimID uuid.UUID, startDate, endDate time.Time) ([]*entities.ClaimHistory, error)
+	SoftDeleteByClaimID(ctx context.Context, claimID uuid.UUID) error
 }

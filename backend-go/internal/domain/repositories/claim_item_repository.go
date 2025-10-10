@@ -12,7 +12,8 @@ type ClaimItemRepository interface {
 	FindByID(ctx context.Context, id uuid.UUID) (*entities.ClaimItem, error)
 	FindByClaimID(ctx context.Context, claimID uuid.UUID) ([]*entities.ClaimItem, error)
 	Update(ctx context.Context, item *entities.ClaimItem) error
-	Delete(ctx context.Context, id uuid.UUID) error
+	HardDelete(ctx context.Context, id uuid.UUID) error
+	SoftDeleteByClaimID(ctx context.Context, claimID uuid.UUID) error
 	UpdateStatus(ctx context.Context, id uuid.UUID, status string) error
 	CountByClaimID(ctx context.Context, claimID uuid.UUID) (int64, error)
 	SumCostByClaimID(ctx context.Context, claimID uuid.UUID) (float64, error)
