@@ -2,9 +2,9 @@ package services
 
 import (
 	"context"
+	"ev-warranty-go/internal/apperrors"
 	"ev-warranty-go/internal/application/repositories"
 	"ev-warranty-go/internal/domain/entities"
-	"ev-warranty-go/internal/errors/apperrors"
 
 	"github.com/google/uuid"
 )

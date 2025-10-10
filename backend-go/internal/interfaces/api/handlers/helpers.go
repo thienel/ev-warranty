@@ -2,7 +2,7 @@ package handlers
 
 import (
 	"errors"
-	"ev-warranty-go/internal/errors/apperrors"
+	"ev-warranty-go/internal/apperrors"
 	"ev-warranty-go/internal/interfaces/api/dtos"
 	"ev-warranty-go/pkg/logger"
 	"net/http"

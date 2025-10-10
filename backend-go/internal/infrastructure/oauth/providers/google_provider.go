@@ -2,7 +2,7 @@ package providers
 
 import (
 	"context"
-	"ev-warranty-go/internal/errors/apperrors"
+	"ev-warranty-go/internal/apperrors"
 	"fmt"
 
 	"github.com/coreos/go-oidc"
