@@ -63,8 +63,20 @@ func (c *claimItemRepository) Update(ctx context.Context, item *entities.ClaimIt
 	return nil
 }
 
-func (c *claimItemRepository) Delete(ctx context.Context, id uuid.UUID) error {
-	if err := c.db.WithContext(ctx).Delete(&entities.ClaimItem{}, "id = ?", id).Error; err != nil {
+func (c *claimItemRepository) HardDelete(ctx context.Context, id uuid.UUID) error {
+	if err := c.db.WithContext(ctx).Unscoped().
+		Delete(&entities.ClaimItem{}, "id = ?", id).Error; err != nil {
+
+		return apperrors.ErrDBOperation(err)
+	}
+	return nil
+}
+
+func (c *claimItemRepository) SoftDeleteByClaimID(ctx context.Context, claimID uuid.UUID) error {
+	if err := c.db.WithContext(ctx).
+		Delete(&entities.ClaimItem{}, "claim_id = ?", claimID).
+		Error; err != nil {
+
 		return apperrors.ErrDBOperation(err)
 	}
 	return nil

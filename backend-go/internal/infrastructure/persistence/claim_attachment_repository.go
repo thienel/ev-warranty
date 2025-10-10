@@ -53,8 +53,20 @@ func (c *claimAttachmentRepository) FindByClaimID(ctx context.Context, claimID u
 	return attachments, nil
 }
 
-func (c *claimAttachmentRepository) Delete(ctx context.Context, id uuid.UUID) error {
-	if err := c.db.WithContext(ctx).Delete(&entities.ClaimAttachment{}, "id = ?", id).Error; err != nil {
+func (c *claimAttachmentRepository) HardDelete(ctx context.Context, id uuid.UUID) error {
+	if err := c.db.WithContext(ctx).Unscoped().
+		Delete(&entities.ClaimAttachment{}, "id = ?", id).Error; err != nil {
+
+		return apperrors.ErrDBOperation(err)
+	}
+	return nil
+}
+
+func (c *claimAttachmentRepository) SoftDeleteByClaimID(ctx context.Context, claimID uuid.UUID) error {
+	if err := c.db.WithContext(ctx).
+		Delete(&entities.ClaimAttachment{}, "claim_id = ?", claimID).
+		Error; err != nil {
+
 		return apperrors.ErrDBOperation(err)
 	}
 	return nil

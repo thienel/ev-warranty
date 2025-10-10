@@ -67,3 +67,13 @@ func (c *claimHistoryRepository) FindByDateRange(ctx context.Context, claimID uu
 	}
 	return histories, nil
 }
+
+func (c *claimHistoryRepository) SoftDeleteByClaimID(ctx context.Context, claimID uuid.UUID) error {
+	if err := c.db.WithContext(ctx).
+		Delete(&entities.ClaimHistory{}, "claim_id = ?", claimID).
+		Error; err != nil {
+
+		return apperrors.ErrDBOperation(err)
+	}
+	return nil
+}

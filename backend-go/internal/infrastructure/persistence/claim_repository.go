@@ -102,7 +102,15 @@ func (c *claimRepository) Update(ctx context.Context, claim *entities.Claim) err
 	return nil
 }
 
-func (c *claimRepository) Delete(ctx context.Context, id uuid.UUID) error {
+func (c *claimRepository) HardDelete(ctx context.Context, id uuid.UUID) error {
+	if err := c.db.WithContext(ctx).Unscoped().
+		Delete(&entities.Claim{}, "id = ?", id).Error; err != nil {
+		return apperrors.ErrDBOperation(err)
+	}
+	return nil
+}
+
+func (c *claimRepository) SoftDelete(ctx context.Context, id uuid.UUID) error {
 	if err := c.db.WithContext(ctx).Delete(&entities.Claim{}, "id = ?", id).Error; err != nil {
 		return apperrors.ErrDBOperation(err)
 	}
@@ -138,18 +146,4 @@ func (c *claimRepository) FindByVehicleID(ctx context.Context, vehicleID uuid.UU
 		return nil, apperrors.ErrDBOperation(err)
 	}
 	return claims, nil
-}
-
-func (c *claimRepository) CalculateTotalCost(ctx context.Context, claimID uuid.UUID) (float64, error) {
-	var totalCost float64
-
-	if err := c.db.WithContext(ctx).
-		Model(&entities.ClaimItem{}).
-		Where("claim_id = ?", claimID).
-		Select("COALESCE(SUM(cost), 0)").
-		Scan(&totalCost).Error; err != nil {
-		return 0, apperrors.ErrDBOperation(err)
-	}
-
-	return totalCost, nil
 }
