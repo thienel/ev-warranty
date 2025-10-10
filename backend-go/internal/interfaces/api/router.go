@@ -28,8 +28,8 @@ func NewRouter(db *database.Database, authHandler handlers.AuthHandler, oauthHan
 		auth.POST("/token", authHandler.RefreshToken)
 		auth.GET("/token", authHandler.ValidateToken)
 
-		auth.GET("/:provider", oauthHandler.InitiateOAuth)
-		auth.GET("/:provider/callback", oauthHandler.HandleCallback)
+		auth.GET("/google", oauthHandler.InitiateOAuth)
+		auth.GET("/google/callback", oauthHandler.HandleCallback)
 	}
 
 	users := router.Group("/users")
