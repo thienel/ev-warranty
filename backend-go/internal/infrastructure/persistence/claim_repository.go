@@ -12,8 +12,6 @@ import (
 	"gorm.io/gorm"
 )
 
-const entityClaim = "claim"
-
 type claimRepository struct {
 	db *gorm.DB
 }

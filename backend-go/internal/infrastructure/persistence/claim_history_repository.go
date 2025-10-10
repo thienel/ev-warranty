@@ -13,8 +13,6 @@ import (
 	"gorm.io/gorm"
 )
 
-const entityClaimHistory = "claim history"
-
 type claimHistoryRepository struct {
 	db *gorm.DB
 }
