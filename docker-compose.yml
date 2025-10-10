@@ -11,7 +11,7 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./backend-go/internal/infrastructure/database/migrations:/docker-entrypoint-initdb.d
+      - ./backend-go/migrations:/docker-entrypoint-initdb.d
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U auth_service -d auth_service"]
       interval: 10s

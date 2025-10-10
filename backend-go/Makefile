@@ -32,26 +32,26 @@ install-migrate:
 .PHONY: db/migrations/new
 db/migrations/new: install-migrate
 	@echo 'Creating migration files for ${name}'
-	migrate create -seq -ext .sql -dir ./internal/infrastructure/database/migrations ${name}
+	migrate create -seq -ext .sql -dir ./migrations ${name}
 
 .PHONY: db/migrations/up
 db/migrations/up: confirm install-migrate
 	@echo 'running up migrations...'
-	migrate -path ./internal/infrastructure/database/migrations -database ${DATABASE_URL} up
+	migrate -path ./migrations -database ${DATABASE_URL} up
 
 .PHONY: db/migrations/down
 db/migrations/down: confirm install-migrate
 	@echo 'running down migrations...'
-	migrate -path ./internal/infrastructure/database/migrations -database ${DATABASE_URL} down
+	migrate -path ./migrations -database ${DATABASE_URL} down
 
 .PHONY: db/migrations/force
 db/migrations/force: confirm install-migrate
 	@echo 'forcing migration version to ${version}...'
-	migrate -path ./internal/infrastructure/database/migrations -database ${DATABASE_URL} force ${version}
+	migrate -path ./migrations -database ${DATABASE_URL} force ${version}
 
 .PHONY: db/migrations/version
 db/migrations/version: install-migrate
-	migrate -path ./internal/infrastructure/database/migrations -database ${DATABASE_URL} version
+	migrate -path ./migrations -database ${DATABASE_URL} version
 
 .PHONY: audit
 audit:

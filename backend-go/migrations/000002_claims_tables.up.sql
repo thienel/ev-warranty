@@ -41,7 +41,7 @@ CREATE INDEX IF NOT EXISTS idx_claim_items_claim_id ON claim_items(claim_id);
 CREATE TABLE IF NOT EXISTS claim_attachments (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     claim_id UUID NOT NULL,
-    attachment_type TEXT NOT NULL,
+    type TEXT NOT NULL,
     url TEXT NOT NULL,
     created_at TIMESTAMP WITH TIME ZONE NOT NULL,
     deleted_at TIMESTAMP WITH TIME ZONE,
