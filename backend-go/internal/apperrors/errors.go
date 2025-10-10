@@ -31,36 +31,16 @@ func New(httpCode int, errorCode string, err error) *AppError {
 	}
 }
 
-func NewBadRequest(err error) *AppError {
-	return New(http.StatusBadRequest, ErrorCodeBadRequest, err)
-}
-
 func NewInternalServerError(err error) *AppError {
 	return New(http.StatusInternalServerError, ErrorCodeInternalServerError, err)
 }
 
-func NewNotFound(err error) *AppError {
-	return New(http.StatusNotFound, ErrorCodeNotFound, err)
-}
-
-func NewConflict(err error) *AppError {
-	return New(http.StatusConflict, ErrorCodeConflict, err)
-}
-
-func NewUnauthorized(err error) *AppError {
-	return New(http.StatusUnauthorized, ErrorCodeUnauthorized, err)
-}
-
-func NewForbidden(err error) *AppError {
-	return New(http.StatusForbidden, ErrorCodeForbidden, err)
-}
-
-func NewTimeout(err error) *AppError {
-	return New(http.StatusRequestTimeout, ErrorCodeTimeout, err)
-}
-
 func NewBadGateWay(err error) *AppError {
 	return New(http.StatusBadGateway, ErrorCodeBadGateway, err)
+}
+
+func NewInvalidJsonRequest() *AppError {
+	return New(http.StatusBadRequest, ErrorCodeInvalidJsonRequest, errors.New("invalid json request"))
 }
 
 func NewInvalidAccessToken() *AppError {
@@ -88,7 +68,7 @@ func NewInvalidAuthHeader() *AppError {
 }
 
 func NewInvalidCredentials() *AppError {
-	return New(http.StatusUnauthorized, ErrorCodeInvalidCredentials, errors.New("invalid credentials"))
+	return New(http.StatusBadRequest, ErrorCodeInvalidCredentials, errors.New("invalid credentials"))
 }
 
 func NewFailedSignAccessToken(err error) *AppError {
@@ -103,24 +83,8 @@ func NewClaimNotFound() *AppError {
 	return New(http.StatusNotFound, ErrorCodeClaimNotFound, errors.New("claim not found"))
 }
 
-func NewClaimInvalidStatus() *AppError {
-	return New(http.StatusBadRequest, ErrorCodeClaimInvalidStatus, errors.New("invalid claim status"))
-}
-
-func NewClaimDeleteFailed(err error) *AppError {
-	return New(http.StatusInternalServerError, ErrorCodeClaimDeleteFailed, err)
-}
-
-func NewClaimCreateFailed(err error) *AppError {
-	return New(http.StatusInternalServerError, ErrorCodeClaimCreateFailed, err)
-}
-
 func NewUserNotFound() *AppError {
 	return New(http.StatusNotFound, ErrorCodeUserNotFound, errors.New("user not found"))
-}
-
-func NewUserAlreadyExists() *AppError {
-	return New(http.StatusConflict, ErrorCodeUserAlreadyExists, errors.New("user already exists"))
 }
 
 func NewUserPasswordInvalid() *AppError {
@@ -146,12 +110,31 @@ func NewRefreshTokenNotFound() *AppError {
 func NewOfficeNotFound() *AppError {
 	return New(http.StatusNotFound, ErrorCodeOfficeNotFound, errors.New("office not found"))
 }
+
 func NewClaimItemNotFound() *AppError {
-	return New(http.StatusNotFound, ErrorCodeClaimItemNotFound, errors.New("office not found"))
+	return New(http.StatusNotFound, ErrorCodeClaimItemNotFound, errors.New("claim item not found"))
 }
+
 func NewClaimHistoryNotFound() *AppError {
-	return New(http.StatusNotFound, ErrorCodeClaimHistoryNotFound, errors.New("office not found"))
+	return New(http.StatusNotFound, ErrorCodeClaimHistoryNotFound, errors.New("claim history not found"))
 }
+
 func NewClaimAttachmentNotFound() *AppError {
-	return New(http.StatusNotFound, ErrorCodeClaimAttachmentNotFound, errors.New("office not found"))
+	return New(http.StatusNotFound, ErrorCodeClaimAttachmentNotFound, errors.New("claim attachment not found"))
+}
+
+func NewUserInactive() *AppError {
+	return New(http.StatusForbidden, ErrorCodeUserInactive, errors.New("user inactive"))
+}
+
+func NewInvalidOfficeType() *AppError {
+	return New(http.StatusBadRequest, ErrorCodeInvalidOfficeType, errors.New("invalid office type"))
+}
+
+func NewFailedHashToken() *AppError {
+	return New(http.StatusInternalServerError, ErrorCodeFailedHashToken, errors.New("hash token failed"))
+}
+
+func NewUnexpectedSigningMethod(method any) *AppError {
+	return New(http.StatusUnauthorized, ErrorCodeUnexpectedSigningMethod, errors.New(fmt.Sprintf("unexpected signing method: %v", method)))
 }
