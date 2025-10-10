@@ -7,7 +7,6 @@ import (
 	"ev-warranty-go/internal/application/repositories"
 	"ev-warranty-go/internal/domain/entities"
 	"ev-warranty-go/pkg/logger"
-	"log"
 	"time"
 
 	"github.com/google/uuid"
@@ -62,17 +61,10 @@ func (s *claimService) Create(tx application.Transaction, cmd *CreateClaimComman
 
 	history := entities.NewClaimHistory(claim.ID, entities.ClaimStatusDraft, cmd.CreatorID)
 	if err := s.historyRepo.Create(tx, history); err != nil {
-		if err := tx.Rollback(); err != nil {
-			return nil, err
-		}
-		return nil, err
+		return nil, rollbackOnErr(tx, err)
 	}
 
-	if err := tx.Commit(); err != nil {
-		return nil, err
-	}
-
-	return claim, nil
+	return claim, commitOrLog(tx)
 }
 
 func (s *claimService) Update(tx application.Transaction, id uuid.UUID, cmd *UpdateClaimCommand) error {
@@ -82,7 +74,7 @@ func (s *claimService) Update(tx application.Transaction, id uuid.UUID, cmd *Upd
 	}
 
 	if claim.Status != entities.ClaimStatusDraft && claim.Status != entities.ClaimStatusRequestInfo {
-		return apperrors.ErrInvalidCredentials("can only update draft or request info claims")
+		return apperrors.NewNotAllowUpdateClaim()
 	}
 
 	claim.Description = cmd.Description
@@ -91,7 +83,7 @@ func (s *claimService) Update(tx application.Transaction, id uuid.UUID, cmd *Upd
 		return rollbackOnErr(tx, err)
 	}
 
-	return tx.Commit()
+	return commitOrLog(tx)
 }
 
 func (s *claimService) Delete(tx application.Transaction, id uuid.UUID) error {
@@ -101,7 +93,7 @@ func (s *claimService) Delete(tx application.Transaction, id uuid.UUID) error {
 	}
 
 	if claim.Status != entities.ClaimStatusDraft && claim.Status != entities.ClaimStatusCancelled {
-		return apperrors.ErrInvalidCredentials("can only delete draft or cancelled claims")
+		return apperrors.NewNotAllowDeleteClaim()
 	}
 
 	if claim.Status == entities.ClaimStatusCancelled {
@@ -117,14 +109,14 @@ func (s *claimService) Delete(tx application.Transaction, id uuid.UUID) error {
 				return rollbackOnErr(tx, err)
 			}
 		}
-		return tx.Commit()
+		return commitOrLog(tx)
 	}
 
 	if err = s.claimRepo.HardDelete(tx, id); err != nil {
 		return rollbackOnErr(tx, err)
 	}
 
-	return tx.Commit()
+	return commitOrLog(tx)
 }
 
 func (s *claimService) UpdateStatus(tx application.Transaction,
@@ -136,11 +128,11 @@ func (s *claimService) UpdateStatus(tx application.Transaction,
 	}
 
 	if !entities.IsValidClaimStatus(cmd.Status) {
-		return apperrors.ErrInvalidCredentials("invalid claim status")
+		return apperrors.NewInvalidCredentials()
 	}
 
 	if !s.isValidStatusTransition(claim.Status, cmd.Status) {
-		return apperrors.ErrInvalidCredentials("invalid status transition")
+		return apperrors.NewInvalidCredentials()
 	}
 
 	if err = s.claimRepo.UpdateStatus(tx, id, cmd.Status); err != nil {
@@ -175,7 +167,7 @@ func (s *claimService) UpdateStatus(tx application.Transaction,
 		}
 	}
 
-	return tx.Commit()
+	return commitOrLog(tx)
 }
 
 func (s *claimService) GetByID(ctx context.Context, id uuid.UUID) (*entities.Claim, error) {
@@ -255,19 +247,4 @@ func (s *claimService) isValidStatusTransition(currentStatus, newStatus string) 
 	}
 
 	return false
-}
-
-func rollbackOnErr(tx application.Transaction, originalErr error) error {
-	if err := tx.Rollback(); err != nil {
-		log.Printf("[TX ROLLBACK FAILED] original error: %v, rollback error: %v", originalErr, err)
-	}
-	return originalErr
-}
-
-func commitLog(tx application.Transaction) error {
-	if err := tx.Rollback(); err != nil {
-		log.Printf("[TX COMMIT FAILED] commit error: %v", err)
-		return apperrors.NewInternal("transaction commit error", err)
-	}
-	return nil
 }
