@@ -2,7 +2,7 @@ package services
 
 import (
 	"context"
-	"ev-warranty-go/internal/domain/repositories"
+	"ev-warranty-go/internal/application/repositories"
 	"ev-warranty-go/internal/errors/apperrors"
 	"ev-warranty-go/internal/infrastructure/oauth/providers"
 	"ev-warranty-go/internal/security"
