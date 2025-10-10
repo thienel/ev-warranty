@@ -67,12 +67,11 @@ func main() {
 	tokenService := services.NewTokenService(tokenRepo,
 		cfg.AccessTokenTTL, cfg.RefreshTokenTTL, security.PrivateKey(), security.PublicKey())
 	authService := services.NewAuthService(userRepo, tokenService)
-	oauthService := oauth.NewOAuthService(userRepo)
 	userService := services.NewUserService(userRepo, officeService)
 
 	googleProvider := providers.NewGoogleProvider(
 		cfg.OAuth.GoogleClientID, cfg.OAuth.GoogleClientSecret, cfg.OAuth.GoogleRedirectURL)
-	oauthService.RegisterProvider(googleProvider)
+	oauthService := oauth.NewOAuthService(googleProvider, userRepo)
 
 	officeHandler := handlers.NewOfficeHandler(log, officeService)
 	authHandler := handlers.NewAuthHandler(log, authService, tokenService, userService)
