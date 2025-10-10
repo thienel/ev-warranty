@@ -2,8 +2,8 @@ package providers
 
 import (
 	"context"
+	"errors"
 	"ev-warranty-go/internal/apperrors"
-	"fmt"
 
 	"github.com/coreos/go-oidc"
 	"golang.org/x/oauth2"
@@ -40,10 +40,10 @@ func (g *GoogleProvider) ExchangeCode(ctx context.Context, code string) (*oauth2
 	token, err := g.Config.Exchange(ctx, code)
 	if err != nil {
 		if oauthErr, ok := err.(*oauth2.RetrieveError); ok {
-			return nil, apperrors.NewBadRequest(fmt.Sprintf("oauth exchange failed: %s", string(oauthErr.Body)))
+			return nil, apperrors.NewBadRequest(oauthErr)
 		}
 
-		return nil, apperrors.NewBadGateway(fmt.Sprintf("failed to exchange code: %v", err))
+		return nil, apperrors.NewBadGateWay(err)
 	}
 	return token, nil
 }
@@ -51,7 +51,7 @@ func (g *GoogleProvider) ExchangeCode(ctx context.Context, code string) (*oauth2
 func (g *GoogleProvider) GetUserInfo(ctx context.Context, token *oauth2.Token) (*UserInfo, error) {
 	rawIDToken, ok := token.Extra("id_token").(string)
 	if !ok {
-		return nil, apperrors.NewUnauthorized("no id_token field in oauth2 token")
+		return nil, apperrors.NewUnauthorized(errors.New("no id_token field in oauth2 token"))
 	}
 
 	verifier := oidc.NewVerifier(
@@ -62,7 +62,7 @@ func (g *GoogleProvider) GetUserInfo(ctx context.Context, token *oauth2.Token) (
 
 	idToken, err := verifier.Verify(ctx, rawIDToken)
 	if err != nil {
-		return nil, apperrors.NewUnauthorized("id token verification failed")
+		return nil, apperrors.NewUnauthorized(errors.New("id token verification failed"))
 	}
 
 	var claims struct {
@@ -71,7 +71,7 @@ func (g *GoogleProvider) GetUserInfo(ctx context.Context, token *oauth2.Token) (
 	}
 
 	if err = idToken.Claims(&claims); err != nil {
-		return nil, apperrors.NewInternal("failed to parse claims from id token", err)
+		return nil, apperrors.NewInternalServerError(err)
 	}
 
 	return &UserInfo{
