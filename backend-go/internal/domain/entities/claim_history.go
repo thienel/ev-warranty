@@ -16,3 +16,12 @@ type ClaimHistory struct {
 	ChangedAt time.Time       `gorm:"autoCreateTime"`
 	DeletedAt *gorm.DeletedAt `gorm:"index" json:"-"`
 }
+
+func NewClaimHistory(claimID uuid.UUID, status string, changedBy uuid.UUID) *ClaimHistory {
+	return &ClaimHistory{
+		ID:        uuid.New(),
+		ClaimID:   claimID,
+		Status:    status,
+		ChangedBy: changedBy,
+	}
+}
