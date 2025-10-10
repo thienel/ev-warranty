@@ -8,15 +8,23 @@ import (
 )
 
 type transaction struct {
-	tx *gorm.DB
+	tx  *gorm.DB
+	ctx context.Context
 }
 
 func NewTransaction(ctx context.Context, db *gorm.DB) application.Transaction {
-	return &transaction{tx: db.WithContext(ctx).Begin()}
+	return &transaction{
+		tx:  db.WithContext(ctx).Begin(),
+		ctx: ctx,
+	}
 }
 
 func (t *transaction) GetTx() any {
 	return t.tx
+}
+
+func (t *transaction) GetCtx() context.Context {
+	return t.ctx
 }
 
 func (t *transaction) Rollback() error {
