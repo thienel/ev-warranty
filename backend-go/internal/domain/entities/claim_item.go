@@ -26,12 +26,12 @@ type ClaimItem struct {
 	FaultyPartID      uuid.UUID       `gorm:"not null;type:uuid" json:"faulty_part_id"`
 	ReplacementPartID *uuid.UUID      `gorm:"type:uuid" json:"replacement_part_id"`
 	IssueDescription  string          `gorm:"not null;type:text" json:"issue_description"`
-	LineStatus        string          `gorm:"not null" json:"line_status"`
+	Status            string          `gorm:"not null" json:"status"`
 	Type              string          `gorm:"not null" json:"type"`
 	Cost              float64         `json:"cost"`
 	CreatedAt         time.Time       `gorm:"autoCreateTime" json:"created_at"`
 	UpdatedAt         time.Time       `gorm:"autoUpdateTime" json:"updated_at"`
-	DeletedAt         *gorm.DeletedAt `json:"-"`
+	DeletedAt         *gorm.DeletedAt `gorm:"index" json:"-"`
 }
 
 func NewClaimItem(claimID uuid.UUID, partCategoryID int, faultyPartID uuid.UUID, replacementPartID *uuid.UUID,
@@ -44,7 +44,7 @@ func NewClaimItem(claimID uuid.UUID, partCategoryID int, faultyPartID uuid.UUID,
 		FaultyPartID:      faultyPartID,
 		ReplacementPartID: replacementPartID,
 		IssueDescription:  IssueDescription,
-		LineStatus:        lineStatus,
+		Status:            lineStatus,
 		Type:              claimItemType,
 		Cost:              cost,
 	}
