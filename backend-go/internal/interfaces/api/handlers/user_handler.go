@@ -41,8 +41,7 @@ func (h userHandler) Create(c *gin.Context) {
 
 	var req dtos.CreateUserRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		h.log.Error("invalid create user request", "error", err.Error())
-		handleError(h.log, c, apperrors.ErrInvalidJSONRequest, "invalid JSON RegisterRequest")
+		handleError(h.log, c, apperrors.NewInvalidJsonRequest())
 		return
 	}
 
@@ -59,14 +58,13 @@ func (h userHandler) Create(c *gin.Context) {
 
 	user, err := h.userService.Create(ctx, params)
 	if err != nil {
-		h.log.Error("user creation failed", "email", req.Email, "error", err.Error())
-		handleError(h.log, c, err, "user creation failed")
+		handleError(h.log, c, err)
 		return
 	}
 
 	response := *dtos.GenerateUserDTO(user)
 	h.log.Info("user created", "user_id", user.ID, "email", user.Email)
-	writeSuccessResponse(c, http.StatusCreated, "registration successful", response)
+	writeSuccessResponse(c, http.StatusCreated, response)
 }
 
 func (h userHandler) Update(c *gin.Context) {
@@ -78,15 +76,13 @@ func (h userHandler) Update(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := uuid.Parse(idStr)
 	if err != nil {
-		h.log.Error("invalid user ID", "id", idStr, "error", err.Error())
-		handleError(h.log, c, apperrors.ErrInvalidCredentials("invalid user id"), "invalid user id")
+		handleError(h.log, c, apperrors.NewInvalidCredentials())
 		return
 	}
 
 	var req dtos.UpdateUserRequest
 	if err = c.ShouldBindJSON(&req); err != nil {
-		h.log.Error("invalid update user request", "user_id", id, "error", err.Error())
-		handleError(h.log, c, apperrors.ErrInvalidJSONRequest, "invalid JSON RegisterRequest")
+		handleError(h.log, c, apperrors.NewInvalidJsonRequest())
 		return
 	}
 
@@ -101,13 +97,12 @@ func (h userHandler) Update(c *gin.Context) {
 
 	err = h.userService.Update(ctx, id, cmd)
 	if err != nil {
-		h.log.Error("user update failed", "user_id", id, "error", err.Error())
-		handleError(h.log, c, err, "user update failed")
+		handleError(h.log, c, err)
 		return
 	}
 
 	h.log.Info("user updated", "user_id", id)
-	writeSuccessResponse(c, http.StatusOK, "user update successful", nil)
+	writeSuccessResponse(c, http.StatusOK, nil)
 }
 
 func (h userHandler) GetByID(c *gin.Context) {
@@ -119,21 +114,18 @@ func (h userHandler) GetByID(c *gin.Context) {
 	userIDStr := c.Param("id")
 	userID, err := uuid.Parse(userIDStr)
 	if err != nil {
-		h.log.Error("invalid user ID", "id", userIDStr, "error", err.Error())
-		err = apperrors.ErrInvalidCredentials("invalid id")
-		handleError(h.log, c, err, "invalid id in get user by id")
+		handleError(h.log, c, apperrors.NewInvalidCredentials())
 		return
 	}
 
 	user, err := h.userService.GetByID(ctx, userID)
 	if err != nil {
-		h.log.Error("failed to get user", "user_id", userID, "error", err.Error())
-		handleError(h.log, c, err, "user not found in get user by id")
+		handleError(h.log, c, err)
 		return
 	}
 
 	h.log.Info("user retrieved", "user_id", userID, "email", user.Email)
-	writeSuccessResponse(c, http.StatusOK, "user retrieve successfully", user)
+	writeSuccessResponse(c, http.StatusOK, user)
 }
 
 func (h userHandler) GetAll(c *gin.Context) {
@@ -144,14 +136,13 @@ func (h userHandler) GetAll(c *gin.Context) {
 
 	users, err := h.userService.GetAll(ctx)
 	if err != nil {
-		h.log.Error("failed to get users", "error", err.Error())
-		handleError(h.log, c, err, "error getting all users")
+		handleError(h.log, c, err)
 		return
 	}
 
 	usersDto := dtos.GenerateUserDTOList(users)
 	h.log.Info("users retrieved", "count", len(usersDto))
-	writeSuccessResponse(c, http.StatusOK, "users retrieve successfully", usersDto)
+	writeSuccessResponse(c, http.StatusOK, usersDto)
 }
 
 func (h userHandler) Delete(c *gin.Context) {
@@ -163,19 +154,16 @@ func (h userHandler) Delete(c *gin.Context) {
 	userIDStr := c.Param("id")
 	userID, err := uuid.Parse(userIDStr)
 	if err != nil {
-		h.log.Error("invalid user ID", "id", userIDStr, "error", err.Error())
-		err = apperrors.ErrInvalidCredentials("invalid user id")
-		handleError(h.log, c, err, "invalid user ID deleting user")
+		handleError(h.log, c, apperrors.NewInvalidCredentials())
 		return
 	}
 
 	err = h.userService.Delete(ctx, userID)
 	if err != nil {
-		h.log.Error("user deletion failed", "user_id", userID, "error", err.Error())
-		handleError(h.log, c, err, "error deleting user")
+		handleError(h.log, c, err)
 		return
 	}
 
 	h.log.Info("user deleted", "user_id", userID)
-	writeSuccessResponse(c, http.StatusNoContent, "delete user successfully", nil)
+	writeSuccessResponse(c, http.StatusNoContent, nil)
 }
