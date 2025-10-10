@@ -2,6 +2,7 @@ package api
 
 import (
 	"ev-warranty-go/internal/infrastructure/database"
+	"ev-warranty-go/internal/interfaces/api/handlers"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -11,8 +12,8 @@ type HealthHandler struct {
 	DB *database.Database
 }
 
-func NewRouter(db *database.Database, authHandler AuthHandler, oauthHandler OAuthHandler,
-	officeHandler OfficeHandler, userHandler UserHandler) *gin.Engine {
+func NewRouter(db *database.Database, authHandler handlers.AuthHandler, oauthHandler handlers.OAuthHandler,
+	officeHandler handlers.OfficeHandler, userHandler handlers.UserHandler) *gin.Engine {
 	router := gin.New()
 
 	router.Use(gin.Recovery(), gin.Logger())

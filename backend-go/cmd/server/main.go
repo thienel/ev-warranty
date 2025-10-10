@@ -10,6 +10,7 @@ import (
 	"ev-warranty-go/internal/infrastructure/oauth/providers"
 	"ev-warranty-go/internal/infrastructure/persistence"
 	"ev-warranty-go/internal/interfaces/api"
+	"ev-warranty-go/internal/interfaces/api/handlers"
 	"ev-warranty-go/internal/security"
 	"ev-warranty-go/pkg/logger"
 	"net/http"
@@ -73,10 +74,10 @@ func main() {
 		cfg.OAuth.GoogleClientID, cfg.OAuth.GoogleClientSecret, cfg.OAuth.GoogleRedirectURL)
 	oauthService.RegisterProvider(googleProvider)
 
-	officeHandler := api.NewOfficeHandler(log, officeService)
-	authHandler := api.NewAuthHandler(log, authService, tokenService, userService)
-	oauthHandler := api.NewOAuthHandler(log, cfg.OAuth.FrontendBaseURL, oauthService, authService)
-	userHandler := api.NewUserHandler(log, userService)
+	officeHandler := handlers.NewOfficeHandler(log, officeService)
+	authHandler := handlers.NewAuthHandler(log, authService, tokenService, userService)
+	oauthHandler := handlers.NewOAuthHandler(log, cfg.OAuth.FrontendBaseURL, oauthService, authService)
+	userHandler := handlers.NewUserHandler(log, userService)
 
 	r := api.NewRouter(app.DB, authHandler, oauthHandler, officeHandler, userHandler)
 	log.Info("Server starting on port " + cfg.Port)
