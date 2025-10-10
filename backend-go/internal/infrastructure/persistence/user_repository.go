@@ -12,8 +12,6 @@ import (
 	"gorm.io/gorm"
 )
 
-const entityUser = "user"
-
 type userRepository struct {
 	db *gorm.DB
 }
@@ -25,9 +23,9 @@ func NewUserRepository(db *gorm.DB) repositories.UserRepository {
 func (u *userRepository) Create(ctx context.Context, user *entities.User) error {
 	if err := u.db.WithContext(ctx).Create(user).Error; err != nil {
 		if dup := getDuplicateKeyConstraint(err); dup != "" {
-			return apperrors.ErrDuplicateKey(dup)
+			return apperrors.NewDBDuplicateKeyError(dup)
 		}
-		return apperrors.ErrDBOperation(err)
+		return apperrors.NewDBOperationError(err)
 	}
 	return nil
 }
@@ -36,9 +34,9 @@ func (u *userRepository) FindByID(ctx context.Context, id uuid.UUID) (*entities.
 	var user entities.User
 	if err := u.db.WithContext(ctx).Where("id = ?", id).First(&user).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, apperrors.ErrNotFound(entityUser)
+			return nil, apperrors.NewUserNotFound()
 		}
-		return nil, apperrors.ErrDBOperation(err)
+		return nil, apperrors.NewDBOperationError(err)
 	}
 	return &user, nil
 }
@@ -47,9 +45,9 @@ func (u *userRepository) FindByEmail(ctx context.Context, email string) (*entiti
 	var user entities.User
 	if err := u.db.WithContext(ctx).Where("email = ?", email).First(&user).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, apperrors.ErrNotFound(entityUser)
+			return nil, apperrors.NewUserNotFound()
 		}
-		return nil, apperrors.ErrDBOperation(err)
+		return nil, apperrors.NewDBOperationError(err)
 	}
 	return &user, nil
 }
@@ -58,9 +56,9 @@ func (u *userRepository) FindAll(ctx context.Context) ([]*entities.User, error) 
 	var users []*entities.User
 	if err := u.db.WithContext(ctx).Find(&users).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, apperrors.ErrNotFound(entityUser)
+			return nil, apperrors.NewUserNotFound()
 		}
-		return nil, apperrors.ErrDBOperation(err)
+		return nil, apperrors.NewDBOperationError(err)
 	}
 	return users, nil
 }
@@ -70,14 +68,14 @@ func (u *userRepository) Update(ctx context.Context, user *entities.User) error 
 		Select("name", "email", "role",
 			"password_hash", "is_active", "office_id", "oauth_provider", "oauth_id").
 		Updates(user).Error; err != nil {
-		return apperrors.ErrDBOperation(err)
+		return apperrors.NewDBOperationError(err)
 	}
 	return nil
 }
 
 func (u *userRepository) SoftDelete(ctx context.Context, id uuid.UUID) error {
 	if err := u.db.WithContext(ctx).Delete(&entities.User{}, "id = ?", id).Error; err != nil {
-		return apperrors.ErrDBOperation(err)
+		return apperrors.NewDBOperationError(err)
 	}
 	return nil
 }
@@ -86,7 +84,7 @@ func (u *userRepository) FindByOAuth(ctx context.Context, provider, oauthID stri
 	var user entities.User
 	if err := u.db.WithContext(ctx).Where("oauth_provider = ? AND oauth_id = ?", provider, oauthID).First(&user).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, apperrors.ErrNotFound(entityUser)
+			return nil, apperrors.NewUserNotFound()
 		}
 	}
 	return &user, nil

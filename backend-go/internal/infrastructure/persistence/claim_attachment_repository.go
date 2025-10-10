@@ -26,9 +26,9 @@ func (c *claimAttachmentRepository) Create(tx application.Transaction, attachmen
 	db := tx.GetTx().(*gorm.DB)
 	if err := db.Create(attachment).Error; err != nil {
 		if dup := getDuplicateKeyConstraint(err); dup != "" {
-			return apperrors.ErrDuplicateKey(dup)
+			return apperrors.NewDBDuplicateKeyError(dup)
 		}
-		return apperrors.ErrDBOperation(err)
+		return apperrors.NewDBOperationError(err)
 	}
 	return nil
 }
@@ -36,7 +36,7 @@ func (c *claimAttachmentRepository) Create(tx application.Transaction, attachmen
 func (c *claimAttachmentRepository) HardDelete(tx application.Transaction, id uuid.UUID) error {
 	db := tx.GetTx().(*gorm.DB)
 	if err := db.Unscoped().Delete(&entities.ClaimAttachment{}, "id = ?", id).Error; err != nil {
-		return apperrors.ErrDBOperation(err)
+		return apperrors.NewDBOperationError(err)
 	}
 	return nil
 }
@@ -44,7 +44,7 @@ func (c *claimAttachmentRepository) HardDelete(tx application.Transaction, id uu
 func (c *claimAttachmentRepository) SoftDeleteByClaimID(tx application.Transaction, claimID uuid.UUID) error {
 	db := tx.GetTx().(*gorm.DB)
 	if err := db.Delete(&entities.ClaimAttachment{}, "claim_id = ?", claimID).Error; err != nil {
-		return apperrors.ErrDBOperation(err)
+		return apperrors.NewDBOperationError(err)
 	}
 	return nil
 }
@@ -53,9 +53,9 @@ func (c *claimAttachmentRepository) FindByID(ctx context.Context, id uuid.UUID) 
 	var attachment entities.ClaimAttachment
 	if err := c.db.WithContext(ctx).Where("id = ?", id).First(&attachment).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, apperrors.ErrNotFound(entityClaimAttachment)
+			return nil, apperrors.NewClaimAttachmentNotFound()
 		}
-		return nil, apperrors.ErrDBOperation(err)
+		return nil, apperrors.NewDBOperationError(err)
 	}
 	return &attachment, nil
 }
@@ -66,7 +66,7 @@ func (c *claimAttachmentRepository) FindByClaimID(ctx context.Context, claimID u
 		Where("claim_id = ?", claimID).
 		Order("created_at DESC").
 		Find(&attachments).Error; err != nil {
-		return nil, apperrors.ErrDBOperation(err)
+		return nil, apperrors.NewDBOperationError(err)
 	}
 	return attachments, nil
 }
@@ -77,7 +77,7 @@ func (c *claimAttachmentRepository) CountByClaimID(ctx context.Context, claimID 
 		Model(&entities.ClaimAttachment{}).
 		Where("claim_id = ?", claimID).
 		Count(&count).Error; err != nil {
-		return 0, apperrors.ErrDBOperation(err)
+		return 0, apperrors.NewDBOperationError(err)
 	}
 	return count, nil
 }
@@ -88,7 +88,7 @@ func (c *claimAttachmentRepository) FindByType(ctx context.Context, claimID uuid
 		Where("claim_id = ? AND attachment_type = ?", claimID, attachmentType).
 		Order("created_at DESC").
 		Find(&attachments).Error; err != nil {
-		return nil, apperrors.ErrDBOperation(err)
+		return nil, apperrors.NewDBOperationError(err)
 	}
 	return attachments, nil
 }

@@ -26,9 +26,9 @@ func (c *claimRepository) Create(tx application.Transaction, claim *entities.Cla
 	db := tx.GetTx().(*gorm.DB)
 	if err := db.Create(claim).Error; err != nil {
 		if dup := getDuplicateKeyConstraint(err); dup != "" {
-			return apperrors.ErrDuplicateKey(dup)
+			return apperrors.NewDBDuplicateKeyError(dup)
 		}
-		return apperrors.ErrDBOperation(err)
+		return apperrors.NewDBOperationError(err)
 	}
 	return nil
 }
@@ -38,7 +38,7 @@ func (c *claimRepository) Update(tx application.Transaction, claim *entities.Cla
 	if err := db.Model(claim).Select("vehicle_id",
 		"customer_id", "description", "status", "total_cost", "approved_by").
 		Updates(claim).Error; err != nil {
-		return apperrors.ErrDBOperation(err)
+		return apperrors.NewDBOperationError(err)
 	}
 	return nil
 }
@@ -46,7 +46,7 @@ func (c *claimRepository) Update(tx application.Transaction, claim *entities.Cla
 func (c *claimRepository) HardDelete(tx application.Transaction, id uuid.UUID) error {
 	db := tx.GetTx().(*gorm.DB)
 	if err := db.Unscoped().Delete(&entities.Claim{}, "id = ?", id).Error; err != nil {
-		return apperrors.ErrDBOperation(err)
+		return apperrors.NewDBOperationError(err)
 	}
 	return nil
 }
@@ -54,7 +54,7 @@ func (c *claimRepository) HardDelete(tx application.Transaction, id uuid.UUID) e
 func (c *claimRepository) SoftDelete(tx application.Transaction, id uuid.UUID) error {
 	db := tx.GetTx().(*gorm.DB)
 	if err := db.Delete(&entities.Claim{}, "id = ?", id).Error; err != nil {
-		return apperrors.ErrDBOperation(err)
+		return apperrors.NewDBOperationError(err)
 	}
 	return nil
 }
@@ -65,7 +65,7 @@ func (c *claimRepository) UpdateStatus(tx application.Transaction, id uuid.UUID,
 		Where("id = ?", id).
 		Update("status", status).Error; err != nil {
 
-		return apperrors.ErrDBOperation(err)
+		return apperrors.NewDBOperationError(err)
 	}
 	return nil
 }
@@ -74,9 +74,9 @@ func (c *claimRepository) FindByID(ctx context.Context, id uuid.UUID) (*entities
 	var claim entities.Claim
 	if err := c.db.WithContext(ctx).Where("id = ?", id).First(&claim).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, apperrors.ErrNotFound(entityClaim)
+			return nil, apperrors.NewClaimNotFound()
 		}
-		return nil, apperrors.ErrDBOperation(err)
+		return nil, apperrors.NewDBOperationError(err)
 	}
 	return &claim, nil
 }
@@ -106,7 +106,7 @@ func (c *claimRepository) FindAll(ctx context.Context,
 	}
 
 	if err := query.Count(&total).Error; err != nil {
-		return nil, 0, apperrors.ErrDBOperation(err)
+		return nil, 0, apperrors.NewDBOperationError(err)
 	}
 
 	if pagination.PageSize > 0 {
@@ -125,7 +125,7 @@ func (c *claimRepository) FindAll(ctx context.Context,
 	}
 
 	if err := query.Find(&claims).Error; err != nil {
-		return nil, 0, apperrors.ErrDBOperation(err)
+		return nil, 0, apperrors.NewDBOperationError(err)
 	}
 
 	return claims, total, nil
@@ -137,7 +137,7 @@ func (c *claimRepository) FindByCustomerID(ctx context.Context, customerID uuid.
 		Where("customer_id = ?", customerID).
 		Order("created_at DESC").
 		Find(&claims).Error; err != nil {
-		return nil, apperrors.ErrDBOperation(err)
+		return nil, apperrors.NewDBOperationError(err)
 	}
 	return claims, nil
 }
@@ -148,7 +148,7 @@ func (c *claimRepository) FindByVehicleID(ctx context.Context, vehicleID uuid.UU
 		Where("vehicle_id = ?", vehicleID).
 		Order("created_at DESC").
 		Find(&claims).Error; err != nil {
-		return nil, apperrors.ErrDBOperation(err)
+		return nil, apperrors.NewDBOperationError(err)
 	}
 	return claims, nil
 }

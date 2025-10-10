@@ -26,9 +26,9 @@ func (c *claimItemRepository) Create(tx application.Transaction, item *entities.
 	db := tx.GetTx().(*gorm.DB)
 	if err := db.Create(item).Error; err != nil {
 		if dup := getDuplicateKeyConstraint(err); dup != "" {
-			return apperrors.ErrDuplicateKey(dup)
+			return apperrors.NewDBDuplicateKeyError(dup)
 		}
-		return apperrors.ErrDBOperation(err)
+		return apperrors.NewDBOperationError(err)
 	}
 	return nil
 }
@@ -39,7 +39,7 @@ func (c *claimItemRepository) Update(tx application.Transaction, item *entities.
 		Select("part_category_id", "faulty_part_id", "replacement_part_id",
 			"issue_description", "line_status", "type", "cost").
 		Updates(item).Error; err != nil {
-		return apperrors.ErrDBOperation(err)
+		return apperrors.NewDBOperationError(err)
 	}
 	return nil
 }
@@ -47,7 +47,7 @@ func (c *claimItemRepository) Update(tx application.Transaction, item *entities.
 func (c *claimItemRepository) HardDelete(tx application.Transaction, id uuid.UUID) error {
 	db := tx.GetTx().(*gorm.DB)
 	if err := db.Unscoped().Delete(&entities.ClaimItem{}, "id = ?", id).Error; err != nil {
-		return apperrors.ErrDBOperation(err)
+		return apperrors.NewDBOperationError(err)
 	}
 	return nil
 }
@@ -55,7 +55,7 @@ func (c *claimItemRepository) HardDelete(tx application.Transaction, id uuid.UUI
 func (c *claimItemRepository) SoftDeleteByClaimID(tx application.Transaction, claimID uuid.UUID) error {
 	db := tx.GetTx().(*gorm.DB)
 	if err := db.Delete(&entities.ClaimItem{}, "claim_id = ?", claimID).Error; err != nil {
-		return apperrors.ErrDBOperation(err)
+		return apperrors.NewDBOperationError(err)
 	}
 	return nil
 }
@@ -65,7 +65,7 @@ func (c *claimItemRepository) UpdateStatus(tx application.Transaction, id uuid.U
 	if err := db.Model(&entities.ClaimItem{}).Where("id = ?", id).
 		Update("line_status", status).Error; err != nil {
 
-		return apperrors.ErrDBOperation(err)
+		return apperrors.NewDBOperationError(err)
 	}
 	return nil
 }
@@ -74,9 +74,9 @@ func (c *claimItemRepository) FindByID(ctx context.Context, id uuid.UUID) (*enti
 	var item entities.ClaimItem
 	if err := c.db.WithContext(ctx).Where("id = ?", id).First(&item).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, apperrors.ErrNotFound(entityClaimItem)
+			return nil, apperrors.NewClaimItemNotFound()
 		}
-		return nil, apperrors.ErrDBOperation(err)
+		return nil, apperrors.NewDBOperationError(err)
 	}
 	return &item, nil
 }
@@ -87,7 +87,7 @@ func (c *claimItemRepository) FindByClaimID(ctx context.Context, claimID uuid.UU
 		Where("claim_id = ?", claimID).
 		Order("created_at ASC").
 		Find(&items).Error; err != nil {
-		return nil, apperrors.ErrDBOperation(err)
+		return nil, apperrors.NewDBOperationError(err)
 	}
 	return items, nil
 }
@@ -98,7 +98,7 @@ func (c *claimItemRepository) CountByClaimID(ctx context.Context, claimID uuid.U
 		Model(&entities.ClaimItem{}).
 		Where("claim_id = ?", claimID).
 		Count(&count).Error; err != nil {
-		return 0, apperrors.ErrDBOperation(err)
+		return 0, apperrors.NewDBOperationError(err)
 	}
 	return count, nil
 }
@@ -110,7 +110,7 @@ func (c *claimItemRepository) SumCostByClaimID(ctx context.Context, claimID uuid
 		Where("claim_id = ?", claimID).
 		Select("COALESCE(SUM(cost), 0)").
 		Scan(&totalCost).Error; err != nil {
-		return 0, apperrors.ErrDBOperation(err)
+		return 0, apperrors.NewDBOperationError(err)
 	}
 	return totalCost, nil
 }
@@ -121,7 +121,7 @@ func (c *claimItemRepository) FindByStatus(ctx context.Context, claimID uuid.UUI
 		Where("claim_id = ? AND line_status = ?", claimID, status).
 		Order("created_at ASC").
 		Find(&items).Error; err != nil {
-		return nil, apperrors.ErrDBOperation(err)
+		return nil, apperrors.NewDBOperationError(err)
 	}
 	return items, nil
 }

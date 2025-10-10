@@ -27,9 +27,9 @@ func (c *claimHistoryRepository) Create(tx application.Transaction, history *ent
 	db := tx.GetTx().(*gorm.DB)
 	if err := db.Create(history).Error; err != nil {
 		if dup := getDuplicateKeyConstraint(err); dup != "" {
-			return apperrors.ErrDuplicateKey(dup)
+			return apperrors.NewDBDuplicateKeyError(dup)
 		}
-		return apperrors.ErrDBOperation(err)
+		return apperrors.NewDBOperationError(err)
 	}
 	return nil
 }
@@ -37,7 +37,7 @@ func (c *claimHistoryRepository) Create(tx application.Transaction, history *ent
 func (c *claimHistoryRepository) SoftDeleteByClaimID(tx application.Transaction, claimID uuid.UUID) error {
 	db := tx.GetTx().(*gorm.DB)
 	if err := db.Delete(&entities.ClaimHistory{}, "claim_id = ?", claimID).Error; err != nil {
-		return apperrors.ErrDBOperation(err)
+		return apperrors.NewDBOperationError(err)
 	}
 	return nil
 }
@@ -48,7 +48,7 @@ func (c *claimHistoryRepository) FindByClaimID(ctx context.Context, claimID uuid
 		Where("claim_id = ?", claimID).
 		Order("changed_at DESC").
 		Find(&histories).Error; err != nil {
-		return nil, apperrors.ErrDBOperation(err)
+		return nil, apperrors.NewDBOperationError(err)
 	}
 	return histories, nil
 }
@@ -60,9 +60,9 @@ func (c *claimHistoryRepository) FindLatestByClaimID(ctx context.Context, claimI
 		Order("changed_at DESC").
 		First(&history).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, apperrors.ErrNotFound(entityClaimHistory)
+			return nil, apperrors.NewClaimHistoryNotFound()
 		}
-		return nil, apperrors.ErrDBOperation(err)
+		return nil, apperrors.NewDBOperationError(err)
 	}
 	return &history, nil
 }
@@ -73,7 +73,7 @@ func (c *claimHistoryRepository) FindByDateRange(ctx context.Context, claimID uu
 		Where("claim_id = ? AND changed_at BETWEEN ? AND ?", claimID, startDate, endDate).
 		Order("changed_at DESC").
 		Find(&histories).Error; err != nil {
-		return nil, apperrors.ErrDBOperation(err)
+		return nil, apperrors.NewDBOperationError(err)
 	}
 	return histories, nil
 }
