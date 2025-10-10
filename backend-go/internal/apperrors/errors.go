@@ -1,105 +1,136 @@
 package apperrors
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 )
 
 type AppError struct {
-	Code    int    `json:"code"`
-	Message string `json:"message"`
-	Err     error  `json:"-"`
+	HttpCode  int    `json:"-"`
+	ErrorCode string `json:"error_code"`
+	Err       error  `json:"-"`
 }
 
 func (e *AppError) Error() string {
 	if e.Err != nil {
-		return fmt.Sprintf("%s: %v", e.Message, e.Err)
+		return fmt.Sprintf("%s: %v", e.ErrorCode, e.Err)
 	}
-	return e.Message
+	return e.ErrorCode
 }
 
 func (e *AppError) Unwrap() error {
 	return e.Err
 }
 
-func NewAppError(code int, message string, err error) *AppError {
-	return &AppError{Code: code, Message: message, Err: err}
+func New(httpCode int, errorCode string, err error) *AppError {
+	return &AppError{
+		HttpCode:  httpCode,
+		ErrorCode: errorCode,
+		Err:       err,
+	}
 }
 
-func NewBadRequest(message string) *AppError {
-	return NewAppError(http.StatusBadRequest, message, nil)
+func NewBadRequest(err error) *AppError {
+	return New(http.StatusBadRequest, ErrorCodeBadRequest, err)
 }
 
-func NewUnauthorized(message string) *AppError {
-	return NewAppError(http.StatusUnauthorized, message, nil)
+func NewInternalServerError(err error) *AppError {
+	return New(http.StatusInternalServerError, ErrorCodeInternalServerError, err)
 }
 
-func NewForbidden(message string) *AppError {
-	return NewAppError(http.StatusForbidden, message, nil)
+func NewNotFound(err error) *AppError {
+	return New(http.StatusNotFound, ErrorCodeNotFound, err)
 }
 
-func NewNotFound(message string) *AppError {
-	return NewAppError(http.StatusNotFound, message, nil)
+func NewConflict(err error) *AppError {
+	return New(http.StatusConflict, ErrorCodeConflict, err)
 }
 
-func NewConflict(message string) *AppError {
-	return NewAppError(http.StatusConflict, message, nil)
+func NewUnauthorized(err error) *AppError {
+	return New(http.StatusUnauthorized, ErrorCodeUnauthorized, err)
 }
 
-func NewBadGateway(message string) *AppError {
-	return NewAppError(http.StatusBadGateway, message, nil)
+func NewForbidden(err error) *AppError {
+	return New(http.StatusForbidden, ErrorCodeForbidden, err)
 }
 
-func NewInternal(message string, err error) *AppError {
-	return NewAppError(http.StatusInternalServerError, message, err)
+func NewTimeout(err error) *AppError {
+	return New(http.StatusRequestTimeout, ErrorCodeTimeout, err)
 }
 
-var (
-	ErrScanValue = NewInternal("scan value error", nil)
-
-	ErrUserInactive = NewForbidden("user is inactive")
-
-	ErrInvalidAccessToken = NewUnauthorized("invalid access token")
-	ErrExpiredAccessToken = NewUnauthorized("access token expired")
-
-	ErrInvalidRefreshToken         = NewUnauthorized("invalid refresh token")
-	ErrExpiredRefreshToken         = NewUnauthorized("refresh token expired")
-	ErrRevokedRefreshToken         = NewUnauthorized("refresh token revoked")
-	ErrInvalidAuthenticationHeader = NewUnauthorized("missing or invalid authorization header")
-
-	ErrInvalidJSONRequest = NewBadRequest("invalid json request")
-)
-
-func ErrInvalidCredentials(message string) *AppError {
-	return NewUnauthorized(message)
+func NewInvalidAccessToken() *AppError {
+	return New(http.StatusUnauthorized, ErrorCodeInvalidAccessToken, errors.New("invalid access token"))
 }
 
-func ErrNotFound(entity string) *AppError {
-	message := fmt.Sprintf("%s not found", entity)
-	return NewNotFound(message)
+func NewExpiredAccessToken() *AppError {
+	return New(http.StatusUnauthorized, ErrorCodeExpiredAccessToken, errors.New("expired access token"))
 }
 
-func ErrDuplicateKey(dup string) *AppError {
-	message := fmt.Sprintf("duplicate key value violates unique constraint %s", dup)
-	return NewConflict(message)
+func NewInvalidRefreshToken() *AppError {
+	return New(http.StatusUnauthorized, ErrorCodeInvalidRefreshToken, errors.New("invalid refresh token"))
 }
 
-func ErrDBOperation(err error) *AppError {
-	return NewInternal("database operation error", err)
+func NewExpiredRefreshToken() *AppError {
+	return New(http.StatusUnauthorized, ErrorCodeExpiredRefreshToken, errors.New("expired refresh token"))
 }
 
-func ErrRequestTimeout(err error) *AppError {
-	return NewInternal("request timeout or canceled", err)
+func NewRevokedRefreshToken() *AppError {
+	return New(http.StatusUnauthorized, ErrorCodeRevokedRefreshToken, errors.New("revoked refresh token"))
 }
 
-func ErrHashPassword(err error) *AppError {
-	return NewInternal("hashing password error", err)
+func NewInvalidAuthHeader() *AppError {
+	return New(http.StatusUnauthorized, ErrorCodeInvalidAuthHeader, errors.New("invalid authorization header"))
 }
 
-func ErrFailedSignAccessToken(err error) *AppError {
-	return NewInternal("failed to sign access token", err)
+func NewInvalidCredentials() *AppError {
+	return New(http.StatusUnauthorized, ErrorCodeInvalidCredentials, errors.New("invalid credentials"))
 }
 
-func ErrFailedGenerateRefreshToken(err error) *AppError {
-	return NewInternal("failed to generate refresh token", err)
+func NewFailedSignAccessToken(err error) *AppError {
+	return New(http.StatusInternalServerError, ErrorCodeFailedSignAccessToken, err)
+}
+
+func NewFailedGenerateRefreshToken(err error) *AppError {
+	return New(http.StatusInternalServerError, ErrorCodeFailedGenerateRefreshToken, err)
+}
+
+func NewClaimNotFound() *AppError {
+	return New(http.StatusNotFound, ErrorCodeClaimNotFound, errors.New("claim not found"))
+}
+
+func NewClaimInvalidStatus() *AppError {
+	return New(http.StatusBadRequest, ErrorCodeClaimInvalidStatus, errors.New("invalid claim status"))
+}
+
+func NewClaimDeleteFailed(err error) *AppError {
+	return New(http.StatusInternalServerError, ErrorCodeClaimDeleteFailed, err)
+}
+
+func NewClaimCreateFailed(err error) *AppError {
+	return New(http.StatusInternalServerError, ErrorCodeClaimCreateFailed, err)
+}
+
+func NewUserNotFound() *AppError {
+	return New(http.StatusNotFound, ErrorCodeUserNotFound, errors.New("user not found"))
+}
+
+func NewUserAlreadyExists() *AppError {
+	return New(http.StatusConflict, ErrorCodeUserAlreadyExists, errors.New("user already exists"))
+}
+
+func NewUserPasswordInvalid() *AppError {
+	return New(http.StatusUnauthorized, ErrorCodeUserPasswordInvalid, errors.New("invalid user password"))
+}
+
+func NewDBOperationError(err error) *AppError {
+	return New(http.StatusInternalServerError, ErrorCodeDBOperation, err)
+}
+
+func NewDBDuplicateKeyError(err error) *AppError {
+	return New(http.StatusConflict, ErrorCodeDuplicateKey, err)
+}
+
+func NewHashPasswordError(err error) *AppError {
+	return New(http.StatusInternalServerError, ErrorCodeHashPassword, err)
 }
