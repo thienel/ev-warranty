@@ -59,6 +59,10 @@ func NewTimeout(err error) *AppError {
 	return New(http.StatusRequestTimeout, ErrorCodeTimeout, err)
 }
 
+func NewBadGateWay(err error) *AppError {
+	return New(http.StatusBadGateway, ErrorCodeBadGateway, err)
+}
+
 func NewInvalidAccessToken() *AppError {
 	return New(http.StatusUnauthorized, ErrorCodeInvalidAccessToken, errors.New("invalid access token"))
 }
@@ -127,10 +131,27 @@ func NewDBOperationError(err error) *AppError {
 	return New(http.StatusInternalServerError, ErrorCodeDBOperation, err)
 }
 
-func NewDBDuplicateKeyError(err error) *AppError {
-	return New(http.StatusConflict, ErrorCodeDuplicateKey, err)
+func NewDBDuplicateKeyError(key string) *AppError {
+	return New(http.StatusConflict, ErrorCodeDuplicateKey, errors.New(fmt.Sprintf("key %s already existed", key)))
 }
 
 func NewHashPasswordError(err error) *AppError {
 	return New(http.StatusInternalServerError, ErrorCodeHashPassword, err)
+}
+
+func NewRefreshTokenNotFound() *AppError {
+	return New(http.StatusNotFound, ErrorCodeRefreshTokenNotFound, errors.New("refresh token not found"))
+}
+
+func NewOfficeNotFound() *AppError {
+	return New(http.StatusNotFound, ErrorCodeOfficeNotFound, errors.New("office not found"))
+}
+func NewClaimItemNotFound() *AppError {
+	return New(http.StatusNotFound, ErrorCodeClaimItemNotFound, errors.New("office not found"))
+}
+func NewClaimHistoryNotFound() *AppError {
+	return New(http.StatusNotFound, ErrorCodeClaimHistoryNotFound, errors.New("office not found"))
+}
+func NewClaimAttachmentNotFound() *AppError {
+	return New(http.StatusNotFound, ErrorCodeClaimAttachmentNotFound, errors.New("office not found"))
 }

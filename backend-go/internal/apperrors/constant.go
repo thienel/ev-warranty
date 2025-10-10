@@ -8,6 +8,7 @@ const (
 	ErrorCodeUnauthorized        = "COMMON_UNAUTHORIZED"
 	ErrorCodeForbidden           = "COMMON_FORBIDDEN"
 	ErrorCodeTimeout             = "COMMON_TIMEOUT"
+	ErrorCodeBadGateway          = "COMMON_BAD_GATEWAY"
 
 	ErrorCodeInvalidAccessToken         = "AUTH_INVALID_ACCESS_TOKEN"
 	ErrorCodeExpiredAccessToken         = "AUTH_EXPIRED_ACCESS_TOKEN"
@@ -18,6 +19,12 @@ const (
 	ErrorCodeInvalidCredentials         = "AUTH_INVALID_CREDENTIALS"
 	ErrorCodeFailedSignAccessToken      = "AUTH_FAILED_SIGN_ACCESS_TOKEN"
 	ErrorCodeFailedGenerateRefreshToken = "AUTH_FAILED_GENERATE_REFRESH_TOKEN"
+
+	ErrorCodeRefreshTokenNotFound    = "REFRESH_TOKEN_NOT_FOUND"
+	ErrorCodeOfficeNotFound          = "OFFICE_NOT_FOUND"
+	ErrorCodeClaimItemNotFound       = "CLAIM_ITEM_NOT_FOUND"
+	ErrorCodeClaimHistoryNotFound    = "CLAIM_HISTORY_NOT_FOUND"
+	ErrorCodeClaimAttachmentNotFound = "CLAIM_ATTACHMENT_NOT_FOUND"
 
 	ErrorCodeClaimNotFound      = "CLAIM_NOT_FOUND"
 	ErrorCodeClaimInvalidStatus = "CLAIM_INVALID_STATUS"
