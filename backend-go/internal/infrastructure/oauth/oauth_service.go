@@ -10,9 +10,8 @@ import (
 )
 
 type OAuthService interface {
-	GenerateAuthURL(providerName string) (string, error)
-	HandleCallback(ctx context.Context, providerName, code, state string) (*providers.UserInfo, error)
-	HandleCallbackError(ctx context.Context, state string)
+	GenerateAuthURL() (string, error)
+	HandleCallback(ctx context.Context, code, state string) (*providers.UserInfo, error)
 }
 
 type oauthService struct {
@@ -29,7 +28,7 @@ func NewOAuthService(provider providers.Provider, userRepo repositories.UserRepo
 	}
 }
 
-func (s *oauthService) GenerateAuthURL(providerName string) (string, error) {
+func (s *oauthService) GenerateAuthURL() (string, error) {
 	state := s.generateState()
 	s.states[state] = true
 
@@ -37,7 +36,7 @@ func (s *oauthService) GenerateAuthURL(providerName string) (string, error) {
 	return authURL, nil
 }
 
-func (s *oauthService) HandleCallback(ctx context.Context, providerName, code, state string) (*providers.UserInfo, error) {
+func (s *oauthService) HandleCallback(ctx context.Context, code, state string) (*providers.UserInfo, error) {
 	if !s.states[state] {
 		return nil, apperrors.NewInvalidCredentials()
 	}
@@ -49,10 +48,6 @@ func (s *oauthService) HandleCallback(ctx context.Context, providerName, code, s
 	}
 
 	return s.provider.GetUserInfo(ctx, token)
-}
-
-func (s *oauthService) HandleCallbackError(ctx context.Context, state string) {
-	delete(s.states, state)
 }
 
 func (s *oauthService) generateState() string {
