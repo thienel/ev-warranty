@@ -5,7 +5,7 @@ using System.Text.RegularExpressions;
 
 namespace CustomerVehicleService.Domain.Entities
 {
-    public class Vehicle : BaseEntity
+    public class Vehicle : BaseEntity, ISoftDeletable
     {
         public string Vin { get; private set; }
         public string LicensePlate { get; private set; }
@@ -14,6 +14,8 @@ namespace CustomerVehicleService.Domain.Entities
         public Guid ModelId { get; private set; }
 
         public DateTime? PurchaseDate { get; private set; }
+        public DateTime? DeletedAt { get; private set; }
+        public bool IsDeleted => DeletedAt.HasValue;
 
         // Navigation properties
         [ForeignKey("CustomerId")]
@@ -63,6 +65,29 @@ namespace CustomerVehicleService.Domain.Entities
                 throw new BusinessRuleViolationException("New customer ID is invalid");
 
             CustomerId = newCustomerId;
+            SetUpdatedAt();
+        }
+
+        // Soft delete mechanism
+        public void Delete()
+        {
+            if (DeletedAt.HasValue)
+            {
+                throw new BusinessRuleViolationException("Vehicle is already deleted");
+            }
+
+            DeletedAt = DateTime.UtcNow;
+            SetUpdatedAt();
+        }
+
+        public void Restore()
+        {
+            if (!DeletedAt.HasValue)
+            {
+                throw new BusinessRuleViolationException("Vehicle is not deleted");
+            }
+
+            DeletedAt = null;
             SetUpdatedAt();
         }
 

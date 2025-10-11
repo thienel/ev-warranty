@@ -83,10 +83,10 @@ namespace CustomerVehicleService.Domain.Entities
             SetUpdatedAt();
         }
 
-        // 
+        // Soft delete mechanism
         public void Delete()
         {
-            if (IsDeleted)
+            if (DeletedAt.HasValue)
                 throw new BusinessRuleViolationException("Customer is already deleted");
 
             DeletedAt = DateTime.UtcNow;
@@ -95,13 +95,14 @@ namespace CustomerVehicleService.Domain.Entities
 
         public void Restore()
         {
-            if (!IsDeleted)
+            if (!DeletedAt.HasValue)
                 throw new BusinessRuleViolationException("Customer is not deleted");
 
             DeletedAt = null;
             SetUpdatedAt();
         }
 
+        // PRIVATE SETTER
         private void SetFirstName(string firstName)
         {
             if (string.IsNullOrWhiteSpace(firstName))
