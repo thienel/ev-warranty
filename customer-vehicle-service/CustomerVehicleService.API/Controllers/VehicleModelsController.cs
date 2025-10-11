@@ -117,5 +117,16 @@ namespace CustomerVehicleService.API.Controllers
 
             return Ok(result);
         }
+
+        // Hard delete Endpoints
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(Guid id)
+        {
+            var result = await _vehicleModelService.DeleteAsync(id);
+            if (!result.IsSuccess)
+                return BadRequest(result);
+
+            return Ok(result);
+        }
     }
 }

@@ -131,6 +131,27 @@ namespace CustomerVehicleService.API.Controllers
 
             return Ok(result);
         }
-    }
 
+        // Soft delete Endpoints
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> SoftDelete(Guid id)
+        {
+            var result = await _customerService.SoftDeleteAsync(id);
+            if (!result.IsSuccess)
+                return BadRequest(result);
+
+            return Ok(result);
+        }
+
+        [HttpPost("{id}/restore")]
+        public async Task<IActionResult> Restore(Guid id)
+        {
+            var result = await _customerService.RestoreAsync(id);
+            if (!result.IsSuccess)
+                return BadRequest(result);
+
+            return Ok(result);
+        }
+
+    }
 }
