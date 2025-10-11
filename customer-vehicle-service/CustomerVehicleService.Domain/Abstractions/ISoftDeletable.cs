@@ -9,7 +9,7 @@ namespace CustomerVehicleService.Domain.Abstractions
     public interface ISoftDeletable
     {
         DateTime? DeletedAt { get; }
-        bool IsDeleted { get; }
+        //bool IsDeleted { get; }
         void Delete();
         void Restore();
     }
