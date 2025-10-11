@@ -17,6 +17,6 @@ namespace CustomerVehicleService.Application.Interfaces.Data
 
         // Soft delete operations
         Task<Customer?> GetByIdIncludingDeletedAsync(Guid id);
-        Task<IEnumerable<Customer>> GetDeletedCustomersAsync(Guid id);
+        Task<IEnumerable<Customer>> GetDeletedCustomersAsync();
     }
 }

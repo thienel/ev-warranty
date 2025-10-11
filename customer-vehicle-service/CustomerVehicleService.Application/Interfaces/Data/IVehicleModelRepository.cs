@@ -1,4 +1,5 @@
 ﻿using CustomerVehicleService.Domain.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace CustomerVehicleService.Application.Interfaces.Data
 {
@@ -10,5 +11,16 @@ namespace CustomerVehicleService.Application.Interfaces.Data
         Task<IEnumerable<VehicleModel>> GetByBrandAsync(string brand);
         Task<IEnumerable<VehicleModel>> SearchAsync(string searchTerm);
         Task<IEnumerable<string>> GetAllBrandsAsync();
+
+        // Hard delete assurance check
+        Task<bool> HasActiveVehiclesAsync(Guid modelId);
+
+        Task<int> GetActiveVehicleCountAsync(Guid modelId);
+        // thong nhat su dung truy van xe active/inactive - non-deleted/deleted
+        // VehicleRepo: GetByModelIdAsync GetDeletedVehicleAsync GetByIdIncludingDeletedAsync
+        //Task<IEnumerable<Vehicle>> GetActiveVehicleAsync(Guid modelId);
+        //Task<IEnumerable<VehicleModel>> GetInactiveVehicleAsync(Guid modelId); // relate to restore procudure
+
+        // *u: count feat later due to needed
     }
 }

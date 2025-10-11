@@ -17,5 +17,9 @@ namespace CustomerVehicleService.Application.Interfaces.Data
         Task<IEnumerable<Vehicle>> GetByModelIdAsync(Guid modelId);
         Task<Vehicle?> GetWithDetailsAsync(Guid vehicleId);
         Task<IEnumerable<Vehicle>> SearchAsync(string searchTerm);
+
+        // Soft delete operations
+        Task<Vehicle?> GetByIdIncludingDeletedAsync(Guid id);
+        Task<IEnumerable<Vehicle>> GetDeletedVehicleAsync();
     }
 }

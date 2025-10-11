@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static CustomerVehicleService.Application.DTOs.CustomerDto;
 using static CustomerVehicleService.Application.DTOs.VehicleDto;
 
 namespace CustomerVehicleService.Application.Interfaces
@@ -24,5 +25,9 @@ namespace CustomerVehicleService.Application.Interfaces
         Task<BaseResponseDto<VehicleResponse>> UpdateAsync(Guid id, UpdateVehicleRequest request);
         Task<BaseResponseDto<VehicleResponse>> UpdateLicensePlateAsync(Guid id, UpdateLicensePlateCommand command);
         Task<BaseResponseDto<VehicleResponse>> TransferOwnershipAsync(Guid id, TransferVehicleCommand command);
+
+        // Soft delete operations
+        Task<BaseResponseDto<VehicleResponse>> SoftDeleteAsync(Guid id);
+        Task<BaseResponseDto<VehicleResponse>> RestoreAsync(Guid id);
     }
 }

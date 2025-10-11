@@ -1,4 +1,5 @@
 ﻿using CustomerVehicleService.Application.DTOs;
+using static CustomerVehicleService.Application.DTOs.CustomerDto;
 using static CustomerVehicleService.Application.DTOs.VehicleModelDto;
 
 namespace CustomerVehicleService.Application.Interfaces
@@ -7,7 +8,6 @@ namespace CustomerVehicleService.Application.Interfaces
     {
         Task<BaseResponseDto<VehicleModelResponse>> CreateAsync(CreateVehicleModelRequest request);
 
-        // Read
         Task<BaseResponseDto<VehicleModelResponse>> GetByIdAsync(Guid id);
         //Task<BaseResponseDto<VehicleModelWithStatsResponse>> GetWithStatsAsync(Guid id);
         Task<BaseResponseDto<IEnumerable<VehicleModelResponse>>> GetAllAsync();
@@ -16,7 +16,9 @@ namespace CustomerVehicleService.Application.Interfaces
         Task<BaseResponseDto<IEnumerable<string>>> GetAllBrandsAsync();
         Task<BaseResponseDto<IEnumerable<VehicleModelResponse>>> SearchAsync(string searchTerm);
 
-        // Update
         Task<BaseResponseDto<VehicleModelResponse>> UpdateAsync(Guid id, UpdateVehicleModelRequest request);
+
+        // Hard delete operations
+        Task<BaseResponseDto> DeleteAsync(Guid id);
     }
 }

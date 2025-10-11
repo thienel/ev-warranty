@@ -17,5 +17,9 @@ namespace CustomerVehicleService.Application.Interfaces
         Task<BaseResponseDto<CustomerResponse>> UpdateEmailAsync(Guid id, string email);
         Task<BaseResponseDto<CustomerResponse>> UpdatePhoneNumberAsync(Guid id, string phoneNumber);
         Task<BaseResponseDto<CustomerResponse>> UpdateAddressAsync(Guid id, string address);
+
+        // Soft delete operations
+        Task<BaseResponseDto<CustomerResponse>> SoftDeleteAsync(Guid id);
+        Task<BaseResponseDto<CustomerResponse>> RestoreAsync(Guid id);
     }
 }
