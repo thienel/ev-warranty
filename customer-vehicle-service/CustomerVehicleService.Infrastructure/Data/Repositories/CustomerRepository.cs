@@ -12,13 +12,13 @@ namespace CustomerVehicleService.Infrastructure.Data.Repositories
         public async Task<Customer?> GetByEmailAsync(string email)
         {
             return await _dbSet
-                .Where(c => !c.IsDeleted)
+                .Where(c => c.DeletedAt == null)
                 .FirstOrDefaultAsync(c => c.Email.ToLower() == email.ToLower());
         }
 
         public async Task<bool> EmailExistsAsync(string email, Guid? excludeCustomerId = null)
         {
-            var query = _dbSet.Where(c => !c.IsDeleted && c.Email.ToLower() == email.ToLower());
+            var query = _dbSet.Where(c => c.DeletedAt == null && c.Email.ToLower() == email.ToLower());
 
             if (excludeCustomerId.HasValue)
             {
@@ -31,7 +31,7 @@ namespace CustomerVehicleService.Infrastructure.Data.Repositories
         public async Task<Customer?> GetWithVehiclesAsync(Guid customerId)
         {
             return await _dbSet
-                .Where(c => !c.IsDeleted)
+                .Where(c => c.DeletedAt == null)
                 .Include(c => c.Vehicles)
                     .ThenInclude(v => v.Model)
                 .FirstOrDefaultAsync(c => c.Id == customerId);
@@ -40,11 +40,11 @@ namespace CustomerVehicleService.Infrastructure.Data.Repositories
         public async Task<IEnumerable<Customer>> SearchAsync(string searchTerm)
         {
             if (string.IsNullOrWhiteSpace(searchTerm))
-                return await _dbSet.Where(c => !c.IsDeleted).ToListAsync();
+                return await _dbSet.Where(c => c.DeletedAt == null).ToListAsync();
 
             var term = searchTerm.ToLower();
             return await _dbSet
-                .Where(c => !c.IsDeleted &&
+                .Where(c => c.DeletedAt == null &&
                        (c.FirstName.ToLower().Contains(term) ||
                         c.LastName.ToLower().Contains(term) ||
                         c.Email.ToLower().Contains(term) ||
@@ -52,6 +52,7 @@ namespace CustomerVehicleService.Infrastructure.Data.Repositories
                 .ToListAsync();
         }
 
+        // Soft Delete
         public async Task<Customer?> GetByIdIncludingDeletedAsync(Guid id)
         {
             return await _dbSet
@@ -59,11 +60,11 @@ namespace CustomerVehicleService.Infrastructure.Data.Repositories
                 .FirstOrDefaultAsync(c => c.Id == id);
         }
 
-        public async Task<IEnumerable<Customer>> GetDeletedCustomersAsync(Guid id)
+        public async Task<IEnumerable<Customer>> GetDeletedCustomersAsync()
         {
             return await _dbSet
                 .IgnoreQueryFilters()
-                .Where(c => c.IsDeleted)
+                .Where(c => c.DeletedAt != null)
                 .ToListAsync();
         }
 
@@ -71,14 +72,14 @@ namespace CustomerVehicleService.Infrastructure.Data.Repositories
         public override async Task<Customer?> GetByIdAsync(Guid id)
         {
             return await _dbSet
-                .Where(c => !c.IsDeleted)
+                .Where(c => c.DeletedAt == null)
                 .FirstOrDefaultAsync(c => c.Id == id);
         }
 
         public override async Task<IEnumerable<Customer>> GetAllAsync()
         {
             return await _dbSet
-                .Where(c => !c.IsDeleted)
+                .Where(c => c.DeletedAt == null)
                 .ToListAsync();
         }
     }

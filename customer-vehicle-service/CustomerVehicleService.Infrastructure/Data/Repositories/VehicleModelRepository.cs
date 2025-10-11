@@ -51,7 +51,7 @@ namespace CustomerVehicleService.Infrastructure.Data.Repositories
             return await _dbSet
                 .Where(vm =>
                     vm.Brand.ToLower().Contains(term) ||
-                    vm.ModelName.ToLower().Contains(term))
+                    vm.ModelName.ToLower().Contains(term)) // *u: add filter year
                 .OrderBy(vm => vm.Brand)
                 .ThenBy(vm => vm.ModelName)
                 .ThenBy(vm => vm.Year)
@@ -65,6 +65,20 @@ namespace CustomerVehicleService.Infrastructure.Data.Repositories
                 .Distinct()
                 .OrderBy(b => b)
                 .ToListAsync();
+        }
+
+        public async Task<bool> HasActiveVehiclesAsync(Guid modelId)
+        {
+            return await _context.Set<Vehicle>()
+                .Where(v => v.DeletedAt == null)
+                .AnyAsync(v => v.ModelId  == modelId);
+        }
+
+        public async Task<int> GetActiveVehicleCountAsync(Guid modelId)
+        {
+            return await _context.Set<Vehicle>()
+                .Where(v => v.DeletedAt == null)
+                .CountAsync(v => v.ModelId == modelId);
         }
     }
 }
