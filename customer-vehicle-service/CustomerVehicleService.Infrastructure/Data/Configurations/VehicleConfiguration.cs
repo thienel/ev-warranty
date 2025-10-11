@@ -57,6 +57,13 @@ namespace CustomerVehicleService.Infrastructure.Data.Configurations
                 .HasColumnType("datetime2")
                 .IsRequired(false);
 
+            builder.Property(v => v.DeletedAt)
+                .HasColumnName("deleted_at")
+                .HasColumnType("datetime2")
+                .IsRequired(false);
+
+            builder.Ignore(v => v.IsDeleted);
+
             // Indexes
             builder.HasIndex(v => v.Vin)
                 .IsUnique()
@@ -71,6 +78,8 @@ namespace CustomerVehicleService.Infrastructure.Data.Configurations
             builder.HasIndex(v => v.LicensePlate)
                 .HasDatabaseName("ix_vehicles_license_plate");
 
+            builder.HasIndex(v => v.DeletedAt);
+
             // Relationships
             builder.HasOne(v => v.Customer)
                 .WithMany(c => c.Vehicles)
@@ -81,6 +90,8 @@ namespace CustomerVehicleService.Infrastructure.Data.Configurations
                 .WithMany(vm => vm.Vehicles)
                 .HasForeignKey(v => v.ModelId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            builder.HasQueryFilter(v => v.DeletedAt == null);
         }
     }
 }
