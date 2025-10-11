@@ -478,5 +478,98 @@ namespace CustomerVehicleService.Application.Services
                 };
             }
         }
+
+        // SOFT DELETE OPERATIONS
+        public async Task<BaseResponseDto<VehicleResponse>> SoftDeleteAsync(Guid id)
+        {
+            try
+            {
+                var vehicle = await _unitOfWork.Vehicles.GetByIdAsync(id);
+                if (vehicle == null)
+                {
+                    return new BaseResponseDto<VehicleResponse>
+                    {
+                        IsSuccess = false,
+                        Message = $"Vehicle with ID '{id}' not found",
+                        ErrorCode = "NOT_FOUND"
+                    };
+                }
+
+                vehicle.Delete();
+                _unitOfWork.Vehicles.Update(vehicle);
+                await _unitOfWork.SaveChangesAsync();
+
+                return new BaseResponseDto<VehicleResponse>
+                {
+                    IsSuccess = true,
+                    Message = "Vehicle soft deleted successfully",
+                    Data = vehicle.ToResponse()
+                };
+            }
+            catch (BusinessRuleViolationException ex)
+            {
+                return new BaseResponseDto<VehicleResponse>
+                {
+                    IsSuccess = false,
+                    Message = ex.Message,
+                    ErrorCode = ex.ErrorCode
+                };
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponseDto<VehicleResponse>
+                {
+                    IsSuccess = false,
+                    Message = "An error occurred while deleting vehicle",
+                    ErrorCode = "INTERNAL_ERROR"
+                };
+            }
+        }
+
+        public async Task<BaseResponseDto<VehicleResponse>> RestoreAsync(Guid id)
+        {
+            try
+            {
+                var vehicle = await _unitOfWork.Vehicles.GetByIdIncludingDeletedAsync(id);
+                if (vehicle == null)
+                {
+                    return new BaseResponseDto<VehicleResponse>
+                    {
+                        IsSuccess = false,
+                        Message = $"Vehicle with ID '{id}' not found",
+                        ErrorCode = "NOT_FOUND"
+                    };
+                }
+
+                vehicle.Restore();
+                _unitOfWork.Vehicles.Update(vehicle);
+                await _unitOfWork.SaveChangesAsync();
+
+                return new BaseResponseDto<VehicleResponse>
+                {
+                    IsSuccess = true,
+                    Message = "Vehicle restored successfully",
+                    Data = vehicle.ToResponse()
+                };
+            }
+            catch (BusinessRuleViolationException ex)
+            {
+                return new BaseResponseDto<VehicleResponse>
+                {
+                    IsSuccess = false,
+                    Message = ex.Message,
+                    ErrorCode = ex.ErrorCode
+                };
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponseDto<VehicleResponse>
+                {
+                    IsSuccess = false,
+                    Message = "An error occurred while restoring vehicle",
+                    ErrorCode = "INTERNAL_ERROR"
+                };
+            }
+        }
     }
 }

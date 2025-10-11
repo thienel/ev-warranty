@@ -401,5 +401,98 @@ namespace CustomerVehicleService.Application.Services
                 };
             }
         }
+
+        // SOFT DELETE OPERATIONS
+        public async Task<BaseResponseDto<CustomerResponse>> SoftDeleteAsync(Guid id)
+        {
+            try
+            {
+                var customer = await _unitOfWork.Customers.GetByIdAsync(id);
+                if (customer == null)
+                {
+                    return new BaseResponseDto<CustomerResponse>
+                    {
+                        IsSuccess = false,
+                        Message = $"Customer with ID '{id}' not found",
+                        ErrorCode = "NOT_FOUND"
+                    };
+                }
+
+                customer.Delete(); // soft delete by set DeletedAt
+                _unitOfWork.Customers.Update(customer);
+                await _unitOfWork.SaveChangesAsync();
+
+                return new BaseResponseDto<CustomerResponse>
+                {
+                    IsSuccess = true,
+                    Message = "Customer soft deleted successfully",
+                    Data = customer.ToResponse()
+                };
+            }
+            catch (BusinessRuleViolationException ex)
+            {
+                return new BaseResponseDto<CustomerResponse>
+                {
+                    IsSuccess = false,
+                    Message = ex.Message,
+                    ErrorCode = ex.ErrorCode
+                };
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponseDto<CustomerResponse>
+                {
+                    IsSuccess = false,
+                    Message = "An error occurred while deleting customer",
+                    ErrorCode = "INTERNAL_ERROR"
+                };
+            }
+        }
+
+        public async Task<BaseResponseDto<CustomerResponse>> RestoreAsync(Guid id)
+        {
+            try
+            {
+                var customer = await _unitOfWork.Customers.GetByIdIncludingDeletedAsync(id);
+                if (customer == null)
+                {
+                    return new BaseResponseDto<CustomerResponse>
+                    {
+                        IsSuccess = false,
+                        Message = $"Customer with ID '{id}' not found",
+                        ErrorCode = "NOT_FOUND"
+                    };
+                }
+
+                customer.Restore();
+                _unitOfWork.Customers.Update(customer);
+                await _unitOfWork.SaveChangesAsync();
+
+                return new BaseResponseDto<CustomerResponse>
+                {
+                    IsSuccess = true,
+                    Message = "Customer restored successfully",
+                    Data = customer.ToResponse()
+                };
+            }
+            catch (BusinessRuleViolationException ex)
+            {
+                return new BaseResponseDto<CustomerResponse>
+                {
+                    IsSuccess = false,
+                    Message = ex.Message,
+                    ErrorCode = ex.ErrorCode
+                };
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponseDto<CustomerResponse>
+                {
+                    IsSuccess = false,
+                    Message = "An error occurred while restoring customer",
+                    ErrorCode = "INTERNAL_ERROR"
+                };
+            }
+        }
     }
 }

@@ -295,5 +295,56 @@ namespace CustomerVehicleService.Application.Services
                 };
             }
         }
+
+        // HARD DELETE OPERATION
+        public async Task<BaseResponseDto> DeleteAsync(Guid id)
+        {
+            try
+            {
+                var model = await _unitOfWork.VehicleModels.GetByIdAsync(id);
+                if (model == null)
+                {
+                    return new BaseResponseDto
+                    {
+                        IsSuccess = false,
+                        Message = $"Vehicle model with ID '{id}' not found",
+                        ErrorCode = "NOT_FOUND"
+                    };
+                }
+
+                // Check if any active vehicles reference this model
+                var hasVehicles = await _unitOfWork.VehicleModels.HasActiveVehiclesAsync(id);
+                if (hasVehicles)
+                {
+                    var count = await _unitOfWork.VehicleModels.GetActiveVehicleCountAsync(id);
+                    return new BaseResponseDto
+                    {
+                        IsSuccess = false,
+                        Message = $"Cannot delete vehicle model. {count} active vehicle(s) are using this model.",
+                        ErrorCode = "MODEL_IN_USE"
+                    };
+                }
+
+                _unitOfWork.VehicleModels.Remove(model);
+                await _unitOfWork.SaveChangesAsync();
+
+                return new BaseResponseDto
+                {
+                    IsSuccess = true,
+                    Message = "Vehicle model deleted successfully",
+                    ErrorCode = "null"
+                    //Data = true //should show which have been permanently deleted
+                };
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponseDto
+                {
+                    IsSuccess = false,
+                    Message = "An error occurred while deleting vehicle model",
+                    ErrorCode = "INTERNAL_ERROR"
+                };
+            }
+        }
     }
 }
