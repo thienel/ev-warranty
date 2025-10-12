@@ -14,6 +14,8 @@ const (
 
 	ClaimItemTypeReplacement = "REPLACEMENT"
 	ClaimItemTypeRepair      = "REPAIR"
+
+	ClaimItemRequirePerClaim = 1
 )
 
 type ClaimItem struct {
