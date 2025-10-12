@@ -35,10 +35,6 @@ func NewInternalServerError(err error) *AppError {
 	return New(http.StatusInternalServerError, ErrorCodeInternalServerError, err)
 }
 
-func NewBadGateWay(err error) *AppError {
-	return New(http.StatusBadGateway, ErrorCodeBadGateway, err)
-}
-
 func NewInvalidJsonRequest() *AppError {
 	return New(http.StatusBadRequest, ErrorCodeInvalidJsonRequest, errors.New("invalid json request"))
 }
@@ -139,8 +135,8 @@ func NewUnexpectedSigningMethod(method any) *AppError {
 	return New(http.StatusUnauthorized, ErrorCodeUnexpectedSigningMethod, errors.New(fmt.Sprintf("unexpected signing method: %v", method)))
 }
 
-func NewInvalidClaimStatus() *AppError {
-	return New(http.StatusConflict, ErrorCodeClaimInvalidStatus, errors.New("invalid claim status"))
+func NewInvalidClaimAction() *AppError {
+	return New(http.StatusConflict, ErrorCodeInvalidClaimAction, errors.New("invalid claim action"))
 }
 
 func NewNotAllowUpdateClaim() *AppError {
