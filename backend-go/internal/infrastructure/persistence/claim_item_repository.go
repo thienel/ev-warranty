@@ -68,6 +68,17 @@ func (c *claimItemRepository) UpdateStatus(tx application.Transaction, id uuid.U
 	return nil
 }
 
+func (c *claimItemRepository) SumCostByClaimID(tx application.Transaction, claimID uuid.UUID) (float64, error) {
+	db := tx.GetTx().(*gorm.DB)
+	var totalCost float64
+	if err := db.Model(&entities.ClaimItem{}).Where("claim_id = ? AND status = 'APPROVED'", claimID).
+		Select("COALESCE(SUM(cost), 0)").Scan(&totalCost).Error; err != nil {
+
+		return 0, apperrors.NewDBOperationError(err)
+	}
+	return totalCost, nil
+}
+
 func (c *claimItemRepository) FindByID(ctx context.Context, id uuid.UUID) (*entities.ClaimItem, error) {
 	var item entities.ClaimItem
 	if err := c.db.WithContext(ctx).Where("id = ?", id).First(&item).Error; err != nil {
@@ -99,18 +110,6 @@ func (c *claimItemRepository) CountByClaimID(ctx context.Context, claimID uuid.U
 		return 0, apperrors.NewDBOperationError(err)
 	}
 	return count, nil
-}
-
-func (c *claimItemRepository) SumCostByClaimID(ctx context.Context, claimID uuid.UUID) (float64, error) {
-	var totalCost float64
-	if err := c.db.WithContext(ctx).
-		Model(&entities.ClaimItem{}).
-		Where("claim_id = ?", claimID).
-		Select("COALESCE(SUM(cost), 0)").
-		Scan(&totalCost).Error; err != nil {
-		return 0, apperrors.NewDBOperationError(err)
-	}
-	return totalCost, nil
 }
 
 func (c *claimItemRepository) FindByStatus(ctx context.Context, claimID uuid.UUID, status string) ([]*entities.ClaimItem, error) {
