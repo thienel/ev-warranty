@@ -76,19 +76,17 @@ func (s *claimItemService) GetByClaimID(ctx context.Context, claimID uuid.UUID) 
 
 func (s *claimItemService) Create(tx application.Transaction, claimID uuid.UUID,
 	cmd *CreateClaimItemCommand) (*entities.ClaimItem, error) {
+	defer rollbackOrLog(tx)
 
 	_, err := s.claimRepo.FindByID(tx.GetCtx(), claimID)
 	if err != nil {
-		_ = tx.Rollback()
 		return nil, err
 	}
 
 	if !entities.IsValidClaimItemStatus(cmd.Status) {
-		_ = tx.Rollback()
 		return nil, apperrors.NewInvalidCredentials()
 	}
 	if !entities.IsValidClaimItemType(cmd.Type) {
-		_ = tx.Rollback()
 		return nil, apperrors.NewInvalidCredentials()
 	}
 
@@ -96,7 +94,7 @@ func (s *claimItemService) Create(tx application.Transaction, claimID uuid.UUID,
 		cmd.IssueDescription, cmd.Status, cmd.Type, cmd.Cost)
 	err = s.itemRepo.Create(tx, item)
 	if err != nil {
-		return nil, rollbackOnErr(tx, err)
+		return nil, err
 	}
 
 	return item, commitOrLog(tx)
@@ -104,33 +102,30 @@ func (s *claimItemService) Create(tx application.Transaction, claimID uuid.UUID,
 
 func (s *claimItemService) Update(tx application.Transaction, claimID, itemID uuid.UUID, cmd *UpdateClaimItemCommand) error {
 	claim, err := s.claimRepo.FindByID(tx.GetCtx(), claimID)
+	defer rollbackOrLog(tx)
+
 	if err != nil {
-		_ = tx.Rollback()
 		return err
 	}
 
 	switch claim.Status {
 	case entities.ClaimStatusDraft, entities.ClaimStatusRequestInfo:
 	default:
-		_ = tx.Rollback()
 		return apperrors.NewNotAllowUpdateClaim()
 	}
 
 	item, err := s.itemRepo.FindByID(tx.GetCtx(), itemID)
 	if err != nil {
-		_ = tx.Rollback()
 		return err
 	}
 
 	switch item.Status {
 	case entities.ClaimItemStatusApproved, entities.ClaimItemStatusRejected:
 	default:
-		_ = tx.Rollback()
 		return apperrors.NewNotAllowUpdateClaim()
 	}
 
 	if !entities.IsValidClaimItemType(cmd.Type) {
-		_ = tx.Rollback()
 		return apperrors.NewInvalidCredentials()
 	}
 	item.IssueDescription = cmd.IssueDescription
@@ -139,7 +134,7 @@ func (s *claimItemService) Update(tx application.Transaction, claimID, itemID uu
 
 	err = s.itemRepo.Update(tx, item)
 	if err != nil {
-		return rollbackOnErr(tx, err)
+		return err
 	}
 
 	return commitOrLog(tx)
@@ -147,19 +142,19 @@ func (s *claimItemService) Update(tx application.Transaction, claimID, itemID uu
 
 func (s *claimItemService) HardDelete(tx application.Transaction, claimID, itemID uuid.UUID) error {
 	claim, err := s.claimRepo.FindByID(tx.GetCtx(), claimID)
+	defer rollbackOrLog(tx)
+
 	if err != nil {
-		_ = tx.Rollback()
 		return err
 	}
 
 	if claim.Status != entities.ClaimStatusDraft {
-		_ = tx.Rollback()
 		return apperrors.NewNotAllowDeleteClaim()
 	}
 
 	err = s.itemRepo.HardDelete(tx, itemID)
 	if err != nil {
-		return rollbackOnErr(tx, err)
+		return err
 	}
 
 	return commitOrLog(tx)
@@ -167,19 +162,19 @@ func (s *claimItemService) HardDelete(tx application.Transaction, claimID, itemI
 
 func (s *claimItemService) Approve(tx application.Transaction, claimID, itemID uuid.UUID) error {
 	claim, err := s.claimRepo.FindByID(tx.GetCtx(), claimID)
+	defer rollbackOrLog(tx)
+
 	if err != nil {
-		_ = tx.Rollback()
 		return err
 	}
 
 	if claim.Status != entities.ClaimStatusReviewing {
-		_ = tx.Rollback()
 		return apperrors.NewNotAllowUpdateClaim()
 	}
 
 	err = s.itemRepo.UpdateStatus(tx, itemID, entities.ClaimStatusApproved)
 	if err != nil {
-		return rollbackOnErr(tx, err)
+		return err
 	}
 
 	return commitOrLog(tx)
@@ -187,19 +182,19 @@ func (s *claimItemService) Approve(tx application.Transaction, claimID, itemID u
 
 func (s *claimItemService) Reject(tx application.Transaction, claimID, itemID uuid.UUID) error {
 	claim, err := s.claimRepo.FindByID(tx.GetCtx(), claimID)
+	defer rollbackOrLog(tx)
+
 	if err != nil {
-		_ = tx.Rollback()
 		return err
 	}
 
 	if claim.Status != entities.ClaimStatusReviewing {
-		_ = tx.Rollback()
 		return apperrors.NewNotAllowUpdateClaim()
 	}
 
 	err = s.itemRepo.UpdateStatus(tx, itemID, entities.ClaimStatusRejected)
 	if err != nil {
-		return rollbackOnErr(tx, err)
+		return err
 	}
 
 	return commitOrLog(tx)

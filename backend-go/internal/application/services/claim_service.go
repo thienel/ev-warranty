@@ -130,49 +130,50 @@ func (s *claimService) GetAll(ctx context.Context, filters ClaimFilters, paginat
 
 func (s *claimService) Create(tx application.Transaction, cmd *CreateClaimCommand) (*entities.Claim, error) {
 	claim := entities.NewClaim(cmd.VehicleID, cmd.CustomerID, cmd.Description, entities.ClaimStatusDraft, uuid.Nil)
+	defer rollbackOrLog(tx)
 
 	if err := s.claimRepo.Create(tx, claim); err != nil {
-		return nil, rollbackOnErr(tx, err)
+		return nil, err
 	}
 
 	history := entities.NewClaimHistory(claim.ID, entities.ClaimStatusDraft, cmd.CreatorID)
 	if err := s.historyRepo.Create(tx, history); err != nil {
-		return nil, rollbackOnErr(tx, err)
+		return nil, err
 	}
 
 	return claim, commitOrLog(tx)
 }
 
 func (s *claimService) Update(tx application.Transaction, id uuid.UUID, cmd *UpdateClaimCommand) error {
+	defer rollbackOrLog(tx)
+
 	claim, err := s.claimRepo.FindByID(tx.GetCtx(), id)
 	if err != nil {
-		_ = tx.Rollback()
 		return err
 	}
 
 	if claim.Status != entities.ClaimStatusDraft && claim.Status != entities.ClaimStatusRequestInfo {
-		_ = tx.Rollback()
 		return apperrors.NewNotAllowUpdateClaim()
 	}
 
 	claim.Description = cmd.Description
 
 	if err = s.claimRepo.Update(tx, claim); err != nil {
-		return rollbackOnErr(tx, err)
+		return err
 	}
 
 	return commitOrLog(tx)
 }
 
 func (s *claimService) Delete(tx application.Transaction, id uuid.UUID) error {
+	defer rollbackOrLog(tx)
+
 	claim, err := s.claimRepo.FindByID(tx.GetCtx(), id)
 	if err != nil {
-		_ = tx.Rollback()
 		return err
 	}
 
 	if claim.Status != entities.ClaimStatusDraft && claim.Status != entities.ClaimStatusCancelled {
-		_ = tx.Rollback()
 		return apperrors.NewNotAllowDeleteClaim()
 	}
 
@@ -186,12 +187,12 @@ func (s *claimService) Delete(tx application.Transaction, id uuid.UUID) error {
 
 		for _, deleteFn := range softDeleters {
 			if err = deleteFn(tx, id); err != nil {
-				return rollbackOnErr(tx, err)
+				return err
 			}
 		}
 	} else if claim.Status == entities.ClaimStatusDraft {
 		if err = s.claimRepo.HardDelete(tx, id); err != nil {
-			return rollbackOnErr(tx, err)
+			return err
 		}
 	}
 
@@ -199,6 +200,17 @@ func (s *claimService) Delete(tx application.Transaction, id uuid.UUID) error {
 }
 
 func (s *claimService) Submit(tx application.Transaction, id uuid.UUID) error {
+	defer rollbackOrLog(tx)
+
+	claim, err := s.claimRepo.FindByID(tx.GetCtx(), id)
+	if err != nil {
+		return err
+	}
+
+	if !entities.IsValidClaimStatusTransition(claim.Status, entities.ClaimStatusSubmitted) {
+		return apperrors.NewInvalidClaimAction()
+	}
+
 	// TODO
 	return nil
 }

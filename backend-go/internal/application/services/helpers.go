@@ -1,17 +1,18 @@
 package services
 
 import (
+	"database/sql"
+	"errors"
 	"ev-warranty-go/internal/apperrors"
 	"ev-warranty-go/internal/application"
 	"log"
 	"net/url"
 )
 
-func rollbackOnErr(tx application.Transaction, originalErr error) error {
-	if err := tx.Rollback(); err != nil {
-		log.Printf("[TX ROLLBACK FAILED] original error: %v, rollback error: %v", originalErr, err)
+func rollbackOrLog(tx application.Transaction) {
+	if err := tx.Rollback(); err != nil && !errors.Is(err, sql.ErrTxDone) {
+		log.Printf("[TX ROLLBACK FAILED] rollback error: %v", err)
 	}
-	return originalErr
 }
 
 func commitOrLog(tx application.Transaction) error {

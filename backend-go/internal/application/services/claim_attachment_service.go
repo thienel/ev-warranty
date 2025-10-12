@@ -58,26 +58,24 @@ func (s *claimAttachmentService) GetByClaimID(ctx context.Context, claimID uuid.
 
 func (s *claimAttachmentService) Create(tx application.Transaction, claimID uuid.UUID,
 	cmd *CreateAttachmentCommand) (*entities.ClaimAttachment, error) {
+	defer rollbackOrLog(tx)
 
 	_, err := s.claimRepo.FindByID(tx.GetCtx(), claimID)
 	if err != nil {
-		_ = tx.Rollback()
 		return nil, err
 	}
 
 	if !entities.IsValidAttachmentType(cmd.Type) {
-		_ = tx.Rollback()
 		return nil, apperrors.NewInvalidCredentials()
 	}
 	if !IsValidURL(cmd.URL) {
-		_ = tx.Rollback()
 		return nil, apperrors.NewInvalidCredentials()
 	}
 
 	attachment := entities.NewClaimAttachment(claimID, cmd.Type, cmd.URL)
 	err = s.attachRepo.Create(tx, attachment)
 	if err != nil {
-		return nil, rollbackOnErr(tx, err)
+		return nil, err
 	}
 
 	return attachment, commitOrLog(tx)
@@ -85,18 +83,18 @@ func (s *claimAttachmentService) Create(tx application.Transaction, claimID uuid
 
 func (s *claimAttachmentService) HardDelete(tx application.Transaction, claimID, attachmentID uuid.UUID) error {
 	claim, err := s.claimRepo.FindByID(tx.GetCtx(), claimID)
+	defer rollbackOrLog(tx)
+
 	if err != nil {
-		_ = tx.Rollback()
 		return err
 	}
 
 	if claim.Status != entities.ClaimStatusDraft {
-		_ = tx.Rollback()
 		return apperrors.NewNotAllowDeleteClaim()
 	}
 	err = s.attachRepo.HardDelete(tx, attachmentID)
 	if err != nil {
-		return rollbackOnErr(tx, err)
+		return err
 	}
 
 	return commitOrLog(tx)
