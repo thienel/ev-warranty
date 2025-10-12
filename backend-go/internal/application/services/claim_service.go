@@ -146,10 +146,12 @@ func (s *claimService) Create(tx application.Transaction, cmd *CreateClaimComman
 func (s *claimService) Update(tx application.Transaction, id uuid.UUID, cmd *UpdateClaimCommand) error {
 	claim, err := s.claimRepo.FindByID(tx.GetCtx(), id)
 	if err != nil {
+		_ = tx.Rollback()
 		return err
 	}
 
 	if claim.Status != entities.ClaimStatusDraft && claim.Status != entities.ClaimStatusRequestInfo {
+		_ = tx.Rollback()
 		return apperrors.NewNotAllowUpdateClaim()
 	}
 
@@ -165,10 +167,12 @@ func (s *claimService) Update(tx application.Transaction, id uuid.UUID, cmd *Upd
 func (s *claimService) Delete(tx application.Transaction, id uuid.UUID) error {
 	claim, err := s.claimRepo.FindByID(tx.GetCtx(), id)
 	if err != nil {
+		_ = tx.Rollback()
 		return err
 	}
 
 	if claim.Status != entities.ClaimStatusDraft && claim.Status != entities.ClaimStatusCancelled {
+		_ = tx.Rollback()
 		return apperrors.NewNotAllowDeleteClaim()
 	}
 

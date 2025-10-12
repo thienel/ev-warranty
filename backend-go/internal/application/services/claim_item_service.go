@@ -84,9 +84,11 @@ func (s *claimItemService) Create(tx application.Transaction, claimID uuid.UUID,
 	}
 
 	if !entities.IsValidClaimItemStatus(cmd.Status) {
+		_ = tx.Rollback()
 		return nil, apperrors.NewInvalidCredentials()
 	}
 	if !entities.IsValidClaimItemType(cmd.Type) {
+		_ = tx.Rollback()
 		return nil, apperrors.NewInvalidCredentials()
 	}
 
@@ -110,6 +112,7 @@ func (s *claimItemService) Update(tx application.Transaction, claimID, itemID uu
 	switch claim.Status {
 	case entities.ClaimStatusDraft, entities.ClaimStatusRequestInfo:
 	default:
+		_ = tx.Rollback()
 		return apperrors.NewNotAllowUpdateClaim()
 	}
 
@@ -122,10 +125,12 @@ func (s *claimItemService) Update(tx application.Transaction, claimID, itemID uu
 	switch item.Status {
 	case entities.ClaimItemStatusApproved, entities.ClaimItemStatusRejected:
 	default:
+		_ = tx.Rollback()
 		return apperrors.NewNotAllowUpdateClaim()
 	}
 
 	if !entities.IsValidClaimItemType(cmd.Type) {
+		_ = tx.Rollback()
 		return apperrors.NewInvalidCredentials()
 	}
 	item.IssueDescription = cmd.IssueDescription

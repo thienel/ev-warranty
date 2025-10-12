@@ -66,9 +66,11 @@ func (s *claimAttachmentService) Create(tx application.Transaction, claimID uuid
 	}
 
 	if !entities.IsValidAttachmentType(cmd.Type) {
+		_ = tx.Rollback()
 		return nil, apperrors.NewInvalidCredentials()
 	}
 	if !IsValidURL(cmd.URL) {
+		_ = tx.Rollback()
 		return nil, apperrors.NewInvalidCredentials()
 	}
 
@@ -89,6 +91,7 @@ func (s *claimAttachmentService) HardDelete(tx application.Transaction, claimID,
 	}
 
 	if claim.Status != entities.ClaimStatusDraft {
+		_ = tx.Rollback()
 		return apperrors.NewNotAllowDeleteClaim()
 	}
 	err = s.attachRepo.HardDelete(tx, attachmentID)
