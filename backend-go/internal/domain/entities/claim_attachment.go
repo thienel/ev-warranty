@@ -30,3 +30,12 @@ func NewClaimAttachment(claimID uuid.UUID, attachmentType, url string) *ClaimAtt
 		URL:     url,
 	}
 }
+
+func IsValidAttachmentType(attachmentType string) bool {
+	switch attachmentType {
+	case AttachmentTypeVideo, AttachmentTypePhoto:
+		return true
+	default:
+		return false
+	}
+}

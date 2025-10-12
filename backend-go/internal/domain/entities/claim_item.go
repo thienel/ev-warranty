@@ -8,11 +8,9 @@ import (
 )
 
 const (
-	ClaimItemStatusPending    = "PENDING"
-	ClaimItemStatusRejected   = "REJECTED"
-	ClaimItemStatusApproved   = "APPROVED"
-	ClaimItemStatusInProgress = "IN_PROGRESS"
-	ClaimItemStatusCompleted  = "COMPLETED"
+	ClaimItemStatusPending  = "PENDING"
+	ClaimItemStatusRejected = "REJECTED"
+	ClaimItemStatusApproved = "APPROVED"
 
 	ClaimItemTypeReplacement = "REPLACEMENT"
 	ClaimItemTypeRepair      = "REPAIR"
@@ -35,7 +33,7 @@ type ClaimItem struct {
 }
 
 func NewClaimItem(claimID uuid.UUID, partCategoryID int, faultyPartID uuid.UUID, replacementPartID *uuid.UUID,
-	IssueDescription, lineStatus, claimItemType string, cost float64) *ClaimItem {
+	issueDescription, status, itemType string, cost float64) *ClaimItem {
 
 	return &ClaimItem{
 		ID:                uuid.New(),
@@ -43,16 +41,16 @@ func NewClaimItem(claimID uuid.UUID, partCategoryID int, faultyPartID uuid.UUID,
 		PartCategoryID:    partCategoryID,
 		FaultyPartID:      faultyPartID,
 		ReplacementPartID: replacementPartID,
-		IssueDescription:  IssueDescription,
-		Status:            lineStatus,
-		Type:              claimItemType,
+		IssueDescription:  issueDescription,
+		Status:            status,
+		Type:              itemType,
 		Cost:              cost,
 	}
 }
 
 func IsValidClaimItemStatus(status string) bool {
 	switch status {
-	case ClaimItemStatusPending, ClaimItemStatusRejected, ClaimItemStatusApproved, ClaimItemStatusInProgress, ClaimItemStatusCompleted:
+	case ClaimItemStatusPending, ClaimItemStatusRejected, ClaimItemStatusApproved:
 		return true
 	default:
 		return false

@@ -51,3 +51,43 @@ func IsValidClaimStatus(status string) bool {
 		return false
 	}
 }
+
+func IsValidClaimStatusTransition(currentStatus, newStatus string) bool {
+	validTransitions := map[string][]string{
+		ClaimStatusDraft: {
+			ClaimStatusSubmitted,
+			ClaimStatusCancelled,
+		},
+		ClaimStatusSubmitted: {
+			ClaimStatusReviewing,
+			ClaimStatusCancelled,
+		},
+		ClaimStatusReviewing: {
+			ClaimStatusRequestInfo,
+			ClaimStatusApproved,
+			ClaimStatusPartiallyApproved,
+			ClaimStatusRejected,
+		},
+		ClaimStatusRequestInfo: {
+			ClaimStatusSubmitted,
+			ClaimStatusCancelled,
+		},
+		ClaimStatusApproved:          {},
+		ClaimStatusPartiallyApproved: {},
+		ClaimStatusRejected:          {},
+		ClaimStatusCancelled:         {},
+	}
+
+	allowedStatuses, exists := validTransitions[currentStatus]
+	if !exists {
+		return false
+	}
+
+	for _, status := range allowedStatuses {
+		if status == newStatus {
+			return true
+		}
+	}
+
+	return false
+}
