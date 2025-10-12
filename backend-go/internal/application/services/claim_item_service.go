@@ -137,6 +137,16 @@ func (s *claimItemService) Update(tx application.Transaction, claimID, itemID uu
 		return err
 	}
 
+	claim.TotalCost, err = s.itemRepo.SumCostByClaimID(tx, claimID)
+	if err != nil {
+		return err
+	}
+
+	err = s.claimRepo.Update(tx, claim)
+	if err != nil {
+		return err
+	}
+
 	return commitOrLog(tx)
 }
 
@@ -153,6 +163,16 @@ func (s *claimItemService) HardDelete(tx application.Transaction, claimID, itemI
 	}
 
 	err = s.itemRepo.HardDelete(tx, itemID)
+	if err != nil {
+		return err
+	}
+
+	claim.TotalCost, err = s.itemRepo.SumCostByClaimID(tx, claimID)
+	if err != nil {
+		return err
+	}
+
+	err = s.claimRepo.Update(tx, claim)
 	if err != nil {
 		return err
 	}
@@ -177,6 +197,16 @@ func (s *claimItemService) Approve(tx application.Transaction, claimID, itemID u
 		return err
 	}
 
+	claim.TotalCost, err = s.itemRepo.SumCostByClaimID(tx, claimID)
+	if err != nil {
+		return err
+	}
+
+	err = s.claimRepo.Update(tx, claim)
+	if err != nil {
+		return err
+	}
+
 	return commitOrLog(tx)
 }
 
@@ -193,6 +223,16 @@ func (s *claimItemService) Reject(tx application.Transaction, claimID, itemID uu
 	}
 
 	err = s.itemRepo.UpdateStatus(tx, itemID, entities.ClaimStatusRejected)
+	if err != nil {
+		return err
+	}
+
+	claim.TotalCost, err = s.itemRepo.SumCostByClaimID(tx, claimID)
+	if err != nil {
+		return err
+	}
+
+	err = s.claimRepo.Update(tx, claim)
 	if err != nil {
 		return err
 	}
