@@ -54,13 +54,11 @@ type ClaimService interface {
 	Update(tx application.Transaction, id uuid.UUID, cmd *UpdateClaimCommand) error
 	Delete(tx application.Transaction, id uuid.UUID) error
 
-	Submit(tx application.Transaction, id uuid.UUID) error
-	Reviewing(tx application.Transaction, id uuid.UUID) error
-	RequestInfo(tx application.Transaction, id uuid.UUID) error
-	Cancel(tx application.Transaction, id uuid.UUID) error
-	Approve(tx application.Transaction, id uuid.UUID) error
-	Reject(tx application.Transaction, id uuid.UUID) error
-	PartiallyApprove(tx application.Transaction, id uuid.UUID) error
+	UpdateStatus(tx application.Transaction, id uuid.UUID, status string, changedBy uuid.UUID) error
+	Submit(tx application.Transaction, id uuid.UUID, changedBy uuid.UUID) error
+	Approve(tx application.Transaction, id uuid.UUID, changedBy uuid.UUID) error
+	Reject(tx application.Transaction, id uuid.UUID, changedBy uuid.UUID) error
+	PartiallyApprove(tx application.Transaction, id uuid.UUID, changedBy uuid.UUID) error
 
 	GetHistory(ctx context.Context, claimID uuid.UUID) ([]*entities.ClaimHistory, error)
 }
@@ -199,7 +197,36 @@ func (s *claimService) Delete(tx application.Transaction, id uuid.UUID) error {
 	return commitOrLog(tx)
 }
 
-func (s *claimService) Submit(tx application.Transaction, id uuid.UUID) error {
+func (s *claimService) UpdateStatus(tx application.Transaction, id uuid.UUID, status string, changedBy uuid.UUID) error {
+	defer rollbackOrLog(tx)
+
+	if !entities.IsValidClaimStatus(status) {
+		return apperrors.NewInvalidCredentials()
+	}
+
+	claim, err := s.claimRepo.FindByID(tx.GetCtx(), id)
+	if err != nil {
+		return err
+	}
+
+	if !entities.IsValidClaimStatusTransition(claim.Status, status) {
+		return apperrors.NewInvalidClaimAction()
+	}
+
+	err = s.claimRepo.UpdateStatus(tx, id, status)
+	if err != nil {
+		return err
+	}
+
+	history := entities.NewClaimHistory(claim.ID, status, changedBy)
+	if err = s.historyRepo.Create(tx, history); err != nil {
+		return err
+	}
+
+	return commitOrLog(tx)
+}
+
+func (s *claimService) Submit(tx application.Transaction, id uuid.UUID, changedBy uuid.UUID) error {
 	defer rollbackOrLog(tx)
 
 	claim, err := s.claimRepo.FindByID(tx.GetCtx(), id)
@@ -211,41 +238,147 @@ func (s *claimService) Submit(tx application.Transaction, id uuid.UUID) error {
 		return apperrors.NewInvalidClaimAction()
 	}
 
-	// TODO
-	return nil
+	items, err := s.itemRepo.FindByClaimID(tx.GetCtx(), id)
+	if err != nil {
+		return err
+	}
+	attachments, err := s.attachmentRepo.FindByClaimID(tx.GetCtx(), id)
+	if err != nil {
+		return err
+	}
+
+	if len(items) < entities.ClaimItemRequirePerClaim || len(attachments) < entities.AttachmentRequirePerClaim {
+		return apperrors.NewMissingInformationClaim()
+	}
+
+	err = s.claimRepo.UpdateStatus(tx, id, entities.ClaimStatusSubmitted)
+	if err != nil {
+		return err
+	}
+
+	history := entities.NewClaimHistory(claim.ID, entities.ClaimStatusSubmitted, changedBy)
+	if err = s.historyRepo.Create(tx, history); err != nil {
+		return err
+	}
+
+	return commitOrLog(tx)
 }
 
-func (s *claimService) Reviewing(tx application.Transaction, id uuid.UUID) error {
-	//TODO
-	return nil
+func (s *claimService) Approve(tx application.Transaction, id uuid.UUID, changedBy uuid.UUID) error {
+	defer rollbackOrLog(tx)
+
+	claim, err := s.claimRepo.FindByID(tx.GetCtx(), id)
+	if err != nil {
+		return err
+	}
+
+	if !entities.IsValidClaimStatusTransition(claim.Status, entities.ClaimStatusApproved) {
+		return apperrors.NewInvalidClaimAction()
+	}
+
+	items, err := s.itemRepo.FindByClaimID(tx.GetCtx(), id)
+	if err != nil {
+		return err
+	}
+
+	for _, item := range items {
+		err = s.itemRepo.UpdateStatus(tx, item.ID, entities.ClaimItemStatusApproved)
+		if err != nil {
+			return err
+		}
+	}
+
+	err = s.claimRepo.UpdateStatus(tx, id, entities.ClaimStatusApproved)
+	if err != nil {
+		return err
+	}
+
+	history := entities.NewClaimHistory(claim.ID, entities.ClaimStatusApproved, changedBy)
+	if err = s.historyRepo.Create(tx, history); err != nil {
+		return err
+	}
+
+	return commitOrLog(tx)
 }
 
-func (s *claimService) RequestInfo(tx application.Transaction, id uuid.UUID) error {
-	// TODO
-	return nil
+func (s *claimService) Reject(tx application.Transaction, id uuid.UUID, changedBy uuid.UUID) error {
+	defer rollbackOrLog(tx)
+
+	claim, err := s.claimRepo.FindByID(tx.GetCtx(), id)
+	if err != nil {
+		return err
+	}
+
+	if !entities.IsValidClaimStatusTransition(claim.Status, entities.ClaimStatusRejected) {
+		return apperrors.NewInvalidClaimAction()
+	}
+
+	items, err := s.itemRepo.FindByClaimID(tx.GetCtx(), id)
+	if err != nil {
+		return err
+	}
+
+	for _, item := range items {
+		err = s.itemRepo.UpdateStatus(tx, item.ID, entities.ClaimItemStatusRejected)
+		if err != nil {
+			return err
+		}
+	}
+
+	err = s.claimRepo.UpdateStatus(tx, id, entities.ClaimStatusRejected)
+	if err != nil {
+		return err
+	}
+
+	history := entities.NewClaimHistory(claim.ID, entities.ClaimStatusRejected, changedBy)
+	if err = s.historyRepo.Create(tx, history); err != nil {
+		return err
+	}
+
+	return commitOrLog(tx)
 }
 
-func (s *claimService) Cancel(tx application.Transaction, id uuid.UUID) error {
-	// TODO
-	return nil
-}
+func (s *claimService) PartiallyApprove(tx application.Transaction, id uuid.UUID, changedBy uuid.UUID) error {
+	defer rollbackOrLog(tx)
 
-func (s *claimService) Approve(tx application.Transaction, id uuid.UUID) error {
-	// TODO
-	return nil
-}
+	claim, err := s.claimRepo.FindByID(tx.GetCtx(), id)
+	if err != nil {
+		return err
+	}
 
-func (s *claimService) Reject(tx application.Transaction, id uuid.UUID) error {
-	// TODO
-	return nil
-}
+	if !entities.IsValidClaimStatusTransition(claim.Status, entities.ClaimStatusPartiallyApproved) {
+		return apperrors.NewInvalidClaimAction()
+	}
 
-func (s *claimService) PartiallyApprove(tx application.Transaction, id uuid.UUID) error {
-	// TODO
-	return nil
+	items, err := s.itemRepo.FindByClaimID(tx.GetCtx(), id)
+	if err != nil {
+		return err
+	}
+
+	for _, item := range items {
+		if item.Status == entities.ClaimItemStatusPending {
+			return apperrors.NewInvalidClaimAction()
+		}
+	}
+
+	err = s.claimRepo.UpdateStatus(tx, id, entities.ClaimStatusPartiallyApproved)
+	if err != nil {
+		return err
+	}
+
+	history := entities.NewClaimHistory(claim.ID, entities.ClaimStatusPartiallyApproved, changedBy)
+	if err = s.historyRepo.Create(tx, history); err != nil {
+		return err
+	}
+
+	return commitOrLog(tx)
 }
 
 func (s *claimService) GetHistory(ctx context.Context, claimID uuid.UUID) ([]*entities.ClaimHistory, error) {
-	// TODO
-	return nil, nil
+	histories, err := s.historyRepo.FindByClaimID(ctx, claimID)
+	if err != nil {
+		return nil, err
+	}
+
+	return histories, nil
 }
