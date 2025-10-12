@@ -4,6 +4,7 @@ import (
 	"ev-warranty-go/internal/apperrors"
 	"ev-warranty-go/internal/application"
 	"log"
+	"net/url"
 )
 
 func rollbackOnErr(tx application.Transaction, originalErr error) error {
@@ -19,4 +20,15 @@ func commitOrLog(tx application.Transaction) error {
 		return apperrors.NewInternalServerError(err)
 	}
 	return nil
+}
+
+func IsValidURL(str string) bool {
+	u, err := url.ParseRequestURI(str)
+	if err != nil {
+		return false
+	}
+	if u.Scheme == "" || u.Host == "" {
+		return false
+	}
+	return true
 }
