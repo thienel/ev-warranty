@@ -38,4 +38,5 @@ const (
 	ErrorCodeClaimStatusNotAllowedUpdate = "CLAIM_STATUS_NOT_ALLOWED_TO_UPDATE"
 	ErrorCodeClaimStatusNotAllowedDelete = "CLAIM_STATUS_NOT_ALLOWED_TO_DELETE"
 	ErrorCodeInvalidClaimAction          = "CLAIM_INVALID_ACTION"
+	ErrorCodeClaimMissingInformation     = "CLAIM_MISSING_INFORMATION"
 )

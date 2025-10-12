@@ -132,7 +132,8 @@ func NewFailedHashToken() *AppError {
 }
 
 func NewUnexpectedSigningMethod(method any) *AppError {
-	return New(http.StatusUnauthorized, ErrorCodeUnexpectedSigningMethod, errors.New(fmt.Sprintf("unexpected signing method: %v", method)))
+	return New(http.StatusUnauthorized, ErrorCodeUnexpectedSigningMethod,
+		errors.New(fmt.Sprintf("unexpected signing method: %v", method)))
 }
 
 func NewInvalidClaimAction() *AppError {
@@ -147,4 +148,9 @@ func NewNotAllowUpdateClaim() *AppError {
 func NewNotAllowDeleteClaim() *AppError {
 	return New(http.StatusConflict, ErrorCodeClaimStatusNotAllowedDelete,
 		errors.New("current claim's status does not allow to delete"))
+}
+
+func NewMissingInformationClaim() *AppError {
+	return New(http.StatusConflict, ErrorCodeClaimMissingInformation,
+		errors.New("claim does not have enough information to submit"))
 }
