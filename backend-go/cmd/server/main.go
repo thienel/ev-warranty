@@ -51,6 +51,8 @@ func main() {
 		}
 	}(db)
 
+	txManager := database.NewTxManager(log, db.DB)
+
 	app := &App{
 		Cfg: cfg,
 		DB:  db,
@@ -84,9 +86,9 @@ func main() {
 	authHandler := handlers.NewAuthHandler(log, authService, tokenService, userService)
 	oauthHandler := handlers.NewOAuthHandler(log, cfg.OAuth.FrontendBaseURL, oauthService, authService)
 	userHandler := handlers.NewUserHandler(log, userService)
-	claimHandler := handlers.NewClaimHandler(log, claimService)
-	claimItemHandler := handlers.NewClaimItemHandler(log, claimItemService)
-	claimAttachmentHandler := handlers.NewClaimAttachmentHandler(log, claimAttachmentService)
+	claimHandler := handlers.NewClaimHandler(log, txManager, claimService)
+	claimItemHandler := handlers.NewClaimItemHandler(log, txManager, claimItemService)
+	claimAttachmentHandler := handlers.NewClaimAttachmentHandler(log, txManager, claimAttachmentService)
 
 	r := api.NewRouter(app.DB, authHandler, oauthHandler, officeHandler,
 		userHandler, claimHandler, claimItemHandler, claimAttachmentHandler)

@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"ev-warranty-go/internal/application"
 	"ev-warranty-go/internal/application/services"
 	"ev-warranty-go/pkg/logger"
 
@@ -17,14 +18,16 @@ type ClaimItemHandler interface {
 }
 
 type claimItemHandler struct {
-	log     logger.Logger
-	service services.ClaimItemService
+	log       logger.Logger
+	txManager application.TxManager
+	service   services.ClaimItemService
 }
 
-func NewClaimItemHandler(log logger.Logger, service services.ClaimItemService) ClaimItemHandler {
+func NewClaimItemHandler(log logger.Logger, txManager application.TxManager, service services.ClaimItemService) ClaimItemHandler {
 	return &claimItemHandler{
-		log:     log,
-		service: service,
+		log:       log,
+		txManager: txManager,
+		service:   service,
 	}
 }
 

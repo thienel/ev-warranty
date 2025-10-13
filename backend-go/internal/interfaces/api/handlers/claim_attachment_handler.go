@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"ev-warranty-go/internal/application"
 	"ev-warranty-go/internal/application/services"
 	"ev-warranty-go/pkg/logger"
 
@@ -14,16 +15,18 @@ type ClaimAttachmentHandler interface {
 	Delete(c *gin.Context)
 }
 
-func NewClaimAttachmentHandler(log logger.Logger, service services.ClaimAttachmentService) ClaimAttachmentHandler {
-	return &claimAttachmentHandler{
-		log:     log,
-		service: service,
-	}
+type claimAttachmentHandler struct {
+	log       logger.Logger
+	txManager application.TxManager
+	service   services.ClaimAttachmentService
 }
 
-type claimAttachmentHandler struct {
-	log     logger.Logger
-	service services.ClaimAttachmentService
+func NewClaimAttachmentHandler(log logger.Logger, txManager application.TxManager, service services.ClaimAttachmentService) ClaimAttachmentHandler {
+	return &claimAttachmentHandler{
+		log:       log,
+		txManager: txManager,
+		service:   service,
+	}
 }
 
 func (c2 claimAttachmentHandler) GetByID(c *gin.Context) {
