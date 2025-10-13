@@ -20,7 +20,7 @@ func NewClaimRepository(db *gorm.DB) repositories.ClaimRepository {
 	return &claimRepository{db: db}
 }
 
-func (c *claimRepository) Create(tx application.Transaction, claim *entities.Claim) error {
+func (c *claimRepository) Create(tx application.Tx, claim *entities.Claim) error {
 	db := tx.GetTx().(*gorm.DB)
 	if err := db.Create(claim).Error; err != nil {
 		if dup := getDuplicateKeyConstraint(err); dup != "" {
@@ -31,7 +31,7 @@ func (c *claimRepository) Create(tx application.Transaction, claim *entities.Cla
 	return nil
 }
 
-func (c *claimRepository) Update(tx application.Transaction, claim *entities.Claim) error {
+func (c *claimRepository) Update(tx application.Tx, claim *entities.Claim) error {
 	db := tx.GetTx().(*gorm.DB)
 	if err := db.Model(claim).Select("vehicle_id",
 		"customer_id", "description", "status", "total_cost", "approved_by").
@@ -41,7 +41,7 @@ func (c *claimRepository) Update(tx application.Transaction, claim *entities.Cla
 	return nil
 }
 
-func (c *claimRepository) HardDelete(tx application.Transaction, id uuid.UUID) error {
+func (c *claimRepository) HardDelete(tx application.Tx, id uuid.UUID) error {
 	db := tx.GetTx().(*gorm.DB)
 	if err := db.Unscoped().Delete(&entities.Claim{}, "id = ?", id).Error; err != nil {
 		return apperrors.NewDBOperationError(err)
@@ -49,7 +49,7 @@ func (c *claimRepository) HardDelete(tx application.Transaction, id uuid.UUID) e
 	return nil
 }
 
-func (c *claimRepository) SoftDelete(tx application.Transaction, id uuid.UUID) error {
+func (c *claimRepository) SoftDelete(tx application.Tx, id uuid.UUID) error {
 	db := tx.GetTx().(*gorm.DB)
 	if err := db.Delete(&entities.Claim{}, "id = ?", id).Error; err != nil {
 		return apperrors.NewDBOperationError(err)
@@ -57,7 +57,7 @@ func (c *claimRepository) SoftDelete(tx application.Transaction, id uuid.UUID) e
 	return nil
 }
 
-func (c *claimRepository) UpdateStatus(tx application.Transaction, id uuid.UUID, status string) error {
+func (c *claimRepository) UpdateStatus(tx application.Tx, id uuid.UUID, status string) error {
 	db := tx.GetTx().(*gorm.DB)
 	if err := db.Model(&entities.Claim{}).
 		Where("id = ?", id).

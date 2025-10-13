@@ -21,7 +21,7 @@ func NewClaimHistoryRepository(db *gorm.DB) repositories.ClaimHistoryRepository 
 	return &claimHistoryRepository{db: db}
 }
 
-func (c *claimHistoryRepository) Create(tx application.Transaction, history *entities.ClaimHistory) error {
+func (c *claimHistoryRepository) Create(tx application.Tx, history *entities.ClaimHistory) error {
 	db := tx.GetTx().(*gorm.DB)
 	if err := db.Create(history).Error; err != nil {
 		if dup := getDuplicateKeyConstraint(err); dup != "" {
@@ -32,7 +32,7 @@ func (c *claimHistoryRepository) Create(tx application.Transaction, history *ent
 	return nil
 }
 
-func (c *claimHistoryRepository) SoftDeleteByClaimID(tx application.Transaction, claimID uuid.UUID) error {
+func (c *claimHistoryRepository) SoftDeleteByClaimID(tx application.Tx, claimID uuid.UUID) error {
 	db := tx.GetTx().(*gorm.DB)
 	if err := db.Delete(&entities.ClaimHistory{}, "claim_id = ?", claimID).Error; err != nil {
 		return apperrors.NewDBOperationError(err)

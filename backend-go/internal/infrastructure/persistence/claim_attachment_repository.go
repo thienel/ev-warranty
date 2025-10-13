@@ -20,7 +20,7 @@ func NewClaimAttachmentRepository(db *gorm.DB) repositories.ClaimAttachmentRepos
 	return &claimAttachmentRepository{db: db}
 }
 
-func (c *claimAttachmentRepository) Create(tx application.Transaction, attachment *entities.ClaimAttachment) error {
+func (c *claimAttachmentRepository) Create(tx application.Tx, attachment *entities.ClaimAttachment) error {
 	db := tx.GetTx().(*gorm.DB)
 	if err := db.Create(attachment).Error; err != nil {
 		if dup := getDuplicateKeyConstraint(err); dup != "" {
@@ -31,7 +31,7 @@ func (c *claimAttachmentRepository) Create(tx application.Transaction, attachmen
 	return nil
 }
 
-func (c *claimAttachmentRepository) HardDelete(tx application.Transaction, id uuid.UUID) error {
+func (c *claimAttachmentRepository) HardDelete(tx application.Tx, id uuid.UUID) error {
 	db := tx.GetTx().(*gorm.DB)
 	if err := db.Unscoped().Delete(&entities.ClaimAttachment{}, "id = ?", id).Error; err != nil {
 		return apperrors.NewDBOperationError(err)
@@ -39,7 +39,7 @@ func (c *claimAttachmentRepository) HardDelete(tx application.Transaction, id uu
 	return nil
 }
 
-func (c *claimAttachmentRepository) SoftDeleteByClaimID(tx application.Transaction, claimID uuid.UUID) error {
+func (c *claimAttachmentRepository) SoftDeleteByClaimID(tx application.Tx, claimID uuid.UUID) error {
 	db := tx.GetTx().(*gorm.DB)
 	if err := db.Delete(&entities.ClaimAttachment{}, "claim_id = ?", claimID).Error; err != nil {
 		return apperrors.NewDBOperationError(err)
