@@ -34,12 +34,12 @@ type ClaimItemService interface {
 	GetByID(ctx context.Context, id uuid.UUID) (*entities.ClaimItem, error)
 	GetByClaimID(ctx context.Context, claimID uuid.UUID) ([]*entities.ClaimItem, error)
 
-	Create(tx application.Transaction, claimID uuid.UUID, cmd *CreateClaimItemCommand) (*entities.ClaimItem, error)
-	Update(tx application.Transaction, claimID, itemID uuid.UUID, cmd *UpdateClaimItemCommand) error
-	HardDelete(tx application.Transaction, claimID, itemID uuid.UUID) error
+	Create(tx application.Tx, claimID uuid.UUID, cmd *CreateClaimItemCommand) (*entities.ClaimItem, error)
+	Update(tx application.Tx, claimID, itemID uuid.UUID, cmd *UpdateClaimItemCommand) error
+	HardDelete(tx application.Tx, claimID, itemID uuid.UUID) error
 
-	Approve(tx application.Transaction, claimID, itemID uuid.UUID) error
-	Reject(tx application.Transaction, claimID, itemID uuid.UUID) error
+	Approve(tx application.Tx, claimID, itemID uuid.UUID) error
+	Reject(tx application.Tx, claimID, itemID uuid.UUID) error
 }
 
 type claimItemService struct {
@@ -74,10 +74,8 @@ func (s *claimItemService) GetByClaimID(ctx context.Context, claimID uuid.UUID) 
 	return items, nil
 }
 
-func (s *claimItemService) Create(tx application.Transaction, claimID uuid.UUID,
+func (s *claimItemService) Create(tx application.Tx, claimID uuid.UUID,
 	cmd *CreateClaimItemCommand) (*entities.ClaimItem, error) {
-	defer rollbackOrLog(tx)
-
 	_, err := s.claimRepo.FindByID(tx.GetCtx(), claimID)
 	if err != nil {
 		return nil, err
@@ -97,13 +95,11 @@ func (s *claimItemService) Create(tx application.Transaction, claimID uuid.UUID,
 		return nil, err
 	}
 
-	return item, commitOrLog(tx)
+	return item, nil
 }
 
-func (s *claimItemService) Update(tx application.Transaction, claimID, itemID uuid.UUID, cmd *UpdateClaimItemCommand) error {
+func (s *claimItemService) Update(tx application.Tx, claimID, itemID uuid.UUID, cmd *UpdateClaimItemCommand) error {
 	claim, err := s.claimRepo.FindByID(tx.GetCtx(), claimID)
-	defer rollbackOrLog(tx)
-
 	if err != nil {
 		return err
 	}
@@ -147,13 +143,11 @@ func (s *claimItemService) Update(tx application.Transaction, claimID, itemID uu
 		return err
 	}
 
-	return commitOrLog(tx)
+	return nil
 }
 
-func (s *claimItemService) HardDelete(tx application.Transaction, claimID, itemID uuid.UUID) error {
+func (s *claimItemService) HardDelete(tx application.Tx, claimID, itemID uuid.UUID) error {
 	claim, err := s.claimRepo.FindByID(tx.GetCtx(), claimID)
-	defer rollbackOrLog(tx)
-
 	if err != nil {
 		return err
 	}
@@ -177,13 +171,11 @@ func (s *claimItemService) HardDelete(tx application.Transaction, claimID, itemI
 		return err
 	}
 
-	return commitOrLog(tx)
+	return nil
 }
 
-func (s *claimItemService) Approve(tx application.Transaction, claimID, itemID uuid.UUID) error {
+func (s *claimItemService) Approve(tx application.Tx, claimID, itemID uuid.UUID) error {
 	claim, err := s.claimRepo.FindByID(tx.GetCtx(), claimID)
-	defer rollbackOrLog(tx)
-
 	if err != nil {
 		return err
 	}
@@ -207,13 +199,11 @@ func (s *claimItemService) Approve(tx application.Transaction, claimID, itemID u
 		return err
 	}
 
-	return commitOrLog(tx)
+	return nil
 }
 
-func (s *claimItemService) Reject(tx application.Transaction, claimID, itemID uuid.UUID) error {
+func (s *claimItemService) Reject(tx application.Tx, claimID, itemID uuid.UUID) error {
 	claim, err := s.claimRepo.FindByID(tx.GetCtx(), claimID)
-	defer rollbackOrLog(tx)
-
 	if err != nil {
 		return err
 	}
@@ -237,5 +227,5 @@ func (s *claimItemService) Reject(tx application.Transaction, claimID, itemID uu
 		return err
 	}
 
-	return commitOrLog(tx)
+	return nil
 }

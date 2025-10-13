@@ -7,6 +7,7 @@ import (
 	"ev-warranty-go/internal/application/repositories"
 	"ev-warranty-go/internal/domain/entities"
 	"ev-warranty-go/pkg/logger"
+	"net/url"
 
 	"github.com/google/uuid"
 )
@@ -20,8 +21,8 @@ type ClaimAttachmentService interface {
 	GetByID(ctx context.Context, id uuid.UUID) (*entities.ClaimAttachment, error)
 	GetByClaimID(ctx context.Context, claimID uuid.UUID) ([]*entities.ClaimAttachment, error)
 
-	Create(tx application.Transaction, claimID uuid.UUID, cmd *CreateAttachmentCommand) (*entities.ClaimAttachment, error)
-	HardDelete(tx application.Transaction, claimID, attachmentID uuid.UUID) error
+	Create(tx application.Tx, claimID uuid.UUID, cmd *CreateAttachmentCommand) (*entities.ClaimAttachment, error)
+	HardDelete(tx application.Tx, claimID, attachmentID uuid.UUID) error
 }
 
 type claimAttachmentService struct {
@@ -56,10 +57,8 @@ func (s *claimAttachmentService) GetByClaimID(ctx context.Context, claimID uuid.
 	return claimAttachments, nil
 }
 
-func (s *claimAttachmentService) Create(tx application.Transaction, claimID uuid.UUID,
+func (s *claimAttachmentService) Create(tx application.Tx, claimID uuid.UUID,
 	cmd *CreateAttachmentCommand) (*entities.ClaimAttachment, error) {
-	defer rollbackOrLog(tx)
-
 	_, err := s.claimRepo.FindByID(tx.GetCtx(), claimID)
 	if err != nil {
 		return nil, err
@@ -78,13 +77,11 @@ func (s *claimAttachmentService) Create(tx application.Transaction, claimID uuid
 		return nil, err
 	}
 
-	return attachment, commitOrLog(tx)
+	return attachment, nil
 }
 
-func (s *claimAttachmentService) HardDelete(tx application.Transaction, claimID, attachmentID uuid.UUID) error {
+func (s *claimAttachmentService) HardDelete(tx application.Tx, claimID, attachmentID uuid.UUID) error {
 	claim, err := s.claimRepo.FindByID(tx.GetCtx(), claimID)
-	defer rollbackOrLog(tx)
-
 	if err != nil {
 		return err
 	}
@@ -97,5 +94,16 @@ func (s *claimAttachmentService) HardDelete(tx application.Transaction, claimID,
 		return err
 	}
 
-	return commitOrLog(tx)
+	return nil
+}
+
+func IsValidURL(str string) bool {
+	u, err := url.ParseRequestURI(str)
+	if err != nil {
+		return false
+	}
+	if u.Scheme == "" || u.Host == "" {
+		return false
+	}
+	return true
 }
