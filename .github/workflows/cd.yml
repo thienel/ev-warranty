@@ -19,6 +19,6 @@ jobs:
       - name: Build & Push Docker image
         run: |
           docker build \
-            -t lethiendev/auth-user-service:latest \
-            ./auth-user-service
-          docker push lethiendev/auth-user-service:latest
+            -t lethiendev/ev-warranty-go:latest \
+            ./backend-go
+          docker push lethiendev/ev-warranty-go:latest

@@ -1,7 +1,7 @@
 services:
   postgres:
     image: postgres:15-alpine
-    container_name: auth_postgres
+    container_name: db_postgres_go
     environment:
       POSTGRES_DB: auth_service
       POSTGRES_USER: auth_service
@@ -11,19 +11,19 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./auth-user-service/internal/infrastructure/database/migrations:/docker-entrypoint-initdb.d
+      - ./backend-go/migrations:/docker-entrypoint-initdb.d
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U auth_service -d auth_service"]
       interval: 10s
       timeout: 5s
       retries: 5
     networks:
-      - auth_network
+      - backend-go
 
-  auth-user-service:
+  backend-go:
     platform: linux/amd64
-    image: lethiendev/auth-user-service:latest
-    container_name: auth_user_service
+    image: lethiendev/ev-warranty-go:latest
+    container_name: backend-go
     environment:
       - PORT=8888
       - DATABASE_URL=postgres://auth_service:password@postgres:5432/auth_service?sslmode=disable
@@ -52,7 +52,7 @@ services:
       timeout: 10s
       retries: 3
     networks:
-      - auth_network
+      - backend-go
 
   nginx:
     image: nginx:alpine
@@ -64,18 +64,18 @@ services:
       - ./nginx.conf:/etc/nginx/nginx.conf:ro
       - ./ssl:/etc/nginx/ssl:ro
     depends_on:
-      - auth-user-service
+      - backend-go
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost/health"]
       interval: 30s
       timeout: 10s
       retries: 3
     networks:
-      - auth_network
+      - backend-go
 
 volumes:
   postgres_data:
 
 networks:
-  auth_network:
+  backend-go:
     driver: bridge
