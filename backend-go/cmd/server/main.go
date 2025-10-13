@@ -62,23 +62,34 @@ func main() {
 	officeRepo := persistence.NewOfficeRepository(db.DB)
 	tokenRepo := persistence.NewTokenRepository(db.DB)
 	userRepo := persistence.NewUserRepository(db.DB)
+	claimRepo := persistence.NewClaimRepository(db.DB)
+	claimItemRepo := persistence.NewClaimItemRepository(db.DB)
+	claimAttachmentRepo := persistence.NewClaimAttachmentRepository(db.DB)
+	claimHistoryRepo := persistence.NewClaimHistoryRepository(db.DB)
+
+	googleProvider := providers.NewGoogleProvider(
+		cfg.OAuth.GoogleClientID, cfg.OAuth.GoogleClientSecret, cfg.OAuth.GoogleRedirectURL)
 
 	officeService := services.NewOfficeService(officeRepo)
 	tokenService := services.NewTokenService(tokenRepo,
 		cfg.AccessTokenTTL, cfg.RefreshTokenTTL, security.PrivateKey(), security.PublicKey())
 	authService := services.NewAuthService(userRepo, tokenService)
 	userService := services.NewUserService(userRepo, officeService)
-
-	googleProvider := providers.NewGoogleProvider(
-		cfg.OAuth.GoogleClientID, cfg.OAuth.GoogleClientSecret, cfg.OAuth.GoogleRedirectURL)
 	oauthService := oauth.NewOAuthService(googleProvider, userRepo)
+	claimService := services.NewClaimService(log, claimRepo, claimItemRepo, claimAttachmentRepo, claimHistoryRepo)
+	claimItemService := services.NewClaimItemService(log, claimRepo, claimItemRepo)
+	claimAttachmentService := services.NewClaimAttachmentService(log, claimRepo, claimAttachmentRepo)
 
 	officeHandler := handlers.NewOfficeHandler(log, officeService)
 	authHandler := handlers.NewAuthHandler(log, authService, tokenService, userService)
 	oauthHandler := handlers.NewOAuthHandler(log, cfg.OAuth.FrontendBaseURL, oauthService, authService)
 	userHandler := handlers.NewUserHandler(log, userService)
+	claimHandler := handlers.NewClaimHandler(log, claimService)
+	claimItemHandler := handlers.NewClaimItemHandler(log, claimItemService)
+	claimAttachmentHandler := handlers.NewClaimAttachmentHandler(log, claimAttachmentService)
 
-	r := api.NewRouter(app.DB, authHandler, oauthHandler, officeHandler, userHandler)
+	r := api.NewRouter(app.DB, authHandler, oauthHandler, officeHandler,
+		userHandler, claimHandler, claimItemHandler, claimAttachmentHandler)
 	log.Info("Server starting on port " + cfg.Port)
 	srv := &http.Server{
 		Addr:    ":" + cfg.Port,

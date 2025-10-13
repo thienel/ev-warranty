@@ -12,8 +12,11 @@ type HealthHandler struct {
 	DB *database.Database
 }
 
-func NewRouter(db *database.Database, authHandler handlers.AuthHandler, oauthHandler handlers.OAuthHandler,
-	officeHandler handlers.OfficeHandler, userHandler handlers.UserHandler) *gin.Engine {
+func NewRouter(db *database.Database, authHandler handlers.AuthHandler,
+	oauthHandler handlers.OAuthHandler, officeHandler handlers.OfficeHandler,
+	userHandler handlers.UserHandler, claimHandler handlers.ClaimHandler,
+	itemHandler handlers.ClaimItemHandler, attachmentHandler handlers.ClaimAttachmentHandler) *gin.Engine {
+
 	router := gin.New()
 
 	router.Use(gin.Recovery(), gin.Logger())
@@ -48,6 +51,40 @@ func NewRouter(db *database.Database, authHandler handlers.AuthHandler, oauthHan
 		office.GET("/:id", officeHandler.GetById)
 		office.PUT("/:id", officeHandler.Update)
 		office.DELETE("/:id", officeHandler.Delete)
+	}
+
+	claim := router.Group("/claims")
+	{
+		claim.GET("", claimHandler.GetAll)
+		claim.POST("", claimHandler.Create)
+		claim.GET("/:id", claimHandler.GetByID)
+		claim.PUT("/:id", claimHandler.Update)
+		claim.DELETE("/:id", claimHandler.Delete)
+
+		claim.POST("/:id/submit", claimHandler.Submit)
+		claim.POST("/:id/review", claimHandler.Review)
+		claim.POST("/:id/requestinfo", claimHandler.RequestInfo)
+		claim.POST("/:id/cancel", claimHandler.Cancel)
+		claim.POST("/:id/complete", claimHandler.Complete)
+		claim.POST("/:id/history", claimHandler.History)
+	}
+
+	claimItem := router.Group("/claims/:id/items")
+	{
+		claimItem.GET("", itemHandler.GetByClaimID)
+		claimItem.POST("", itemHandler.Create)
+		claimItem.GET("/:itemID", itemHandler.GetByID)
+		claimItem.DELETE("/:itemID", itemHandler.Delete)
+		claimItem.POST("/:itemID/approve", itemHandler.Approve)
+		claimItem.POST("/:itemID/reject", itemHandler.Reject)
+	}
+
+	claimAttachment := router.Group("/claims/:id/attachments")
+	{
+		claimAttachment.GET("", attachmentHandler.GetByClaimID)
+		claimAttachment.POST("", attachmentHandler.Create)
+		claimAttachment.GET("/:attachmentID", attachmentHandler.GetByID)
+		claimAttachment.DELETE("/:attachmentID", attachmentHandler.Delete)
 	}
 
 	return router
