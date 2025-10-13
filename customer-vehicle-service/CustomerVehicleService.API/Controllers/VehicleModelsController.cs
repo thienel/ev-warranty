@@ -5,7 +5,7 @@ using static CustomerVehicleService.Application.DTOs.VehicleModelDto;
 namespace CustomerVehicleService.API.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("[controller]")]
     [Produces("application/json")]
     public class VehicleModelsController : ControllerBase
     {

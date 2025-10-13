@@ -6,7 +6,7 @@ namespace CustomerVehicleService.API.Controllers
 {
 
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("[controller]")]
     [Produces("application/json")]
     public class VehiclesController : ControllerBase
     {
