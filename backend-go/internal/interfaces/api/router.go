@@ -66,7 +66,7 @@ func NewRouter(db *database.Database, authHandler handlers.AuthHandler,
 		claim.POST("/:id/requestinfo", claimHandler.RequestInfo)
 		claim.POST("/:id/cancel", claimHandler.Cancel)
 		claim.POST("/:id/complete", claimHandler.Complete)
-		claim.POST("/:id/history", claimHandler.History)
+		claim.GET("/:id/history", claimHandler.History)
 	}
 
 	claimItem := router.Group("/claims/:id/items")
