@@ -154,3 +154,16 @@ func NewMissingInformationClaim() *AppError {
 	return New(http.StatusConflict, ErrorCodeClaimMissingInformation,
 		errors.New("claim does not have enough information to submit"))
 }
+
+func NewInvalidQueryParameter(param string) *AppError {
+	return New(http.StatusBadRequest, ErrorCodeInvalidQueryParameter,
+		errors.New(fmt.Sprintf("invalid query parameter: %s", param)))
+}
+
+func NewMissingUserID() *AppError {
+	return New(http.StatusUnauthorized, ErrorCodeMissingUserID, errors.New("missing X-User-ID header"))
+}
+
+func NewInvalidUserID() *AppError {
+	return New(http.StatusBadRequest, ErrorCodeInvalidUserID, errors.New("invalid user ID format"))
+}

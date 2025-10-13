@@ -7,7 +7,8 @@ const (
 	ErrorCodeDuplicateKey = "DB_DUPLICATE_KEY"
 	ErrorCodeHashPassword = "DB_HASH_PASSWORD_ERROR"
 
-	ErrorCodeInvalidJsonRequest = "API_INVALID_JSON_REQUEST"
+	ErrorCodeInvalidJsonRequest    = "API_INVALID_JSON_REQUEST"
+	ErrorCodeInvalidQueryParameter = "API_INVALID_QUERY_PARAMETER"
 
 	ErrorCodeInvalidAccessToken         = "AUTH_INVALID_ACCESS_TOKEN"
 	ErrorCodeExpiredAccessToken         = "AUTH_EXPIRED_ACCESS_TOKEN"
@@ -20,6 +21,8 @@ const (
 	ErrorCodeFailedSignAccessToken      = "AUTH_FAILED_SIGN_ACCESS_TOKEN"
 	ErrorCodeFailedGenerateRefreshToken = "AUTH_FAILED_GENERATE_REFRESH_TOKEN"
 	ErrorCodeUnexpectedSigningMethod    = "AUTH_UNEXPECTED_SIGNING_METHOD"
+	ErrorCodeMissingUserID              = "AUTH_MISSING_USER_ID"
+	ErrorCodeInvalidUserID              = "AUTH_INVALID_USER_ID"
 
 	ErrorCodeRefreshTokenNotFound = "REFRESH_TOKEN_NOT_FOUND"
 
