@@ -1,10 +1,16 @@
 package application
 
-import "context"
+import (
+	"context"
+)
 
-type Transaction interface {
+type Tx interface {
 	GetTx() any
 	GetCtx() context.Context
 	Rollback() error
 	Commit() error
+}
+
+type TxManager interface {
+	Do(ctx context.Context, fn func(tx Tx) error) error
 }

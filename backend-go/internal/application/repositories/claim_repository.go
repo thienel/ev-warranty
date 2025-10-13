@@ -10,11 +10,11 @@ import (
 )
 
 type ClaimRepository interface {
-	Create(tx application.Transaction, claim *entities.Claim) error
-	Update(tx application.Transaction, claim *entities.Claim) error
-	UpdateStatus(tx application.Transaction, id uuid.UUID, status string) error
-	HardDelete(tx application.Transaction, id uuid.UUID) error
-	SoftDelete(tx application.Transaction, id uuid.UUID) error
+	Create(tx application.Tx, claim *entities.Claim) error
+	Update(tx application.Tx, claim *entities.Claim) error
+	UpdateStatus(tx application.Tx, id uuid.UUID, status string) error
+	HardDelete(tx application.Tx, id uuid.UUID) error
+	SoftDelete(tx application.Tx, id uuid.UUID) error
 
 	FindByID(ctx context.Context, id uuid.UUID) (*entities.Claim, error)
 	FindAll(ctx context.Context, filters ClaimFilters, pagination Pagination) ([]*entities.Claim, int64, error)

@@ -9,9 +9,9 @@ import (
 )
 
 type ClaimAttachmentRepository interface {
-	Create(tx application.Transaction, attachment *entities.ClaimAttachment) error
-	HardDelete(tx application.Transaction, id uuid.UUID) error
-	SoftDeleteByClaimID(tx application.Transaction, id uuid.UUID) error
+	Create(tx application.Tx, attachment *entities.ClaimAttachment) error
+	HardDelete(tx application.Tx, id uuid.UUID) error
+	SoftDeleteByClaimID(tx application.Tx, id uuid.UUID) error
 
 	FindByID(ctx context.Context, id uuid.UUID) (*entities.ClaimAttachment, error)
 	FindByClaimID(ctx context.Context, claimID uuid.UUID) ([]*entities.ClaimAttachment, error)

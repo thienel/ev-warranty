@@ -10,8 +10,8 @@ import (
 )
 
 type ClaimHistoryRepository interface {
-	Create(tx application.Transaction, history *entities.ClaimHistory) error
-	SoftDeleteByClaimID(tx application.Transaction, claimID uuid.UUID) error
+	Create(tx application.Tx, history *entities.ClaimHistory) error
+	SoftDeleteByClaimID(tx application.Tx, claimID uuid.UUID) error
 
 	FindByClaimID(ctx context.Context, claimID uuid.UUID) ([]*entities.ClaimHistory, error)
 	FindLatestByClaimID(ctx context.Context, claimID uuid.UUID) (*entities.ClaimHistory, error)
