@@ -30,11 +30,6 @@ type ClaimItemListResponse struct {
 	Total int                  `json:"total"`
 }
 
-type CreateClaimAttachmentRequest struct {
-	Type string `json:"type" binding:"required"`
-	URL  string `json:"url" binding:"required,url"`
-}
-
 type ClaimAttachmentListResponse struct {
 	Attachments []entities.ClaimAttachment `json:"attachments"`
 	Total       int                        `json:"total"`

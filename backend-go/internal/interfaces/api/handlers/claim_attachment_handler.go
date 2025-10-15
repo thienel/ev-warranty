@@ -6,7 +6,6 @@ import (
 	"ev-warranty-go/internal/application"
 	"ev-warranty-go/internal/application/services"
 	"ev-warranty-go/internal/domain/entities"
-	"ev-warranty-go/internal/interfaces/api/dtos"
 	"ev-warranty-go/pkg/logger"
 	"net/http"
 
@@ -80,27 +79,34 @@ func (h *claimAttachmentHandler) Create(c *gin.Context) {
 		return
 	}
 
-	var req dtos.CreateClaimAttachmentRequest
-	if err := c.ShouldBindJSON(&req); err != nil {
-		handleError(h.log, c, apperrors.NewInvalidJsonRequest())
+	form, err := c.MultipartForm()
+	if err != nil || form == nil {
+		handleError(h.log, c, apperrors.NewInvalidMultipartFormRequest())
 		return
 	}
 
-	if !entities.IsValidAttachmentType(req.Type) {
-		handleError(h.log, c, apperrors.NewInvalidCredentials())
+	files := form.File["files"]
+	if len(files) == 0 {
+		handleError(h.log, c, apperrors.NewInvalidMultipartFormRequest())
 		return
 	}
 
-	cmd := &services.CreateAttachmentCommand{
-		Type: req.Type,
-		URL:  req.URL,
-	}
-
-	var attachment *entities.ClaimAttachment
+	var attachments []*entities.ClaimAttachment
 	err = h.txManager.Do(c.Request.Context(), func(tx application.Tx) error {
-		var txErr error
-		attachment, txErr = h.service.Create(tx, claimID, cmd)
-		return txErr
+		for _, fileHeader := range files {
+			file, err := fileHeader.Open()
+			if err != nil {
+				return apperrors.NewInvalidMultipartFormRequest()
+			}
+			attachment, err := h.service.Create(tx, claimID, file)
+			if err != nil {
+				return err
+			}
+			err = file.Close()
+			h.log.Error("Failed to close file", "error", err)
+			attachments = append(attachments, attachment)
+		}
+		return nil
 	})
 
 	if err != nil {
@@ -108,7 +114,7 @@ func (h *claimAttachmentHandler) Create(c *gin.Context) {
 		return
 	}
 
-	writeSuccessResponse(c, http.StatusCreated, attachment)
+	writeSuccessResponse(c, http.StatusCreated, attachments)
 }
 
 func (h *claimAttachmentHandler) Delete(c *gin.Context) {
