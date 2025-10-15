@@ -6,6 +6,7 @@ import (
 	"ev-warranty-go/internal/application"
 	"ev-warranty-go/internal/application/repositories"
 	"ev-warranty-go/internal/domain/entities"
+	"ev-warranty-go/internal/infrastructure/cloudinary"
 	"ev-warranty-go/pkg/logger"
 	"time"
 
@@ -67,6 +68,7 @@ type claimService struct {
 	itemRepo       repositories.ClaimItemRepository
 	attachmentRepo repositories.ClaimAttachmentRepository
 	historyRepo    repositories.ClaimHistoryRepository
+	cloudService   cloudinary.CloudinaryService
 }
 
 func NewClaimService(
@@ -75,6 +77,7 @@ func NewClaimService(
 	itemRepo repositories.ClaimItemRepository,
 	attachmentRepo repositories.ClaimAttachmentRepository,
 	historyRepo repositories.ClaimHistoryRepository,
+	cloudService cloudinary.CloudinaryService,
 ) ClaimService {
 	return &claimService{
 		log:            log,
@@ -82,6 +85,7 @@ func NewClaimService(
 		itemRepo:       itemRepo,
 		attachmentRepo: attachmentRepo,
 		historyRepo:    historyRepo,
+		cloudService:   cloudService,
 	}
 }
 
@@ -182,9 +186,23 @@ func (s *claimService) Delete(tx application.Tx, id uuid.UUID) error {
 			}
 		}
 	} else if claim.Status == entities.ClaimStatusDraft {
-		if err = s.claimRepo.HardDelete(tx, id); err != nil {
+		attachments, err := s.attachmentRepo.FindByClaimID(tx.GetCtx(), id)
+		if err != nil {
 			return err
 		}
+
+		err = s.claimRepo.HardDelete(tx, id)
+		if err == nil {
+			for _, attach := range attachments {
+				go func() {
+					err := s.cloudService.DeleteFileByURL(context.Background(), attach.URL)
+					if err != nil {
+						s.log.Error("[Cloudinary] Failed to delete file in delete claim use case", "error", err)
+					}
+				}()
+			}
+		}
+		return err
 	}
 
 	return nil
