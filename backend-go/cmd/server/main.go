@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"ev-warranty-go/internal/application/services"
+	"ev-warranty-go/internal/infrastructure/cloudinary"
 	"ev-warranty-go/internal/infrastructure/config"
 	"ev-warranty-go/internal/infrastructure/database"
 	"ev-warranty-go/internal/infrastructure/oauth"
@@ -71,6 +72,11 @@ func main() {
 
 	googleProvider := providers.NewGoogleProvider(
 		cfg.OAuth.GoogleClientID, cfg.OAuth.GoogleClientSecret, cfg.OAuth.GoogleRedirectURL)
+	cloudinaryService, err := cloudinary.NewCloudinaryService(&cfg.Cloudinary)
+	if err != nil {
+		log.Error("Failed to initialize cloudinary", "error", err)
+		os.Exit(1)
+	}
 
 	officeService := services.NewOfficeService(officeRepo)
 	tokenService := services.NewTokenService(tokenRepo,
@@ -78,9 +84,9 @@ func main() {
 	authService := services.NewAuthService(userRepo, tokenService)
 	userService := services.NewUserService(userRepo, officeService)
 	oauthService := oauth.NewOAuthService(googleProvider, userRepo)
-	claimService := services.NewClaimService(log, claimRepo, claimItemRepo, claimAttachmentRepo, claimHistoryRepo)
-	claimItemService := services.NewClaimItemService(log, claimRepo, claimItemRepo)
-	claimAttachmentService := services.NewClaimAttachmentService(log, claimRepo, claimAttachmentRepo)
+	claimService := services.NewClaimService(log, claimRepo, claimItemRepo, claimAttachmentRepo, claimHistoryRepo, cloudinaryService)
+	claimItemService := services.NewClaimItemService(claimRepo, claimItemRepo)
+	claimAttachmentService := services.NewClaimAttachmentService(log, claimRepo, claimAttachmentRepo, cloudinaryService)
 
 	officeHandler := handlers.NewOfficeHandler(log, officeService)
 	authHandler := handlers.NewAuthHandler(log, authService, tokenService, userService)
