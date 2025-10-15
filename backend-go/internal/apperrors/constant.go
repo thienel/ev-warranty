@@ -42,4 +42,8 @@ const (
 	ErrorCodeClaimStatusNotAllowedDelete = "CLAIM_STATUS_NOT_ALLOWED_TO_DELETE"
 	ErrorCodeInvalidClaimAction          = "CLAIM_INVALID_ACTION"
 	ErrorCodeClaimMissingInformation     = "CLAIM_MISSING_INFORMATION"
+
+	ErrorCodeFailedInitializeCloudinary = "CLOUDINARY_FAILED_INITIALIZE"
+	ErrorCodeFailedUploadCloudinary     = "CLOUDINARY_FAILED_UPLOAD"
+	ErrorCodeFailedDeleteCloudinary     = "CLOUDINARY_FAILED_DELETE"
 )
