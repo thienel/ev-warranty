@@ -6,36 +6,36 @@ import (
 	"ev-warranty-go/internal/application"
 	"ev-warranty-go/internal/application/repositories"
 	"ev-warranty-go/internal/domain/entities"
+	"ev-warranty-go/internal/infrastructure/cloudinary"
 	"ev-warranty-go/pkg/logger"
-	"net/url"
+	"mime/multipart"
+	"net/http"
 
 	"github.com/google/uuid"
 )
-
-type CreateAttachmentCommand struct {
-	Type string
-	URL  string
-}
 
 type ClaimAttachmentService interface {
 	GetByID(ctx context.Context, id uuid.UUID) (*entities.ClaimAttachment, error)
 	GetByClaimID(ctx context.Context, claimID uuid.UUID) ([]*entities.ClaimAttachment, error)
 
-	Create(tx application.Tx, claimID uuid.UUID, cmd *CreateAttachmentCommand) (*entities.ClaimAttachment, error)
+	Create(tx application.Tx, claimID uuid.UUID, file multipart.File) (*entities.ClaimAttachment, error)
 	HardDelete(tx application.Tx, claimID, attachmentID uuid.UUID) error
 }
 
 type claimAttachmentService struct {
-	log        logger.Logger
-	claimRepo  repositories.ClaimRepository
-	attachRepo repositories.ClaimAttachmentRepository
+	log          logger.Logger
+	claimRepo    repositories.ClaimRepository
+	attachRepo   repositories.ClaimAttachmentRepository
+	cloudService cloudinary.CloudinaryService
 }
 
-func NewClaimAttachmentService(log logger.Logger, claimRepo repositories.ClaimRepository, attachRepo repositories.ClaimAttachmentRepository) ClaimAttachmentService {
+func NewClaimAttachmentService(log logger.Logger, claimRepo repositories.ClaimRepository,
+	attachRepo repositories.ClaimAttachmentRepository, cloudService cloudinary.CloudinaryService) ClaimAttachmentService {
 	return &claimAttachmentService{
-		log:        log,
-		claimRepo:  claimRepo,
-		attachRepo: attachRepo,
+		log:          log,
+		claimRepo:    claimRepo,
+		attachRepo:   attachRepo,
+		cloudService: cloudService,
 	}
 }
 
@@ -57,21 +57,27 @@ func (s *claimAttachmentService) GetByClaimID(ctx context.Context, claimID uuid.
 	return claimAttachments, nil
 }
 
-func (s *claimAttachmentService) Create(tx application.Tx, claimID uuid.UUID,
-	cmd *CreateAttachmentCommand) (*entities.ClaimAttachment, error) {
+func (s *claimAttachmentService) Create(tx application.Tx, claimID uuid.UUID, file multipart.File) (*entities.ClaimAttachment, error) {
 	_, err := s.claimRepo.FindByID(tx.GetCtx(), claimID)
 	if err != nil {
 		return nil, err
 	}
 
-	if !entities.IsValidAttachmentType(cmd.Type) {
-		return nil, apperrors.NewInvalidCredentials()
-	}
-	if !IsValidURL(cmd.URL) {
-		return nil, apperrors.NewInvalidCredentials()
+	mimeType, err := GetMimeType(file)
+	if err != nil {
+		return nil, err
 	}
 
-	attachment := entities.NewClaimAttachment(claimID, cmd.Type, cmd.URL)
+	attachType := cloudinary.DetermineResourceType(mimeType)
+	if !entities.IsValidAttachmentType(attachType) {
+		return nil, apperrors.NewInvalidCredentials()
+	}
+	attachURL, err := s.cloudService.UploadFile(tx.GetCtx(), file, attachType)
+	if err != nil {
+		return nil, err
+	}
+
+	attachment := entities.NewClaimAttachment(claimID, attachType, attachURL)
 	err = s.attachRepo.Create(tx, attachment)
 	if err != nil {
 		return nil, err
@@ -89,21 +95,32 @@ func (s *claimAttachmentService) HardDelete(tx application.Tx, claimID, attachme
 	if claim.Status != entities.ClaimStatusDraft {
 		return apperrors.NewNotAllowDeleteClaim()
 	}
-	err = s.attachRepo.HardDelete(tx, attachmentID)
+	attach, err := s.attachRepo.FindByID(tx.GetCtx(), attachmentID)
 	if err != nil {
 		return err
 	}
 
-	return nil
+	err = s.attachRepo.HardDelete(tx, attachmentID)
+	if err == nil {
+		err := s.cloudService.DeleteFileByURL(tx.GetCtx(), attach.URL)
+		s.log.Error("[Cloudinary] Failed to delete file when hard delete claim attachment", "error", err)
+	}
+
+	return err
 }
 
-func IsValidURL(str string) bool {
-	u, err := url.ParseRequestURI(str)
+func GetMimeType(file multipart.File) (string, error) {
+	buffer := make([]byte, 512)
+	_, err := file.Read(buffer)
 	if err != nil {
-		return false
+		return "", apperrors.NewInternalServerError(err)
 	}
-	if u.Scheme == "" || u.Host == "" {
-		return false
+
+	_, err = file.Seek(0, 0)
+	if err != nil {
+		return "", apperrors.NewInternalServerError(err)
 	}
-	return true
+
+	mimeType := http.DetectContentType(buffer)
+	return mimeType, nil
 }

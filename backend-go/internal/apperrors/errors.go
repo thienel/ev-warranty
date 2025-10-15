@@ -167,3 +167,19 @@ func NewMissingUserID() *AppError {
 func NewInvalidUserID() *AppError {
 	return New(http.StatusBadRequest, ErrorCodeInvalidUserID, errors.New("invalid user ID format"))
 }
+
+func NewFailedInitializeCloudinary() *AppError {
+	return New(http.StatusInternalServerError, ErrorCodeFailedInitializeCloudinary, errors.New("failed to initialize Cloudinary"))
+}
+
+func NewFailedUploadCloudinary() *AppError {
+	return New(http.StatusServiceUnavailable, ErrorCodeFailedUploadCloudinary, errors.New("failed to upload Cloudinary"))
+}
+
+func NewFailedDeleteCloudinary() *AppError {
+	return New(http.StatusServiceUnavailable, ErrorCodeFailedDeleteCloudinary, errors.New("failed to delete Cloudinary"))
+}
+
+func NewInvalidMultipartFormRequest() *AppError {
+	return New(http.StatusBadRequest, ErrorCodeInvalidMultipartFormRequest, errors.New("invalid multipart form request"))
+}

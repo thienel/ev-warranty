@@ -6,6 +6,7 @@ import (
 	"ev-warranty-go/internal/application"
 	"ev-warranty-go/internal/application/repositories"
 	"ev-warranty-go/internal/domain/entities"
+	"ev-warranty-go/internal/infrastructure/cloudinary"
 	"ev-warranty-go/pkg/logger"
 	"time"
 
@@ -39,11 +40,11 @@ type Pagination struct {
 }
 
 type ClaimListResult struct {
-	Claims     []*entities.Claim
-	Total      int64
-	Page       int
-	PageSize   int
-	TotalPages int
+	Claims     []*entities.Claim `json:"claims"`
+	Total      int64             `json:"total"`
+	Page       int               `json:"page"`
+	PageSize   int               `json:"page_size"`
+	TotalPages int               `json:"total_pages"`
 }
 
 type ClaimService interface {
@@ -67,6 +68,7 @@ type claimService struct {
 	itemRepo       repositories.ClaimItemRepository
 	attachmentRepo repositories.ClaimAttachmentRepository
 	historyRepo    repositories.ClaimHistoryRepository
+	cloudService   cloudinary.CloudinaryService
 }
 
 func NewClaimService(
@@ -75,6 +77,7 @@ func NewClaimService(
 	itemRepo repositories.ClaimItemRepository,
 	attachmentRepo repositories.ClaimAttachmentRepository,
 	historyRepo repositories.ClaimHistoryRepository,
+	cloudService cloudinary.CloudinaryService,
 ) ClaimService {
 	return &claimService{
 		log:            log,
@@ -82,6 +85,7 @@ func NewClaimService(
 		itemRepo:       itemRepo,
 		attachmentRepo: attachmentRepo,
 		historyRepo:    historyRepo,
+		cloudService:   cloudService,
 	}
 }
 
@@ -125,7 +129,7 @@ func (s *claimService) GetAll(ctx context.Context, filters ClaimFilters, paginat
 }
 
 func (s *claimService) Create(tx application.Tx, cmd *CreateClaimCommand) (*entities.Claim, error) {
-	claim := entities.NewClaim(cmd.VehicleID, cmd.CustomerID, cmd.Description, entities.ClaimStatusDraft, uuid.Nil)
+	claim := entities.NewClaim(cmd.VehicleID, cmd.CustomerID, cmd.Description, entities.ClaimStatusDraft, nil)
 
 	if err := s.claimRepo.Create(tx, claim); err != nil {
 		return nil, err
@@ -182,9 +186,23 @@ func (s *claimService) Delete(tx application.Tx, id uuid.UUID) error {
 			}
 		}
 	} else if claim.Status == entities.ClaimStatusDraft {
-		if err = s.claimRepo.HardDelete(tx, id); err != nil {
+		attachments, err := s.attachmentRepo.FindByClaimID(tx.GetCtx(), id)
+		if err != nil {
 			return err
 		}
+
+		err = s.claimRepo.HardDelete(tx, id)
+		if err == nil {
+			for _, attach := range attachments {
+				go func() {
+					err := s.cloudService.DeleteFileByURL(context.Background(), attach.URL)
+					if err != nil {
+						s.log.Error("[Cloudinary] Failed to delete file in delete claim use case", "error", err)
+					}
+				}()
+			}
+		}
+		return err
 	}
 
 	return nil

@@ -62,7 +62,7 @@ func (h *claimHandler) GetByID(c *gin.Context) {
 		return
 	}
 
-	writeSuccessResponse(c, http.StatusOK, dtos.ToClaimResponse(claim))
+	writeSuccessResponse(c, http.StatusOK, claim)
 }
 
 func (h *claimHandler) GetAll(c *gin.Context) {
@@ -83,7 +83,7 @@ func (h *claimHandler) GetAll(c *gin.Context) {
 		return
 	}
 
-	writeSuccessResponse(c, http.StatusOK, dtos.ToClaimListResponse(result))
+	writeSuccessResponse(c, http.StatusOK, result)
 }
 
 func (h *claimHandler) Create(c *gin.Context) {
@@ -118,7 +118,7 @@ func (h *claimHandler) Create(c *gin.Context) {
 		return
 	}
 
-	writeSuccessResponse(c, http.StatusCreated, dtos.ToClaimResponse(claim))
+	writeSuccessResponse(c, http.StatusCreated, claim)
 }
 
 func (h *claimHandler) Update(c *gin.Context) {
@@ -318,5 +318,5 @@ func (h *claimHandler) History(c *gin.Context) {
 		return
 	}
 
-	writeSuccessResponse(c, http.StatusOK, dtos.ToClaimHistoryListResponse(histories))
+	writeSuccessResponse(c, http.StatusOK, histories)
 }

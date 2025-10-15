@@ -24,7 +24,7 @@ type ClaimItem struct {
 	Claim             Claim           `gorm:"foreignKey:ClaimID;references:ID;constraint:OnDelete:CASCADE" json:"-"`
 	PartCategoryID    int             `gorm:"not null" json:"part_category_id"`
 	FaultyPartID      uuid.UUID       `gorm:"not null;type:uuid" json:"faulty_part_id"`
-	ReplacementPartID *uuid.UUID      `gorm:"type:uuid" json:"replacement_part_id"`
+	ReplacementPartID *uuid.UUID      `gorm:"type:uuid" json:"replacement_part_id,omitempty"`
 	IssueDescription  string          `gorm:"not null;type:text" json:"issue_description"`
 	Status            string          `gorm:"not null" json:"status"`
 	Type              string          `gorm:"not null" json:"type"`

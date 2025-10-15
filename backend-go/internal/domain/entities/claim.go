@@ -25,13 +25,13 @@ type Claim struct {
 	Description string          `gorm:"not null;" json:"description"`
 	Status      string          `gorm:"not null;default:draft" json:"status"`
 	TotalCost   float64         `json:"total_cost"`
-	ApprovedBy  uuid.UUID       `gorm:"type:uuid" json:"approved_by"`
+	ApprovedBy  *uuid.UUID      `gorm:"type:uuid" json:"approved_by,omitempty"`
 	CreatedAt   time.Time       `gorm:"autoCreateTime" json:"created_at"`
 	UpdatedAt   time.Time       `gorm:"autoUpdateTime" json:"updated_at"`
 	DeletedAt   *gorm.DeletedAt `gorm:"index" json:"-"`
 }
 
-func NewClaim(vehicleID, customerID uuid.UUID, description, status string, approvedBy uuid.UUID) *Claim {
+func NewClaim(vehicleID, customerID uuid.UUID, description, status string, approvedBy *uuid.UUID) *Claim {
 	return &Claim{
 		ID:          uuid.New(),
 		VehicleID:   vehicleID,

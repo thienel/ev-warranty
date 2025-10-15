@@ -7,8 +7,9 @@ const (
 	ErrorCodeDuplicateKey = "DB_DUPLICATE_KEY"
 	ErrorCodeHashPassword = "DB_HASH_PASSWORD_ERROR"
 
-	ErrorCodeInvalidJsonRequest    = "API_INVALID_JSON_REQUEST"
-	ErrorCodeInvalidQueryParameter = "API_INVALID_QUERY_PARAMETER"
+	ErrorCodeInvalidJsonRequest          = "API_INVALID_JSON_REQUEST"
+	ErrorCodeInvalidQueryParameter       = "API_INVALID_QUERY_PARAMETER"
+	ErrorCodeInvalidMultipartFormRequest = "API_INVALID_MULTIPART_FORM_REQUEST"
 
 	ErrorCodeInvalidAccessToken         = "AUTH_INVALID_ACCESS_TOKEN"
 	ErrorCodeExpiredAccessToken         = "AUTH_EXPIRED_ACCESS_TOKEN"
@@ -42,4 +43,8 @@ const (
 	ErrorCodeClaimStatusNotAllowedDelete = "CLAIM_STATUS_NOT_ALLOWED_TO_DELETE"
 	ErrorCodeInvalidClaimAction          = "CLAIM_INVALID_ACTION"
 	ErrorCodeClaimMissingInformation     = "CLAIM_MISSING_INFORMATION"
+
+	ErrorCodeFailedInitializeCloudinary = "CLOUDINARY_FAILED_INITIALIZE"
+	ErrorCodeFailedUploadCloudinary     = "CLOUDINARY_FAILED_UPLOAD"
+	ErrorCodeFailedDeleteCloudinary     = "CLOUDINARY_FAILED_DELETE"
 )

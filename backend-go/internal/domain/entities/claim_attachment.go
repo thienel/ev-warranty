@@ -8,8 +8,8 @@ import (
 )
 
 const (
-	AttachmentTypeVideo = "VIDEO"
-	AttachmentTypePhoto = "PHOTO"
+	AttachmentTypeVideo = "video"
+	AttachmentTypeImage = "image"
 
 	AttachmentRequirePerClaim = 3
 )
@@ -35,7 +35,7 @@ func NewClaimAttachment(claimID uuid.UUID, attachmentType, url string) *ClaimAtt
 
 func IsValidAttachmentType(attachmentType string) bool {
 	switch attachmentType {
-	case AttachmentTypeVideo, AttachmentTypePhoto:
+	case AttachmentTypeVideo, AttachmentTypeImage:
 		return true
 	default:
 		return false

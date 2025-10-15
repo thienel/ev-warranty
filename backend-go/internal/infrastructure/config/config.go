@@ -12,6 +12,11 @@ type OAuthConfig struct {
 	FrontendBaseURL    string
 }
 
+type CloudinaryConfig struct {
+	URL          string
+	UploadFolder string
+}
+
 type Config struct {
 	Port            string
 	DatabaseURL     string
@@ -21,6 +26,7 @@ type Config struct {
 	AccessTokenTTL  time.Duration
 	RefreshTokenTTL time.Duration
 	OAuth           OAuthConfig
+	Cloudinary      CloudinaryConfig
 }
 
 func Load() *Config {
@@ -37,6 +43,10 @@ func Load() *Config {
 	if ggClientID == "" || ggClientSecret == "" {
 		panic("Google OAuth credentials are not set in environment variables")
 	}
+	cloudinaryURL := os.Getenv("CLOUDINARY_URL")
+	if cloudinaryURL == "" {
+		panic("Cloudinary URL are not set in environment variables")
+	}
 	return &Config{
 		Port:            getEnv("PORT", "8888"),
 		DatabaseURL:     getEnv("DATABASE_URL", "postgres://auth_service:password@localhost:5432/auth_service?sslmode=disable"),
@@ -50,6 +60,10 @@ func Load() *Config {
 			GoogleClientSecret: ggClientSecret,
 			GoogleRedirectURL:  getEnv("GOOGLE_REDIRECT_URL", "http://localhost/api/v1/oauth/google/callback"),
 			FrontendBaseURL:    getEnv("FRONTEND_BASE_URL", "http://localhost:3000"),
+		},
+		Cloudinary: CloudinaryConfig{
+			URL:          cloudinaryURL,
+			UploadFolder: getEnv("CLOUDINARY_UPLOAD_FOLDER", "ev-warranty-claim-attachment"),
 		},
 	}
 }
