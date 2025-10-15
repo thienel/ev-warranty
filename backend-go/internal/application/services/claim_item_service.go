@@ -6,7 +6,6 @@ import (
 	"ev-warranty-go/internal/application"
 	"ev-warranty-go/internal/application/repositories"
 	"ev-warranty-go/internal/domain/entities"
-	"ev-warranty-go/pkg/logger"
 
 	"github.com/google/uuid"
 )
@@ -43,14 +42,12 @@ type ClaimItemService interface {
 }
 
 type claimItemService struct {
-	log       logger.Logger
 	claimRepo repositories.ClaimRepository
 	itemRepo  repositories.ClaimItemRepository
 }
 
-func NewClaimItemService(log logger.Logger, claimRepo repositories.ClaimRepository, itemRepo repositories.ClaimItemRepository) ClaimItemService {
+func NewClaimItemService(claimRepo repositories.ClaimRepository, itemRepo repositories.ClaimItemRepository) ClaimItemService {
 	return &claimItemService{
-		log:       log,
 		claimRepo: claimRepo,
 		itemRepo:  itemRepo,
 	}
