@@ -179,3 +179,7 @@ func NewFailedUploadCloudinary() *AppError {
 func NewFailedDeleteCloudinary() *AppError {
 	return New(http.StatusServiceUnavailable, ErrorCodeFailedDeleteCloudinary, errors.New("failed to delete Cloudinary"))
 }
+
+func NewInvalidMultipartFormRequest() *AppError {
+	return New(http.StatusBadRequest, ErrorCodeInvalidMultipartFormRequest, errors.New("invalid multipart form request"))
+}

@@ -7,8 +7,9 @@ const (
 	ErrorCodeDuplicateKey = "DB_DUPLICATE_KEY"
 	ErrorCodeHashPassword = "DB_HASH_PASSWORD_ERROR"
 
-	ErrorCodeInvalidJsonRequest    = "API_INVALID_JSON_REQUEST"
-	ErrorCodeInvalidQueryParameter = "API_INVALID_QUERY_PARAMETER"
+	ErrorCodeInvalidJsonRequest          = "API_INVALID_JSON_REQUEST"
+	ErrorCodeInvalidQueryParameter       = "API_INVALID_QUERY_PARAMETER"
+	ErrorCodeInvalidMultipartFormRequest = "API_INVALID_MULTIPART_FORM_REQUEST"
 
 	ErrorCodeInvalidAccessToken         = "AUTH_INVALID_ACCESS_TOKEN"
 	ErrorCodeExpiredAccessToken         = "AUTH_EXPIRED_ACCESS_TOKEN"
