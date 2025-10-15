@@ -39,11 +39,11 @@ type Pagination struct {
 }
 
 type ClaimListResult struct {
-	Claims     []*entities.Claim
-	Total      int64
-	Page       int
-	PageSize   int
-	TotalPages int
+	Claims     []*entities.Claim `json:"claims"`
+	Total      int64             `json:"total"`
+	Page       int               `json:"page"`
+	PageSize   int               `json:"page_size"`
+	TotalPages int               `json:"total_pages"`
 }
 
 type ClaimService interface {
@@ -125,7 +125,7 @@ func (s *claimService) GetAll(ctx context.Context, filters ClaimFilters, paginat
 }
 
 func (s *claimService) Create(tx application.Tx, cmd *CreateClaimCommand) (*entities.Claim, error) {
-	claim := entities.NewClaim(cmd.VehicleID, cmd.CustomerID, cmd.Description, entities.ClaimStatusDraft, uuid.Nil)
+	claim := entities.NewClaim(cmd.VehicleID, cmd.CustomerID, cmd.Description, entities.ClaimStatusDraft, nil)
 
 	if err := s.claimRepo.Create(tx, claim); err != nil {
 		return nil, err
