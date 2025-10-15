@@ -1,0 +1,27 @@
+using Backend.Dotnet.Application.DTOs;
+using static Backend.Dotnet.Application.DTOs.VehicleDto;
+
+namespace Backend.Dotnet.Application.Interfaces
+{
+    public interface IVehicleService
+    {
+        Task<BaseResponseDto<VehicleResponse>> CreateAsync(CreateVehicleRequest request);
+
+        Task<BaseResponseDto<VehicleResponse>> GetByIdAsync(Guid id);
+        //Task<BaseResponseDto<VehicleDetailResponse>> GetDetailAsync(Guid id);
+        Task<BaseResponseDto<IEnumerable<VehicleResponse>>> GetAllAsync();
+        Task<BaseResponseDto<VehicleResponse>> GetByVinAsync(string vin);
+        Task<BaseResponseDto<VehicleResponse>> GetByLicensePlateAsync(string licensePlate);
+        Task<BaseResponseDto<IEnumerable<VehicleResponse>>> GetByCustomerIdAsync(Guid customerId);
+        Task<BaseResponseDto<IEnumerable<VehicleResponse>>> GetByModelIdAsync(Guid modelId);
+        Task<BaseResponseDto<IEnumerable<VehicleResponse>>> SearchAsync(string searchTerm);
+
+        Task<BaseResponseDto<VehicleResponse>> UpdateAsync(Guid id, UpdateVehicleRequest request);
+        Task<BaseResponseDto<VehicleResponse>> UpdateLicensePlateAsync(Guid id, UpdateLicensePlateCommand command);
+        Task<BaseResponseDto<VehicleResponse>> TransferOwnershipAsync(Guid id, TransferVehicleCommand command);
+
+        // Soft delete operations
+        Task<BaseResponseDto<VehicleResponse>> SoftDeleteAsync(Guid id);
+        Task<BaseResponseDto<VehicleResponse>> RestoreAsync(Guid id);
+    }
+}
