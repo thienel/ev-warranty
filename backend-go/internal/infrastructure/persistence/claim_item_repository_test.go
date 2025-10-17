@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"ev-warranty-go/pkg/mocks"
+	"regexp"
 	"time"
 
 	"github.com/DATA-DOG/go-sqlmock"
@@ -194,7 +195,7 @@ var _ = Describe("ClaimItemRepository", func() {
 				mockTx := mocks.NewTx(GinkgoT())
 				mockTx.On("GetTx").Return(db)
 				mock.ExpectBegin()
-				mock.ExpectExec(`DELETE FROM "claim_items" WHERE id = \$1`).
+				mock.ExpectExec(regexp.QuoteMeta(`DELETE FROM "claim_items" WHERE id = $1`)).
 					WithArgs(itemID).
 					WillReturnResult(sqlmock.NewResult(1, 1))
 				mock.ExpectCommit()
@@ -210,7 +211,7 @@ var _ = Describe("ClaimItemRepository", func() {
 				mockTx := mocks.NewTx(GinkgoT())
 				mockTx.On("GetTx").Return(db)
 				mock.ExpectBegin()
-				mock.ExpectExec(`DELETE FROM "claim_items" WHERE id = \$1`).
+				mock.ExpectExec(regexp.QuoteMeta(`DELETE FROM "claim_items" WHERE id = $1`)).
 					WithArgs(itemID).
 					WillReturnError(errors.New("database connection failed"))
 				mock.ExpectRollback()
@@ -237,7 +238,7 @@ var _ = Describe("ClaimItemRepository", func() {
 				mockTx := mocks.NewTx(GinkgoT())
 				mockTx.On("GetTx").Return(db)
 				mock.ExpectBegin()
-				mock.ExpectExec(`UPDATE "claim_items" SET "deleted_at"=\$1 WHERE claim_id = \$2`).
+				mock.ExpectExec(regexp.QuoteMeta(`UPDATE "claim_items" SET "deleted_at"=$1 WHERE claim_id = $2`)).
 					WithArgs(sqlmock.AnyArg(), claimID).
 					WillReturnResult(sqlmock.NewResult(1, 1))
 				mock.ExpectCommit()
@@ -253,7 +254,7 @@ var _ = Describe("ClaimItemRepository", func() {
 				mockTx := mocks.NewTx(GinkgoT())
 				mockTx.On("GetTx").Return(db)
 				mock.ExpectBegin()
-				mock.ExpectExec(`UPDATE "claim_items" SET "deleted_at"=\$1 WHERE claim_id = \$2`).
+				mock.ExpectExec(regexp.QuoteMeta(`UPDATE "claim_items" SET "deleted_at"=$1 WHERE claim_id = $2`)).
 					WithArgs(sqlmock.AnyArg(), claimID).
 					WillReturnError(errors.New("database connection failed"))
 				mock.ExpectRollback()
@@ -282,7 +283,7 @@ var _ = Describe("ClaimItemRepository", func() {
 				mockTx := mocks.NewTx(GinkgoT())
 				mockTx.On("GetTx").Return(db)
 				mock.ExpectBegin()
-				mock.ExpectExec(`UPDATE "claim_items" SET "line_status"=\$1,"updated_at"=\$2 WHERE id = \$3 AND "claim_items"."deleted_at" IS NULL`).
+				mock.ExpectExec(regexp.QuoteMeta(`UPDATE "claim_items" SET "line_status"=$1,"updated_at"=$2 WHERE id = $3 AND "claim_items"."deleted_at" IS NULL`)).
 					WithArgs(status, sqlmock.AnyArg(), itemID).
 					WillReturnResult(sqlmock.NewResult(1, 1))
 				mock.ExpectCommit()
@@ -298,7 +299,7 @@ var _ = Describe("ClaimItemRepository", func() {
 				mockTx := mocks.NewTx(GinkgoT())
 				mockTx.On("GetTx").Return(db)
 				mock.ExpectBegin()
-				mock.ExpectExec(`UPDATE "claim_items" SET "line_status"=\$1,"updated_at"=\$2 WHERE id = \$3 AND "claim_items"."deleted_at" IS NULL`).
+				mock.ExpectExec(regexp.QuoteMeta(`UPDATE "claim_items" SET "line_status"=$1,"updated_at"=$2 WHERE id = $3 AND "claim_items"."deleted_at" IS NULL`)).
 					WithArgs(status, sqlmock.AnyArg(), itemID).
 					WillReturnError(errors.New("database connection failed"))
 				mock.ExpectRollback()
@@ -324,7 +325,7 @@ var _ = Describe("ClaimItemRepository", func() {
 					mockTx := mocks.NewTx(GinkgoT())
 					mockTx.On("GetTx").Return(db)
 					mock.ExpectBegin()
-					mock.ExpectExec(`UPDATE "claim_items" SET "line_status"=\$1,"updated_at"=\$2 WHERE id = \$3 AND "claim_items"."deleted_at" IS NULL`).
+					mock.ExpectExec(regexp.QuoteMeta(`UPDATE "claim_items" SET "line_status"=$1,"updated_at"=$2 WHERE id = $3 AND "claim_items"."deleted_at" IS NULL`)).
 						WithArgs(s, sqlmock.AnyArg(), itemID).
 						WillReturnResult(sqlmock.NewResult(1, 1))
 					mock.ExpectCommit()
@@ -349,7 +350,7 @@ var _ = Describe("ClaimItemRepository", func() {
 				mockTx.On("GetTx").Return(db)
 				rows := sqlmock.NewRows([]string{"sum"}).AddRow(5000.0)
 
-				mock.ExpectQuery(`SELECT COALESCE\(SUM\(cost\), 0\) FROM "claim_items" WHERE \(claim_id = \$1 AND status = 'APPROVED'\) AND "claim_items"."deleted_at" IS NULL`).
+				mock.ExpectQuery(regexp.QuoteMeta(`SELECT COALESCE(SUM(cost), 0) FROM "claim_items" WHERE (claim_id = $1 AND status = 'APPROVED') AND "claim_items"."deleted_at" IS NULL`)).
 					WithArgs(claimID).
 					WillReturnRows(rows)
 
@@ -366,7 +367,7 @@ var _ = Describe("ClaimItemRepository", func() {
 				mockTx.On("GetTx").Return(db)
 				rows := sqlmock.NewRows([]string{"sum"}).AddRow(0.0)
 
-				mock.ExpectQuery(`SELECT COALESCE\(SUM\(cost\), 0\) FROM "claim_items" WHERE \(claim_id = \$1 AND status = 'APPROVED'\) AND "claim_items"."deleted_at" IS NULL`).
+				mock.ExpectQuery(regexp.QuoteMeta(`SELECT COALESCE(SUM(cost), 0) FROM "claim_items" WHERE (claim_id = $1 AND status = 'APPROVED') AND "claim_items"."deleted_at" IS NULL`)).
 					WithArgs(claimID).
 					WillReturnRows(rows)
 
@@ -381,7 +382,7 @@ var _ = Describe("ClaimItemRepository", func() {
 			It("should return DBOperationError", func() {
 				mockTx := mocks.NewTx(GinkgoT())
 				mockTx.On("GetTx").Return(db)
-				mock.ExpectQuery(`SELECT COALESCE\(SUM\(cost\), 0\) FROM "claim_items" WHERE \(claim_id = \$1 AND status = 'APPROVED'\) AND "claim_items"."deleted_at" IS NULL`).
+				mock.ExpectQuery(regexp.QuoteMeta(`SELECT COALESCE(SUM(cost), 0) FROM "claim_items" WHERE (claim_id = $1 AND status = 'APPROVED') AND "claim_items"."deleted_at" IS NULL`)).
 					WithArgs(claimID).
 					WillReturnError(errors.New("database connection failed"))
 
@@ -401,7 +402,7 @@ var _ = Describe("ClaimItemRepository", func() {
 				mockTx.On("GetTx").Return(db)
 				rows := sqlmock.NewRows([]string{"sum"}).AddRow(999999999.99)
 
-				mock.ExpectQuery(`SELECT COALESCE\(SUM\(cost\), 0\) FROM "claim_items" WHERE \(claim_id = \$1 AND status = 'APPROVED'\) AND "claim_items"."deleted_at" IS NULL`).
+				mock.ExpectQuery(regexp.QuoteMeta(`SELECT COALESCE(SUM(cost), 0) FROM "claim_items" WHERE (claim_id = $1 AND status = 'APPROVED') AND "claim_items"."deleted_at" IS NULL`)).
 					WithArgs(claimID).
 					WillReturnRows(rows)
 
@@ -502,7 +503,7 @@ var _ = Describe("ClaimItemRepository", func() {
 					2000.0, time.Now(), time.Now(), nil,
 				)
 
-				mock.ExpectQuery(`SELECT \* FROM "claim_items" WHERE claim_id = \$1 AND "claim_items"."deleted_at" IS NULL ORDER BY created_at ASC`).
+				mock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "claim_items" WHERE claim_id = $1 AND "claim_items"."deleted_at" IS NULL ORDER BY created_at ASC`)).
 					WithArgs(claimID).
 					WillReturnRows(rows)
 
@@ -522,7 +523,7 @@ var _ = Describe("ClaimItemRepository", func() {
 					"issue_description", "status", "type", "cost", "created_at", "updated_at", "deleted_at",
 				})
 
-				mock.ExpectQuery(`SELECT \* FROM "claim_items" WHERE claim_id = \$1 AND "claim_items"."deleted_at" IS NULL ORDER BY created_at ASC`).
+				mock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "claim_items" WHERE claim_id = $1 AND "claim_items"."deleted_at" IS NULL ORDER BY created_at ASC`)).
 					WithArgs(claimID).
 					WillReturnRows(rows)
 
@@ -535,7 +536,7 @@ var _ = Describe("ClaimItemRepository", func() {
 
 		Context("when there is a database error", func() {
 			It("should return DBOperationError", func() {
-				mock.ExpectQuery(`SELECT \* FROM "claim_items" WHERE claim_id = \$1 AND "claim_items"."deleted_at" IS NULL`).
+				mock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "claim_items" WHERE claim_id = $1 AND "claim_items"."deleted_at" IS NULL`)).
 					WithArgs(claimID).
 					WillReturnError(errors.New("database connection failed"))
 
@@ -563,7 +564,7 @@ var _ = Describe("ClaimItemRepository", func() {
 					500.0, time.Now(), time.Now(), nil,
 				)
 
-				mock.ExpectQuery(`SELECT \* FROM "claim_items" WHERE claim_id = \$1 AND "claim_items"."deleted_at" IS NULL ORDER BY created_at ASC`).
+				mock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "claim_items" WHERE claim_id = $1 AND "claim_items"."deleted_at" IS NULL ORDER BY created_at ASC`)).
 					WithArgs(claimID).
 					WillReturnRows(rows)
 

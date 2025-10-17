@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"ev-warranty-go/pkg/mocks"
+	"regexp"
 	"time"
 
 	"github.com/DATA-DOG/go-sqlmock"
@@ -135,7 +136,7 @@ var _ = Describe("ClaimRepository", func() {
 				mockTx := mocks.NewTx(GinkgoT())
 				mockTx.On("GetTx").Return(db)
 				mock.ExpectBegin()
-				mock.ExpectExec(`DELETE FROM "claims" WHERE id = \$1`).
+				mock.ExpectExec(regexp.QuoteMeta(`DELETE FROM "claims" WHERE id = $1`)).
 					WithArgs(claimID).
 					WillReturnResult(sqlmock.NewResult(1, 1))
 				mock.ExpectCommit()
@@ -151,7 +152,7 @@ var _ = Describe("ClaimRepository", func() {
 				mockTx := mocks.NewTx(GinkgoT())
 				mockTx.On("GetTx").Return(db)
 				mock.ExpectBegin()
-				mock.ExpectExec(`DELETE FROM "claims" WHERE id = \$1`).
+				mock.ExpectExec(regexp.QuoteMeta(`DELETE FROM "claims" WHERE id = $1`)).
 					WithArgs(claimID).
 					WillReturnError(errors.New("database connection failed"))
 				mock.ExpectRollback()
@@ -215,7 +216,7 @@ var _ = Describe("ClaimRepository", func() {
 				mockTx := mocks.NewTx(GinkgoT())
 				mockTx.On("GetTx").Return(db)
 				mock.ExpectBegin()
-				mock.ExpectExec(`UPDATE "claims" SET "status"=\$1,"updated_at"=\$2 WHERE id = \$3 AND "claims"."deleted_at" IS NULL`).
+				mock.ExpectExec(regexp.QuoteMeta(`UPDATE "claims" SET "status"=$1,"updated_at"=$2 WHERE id = $3 AND "claims"."deleted_at" IS NULL`)).
 					WithArgs(status, sqlmock.AnyArg(), claimID).
 					WillReturnResult(sqlmock.NewResult(1, 1))
 				mock.ExpectCommit()
@@ -231,7 +232,7 @@ var _ = Describe("ClaimRepository", func() {
 				mockTx := mocks.NewTx(GinkgoT())
 				mockTx.On("GetTx").Return(db)
 				mock.ExpectBegin()
-				mock.ExpectExec(`UPDATE "claims" SET "status"=\$1,"updated_at"=\$2 WHERE id = \$3 AND "claims"."deleted_at" IS NULL`).
+				mock.ExpectExec(regexp.QuoteMeta(`UPDATE "claims" SET "status"=$1,"updated_at"=$2 WHERE id = $3 AND "claims"."deleted_at" IS NULL`)).
 					WithArgs(status, sqlmock.AnyArg(), claimID).
 					WillReturnError(errors.New("database connection failed"))
 				mock.ExpectRollback()
@@ -260,7 +261,7 @@ var _ = Describe("ClaimRepository", func() {
 					mockTx := mocks.NewTx(GinkgoT())
 					mockTx.On("GetTx").Return(db)
 					mock.ExpectBegin()
-					mock.ExpectExec(`UPDATE "claims" SET "status"=\$1,"updated_at"=\$2 WHERE id = \$3 AND "claims"."deleted_at" IS NULL`).
+					mock.ExpectExec(regexp.QuoteMeta(`UPDATE "claims" SET "status"=$1,"updated_at"=$2 WHERE id = $3 AND "claims"."deleted_at" IS NULL`)).
 						WithArgs(s, sqlmock.AnyArg(), claimID).
 						WillReturnResult(sqlmock.NewResult(1, 1))
 					mock.ExpectCommit()

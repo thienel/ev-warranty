@@ -3,6 +3,7 @@ package persistence_test
 import (
 	"context"
 	"errors"
+	"regexp"
 	"time"
 
 	"github.com/DATA-DOG/go-sqlmock"
@@ -164,7 +165,7 @@ var _ = Describe("UserRepository", func() {
 					expected.UpdatedAt, expected.DeletedAt,
 				)
 
-				mock.ExpectQuery(`SELECT \* FROM "users" WHERE email = \$1`).
+				mock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "users" WHERE email = $1`)).
 					WithArgs(email, 1).
 					WillReturnRows(rows)
 
@@ -178,7 +179,7 @@ var _ = Describe("UserRepository", func() {
 
 		Context("when user is not found", func() {
 			It("should return UserNotFound error", func() {
-				mock.ExpectQuery(`SELECT \* FROM "users" WHERE email = \$1`).
+				mock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "users" WHERE email = $1`)).
 					WithArgs(email, 1).
 					WillReturnError(gorm.ErrRecordNotFound)
 
@@ -194,7 +195,7 @@ var _ = Describe("UserRepository", func() {
 
 		Context("when there is a database error", func() {
 			It("should return DBOperationError", func() {
-				mock.ExpectQuery(`SELECT \* FROM "users" WHERE email = \$1`).
+				mock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "users" WHERE email = $1`)).
 					WithArgs(email, 1).
 					WillReturnError(errors.New("database connection failed"))
 
@@ -210,7 +211,7 @@ var _ = Describe("UserRepository", func() {
 
 		Context("boundary cases for email", func() {
 			It("should handle empty email", func() {
-				mock.ExpectQuery(`SELECT \* FROM "users" WHERE email = \$1`).
+				mock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "users" WHERE email = $1`)).
 					WithArgs("", 1).
 					WillReturnError(gorm.ErrRecordNotFound)
 
@@ -222,7 +223,7 @@ var _ = Describe("UserRepository", func() {
 
 			It("should handle very long email", func() {
 				longEmail := "very.long.email.address.that.exceeds.normal.length@verylongdomainname.com"
-				mock.ExpectQuery(`SELECT \* FROM "users" WHERE email = \$1`).
+				mock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "users" WHERE email = $1`)).
 					WithArgs(longEmail, 1).
 					WillReturnError(gorm.ErrRecordNotFound)
 
@@ -400,7 +401,7 @@ var _ = Describe("UserRepository", func() {
 					expected.UpdatedAt, expected.DeletedAt,
 				)
 
-				mock.ExpectQuery(`SELECT \* FROM "users" WHERE \(oauth_provider = \$1 AND oauth_id = \$2\) AND "users"."deleted_at" IS NULL ORDER BY "users"."id" LIMIT \$3`).
+				mock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "users" WHERE (oauth_provider = $1 AND oauth_id = $2) AND "users"."deleted_at" IS NULL ORDER BY "users"."id" LIMIT $3`)).
 					WithArgs(provider, oauthID, 1).
 					WillReturnRows(rows)
 
@@ -415,7 +416,7 @@ var _ = Describe("UserRepository", func() {
 
 		Context("when user is not found", func() {
 			It("should return UserNotFound error", func() {
-				mock.ExpectQuery(`SELECT \* FROM "users" WHERE \(oauth_provider = \$1 AND oauth_id = \$2\) AND "users"."deleted_at" IS NULL ORDER BY "users"."id" LIMIT \$3`).
+				mock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "users" WHERE (oauth_provider = $1 AND oauth_id = $2) AND "users"."deleted_at" IS NULL ORDER BY "users"."id" LIMIT $3`)).
 					WithArgs(provider, oauthID, 1).
 					WillReturnError(gorm.ErrRecordNotFound)
 
@@ -431,7 +432,7 @@ var _ = Describe("UserRepository", func() {
 
 		Context("boundary cases for OAuth", func() {
 			It("should handle empty provider", func() {
-				mock.ExpectQuery(`SELECT \* FROM "users" WHERE \(oauth_provider = \$1 AND oauth_id = \$2\) AND "users"."deleted_at" IS NULL ORDER BY "users"."id" LIMIT \$3`).
+				mock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "users" WHERE (oauth_provider = $1 AND oauth_id = $2) AND "users"."deleted_at" IS NULL ORDER BY "users"."id" LIMIT $3`)).
 					WithArgs("", oauthID, 1).
 					WillReturnError(gorm.ErrRecordNotFound)
 
@@ -445,7 +446,7 @@ var _ = Describe("UserRepository", func() {
 			})
 
 			It("should handle empty oauth_id", func() {
-				mock.ExpectQuery(`SELECT \* FROM "users" WHERE \(oauth_provider = \$1 AND oauth_id = \$2\) AND "users"."deleted_at" IS NULL ORDER BY "users"."id" LIMIT \$3`).
+				mock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "users" WHERE (oauth_provider = $1 AND oauth_id = $2) AND "users"."deleted_at" IS NULL ORDER BY "users"."id" LIMIT $3`)).
 					WithArgs(provider, "", 1).
 					WillReturnError(gorm.ErrRecordNotFound)
 
