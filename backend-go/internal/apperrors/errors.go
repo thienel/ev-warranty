@@ -92,7 +92,7 @@ func NewDBOperationError(err error) *AppError {
 }
 
 func NewDBDuplicateKeyError(key string) *AppError {
-	return New(http.StatusConflict, ErrorCodeDuplicateKey, errors.New(fmt.Sprintf("key %s already existed", key)))
+	return New(http.StatusConflict, ErrorCodeDuplicateKey, fmt.Errorf("key %s already existed", key))
 }
 
 func NewHashPasswordError(err error) *AppError {
@@ -133,7 +133,7 @@ func NewFailedHashToken() *AppError {
 
 func NewUnexpectedSigningMethod(method any) *AppError {
 	return New(http.StatusUnauthorized, ErrorCodeUnexpectedSigningMethod,
-		errors.New(fmt.Sprintf("unexpected signing method: %v", method)))
+		fmt.Errorf("unexpected signing method: %v", method))
 }
 
 func NewInvalidClaimAction() *AppError {
@@ -157,7 +157,7 @@ func NewMissingInformationClaim() *AppError {
 
 func NewInvalidQueryParameter(param string) *AppError {
 	return New(http.StatusBadRequest, ErrorCodeInvalidQueryParameter,
-		errors.New(fmt.Sprintf("invalid query parameter: %s", param)))
+		fmt.Errorf("invalid query parameter: %s", param))
 }
 
 func NewMissingUserID() *AppError {
