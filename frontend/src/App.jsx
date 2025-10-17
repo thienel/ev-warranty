@@ -7,6 +7,8 @@ import Users from '@pages/admin/Users.jsx'
 import AppLayout from '@components/Layout/Layout.jsx'
 import Offices from '@pages/admin/Offices.jsx'
 import Error from '@pages/Error/Error.jsx'
+import useCheckRole from '@/hooks/useCheckRole.js'
+import { USER_ROLES } from '@constants'
 
 export const ProtectedRoute = () => {
   const { isAuthenticated } = useSelector((state) => state.auth)
@@ -20,6 +22,12 @@ export const PublicRoute = () => {
   return !isAuthenticated ? <Outlet /> : <Navigate to="/" replace />
 }
 
+export const AdminRoute = () => {
+  const isRightRole = useCheckRole(USER_ROLES.ADMIN)
+
+  return isRightRole ? <Outlet /> : <Navigate to="/unauthorized" replace />
+}
+
 const App = () => {
   const routes = [
     {
@@ -27,12 +35,18 @@ const App = () => {
       children: [
         { path: '/', element: <AppLayout /> },
         {
-          path: '/users',
-          element: <Users />,
-        },
-        {
-          path: '/offices',
-          element: <Offices />,
+          path: '/admin',
+          element: <AdminRoute />,
+          children: [
+            {
+              path: 'users',
+              element: <Users />,
+            },
+            {
+              path: 'offices',
+              element: <Offices />,
+            },
+          ],
         },
       ],
     },
