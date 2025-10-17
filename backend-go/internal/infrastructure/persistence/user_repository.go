@@ -86,6 +86,7 @@ func (u *userRepository) FindByOAuth(ctx context.Context, provider, oauthID stri
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, apperrors.NewUserNotFound()
 		}
+		return nil, apperrors.NewDBOperationError(err)
 	}
 	return &user, nil
 }
