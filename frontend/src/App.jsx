@@ -3,9 +3,9 @@ import { Navigate, Outlet, useRoutes } from 'react-router-dom'
 import Login from '@pages/Login/Login.jsx'
 import { useSelector } from 'react-redux'
 import CallBack from '@pages/CallBack.jsx'
-import Users from '@pages/Users.jsx'
+import Users from '@pages/admin/Users.jsx'
 import AppLayout from '@components/Layout/Layout.jsx'
-import Offices from '@pages/Offices.jsx'
+import Offices from '@pages/admin/Offices.jsx'
 import Error from '@pages/Error/Error.jsx'
 
 export const ProtectedRoute = () => {
