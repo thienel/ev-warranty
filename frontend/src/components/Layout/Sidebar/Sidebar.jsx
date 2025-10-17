@@ -19,8 +19,8 @@ const Sidebar = ({ collapsed }) => {
 
   const menuItems = [
     { key: 'reports', icon: <BarChartOutlined />, label: 'Reports', path: '/reports' },
-    { key: 'users', icon: <UserOutlined />, label: 'Users', path: '/users' },
-    { key: 'offices', icon: <BankOutlined />, label: 'Offices', path: '/offices' },
+    { key: 'users', icon: <UserOutlined />, label: 'Users', path: '/admin/users' },
+    { key: 'offices', icon: <BankOutlined />, label: 'Offices', path: '/admin/offices' },
     { key: 'customers', icon: <UserOutlined />, label: 'Customers', path: '/customers' },
     { key: 'vehicles', icon: <CarOutlined />, label: 'Vehicles', path: '/vehicles' },
     { key: 'claims', icon: <ContainerOutlined />, label: 'Warranty claims', path: '/claims' },
