@@ -3,7 +3,6 @@ package persistence_test
 import (
 	"context"
 	"errors"
-	"testing"
 	"time"
 
 	"github.com/DATA-DOG/go-sqlmock"
@@ -17,11 +16,6 @@ import (
 	"ev-warranty-go/internal/domain/entities"
 	"ev-warranty-go/internal/infrastructure/persistence"
 )
-
-func TestOfficeRepository(t *testing.T) {
-	RegisterFailHandler(Fail)
-	RunSpecs(t, "OfficeRepository Suite")
-}
 
 var _ = Describe("OfficeRepository", func() {
 	var (
