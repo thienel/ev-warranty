@@ -37,10 +37,10 @@ export const EMAIL_RULES = [
 ]
 
 export const USER_ROLES = {
-  ADMIN: 'admin',
-  SC_STAFF: 'sc staff',
-  SC_TECHNICIAN: 'sc technician',
-  EVM_STAFF: 'evm staff',
+  ADMIN: 'ADMIN',
+  SC_STAFF: 'SC_STAFF',
+  SC_TECHNICIAN: 'SC TECHNICIAN',
+  EVM_STAFF: 'EVM_STAFF',
 }
 
 export const ROLE_LABELS = {
@@ -65,6 +65,6 @@ export const API_ENDPOINTS = {
     GOOGLE: '/auth/google',
     TOKEN: '/auth/token',
   },
-  USER: '/users/',
-  OFFICE: '/offices/',
+  USER: '/users',
+  OFFICE: '/offices',
 }
