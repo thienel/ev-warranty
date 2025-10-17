@@ -90,3 +90,5 @@ shared-db/
 
 **/bin/
 **/obj/
+**/.vs/
+/.vs/
