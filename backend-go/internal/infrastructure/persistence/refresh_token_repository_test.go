@@ -3,6 +3,7 @@ package persistence_test
 import (
 	"context"
 	"errors"
+	"regexp"
 	"time"
 
 	"github.com/DATA-DOG/go-sqlmock"
@@ -189,7 +190,7 @@ var _ = Describe("RefreshTokenRepository", func() {
 					expected.IsRevoked, expected.CreatedAt, expected.UpdatedAt,
 				)
 
-				mock.ExpectQuery(`SELECT \* FROM "refresh_tokens" WHERE token = \$1`).
+				mock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "refresh_tokens" WHERE token = $1`)).
 					WithArgs(tokenStr, 1).
 					WillReturnRows(rows)
 
@@ -204,7 +205,7 @@ var _ = Describe("RefreshTokenRepository", func() {
 
 		Context("when token is not found", func() {
 			It("should return RefreshTokenNotFound error", func() {
-				mock.ExpectQuery(`SELECT \* FROM "refresh_tokens" WHERE token = \$1`).
+				mock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "refresh_tokens" WHERE token = $1`)).
 					WithArgs(tokenStr, 1).
 					WillReturnError(gorm.ErrRecordNotFound)
 
@@ -220,7 +221,7 @@ var _ = Describe("RefreshTokenRepository", func() {
 
 		Context("when there is a database error", func() {
 			It("should return DBOperationError", func() {
-				mock.ExpectQuery(`SELECT \* FROM "refresh_tokens" WHERE token = \$1`).
+				mock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "refresh_tokens" WHERE token = $1`)).
 					WithArgs(tokenStr, 1).
 					WillReturnError(errors.New("database connection failed"))
 
@@ -236,7 +237,7 @@ var _ = Describe("RefreshTokenRepository", func() {
 
 		Context("boundary cases for token string", func() {
 			It("should handle empty token string", func() {
-				mock.ExpectQuery(`SELECT \* FROM "refresh_tokens" WHERE token = \$1`).
+				mock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "refresh_tokens" WHERE token = $1`)).
 					WithArgs("", 1).
 					WillReturnError(gorm.ErrRecordNotFound)
 
@@ -248,7 +249,7 @@ var _ = Describe("RefreshTokenRepository", func() {
 
 			It("should handle very long token string", func() {
 				longToken := string(make([]byte, 1000))
-				mock.ExpectQuery(`SELECT \* FROM "refresh_tokens" WHERE token = \$1`).
+				mock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "refresh_tokens" WHERE token = $1`)).
 					WithArgs(longToken, 1).
 					WillReturnError(gorm.ErrRecordNotFound)
 
@@ -260,7 +261,7 @@ var _ = Describe("RefreshTokenRepository", func() {
 
 			It("should handle token with special characters", func() {
 				specialToken := "token!@#$%^&*()_+-={}[]|:;<>?,./"
-				mock.ExpectQuery(`SELECT \* FROM "refresh_tokens" WHERE token = \$1`).
+				mock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "refresh_tokens" WHERE token = $1`)).
 					WithArgs(specialToken, 1).
 					WillReturnError(gorm.ErrRecordNotFound)
 
@@ -283,7 +284,7 @@ var _ = Describe("RefreshTokenRepository", func() {
 					expected.IsRevoked, expected.CreatedAt, expected.UpdatedAt,
 				)
 
-				mock.ExpectQuery(`SELECT \* FROM "refresh_tokens" WHERE token = \$1`).
+				mock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "refresh_tokens" WHERE token = $1`)).
 					WithArgs(tokenStr, 1).
 					WillReturnRows(rows)
 
@@ -304,7 +305,7 @@ var _ = Describe("RefreshTokenRepository", func() {
 					expected.IsRevoked, expected.CreatedAt, expected.UpdatedAt,
 				)
 
-				mock.ExpectQuery(`SELECT \* FROM "refresh_tokens" WHERE token = \$1`).
+				mock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "refresh_tokens" WHERE token = $1`)).
 					WithArgs(tokenStr, 1).
 					WillReturnRows(rows)
 
@@ -325,7 +326,7 @@ var _ = Describe("RefreshTokenRepository", func() {
 					expected.IsRevoked, expected.CreatedAt, expected.UpdatedAt,
 				)
 
-				mock.ExpectQuery(`SELECT \* FROM "refresh_tokens" WHERE token = \$1`).
+				mock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "refresh_tokens" WHERE token = $1`)).
 					WithArgs(tokenStr, 1).
 					WillReturnRows(rows)
 
@@ -346,7 +347,7 @@ var _ = Describe("RefreshTokenRepository", func() {
 					expected.IsRevoked, expected.CreatedAt, expected.UpdatedAt,
 				)
 
-				mock.ExpectQuery(`SELECT \* FROM "refresh_tokens" WHERE token = \$1`).
+				mock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "refresh_tokens" WHERE token = $1`)).
 					WithArgs(tokenStr, 1).
 					WillReturnRows(rows)
 
@@ -368,7 +369,7 @@ var _ = Describe("RefreshTokenRepository", func() {
 		Context("when token is revoked successfully", func() {
 			It("should return nil error", func() {
 				mock.ExpectBegin()
-				mock.ExpectExec(`UPDATE "refresh_tokens" SET "is_revoked"=\$1,"updated_at"=\$2 WHERE token = \$3`).
+				mock.ExpectExec(regexp.QuoteMeta(`UPDATE "refresh_tokens" SET "is_revoked"=$1,"updated_at"=$2 WHERE token = $3`)).
 					WithArgs(true, sqlmock.AnyArg(), tokenStr).
 					WillReturnResult(sqlmock.NewResult(1, 1))
 				mock.ExpectCommit()
@@ -382,7 +383,7 @@ var _ = Describe("RefreshTokenRepository", func() {
 		Context("when there is a database error", func() {
 			It("should return DBOperationError", func() {
 				mock.ExpectBegin()
-				mock.ExpectExec(`UPDATE "refresh_tokens" SET "is_revoked"=\$1,"updated_at"=\$2 WHERE token = \$3`).
+				mock.ExpectExec(regexp.QuoteMeta(`UPDATE "refresh_tokens" SET "is_revoked"=$1,"updated_at"=$2 WHERE token = $3`)).
 					WithArgs(true, sqlmock.AnyArg(), tokenStr).
 					WillReturnError(errors.New("database connection failed"))
 				mock.ExpectRollback()
@@ -399,7 +400,7 @@ var _ = Describe("RefreshTokenRepository", func() {
 		Context("boundary cases", func() {
 			It("should handle revoking non-existent token", func() {
 				mock.ExpectBegin()
-				mock.ExpectExec(`UPDATE "refresh_tokens" SET "is_revoked"=\$1,"updated_at"=\$2 WHERE token = \$3`).
+				mock.ExpectExec(regexp.QuoteMeta(`UPDATE "refresh_tokens" SET "is_revoked"=$1,"updated_at"=$2 WHERE token = $3`)).
 					WithArgs(true, sqlmock.AnyArg(), tokenStr).
 					WillReturnResult(sqlmock.NewResult(0, 0))
 				mock.ExpectCommit()
@@ -411,7 +412,7 @@ var _ = Describe("RefreshTokenRepository", func() {
 
 			It("should handle empty token string", func() {
 				mock.ExpectBegin()
-				mock.ExpectExec(`UPDATE "refresh_tokens" SET "is_revoked"=\$1,"updated_at"=\$2 WHERE token = \$3`).
+				mock.ExpectExec(regexp.QuoteMeta(`UPDATE "refresh_tokens" SET "is_revoked"=$1,"updated_at"=$2 WHERE token = $3`)).
 					WithArgs(true, sqlmock.AnyArg(), "").
 					WillReturnResult(sqlmock.NewResult(0, 0))
 				mock.ExpectCommit()
@@ -423,7 +424,7 @@ var _ = Describe("RefreshTokenRepository", func() {
 
 			It("should handle revoking already revoked token", func() {
 				mock.ExpectBegin()
-				mock.ExpectExec(`UPDATE "refresh_tokens" SET "is_revoked"=\$1,"updated_at"=\$2 WHERE token = \$3`).
+				mock.ExpectExec(regexp.QuoteMeta(`UPDATE "refresh_tokens" SET "is_revoked"=$1,"updated_at"=$2 WHERE token = $3`)).
 					WithArgs(true, sqlmock.AnyArg(), tokenStr).
 					WillReturnResult(sqlmock.NewResult(1, 1))
 				mock.ExpectCommit()

@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"ev-warranty-go/pkg/mocks"
+	"regexp"
 	"time"
 
 	"github.com/DATA-DOG/go-sqlmock"
@@ -121,7 +122,7 @@ var _ = Describe("ClaimHistoryRepository", func() {
 				mockTx := mocks.NewTx(GinkgoT())
 				mockTx.On("GetTx").Return(db)
 				mock.ExpectBegin()
-				mock.ExpectExec(`UPDATE "claim_histories" SET "deleted_at"=\$1 WHERE claim_id = \$2`).
+				mock.ExpectExec(regexp.QuoteMeta(`UPDATE "claim_histories" SET "deleted_at"=$1 WHERE claim_id = $2`)).
 					WithArgs(sqlmock.AnyArg(), claimID).
 					WillReturnResult(sqlmock.NewResult(1, 1))
 				mock.ExpectCommit()
@@ -137,7 +138,7 @@ var _ = Describe("ClaimHistoryRepository", func() {
 				mockTx := mocks.NewTx(GinkgoT())
 				mockTx.On("GetTx").Return(db)
 				mock.ExpectBegin()
-				mock.ExpectExec(`UPDATE "claim_histories" SET "deleted_at"=\$1 WHERE claim_id = \$2`).
+				mock.ExpectExec(regexp.QuoteMeta(`UPDATE "claim_histories" SET "deleted_at"=$1 WHERE claim_id = $2`)).
 					WithArgs(sqlmock.AnyArg(), claimID).
 					WillReturnError(errors.New("database connection failed"))
 				mock.ExpectRollback()
@@ -174,7 +175,7 @@ var _ = Describe("ClaimHistoryRepository", func() {
 					historyID2, claimID, entities.ClaimStatusSubmitted, changedBy, now.Add(-1*time.Hour), nil,
 				)
 
-				mock.ExpectQuery(`SELECT \* FROM "claim_histories" WHERE claim_id = \$1 AND "claim_histories"."deleted_at" IS NULL ORDER BY changed_at DESC`).
+				mock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "claim_histories" WHERE claim_id = $1 AND "claim_histories"."deleted_at" IS NULL ORDER BY changed_at DESC`)).
 					WithArgs(claimID).
 					WillReturnRows(rows)
 
@@ -193,7 +194,7 @@ var _ = Describe("ClaimHistoryRepository", func() {
 					"id", "claim_id", "status", "changed_by", "changed_at", "deleted_at",
 				})
 
-				mock.ExpectQuery(`SELECT \* FROM "claim_histories" WHERE claim_id = \$1 AND "claim_histories"."deleted_at" IS NULL ORDER BY changed_at DESC`).
+				mock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "claim_histories" WHERE claim_id = $1 AND "claim_histories"."deleted_at" IS NULL ORDER BY changed_at DESC`)).
 					WithArgs(claimID).
 					WillReturnRows(rows)
 
@@ -206,7 +207,7 @@ var _ = Describe("ClaimHistoryRepository", func() {
 
 		Context("when there is a database error", func() {
 			It("should return DBOperationError", func() {
-				mock.ExpectQuery(`SELECT \* FROM "claim_histories" WHERE claim_id = \$1 AND "claim_histories"."deleted_at" IS NULL`).
+				mock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "claim_histories" WHERE claim_id = $1 AND "claim_histories"."deleted_at" IS NULL`)).
 					WithArgs(claimID).
 					WillReturnError(errors.New("database connection failed"))
 
@@ -231,7 +232,7 @@ var _ = Describe("ClaimHistoryRepository", func() {
 					historyID, claimID, entities.ClaimStatusDraft, changedBy, time.Now(), nil,
 				)
 
-				mock.ExpectQuery(`SELECT \* FROM "claim_histories" WHERE claim_id = \$1 AND "claim_histories"."deleted_at" IS NULL ORDER BY changed_at DESC`).
+				mock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "claim_histories" WHERE claim_id = $1 AND "claim_histories"."deleted_at" IS NULL ORDER BY changed_at DESC`)).
 					WithArgs(claimID).
 					WillReturnRows(rows)
 
@@ -253,7 +254,7 @@ var _ = Describe("ClaimHistoryRepository", func() {
 					)
 				}
 
-				mock.ExpectQuery(`SELECT \* FROM "claim_histories" WHERE claim_id = \$1 AND "claim_histories"."deleted_at" IS NULL ORDER BY changed_at DESC`).
+				mock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "claim_histories" WHERE claim_id = $1 AND "claim_histories"."deleted_at" IS NULL ORDER BY changed_at DESC`)).
 					WithArgs(claimID).
 					WillReturnRows(rows)
 
@@ -284,7 +285,7 @@ var _ = Describe("ClaimHistoryRepository", func() {
 					historyID, claimID, entities.ClaimStatusApproved, changedBy, now, nil,
 				)
 
-				mock.ExpectQuery(`SELECT \* FROM "claim_histories" WHERE claim_id = \$1 AND "claim_histories"."deleted_at" IS NULL ORDER BY changed_at DESC,"claim_histories"."id" LIMIT \$2`).
+				mock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "claim_histories" WHERE claim_id = $1 AND "claim_histories"."deleted_at" IS NULL ORDER BY changed_at DESC,"claim_histories"."id" LIMIT $2`)).
 					WithArgs(claimID, 1).
 					WillReturnRows(rows)
 
@@ -300,7 +301,7 @@ var _ = Describe("ClaimHistoryRepository", func() {
 
 		Context("when no history is found", func() {
 			It("should return ClaimHistoryNotFound error", func() {
-				mock.ExpectQuery(`SELECT \* FROM "claim_histories" WHERE claim_id = \$1 AND "claim_histories"."deleted_at" IS NULL ORDER BY changed_at DESC`).
+				mock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "claim_histories" WHERE claim_id = $1 AND "claim_histories"."deleted_at" IS NULL ORDER BY changed_at DESC`)).
 					WithArgs(claimID, 1).
 					WillReturnError(gorm.ErrRecordNotFound)
 
@@ -316,7 +317,7 @@ var _ = Describe("ClaimHistoryRepository", func() {
 
 		Context("when there is a database error", func() {
 			It("should return DBOperationError", func() {
-				mock.ExpectQuery(`SELECT \* FROM "claim_histories" WHERE claim_id = \$1 AND "claim_histories"."deleted_at" IS NULL ORDER BY changed_at DESC`).
+				mock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "claim_histories" WHERE claim_id = $1 AND "claim_histories"."deleted_at" IS NULL ORDER BY changed_at DESC`)).
 					WithArgs(claimID, 1).
 					WillReturnError(errors.New("database connection failed"))
 
@@ -357,7 +358,7 @@ var _ = Describe("ClaimHistoryRepository", func() {
 					historyID2, claimID, entities.ClaimStatusSubmitted, changedBy, date2, nil,
 				)
 
-				mock.ExpectQuery(`SELECT \* FROM "claim_histories" WHERE \(claim_id = \$1 AND changed_at BETWEEN \$2 AND \$3\) AND "claim_histories"."deleted_at" IS NULL ORDER BY changed_at DESC`).
+				mock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "claim_histories" WHERE (claim_id = $1 AND changed_at BETWEEN $2 AND $3) AND "claim_histories"."deleted_at" IS NULL ORDER BY changed_at DESC`)).
 					WithArgs(claimID, startDate, endDate).
 					WillReturnRows(rows)
 
@@ -376,7 +377,7 @@ var _ = Describe("ClaimHistoryRepository", func() {
 					"id", "claim_id", "status", "changed_by", "changed_at", "deleted_at",
 				})
 
-				mock.ExpectQuery(`SELECT \* FROM "claim_histories" WHERE \(claim_id = \$1 AND changed_at BETWEEN \$2 AND \$3\) AND "claim_histories"."deleted_at" IS NULL ORDER BY changed_at DESC`).
+				mock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "claim_histories" WHERE (claim_id = $1 AND changed_at BETWEEN $2 AND $3) AND "claim_histories"."deleted_at" IS NULL ORDER BY changed_at DESC`)).
 					WithArgs(claimID, startDate, endDate).
 					WillReturnRows(rows)
 
@@ -389,7 +390,7 @@ var _ = Describe("ClaimHistoryRepository", func() {
 
 		Context("when there is a database error", func() {
 			It("should return DBOperationError", func() {
-				mock.ExpectQuery(`SELECT \* FROM "claim_histories" WHERE \(claim_id = \$1 AND changed_at BETWEEN \$2 AND \$3\) AND "claim_histories"."deleted_at" IS NULL`).
+				mock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "claim_histories" WHERE (claim_id = $1 AND changed_at BETWEEN $2 AND $3) AND "claim_histories"."deleted_at" IS NULL`)).
 					WithArgs(claimID, startDate, endDate).
 					WillReturnError(errors.New("database connection failed"))
 
@@ -415,7 +416,7 @@ var _ = Describe("ClaimHistoryRepository", func() {
 					historyID, claimID, entities.ClaimStatusDraft, changedBy, sameDate, nil,
 				)
 
-				mock.ExpectQuery(`SELECT \* FROM "claim_histories" WHERE \(claim_id = \$1 AND changed_at BETWEEN \$2 AND \$3\) AND "claim_histories"."deleted_at" IS NULL ORDER BY changed_at DESC`).
+				mock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "claim_histories" WHERE (claim_id = $1 AND changed_at BETWEEN $2 AND $3) AND "claim_histories"."deleted_at" IS NULL ORDER BY changed_at DESC`)).
 					WithArgs(claimID, sameDate, sameDate).
 					WillReturnRows(rows)
 
@@ -433,7 +434,7 @@ var _ = Describe("ClaimHistoryRepository", func() {
 					"id", "claim_id", "status", "changed_by", "changed_at", "deleted_at",
 				})
 
-				mock.ExpectQuery(`SELECT \* FROM "claim_histories" WHERE \(claim_id = \$1 AND changed_at BETWEEN \$2 AND \$3\) AND "claim_histories"."deleted_at" IS NULL ORDER BY changed_at DESC`).
+				mock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "claim_histories" WHERE (claim_id = $1 AND changed_at BETWEEN $2 AND $3) AND "claim_histories"."deleted_at" IS NULL ORDER BY changed_at DESC`)).
 					WithArgs(claimID, startDate, endDate).
 					WillReturnRows(rows)
 
@@ -451,7 +452,7 @@ var _ = Describe("ClaimHistoryRepository", func() {
 					"id", "claim_id", "status", "changed_by", "changed_at", "deleted_at",
 				})
 
-				mock.ExpectQuery(`SELECT \* FROM "claim_histories" WHERE \(claim_id = \$1 AND changed_at BETWEEN \$2 AND \$3\) AND "claim_histories"."deleted_at" IS NULL ORDER BY changed_at DESC`).
+				mock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "claim_histories" WHERE (claim_id = $1 AND changed_at BETWEEN $2 AND $3) AND "claim_histories"."deleted_at" IS NULL ORDER BY changed_at DESC`)).
 					WithArgs(claimID, startDate, endDate).
 					WillReturnRows(rows)
 
@@ -469,7 +470,7 @@ var _ = Describe("ClaimHistoryRepository", func() {
 					"id", "claim_id", "status", "changed_by", "changed_at", "deleted_at",
 				})
 
-				mock.ExpectQuery(`SELECT \* FROM "claim_histories" WHERE \(claim_id = \$1 AND changed_at BETWEEN \$2 AND \$3\) AND "claim_histories"."deleted_at" IS NULL ORDER BY changed_at DESC`).
+				mock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "claim_histories" WHERE (claim_id = $1 AND changed_at BETWEEN $2 AND $3) AND "claim_histories"."deleted_at" IS NULL ORDER BY changed_at DESC`)).
 					WithArgs(claimID, startDate, endDate).
 					WillReturnRows(rows)
 
