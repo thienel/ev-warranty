@@ -11,10 +11,6 @@ const Error = ({ code = 404 }) => {
     navigate('/')
   }
 
-  const handleGoBack = () => {
-    code === 403 ? navigate(-3) : navigate(-1)
-  }
-
   return (
     <div className="error-container">
       <Result
@@ -26,7 +22,6 @@ const Error = ({ code = 404 }) => {
             <Button type="primary" onClick={handleGoHome}>
               Back Home
             </Button>
-            <Button onClick={handleGoBack}>Go Back</Button>
           </div>
         }
       />
