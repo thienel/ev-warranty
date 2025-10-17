@@ -3,7 +3,6 @@ package persistence_test
 import (
 	"context"
 	"errors"
-	"regexp"
 	"testing"
 	"time"
 
@@ -46,26 +45,12 @@ var _ = Describe("OfficeRepository", func() {
 		var office *entities.Office
 
 		BeforeEach(func() {
-			office = entities.NewOffice("Test Office", entities.OfficeTypeEVM, "123 Test St", true)
+			office = newOffice()
 		})
 
 		Context("when office is created successfully", func() {
 			It("should return nil error", func() {
-				mock.ExpectBegin()
-				mock.ExpectQuery(regexp.QuoteMeta(`INSERT INTO "offices"`)).
-					WithArgs(
-						office.OfficeName,
-						office.OfficeType,
-						office.Address,
-						office.IsActive,
-						sqlmock.AnyArg(),
-						sqlmock.AnyArg(),
-						sqlmock.AnyArg(),
-						office.ID,
-					).
-					WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(office.ID))
-				mock.ExpectCommit()
-
+				MockSuccessfulInsert(mock, "offices", office.ID)
 				err := repository.Create(ctx, office)
 				Expect(err).NotTo(HaveOccurred())
 			})
@@ -103,29 +88,22 @@ var _ = Describe("OfficeRepository", func() {
 
 		Context("when office is found", func() {
 			It("should return the office", func() {
+				expected := newOffice()
+				expected.ID = officeID
 				rows := sqlmock.NewRows([]string{
 					"id", "office_name", "office_type", "address", "is_active", "created_at", "updated_at", "deleted_at",
-				}).AddRow(
-					officeID,
-					"Test Office",
-					entities.OfficeTypeEVM,
-					"123 Test St",
-					true,
-					time.Now(),
-					time.Now(),
-					nil,
-				)
+				}).AddRow(expected.ID, expected.OfficeName, expected.OfficeType, expected.Address,
+					expected.IsActive, expected.CreatedAt, expected.UpdatedAt, expected.DeletedAt)
 
 				MockFindByID(mock, "offices", officeID, rows)
-
 				office, err := repository.FindByID(ctx, officeID)
 				Expect(err).NotTo(HaveOccurred())
 				Expect(office).NotTo(BeNil())
-				Expect(office.ID).To(Equal(officeID))
-				Expect(office.OfficeName).To(Equal("Test Office"))
-				Expect(office.OfficeType).To(Equal(entities.OfficeTypeEVM))
-				Expect(office.Address).To(Equal("123 Test St"))
-				Expect(office.IsActive).To(BeTrue())
+				Expect(office.ID).To(Equal(expected.ID))
+				Expect(office.OfficeName).To(Equal(expected.OfficeName))
+				Expect(office.OfficeType).To(Equal(expected.OfficeType))
+				Expect(office.Address).To(Equal(expected.Address))
+				Expect(office.IsActive).To(Equal(expected.IsActive))
 			})
 		})
 
@@ -209,19 +187,7 @@ var _ = Describe("OfficeRepository", func() {
 
 		Context("when office is updated successfully", func() {
 			It("should return nil error", func() {
-				mock.ExpectBegin()
-				mock.ExpectExec(regexp.QuoteMeta(`UPDATE "offices" SET`)).
-					WithArgs(
-						office.OfficeName,
-						office.OfficeType,
-						office.Address,
-						office.IsActive,
-						sqlmock.AnyArg(),
-						office.ID,
-					).
-					WillReturnResult(sqlmock.NewResult(1, 1))
-				mock.ExpectCommit()
-
+				MockSuccessfulUpdate(mock, "offices")
 				err := repository.Update(ctx, office)
 				Expect(err).NotTo(HaveOccurred())
 			})
@@ -230,7 +196,6 @@ var _ = Describe("OfficeRepository", func() {
 		Context("when there is a database error", func() {
 			It("should return DBOperationError", func() {
 				MockDBError(mock, `UPDATE "offices" SET`)
-
 				err := repository.Update(ctx, office)
 				Expect(err).To(HaveOccurred())
 				var appErr *apperrors.AppError
@@ -267,3 +232,16 @@ var _ = Describe("OfficeRepository", func() {
 		})
 	})
 })
+
+func newOffice() *entities.Office {
+	return &entities.Office{
+		ID:         uuid.New(),
+		OfficeName: "Test Office",
+		OfficeType: entities.OfficeTypeEVM,
+		Address:    "123 Test St",
+		IsActive:   true,
+		CreatedAt:  time.Now(),
+		UpdatedAt:  time.Now(),
+		DeletedAt:  nil,
+	}
+}
