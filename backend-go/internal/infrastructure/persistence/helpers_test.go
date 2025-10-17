@@ -33,6 +33,20 @@ func CleanupMockDB(mock sqlmock.Sqlmock) {
 	Expect(mock.ExpectationsWereMet()).To(Succeed())
 }
 
+func MockSuccessfulInsert(mock sqlmock.Sqlmock, tableName string, id interface{}) {
+	mock.ExpectBegin()
+	mock.ExpectQuery(regexp.QuoteMeta(`INSERT INTO "` + tableName + `"`)).
+		WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(id))
+	mock.ExpectCommit()
+}
+
+func MockSuccessfulUpdate(mock sqlmock.Sqlmock, tableName string) {
+	mock.ExpectBegin()
+	mock.ExpectExec(regexp.QuoteMeta(`UPDATE "` + tableName + `" SET`)).
+		WillReturnResult(sqlmock.NewResult(1, 1))
+	mock.ExpectCommit()
+}
+
 func MockDuplicateKeyError(mock sqlmock.Sqlmock, tableName, constrainName string) {
 	mock.ExpectBegin()
 	mock.ExpectQuery(regexp.QuoteMeta(`INSERT INTO "` + tableName + `"`)).
