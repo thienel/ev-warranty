@@ -26,7 +26,7 @@ const OfficeModal = ({ loading, setLoading, onClose, office = null, opened = fal
       const payload = { ...values }
 
       if (isUpdate) {
-        response = await api.put(`${API_ENDPOINTS.OFFICE}${office.id}`, payload)
+        response = await api.put(`${API_ENDPOINTS.OFFICE}/${office.id}`, payload)
 
         if (response.data.success) {
           message.success('Office updated successfully')

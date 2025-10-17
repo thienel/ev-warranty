@@ -42,7 +42,7 @@ const UserModal = ({
       if (isUpdate) {
         delete payload.password
         delete payload.email
-        response = await api.put(`${API_ENDPOINTS.USER}${user.id}`, payload)
+        response = await api.put(`${API_ENDPOINTS.USER}/${user.id}`, payload)
 
         if (response.data.success) {
           message.success('User updated successfully')

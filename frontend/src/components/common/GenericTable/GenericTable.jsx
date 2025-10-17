@@ -61,7 +61,7 @@ const GenericTable = ({
   const handleDelete = async (itemId) => {
     setLoading(true)
     try {
-      await api.delete(`${deleteEndpoint}${itemId}`)
+      await api.delete(`${deleteEndpoint}/${itemId}`)
       message.success(deleteSuccessMessage)
       onRefresh()
     } catch (error) {
