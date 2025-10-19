@@ -24,7 +24,9 @@ const (
 	ErrorCodeFailedGenerateRefreshToken = "AUTH_FAILED_GENERATE_REFRESH_TOKEN"
 	ErrorCodeUnexpectedSigningMethod    = "AUTH_UNEXPECTED_SIGNING_METHOD"
 	ErrorCodeMissingUserID              = "AUTH_MISSING_USER_ID"
+	ErrorCodeMissingUserRole            = "AUTH_MISSING_USER_ROLE"
 	ErrorCodeInvalidUserID              = "AUTH_INVALID_USER_ID"
+	ErrorCodeUnauthorizedRole           = "AUTH_UNAUTHORIZED_ROLE"
 
 	ErrorCodeRefreshTokenNotFound = "REFRESH_TOKEN_NOT_FOUND"
 

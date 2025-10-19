@@ -168,12 +168,20 @@ func NewMissingUserID() *AppError {
 	return New(http.StatusUnauthorized, ErrorCodeMissingUserID, errors.New("missing X-User-ID header"))
 }
 
+func NewMissingUserRole() *AppError {
+	return New(http.StatusUnauthorized, ErrorCodeMissingUserRole, errors.New("missing X-User-Role header"))
+}
+
 func NewInvalidUserID() *AppError {
 	return New(http.StatusBadRequest, ErrorCodeInvalidUserID, errors.New("invalid user ID format"))
 }
 
 func NewFailedInitializeCloudinary() *AppError {
 	return New(http.StatusInternalServerError, ErrorCodeFailedInitializeCloudinary, errors.New("failed to initialize Cloudinary"))
+}
+
+func NewInvalidCloudinaryURL() *AppError {
+	return New(http.StatusBadRequest, ErrorCodeInvalidCloudinaryURL, errors.New("invalid cloudinary URL"))
 }
 
 func NewFailedUploadCloudinary() *AppError {
@@ -213,6 +221,6 @@ func NewEmptyCloudinaryParameter(param string) *AppError {
 		fmt.Errorf("empty cloudinary parameter: %s", param))
 }
 
-func NewInvalidCloudinaryURL() *AppError {
-	return New(http.StatusBadRequest, ErrorCodeInvalidCloudinaryURL, errors.New("invalid cloudinary URL"))
+func NewUnauthorizedRoleError() *AppError {
+	return New(http.StatusForbidden, ErrorCodeUnauthorizedRole, errors.New("user does not have permission to perform this action"))
 }
