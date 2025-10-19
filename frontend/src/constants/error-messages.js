@@ -1,71 +1,73 @@
 const ErrorMessages = {
   // Common Errors
-  COMMON_INTERNAL_ERROR: "An internal server error occurred. Please try again later.",
+  COMMON_INTERNAL_ERROR: "Something went wrong on our end. Please try again in a moment.",
 
   // Database Errors
-  DB_OPERATION_ERROR: "A database operation failed. Please try again.",
-  DB_DUPLICATE_KEY: "This record already exists in the system.",
-  DB_HASH_PASSWORD_ERROR: "Failed to process password. Please try again.",
+  DB_OPERATION_ERROR: "We're having trouble saving your changes. Please try again.",
+  DB_DUPLICATE_KEY: "This information already exists in our system.",
+  DB_HASH_PASSWORD_ERROR: "Unable to process your password. Please try again.",
 
   // API Request Errors
-  API_INVALID_JSON_REQUEST: "Invalid request format. Please check your input.",
-  API_INVALID_QUERY_PARAMETER: "Invalid query parameter provided.",
-  API_INVALID_MULTIPART_FORM_REQUEST: "Invalid file upload request. Please check your files.",
-  API_INVALID_UUID: "Invalid ID format provided.",
+  API_INVALID_JSON_REQUEST: "We couldn't process your request. Please check your information and try again.",
+  API_INVALID_QUERY_PARAMETER: "Some information provided is invalid. Please check and try again.",
+  API_INVALID_MULTIPART_FORM_REQUEST: "There's an issue with your file upload. Please check your files and try again.",
+  API_INVALID_UUID: "The provided ID is invalid. Please try again.",
 
-  // Authentication Errors
-  AUTH_INVALID_ACCESS_TOKEN: "Invalid access token. Please log in again.",
-  AUTH_EXPIRED_ACCESS_TOKEN: "Your session has expired. Please log in again.",
-  AUTH_FAILED_HASH_TOKEN: "Failed to process authentication token.",
-  AUTH_INVALID_REFRESH_TOKEN: "Invalid refresh token. Please log in again.",
-  AUTH_EXPIRED_REFRESH_TOKEN: "Your session has expired. Please log in again.",
-  AUTH_REVOKED_REFRESH_TOKEN: "Your session has been revoked. Please log in again.",
-  AUTH_INVALID_AUTH_HEADER: "Invalid authorization header. Please log in again.",
-  AUTH_INVALID_CREDENTIALS: "Invalid email or password. Please try again.",
-  AUTH_FAILED_SIGN_ACCESS_TOKEN: "Failed to generate access token. Please try again.",
-  AUTH_FAILED_GENERATE_REFRESH_TOKEN: "Failed to generate refresh token. Please try again.",
-  AUTH_UNEXPECTED_SIGNING_METHOD: "Unexpected authentication method encountered.",
-  AUTH_MISSING_USER_ID: "User ID is missing. Please log in again.",
-  AUTH_INVALID_USER_ID: "Invalid user ID format.",
+  // Authentication Errors - Session Related
+  AUTH_INVALID_ACCESS_TOKEN: "Your session is invalid. Please sign in again.",
+  AUTH_EXPIRED_ACCESS_TOKEN: "Your session has expired. Please sign in again.",
+  AUTH_FAILED_HASH_TOKEN: "Unable to authenticate. Please try signing in again.",
+  AUTH_INVALID_REFRESH_TOKEN: "Your session is no longer valid. Please sign in again.",
+  AUTH_EXPIRED_REFRESH_TOKEN: "Your session has expired. Please sign in again.",
+  AUTH_REVOKED_REFRESH_TOKEN: "Your session has been ended. Please sign in again.",
+  AUTH_INVALID_AUTH_HEADER: "Authentication failed. Please sign in again.",
+
+  // Authentication Errors - Credentials
+  AUTH_INVALID_CREDENTIALS: "The email or password you entered is incorrect. Please try again.",
+  AUTH_FAILED_SIGN_ACCESS_TOKEN: "We're having trouble signing you in. Please try again.",
+  AUTH_FAILED_GENERATE_REFRESH_TOKEN: "Unable to maintain your session. Please sign in again.",
+  AUTH_UNEXPECTED_SIGNING_METHOD: "An authentication error occurred. Please contact support.",
+  AUTH_MISSING_USER_ID: "Your account information is missing. Please sign in again.",
+  AUTH_INVALID_USER_ID: "Your account ID is invalid. Please sign in again.",
 
   // Refresh Token Errors
-  REFRESH_TOKEN_NOT_FOUND: "Session not found. Please log in again.",
+  REFRESH_TOKEN_NOT_FOUND: "Your session could not be found. Please sign in again.",
 
   // Office Errors
-  OFFICE_INVALID_TYPE: "Invalid office type provided.",
-  OFFICE_NOT_FOUND: "Office not found.",
+  OFFICE_INVALID_TYPE: "The office type you selected is invalid.",
+  OFFICE_NOT_FOUND: "We couldn't find that office.",
 
   // User Errors
-  USER_NOT_FOUND: "User not found.",
-  USER_INACTIVE: "This user account is inactive. Please contact an administrator.",
-  USER_PASSWORD_INVALID: "Invalid password. Please try again.",
-  USER_INVALID_INPUT: "Invalid user information provided. Please check your input.",
+  USER_NOT_FOUND: "We couldn't find your account. Please check your information.",
+  USER_INACTIVE: "Your account is currently inactive. Please contact support for help.",
+  USER_PASSWORD_INVALID: "The password you entered is incorrect. Please try again.",
+  USER_INVALID_INPUT: "Some of your information is invalid. Please check and try again.",
 
-  // Claim Errors
-  CLAIM_ITEM_NOT_FOUND: "Claim item not found.",
-  CLAIM_HISTORY_NOT_FOUND: "Claim history not found.",
-  CLAIM_ATTACHMENT_NOT_FOUND: "Claim attachment not found.",
-  CLAIM_NOT_FOUND: "Claim not found.",
+  // Claim Errors - Not Found
+  CLAIM_ITEM_NOT_FOUND: "We couldn't find that claim item.",
+  CLAIM_HISTORY_NOT_FOUND: "No history found for this claim.",
+  CLAIM_ATTACHMENT_NOT_FOUND: "The attachment you're looking for couldn't be found.",
+  CLAIM_NOT_FOUND: "We couldn't find that claim.",
 
   // Claim Status Errors
-  CLAIM_STATUS_NOT_ALLOWED_TO_UPDATE: "This claim cannot be updated in its current status.",
-  CLAIM_STATUS_NOT_ALLOWED_TO_DELETE: "This claim cannot be deleted in its current status.",
-  CLAIM_INVALID_ACTION: "Invalid action for this claim's current status.",
-  CLAIM_MISSING_INFORMATION: "This claim is missing required information. Please add all required items and attachments before submitting.",
-  CLAIM_INVALID_STATUS: "Invalid claim status provided.",
-  CLAIM_ITEM_INVALID_STATUS: "Invalid claim item status provided.",
-  CLAIM_ITEM_INVALID_TYPE: "Invalid claim item type provided.",
-  CLAIM_ATTACHMENT_INVALID_TYPE: "Invalid attachment type. Please upload a valid file.",
+  CLAIM_STATUS_NOT_ALLOWED_TO_UPDATE: "This claim can't be updated at this stage.",
+  CLAIM_STATUS_NOT_ALLOWED_TO_DELETE: "This claim can't be deleted at this stage.",
+  CLAIM_INVALID_ACTION: "That action isn't available for this claim right now.",
+  CLAIM_MISSING_INFORMATION: "Please add all required items and attachments before submitting your claim.",
+  CLAIM_INVALID_STATUS: "The status you selected is not valid for this claim.",
+  CLAIM_ITEM_INVALID_STATUS: "That status isn't valid for this claim item.",
+  CLAIM_ITEM_INVALID_TYPE: "The item type you selected is invalid.",
+  CLAIM_ATTACHMENT_INVALID_TYPE: "That file type isn't supported. Please upload a valid file.",
 
   // Cloudinary Errors
-  CLOUDINARY_FAILED_INITIALIZE: "Failed to initialize cloud storage service.",
-  CLOUDINARY_FAILED_UPLOAD: "Failed to upload file. Please try again.",
-  CLOUDINARY_FAILED_DELETE: "Failed to delete file. Please try again.",
-  CLOUDINARY_INVALID_URL: "Invalid cloud storage URL.",
-  CLOUDINARY_EMPTY_PARAMETER: "Required cloud storage parameter is missing.",
+  CLOUDINARY_FAILED_INITIALIZE: "We're having trouble with our file storage. Please try again later.",
+  CLOUDINARY_FAILED_UPLOAD: "Your file couldn't be uploaded. Please try again.",
+  CLOUDINARY_FAILED_DELETE: "We couldn't delete that file. Please try again.",
+  CLOUDINARY_INVALID_URL: "The file URL is invalid.",
+  CLOUDINARY_EMPTY_PARAMETER: "Required file information is missing.",
 };
 
-export function getErrorMessage(errorCode, defaultMessage = "An error occurred. Please try again.") {
+export function getErrorMessage(errorCode, defaultMessage = "Something went wrong. Please try again.") {
   return ErrorMessages[errorCode] || defaultMessage;
 }
 
@@ -87,8 +89,8 @@ export function getErrorMessageFromResponse(error) {
 
 export function isAuthError(errorCode) {
   return errorCode?.startsWith('AUTH_') ||
-         errorCode === 'REFRESH_TOKEN_NOT_FOUND' ||
-         errorCode === 'USER_INACTIVE';
+    errorCode === 'REFRESH_TOKEN_NOT_FOUND' ||
+    errorCode === 'USER_INACTIVE';
 }
 
 export function shouldRedirectToLogin(errorCode) {
@@ -106,4 +108,3 @@ export function shouldRedirectToLogin(errorCode) {
 }
 
 export default ErrorMessages;
-
