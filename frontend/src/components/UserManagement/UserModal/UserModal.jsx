@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React from 'react'
 import { Modal, Button, Form, Input, message, Select, Space, Switch } from 'antd'
 import { HomeOutlined, LockOutlined, MailOutlined, UserOutlined } from '@ant-design/icons'
 import { API_ENDPOINTS, PASSWORD_RULES, ROLE_LABELS, USER_ROLES } from '@constants'
@@ -16,21 +16,10 @@ const UserModal = ({
   const [form] = Form.useForm()
   const { Option } = Select
 
-  useEffect(() => {
-    if (user) {
-      form.setFieldsValue({
-        ...user,
-      })
-    } else {
-      form.resetFields()
-    }
-  })
-
   const handleSubmit = async (values) => {
     setLoading(true)
     try {
       let response
-
       const payload = { ...values }
 
       if (!isUpdate && !payload.password) {
@@ -81,7 +70,14 @@ const UserModal = ({
       width={500}
       destroyOnHidden
     >
-      <Form form={form} layout="vertical" onFinish={handleSubmit} autoComplete="off">
+      <Form
+        form={form}
+        layout="vertical"
+        onFinish={handleSubmit}
+        autoComplete="off"
+        key={user?.id || 'new'}
+        initialValues={user || { is_active: true }}
+      >
         <Form.Item
           label="Full Name"
           name="name"

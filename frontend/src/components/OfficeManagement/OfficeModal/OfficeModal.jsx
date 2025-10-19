@@ -1,6 +1,6 @@
-import React, { useEffect } from 'react'
+import React from 'react'
 import { Modal, Button, Form, Input, message, Select, Space, Switch } from 'antd'
-import { BankOutlined, EnvironmentOutlined } from '@ant-design/icons'
+import { BankOutlined } from '@ant-design/icons'
 import { API_ENDPOINTS } from '@constants'
 import api from '@services/api.js'
 
@@ -8,21 +8,10 @@ const OfficeModal = ({ loading, setLoading, onClose, office = null, opened = fal
   const [form] = Form.useForm()
   const { Option } = Select
 
-  useEffect(() => {
-    if (office) {
-      form.setFieldsValue({
-        ...office,
-      })
-    } else {
-      form.resetFields()
-    }
-  })
-
   const handleSubmit = async (values) => {
     setLoading(true)
     try {
       let response
-
       const payload = { ...values }
 
       if (isUpdate) {
@@ -67,7 +56,14 @@ const OfficeModal = ({ loading, setLoading, onClose, office = null, opened = fal
       width={500}
       destroyOnHidden
     >
-      <Form form={form} layout="vertical" onFinish={handleSubmit} autoComplete="off">
+      <Form
+        form={form}
+        layout="vertical"
+        onFinish={handleSubmit}
+        autoComplete="off"
+        key={office?.id || 'new'}
+        initialValues={office || { is_active: true }}
+      >
         <Form.Item
           label="Office Name"
           name="office_name"
@@ -87,13 +83,13 @@ const OfficeModal = ({ loading, setLoading, onClose, office = null, opened = fal
           rules={[{ required: true, message: 'Please select office type' }]}
         >
           <Select placeholder="Select office type" size="large">
-            <Option value="evm">
+            <Option value="EVM">
               <Space>
                 <BankOutlined />
                 EVM
               </Space>
             </Option>
-            <Option value="sc">
+            <Option value="SC">
               <Space>
                 <BankOutlined />
                 Service Center
@@ -115,7 +111,7 @@ const OfficeModal = ({ loading, setLoading, onClose, office = null, opened = fal
           <Input.TextArea placeholder="Enter office address" rows={3} size="large" />
         </Form.Item>
 
-        <Form.Item label="Status" name="is_active" valuePropName="checked" initialValue={true}>
+        <Form.Item label="Status" name="is_active" valuePropName="checked">
           <Switch checkedChildren="Active" unCheckedChildren="Inactive" size="default" />
         </Form.Item>
 
