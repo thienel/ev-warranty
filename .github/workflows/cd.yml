@@ -6,25 +6,25 @@ on:
   workflow_dispatch:
 
 jobs:
-  changes:
+  detect-changes:
     runs-on: ubuntu-latest
     outputs:
-      go_changed: ${{ steps.filter.outputs.go }}
-      dotnet_changed: ${{ steps.filter.outputs.dotnet }}
+      backend-go: ${{ steps.filter.outputs.backend-go }}
+      backend-dotnet: ${{ steps.filter.outputs.backend-dotnet }}
     steps:
       - uses: actions/checkout@v4
       - uses: dorny/paths-filter@v3
         id: filter
         with:
           filters: |
-            go:
+            backend-go:
               - 'backend-go/**'
-            dotnet:
+            backend-dotnet:
               - 'backend-dotnet/**'
 
-  build-go:
-    needs: changes
-    if: needs.changes.outputs.go_changed == 'true'
+  build-backend-go:
+    needs: detect-changes
+    if: needs.detect-changes.outputs.backend-go == 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -53,9 +53,9 @@ jobs:
           cache-from: type=registry,ref=lethiendev/ev-warranty-go:buildcache
           cache-to: type=registry,ref=lethiendev/ev-warranty-go:buildcache,mode=max
 
-  build-dotnet:
-    needs: changes
-    if: needs.changes.outputs.dotnet_changed == 'true'
+  build-backend-dotnet:
+    needs: detect-changes
+    if: needs.detect-changes.outputs.backend-dotnet == 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4

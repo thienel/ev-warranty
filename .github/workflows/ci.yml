@@ -6,51 +6,86 @@ on:
       - '**'
 
 jobs:
-  test:
+  detect-changes:
     runs-on: ubuntu-latest
-
+    outputs:
+      frontend: ${{ steps.filter.outputs.frontend }}
+      backend-go: ${{ steps.filter.outputs.backend-go }}
+      backend-dotnet: ${{ steps.filter.outputs.backend-dotnet }}
     steps:
-    - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            frontend:
+              - 'frontend/**'
+            backend-go:
+              - 'backend-go/**'
+            backend-dotnet:
+              - 'backend-dotnet/**'
 
-    - name: Set up Go
-      uses: actions/setup-go@v4
-      with:
-        go-version: '1.24'
+  frontend-ci:
+    needs: detect-changes
+    if: needs.detect-changes.outputs.frontend == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
 
-    - name: Cache Go modules
-      uses: actions/cache@v3
-      with:
-        path: |
-          ~/go/pkg/mod
-          ~/.cache/go-build
-        key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
 
-    - name: Set up .NET
-      uses: actions/setup-dotnet@v3
-      with:
-        dotnet-version: '9.0.x'
+      - name: Cache Node modules
+        uses: actions/cache@v3
+        with:
+          path: frontend/node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('frontend/package-lock.json') }}
 
-    - name: Cache .NET NuGet packages
-      uses: actions/cache@v3
-      with:
-        path: ~/.nuget/packages
-        key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj') }}
+      - name: Build Frontend
+        run: make ci-frontend
 
-    - name: Set up Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '20'
+  go-ci:
+    needs: detect-changes
+    if: needs.detect-changes.outputs.backend-go == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
 
-    - name: Cache Node modules
-      uses: actions/cache@v3
-      with:
-        path: frontend/node_modules
-        key: ${{ runner.os }}-node-${{ hashFiles('frontend/package-lock.json') }}
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.24'
 
-    - name: Build and Test
-      run: |
-        make frontend-build
-        make go-build
-        make dotnet-restore
-        make dotnet-build
-        make ci-test
+      - name: Cache Go modules
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/go/pkg/mod
+            ~/.cache/go-build
+          key: ${{ runner.os }}-go-${{ hashFiles('backend-go/go.sum') }}
+
+      - name: Build and Test Go
+        run: make ci-go
+
+  dotnet-ci:
+    needs: detect-changes
+    if: needs.detect-changes.outputs.backend-dotnet == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '9.0.x'
+
+      - name: Cache .NET NuGet packages
+        uses: actions/cache@v3
+        with:
+          path: ~/.nuget/packages
+          key: ${{ runner.os }}-nuget-${{ hashFiles('backend-dotnet/**/*.csproj') }}
+
+      - name: Build and Test .NET
+        run: make ci-dotnet
