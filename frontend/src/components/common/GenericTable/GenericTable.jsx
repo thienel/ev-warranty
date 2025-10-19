@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { message, Table } from 'antd'
 import api from '@services/api.js'
+import useHandleApiError from '@/hooks/useHandleApiError.js'
 
 const GenericTable = ({
   loading,
@@ -13,7 +14,6 @@ const GenericTable = ({
   searchFields = [],
   deleteEndpoint,
   deleteSuccessMessage = 'Item deleted successfully',
-  deleteErrorMessage = 'Failed to delete item',
   additionalProps = {},
 }) => {
   const [filteredInfo, setFilteredInfo] = useState({})
@@ -23,6 +23,7 @@ const GenericTable = ({
     pageSize: 10,
     total: 0,
   })
+  const handleError = useHandleApiError()
 
   useEffect(() => {
     setFilteredInfo({})
@@ -65,8 +66,7 @@ const GenericTable = ({
       message.success(deleteSuccessMessage)
       onRefresh()
     } catch (error) {
-      message.error(error.response?.data?.message || deleteErrorMessage)
-      console.error('Error deleting item:', error)
+      handleError(error)
     } finally {
       setLoading(false)
     }

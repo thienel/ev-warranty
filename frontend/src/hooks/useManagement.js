@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
-import { message } from 'antd'
 import api from '@services/api'
 import useDelay from '@/hooks/useDelay.js'
+import useHandleApiError from '@/hooks/useHandleApiError.js'
 
 const useManagement = (apiEndpoint, itemName = 'item') => {
   const [items, setItems] = useState([])
@@ -10,6 +10,7 @@ const useManagement = (apiEndpoint, itemName = 'item') => {
   const [updateItem, setUpdateItem] = useState(null)
   const [isUpdate, setIsUpdate] = useState(false)
   const [isOpenModal, setIsOpenModal] = useState(false)
+  const handleError = useHandleApiError()
 
   const handleOpenModal = (item = null, isUpdate = false) => {
     setUpdateItem(item)
@@ -23,8 +24,7 @@ const useManagement = (apiEndpoint, itemName = 'item') => {
       const itemData = response.data.data || []
       setItems(itemData)
     } catch (error) {
-      message.error(error.response?.data?.message || `Failed to load ${itemName}s`)
-      console.error(`Error fetching ${itemName}s:`, error)
+      handleError(error)
     }
   }
 

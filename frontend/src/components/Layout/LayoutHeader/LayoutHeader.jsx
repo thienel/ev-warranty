@@ -13,12 +13,15 @@ import { API_ENDPOINTS } from '@constants/common-constants.js'
 import { useDispatch } from 'react-redux'
 import { logout } from '@redux/authSlice.js'
 import { persistor } from '@redux/store.js'
+import useHandleApiError from '@/hooks/useHandleApiError.js'
 
 const { Header } = Layout
 const { Text } = Typography
 
 const LayoutHeader = ({ collapsed, onToggleCollapse, title }) => {
   const dispatch = useDispatch()
+  const handleError = useHandleApiError()
+
   const handleLogout = async () => {
     try {
       const _ = await api.post(API_ENDPOINTS.AUTH.LOGOUT, {}, { withCredentials: true })
@@ -26,8 +29,7 @@ const LayoutHeader = ({ collapsed, onToggleCollapse, title }) => {
       await persistor.purge()
       message.success('Logout successful!')
     } catch (error) {
-      console.log(error)
-      message.error('Logout failed')
+      handleError(error)
     }
   }
 

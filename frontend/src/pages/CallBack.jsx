@@ -6,11 +6,13 @@ import { message } from 'antd'
 import { useDispatch } from 'react-redux'
 import api from '@services/api.js'
 import { API_ENDPOINTS } from '@constants/common-constants.js'
+import useHandleApiError from '@/hooks/useHandleApiError.js'
 
 const CallBack = () => {
   const [searchParams] = useSearchParams()
   const dispatch = useDispatch()
   const navigate = useNavigate()
+  const handleError = useHandleApiError()
 
   useEffect(() => {
     const handleLogin = async () => {
@@ -26,14 +28,13 @@ const CallBack = () => {
           dispatch(loginSuccess({ user: res.data.user, token }))
         }
       } catch (error) {
-        console.error(error)
-        message.error('Login failed. Please check your credentials.')
+        await handleError(error)
         navigate('/login')
       }
     }
 
     handleLogin()
-  }, [dispatch, searchParams, navigate])
+  }, [dispatch, searchParams, navigate, handleError])
 
   return <LoadingOverlay loading={true} />
 }

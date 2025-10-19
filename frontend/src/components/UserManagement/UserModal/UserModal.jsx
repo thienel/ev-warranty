@@ -3,6 +3,7 @@ import { Modal, Button, Form, Input, message, Select, Space, Switch } from 'antd
 import { HomeOutlined, LockOutlined, MailOutlined, UserOutlined } from '@ant-design/icons'
 import { API_ENDPOINTS, PASSWORD_RULES, ROLE_LABELS, USER_ROLES } from '@constants/common-constants.js'
 import api from '@services/api.js'
+import useHandleApiError from '@/hooks/useHandleApiError.js'
 
 const UserModal = ({
   loading,
@@ -15,6 +16,7 @@ const UserModal = ({
 }) => {
   const [form] = Form.useForm()
   const { Option } = Select
+  const handleError = useHandleApiError()
 
   const handleSubmit = async (values) => {
     setLoading(true)
@@ -40,11 +42,7 @@ const UserModal = ({
       form.resetFields()
       onClose()
     } catch (error) {
-      const errorMsg =
-        error.response?.data?.message ||
-        (isUpdate ? 'Failed to update user' : 'Failed to create user')
-      message.error(errorMsg)
-      console.error('Error saving user:', error)
+      handleError(error)
     } finally {
       setLoading(false)
     }

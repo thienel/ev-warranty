@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react'
-import { message } from 'antd'
 import api from '@services/api'
 import { API_ENDPOINTS, ROLE_LABELS } from '@constants/common-constants.js'
 import UserModal from '@components/UserManagement/UserModal/UserModal.jsx'
@@ -7,6 +6,7 @@ import useManagement from '@/hooks/useManagement.js'
 import GenericActionBar from '@components/common/GenericActionBar/GenericActionBar.jsx'
 import GenericTable from '@components/common/GenericTable/GenericTable.jsx'
 import GenerateColumns from './userTableColumns.jsx'
+import useHandleApiError from '@/hooks/useHandleApiError.js'
 
 const UserManagement = () => {
   const {
@@ -23,19 +23,20 @@ const UserManagement = () => {
   } = useManagement(API_ENDPOINTS.USER, 'user')
 
   const [offices, setOffices] = useState([])
+  const handleError = useHandleApiError()
 
   const fetchOffices = async () => {
     try {
       const response = await api.get(API_ENDPOINTS.OFFICE)
       setOffices(response.data.data || [])
     } catch (error) {
-      message.error(error.response?.data?.message || 'Failed to load offices')
-      console.error('Error fetching offices:', error)
+      handleError(error)
     }
   }
 
   useEffect(() => {
     fetchOffices()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const getOfficeName = (officeId) => {
