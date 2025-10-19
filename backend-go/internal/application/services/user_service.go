@@ -46,7 +46,7 @@ func NewUserService(userRepo repositories.UserRepository, officeService OfficeSe
 func (s *userService) Create(ctx context.Context, cmd *UserCreateCommand) (*entities.User, error) {
 	if !entities.IsValidName(cmd.Name) || !entities.IsValidEmail(cmd.Email) ||
 		!entities.IsValidPassword(cmd.Password) || !entities.IsValidUserRole(cmd.Role) {
-		return nil, apperrors.NewInvalidCredentials()
+		return nil, apperrors.NewInvalidUserInput()
 	}
 
 	if _, err := s.officeService.GetByID(ctx, cmd.OfficeID); err != nil {
@@ -87,7 +87,7 @@ func (s *userService) Update(ctx context.Context, id uuid.UUID, cmd *UserUpdateC
 	}
 
 	if !entities.IsValidName(cmd.Name) || !entities.IsValidUserRole(cmd.Role) {
-		return apperrors.NewInvalidCredentials()
+		return apperrors.NewInvalidUserInput()
 	}
 	user.Role = cmd.Role
 	user.Name = cmd.Name

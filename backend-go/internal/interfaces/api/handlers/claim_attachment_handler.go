@@ -146,7 +146,7 @@ func parseAttachmentIDParam(c *gin.Context) (uuid.UUID, error) {
 	attachmentIDStr := c.Param("attachmentID")
 	attachmentID, err := uuid.Parse(attachmentIDStr)
 	if err != nil {
-		return uuid.Nil, apperrors.NewInvalidCredentials()
+		return uuid.Nil, apperrors.NewInvalidUUID()
 	}
 	return attachmentID, nil
 }

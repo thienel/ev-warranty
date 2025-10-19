@@ -10,6 +10,7 @@ const (
 	ErrorCodeInvalidJsonRequest          = "API_INVALID_JSON_REQUEST"
 	ErrorCodeInvalidQueryParameter       = "API_INVALID_QUERY_PARAMETER"
 	ErrorCodeInvalidMultipartFormRequest = "API_INVALID_MULTIPART_FORM_REQUEST"
+	ErrorCodeInvalidUUID                 = "API_INVALID_UUID"
 
 	ErrorCodeInvalidAccessToken         = "AUTH_INVALID_ACCESS_TOKEN"
 	ErrorCodeExpiredAccessToken         = "AUTH_EXPIRED_ACCESS_TOKEN"
@@ -33,6 +34,7 @@ const (
 	ErrorCodeUserNotFound        = "USER_NOT_FOUND"
 	ErrorCodeUserInactive        = "USER_INACTIVE"
 	ErrorCodeUserPasswordInvalid = "USER_PASSWORD_INVALID"
+	ErrorCodeInvalidUserInput    = "USER_INVALID_INPUT"
 
 	ErrorCodeClaimItemNotFound       = "CLAIM_ITEM_NOT_FOUND"
 	ErrorCodeClaimHistoryNotFound    = "CLAIM_HISTORY_NOT_FOUND"
@@ -43,8 +45,14 @@ const (
 	ErrorCodeClaimStatusNotAllowedDelete = "CLAIM_STATUS_NOT_ALLOWED_TO_DELETE"
 	ErrorCodeInvalidClaimAction          = "CLAIM_INVALID_ACTION"
 	ErrorCodeClaimMissingInformation     = "CLAIM_MISSING_INFORMATION"
+	ErrorCodeInvalidClaimStatus          = "CLAIM_INVALID_STATUS"
+	ErrorCodeInvalidClaimItemStatus      = "CLAIM_ITEM_INVALID_STATUS"
+	ErrorCodeInvalidClaimItemType        = "CLAIM_ITEM_INVALID_TYPE"
+	ErrorCodeInvalidAttachmentType       = "CLAIM_ATTACHMENT_INVALID_TYPE"
 
 	ErrorCodeFailedInitializeCloudinary = "CLOUDINARY_FAILED_INITIALIZE"
 	ErrorCodeFailedUploadCloudinary     = "CLOUDINARY_FAILED_UPLOAD"
 	ErrorCodeFailedDeleteCloudinary     = "CLOUDINARY_FAILED_DELETE"
+	ErrorCodeInvalidCloudinaryURL       = "CLOUDINARY_INVALID_URL"
+	ErrorCodeEmptyCloudinaryParameter   = "CLOUDINARY_EMPTY_PARAMETER"
 )

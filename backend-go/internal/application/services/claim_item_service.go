@@ -79,10 +79,10 @@ func (s *claimItemService) Create(tx application.Tx, claimID uuid.UUID,
 	}
 
 	if !entities.IsValidClaimItemStatus(cmd.Status) {
-		return nil, apperrors.NewInvalidCredentials()
+		return nil, apperrors.NewInvalidClaimItemStatus()
 	}
 	if !entities.IsValidClaimItemType(cmd.Type) {
-		return nil, apperrors.NewInvalidCredentials()
+		return nil, apperrors.NewInvalidClaimItemType()
 	}
 
 	item := entities.NewClaimItem(claimID, cmd.PartCategoryID, cmd.FaultyPartID, cmd.ReplacementPartID,
@@ -119,7 +119,7 @@ func (s *claimItemService) Update(tx application.Tx, claimID, itemID uuid.UUID, 
 	}
 
 	if !entities.IsValidClaimItemType(cmd.Type) {
-		return apperrors.NewInvalidCredentials()
+		return apperrors.NewInvalidClaimItemType()
 	}
 	item.IssueDescription = cmd.IssueDescription
 	item.Type = cmd.Type

@@ -70,7 +70,7 @@ func (s *claimAttachmentService) Create(tx application.Tx, claimID uuid.UUID, fi
 
 	attachType := cloudinary.DetermineResourceType(mimeType)
 	if !entities.IsValidAttachmentType(attachType) {
-		return nil, apperrors.NewInvalidCredentials()
+		return nil, apperrors.NewInvalidAttachmentType()
 	}
 	attachURL, err := s.cloudService.UploadFile(tx.GetCtx(), file, attachType)
 	if err != nil {
