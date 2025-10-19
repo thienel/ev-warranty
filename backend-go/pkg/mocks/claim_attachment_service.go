@@ -20,6 +20,14 @@ type ClaimAttachmentService struct {
 	mock.Mock
 }
 
+type ClaimAttachmentService_Expecter struct {
+	mock *mock.Mock
+}
+
+func (_m *ClaimAttachmentService) EXPECT() *ClaimAttachmentService_Expecter {
+	return &ClaimAttachmentService_Expecter{mock: &_m.Mock}
+}
+
 // Create provides a mock function with given fields: tx, claimID, file
 func (_m *ClaimAttachmentService) Create(tx application.Tx, claimID uuid.UUID, file multipart.File) (*entities.ClaimAttachment, error) {
 	ret := _m.Called(tx, claimID, file)
@@ -48,6 +56,36 @@ func (_m *ClaimAttachmentService) Create(tx application.Tx, claimID uuid.UUID, f
 	}
 
 	return r0, r1
+}
+
+// ClaimAttachmentService_Create_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Create'
+type ClaimAttachmentService_Create_Call struct {
+	*mock.Call
+}
+
+// Create is a helper method to define mock.On call
+//   - tx application.Tx
+//   - claimID uuid.UUID
+//   - file multipart.File
+func (_e *ClaimAttachmentService_Expecter) Create(tx interface{}, claimID interface{}, file interface{}) *ClaimAttachmentService_Create_Call {
+	return &ClaimAttachmentService_Create_Call{Call: _e.mock.On("Create", tx, claimID, file)}
+}
+
+func (_c *ClaimAttachmentService_Create_Call) Run(run func(tx application.Tx, claimID uuid.UUID, file multipart.File)) *ClaimAttachmentService_Create_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(application.Tx), args[1].(uuid.UUID), args[2].(multipart.File))
+	})
+	return _c
+}
+
+func (_c *ClaimAttachmentService_Create_Call) Return(_a0 *entities.ClaimAttachment, _a1 error) *ClaimAttachmentService_Create_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *ClaimAttachmentService_Create_Call) RunAndReturn(run func(application.Tx, uuid.UUID, multipart.File) (*entities.ClaimAttachment, error)) *ClaimAttachmentService_Create_Call {
+	_c.Call.Return(run)
+	return _c
 }
 
 // GetByClaimID provides a mock function with given fields: ctx, claimID
@@ -80,6 +118,35 @@ func (_m *ClaimAttachmentService) GetByClaimID(ctx context.Context, claimID uuid
 	return r0, r1
 }
 
+// ClaimAttachmentService_GetByClaimID_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetByClaimID'
+type ClaimAttachmentService_GetByClaimID_Call struct {
+	*mock.Call
+}
+
+// GetByClaimID is a helper method to define mock.On call
+//   - ctx context.Context
+//   - claimID uuid.UUID
+func (_e *ClaimAttachmentService_Expecter) GetByClaimID(ctx interface{}, claimID interface{}) *ClaimAttachmentService_GetByClaimID_Call {
+	return &ClaimAttachmentService_GetByClaimID_Call{Call: _e.mock.On("GetByClaimID", ctx, claimID)}
+}
+
+func (_c *ClaimAttachmentService_GetByClaimID_Call) Run(run func(ctx context.Context, claimID uuid.UUID)) *ClaimAttachmentService_GetByClaimID_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(uuid.UUID))
+	})
+	return _c
+}
+
+func (_c *ClaimAttachmentService_GetByClaimID_Call) Return(_a0 []*entities.ClaimAttachment, _a1 error) *ClaimAttachmentService_GetByClaimID_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *ClaimAttachmentService_GetByClaimID_Call) RunAndReturn(run func(context.Context, uuid.UUID) ([]*entities.ClaimAttachment, error)) *ClaimAttachmentService_GetByClaimID_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // GetByID provides a mock function with given fields: ctx, id
 func (_m *ClaimAttachmentService) GetByID(ctx context.Context, id uuid.UUID) (*entities.ClaimAttachment, error) {
 	ret := _m.Called(ctx, id)
@@ -110,6 +177,35 @@ func (_m *ClaimAttachmentService) GetByID(ctx context.Context, id uuid.UUID) (*e
 	return r0, r1
 }
 
+// ClaimAttachmentService_GetByID_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetByID'
+type ClaimAttachmentService_GetByID_Call struct {
+	*mock.Call
+}
+
+// GetByID is a helper method to define mock.On call
+//   - ctx context.Context
+//   - id uuid.UUID
+func (_e *ClaimAttachmentService_Expecter) GetByID(ctx interface{}, id interface{}) *ClaimAttachmentService_GetByID_Call {
+	return &ClaimAttachmentService_GetByID_Call{Call: _e.mock.On("GetByID", ctx, id)}
+}
+
+func (_c *ClaimAttachmentService_GetByID_Call) Run(run func(ctx context.Context, id uuid.UUID)) *ClaimAttachmentService_GetByID_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(uuid.UUID))
+	})
+	return _c
+}
+
+func (_c *ClaimAttachmentService_GetByID_Call) Return(_a0 *entities.ClaimAttachment, _a1 error) *ClaimAttachmentService_GetByID_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *ClaimAttachmentService_GetByID_Call) RunAndReturn(run func(context.Context, uuid.UUID) (*entities.ClaimAttachment, error)) *ClaimAttachmentService_GetByID_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // HardDelete provides a mock function with given fields: tx, claimID, attachmentID
 func (_m *ClaimAttachmentService) HardDelete(tx application.Tx, claimID uuid.UUID, attachmentID uuid.UUID) error {
 	ret := _m.Called(tx, claimID, attachmentID)
@@ -126,6 +222,36 @@ func (_m *ClaimAttachmentService) HardDelete(tx application.Tx, claimID uuid.UUI
 	}
 
 	return r0
+}
+
+// ClaimAttachmentService_HardDelete_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'HardDelete'
+type ClaimAttachmentService_HardDelete_Call struct {
+	*mock.Call
+}
+
+// HardDelete is a helper method to define mock.On call
+//   - tx application.Tx
+//   - claimID uuid.UUID
+//   - attachmentID uuid.UUID
+func (_e *ClaimAttachmentService_Expecter) HardDelete(tx interface{}, claimID interface{}, attachmentID interface{}) *ClaimAttachmentService_HardDelete_Call {
+	return &ClaimAttachmentService_HardDelete_Call{Call: _e.mock.On("HardDelete", tx, claimID, attachmentID)}
+}
+
+func (_c *ClaimAttachmentService_HardDelete_Call) Run(run func(tx application.Tx, claimID uuid.UUID, attachmentID uuid.UUID)) *ClaimAttachmentService_HardDelete_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(application.Tx), args[1].(uuid.UUID), args[2].(uuid.UUID))
+	})
+	return _c
+}
+
+func (_c *ClaimAttachmentService_HardDelete_Call) Return(_a0 error) *ClaimAttachmentService_HardDelete_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *ClaimAttachmentService_HardDelete_Call) RunAndReturn(run func(application.Tx, uuid.UUID, uuid.UUID) error) *ClaimAttachmentService_HardDelete_Call {
+	_c.Call.Return(run)
+	return _c
 }
 
 // NewClaimAttachmentService creates a new instance of ClaimAttachmentService. It also registers a testing interface on the mock and a cleanup function to assert the mocks expectations.

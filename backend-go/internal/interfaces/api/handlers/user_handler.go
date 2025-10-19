@@ -4,6 +4,7 @@ import (
 	"context"
 	"ev-warranty-go/internal/apperrors"
 	"ev-warranty-go/internal/application/services"
+	"ev-warranty-go/internal/domain/entities"
 	"ev-warranty-go/internal/interfaces/api/dtos"
 	"ev-warranty-go/pkg/logger"
 	"net/http"
@@ -34,6 +35,11 @@ func NewUserHandler(log logger.Logger, userService services.UserService) UserHan
 }
 
 func (h userHandler) Create(c *gin.Context) {
+	if err := allowedRoles(c, entities.UserRoleAdmin); err != nil {
+		handleError(h.log, c, err)
+		return
+	}
+
 	ctx, cancel := context.WithTimeout(c.Request.Context(), requestTimeout)
 	defer cancel()
 
@@ -68,6 +74,11 @@ func (h userHandler) Create(c *gin.Context) {
 }
 
 func (h userHandler) Update(c *gin.Context) {
+	if err := allowedRoles(c, entities.UserRoleAdmin); err != nil {
+		handleError(h.log, c, err)
+		return
+	}
+
 	ctx, cancel := context.WithTimeout(c.Request.Context(), requestTimeout)
 	defer cancel()
 
@@ -146,6 +157,11 @@ func (h userHandler) GetAll(c *gin.Context) {
 }
 
 func (h userHandler) Delete(c *gin.Context) {
+	if err := allowedRoles(c, entities.UserRoleAdmin); err != nil {
+		handleError(h.log, c, err)
+		return
+	}
+
 	ctx, cancel := context.WithTimeout(c.Request.Context(), requestTimeout)
 	defer cancel()
 

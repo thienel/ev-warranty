@@ -14,6 +14,14 @@ type AuthService struct {
 	mock.Mock
 }
 
+type AuthService_Expecter struct {
+	mock *mock.Mock
+}
+
+func (_m *AuthService) EXPECT() *AuthService_Expecter {
+	return &AuthService_Expecter{mock: &_m.Mock}
+}
+
 // HandleOAuthUser provides a mock function with given fields: ctx, userInfo
 func (_m *AuthService) HandleOAuthUser(ctx context.Context, userInfo *providers.UserInfo) (string, string, error) {
 	ret := _m.Called(ctx, userInfo)
@@ -47,6 +55,35 @@ func (_m *AuthService) HandleOAuthUser(ctx context.Context, userInfo *providers.
 	}
 
 	return r0, r1, r2
+}
+
+// AuthService_HandleOAuthUser_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'HandleOAuthUser'
+type AuthService_HandleOAuthUser_Call struct {
+	*mock.Call
+}
+
+// HandleOAuthUser is a helper method to define mock.On call
+//   - ctx context.Context
+//   - userInfo *providers.UserInfo
+func (_e *AuthService_Expecter) HandleOAuthUser(ctx interface{}, userInfo interface{}) *AuthService_HandleOAuthUser_Call {
+	return &AuthService_HandleOAuthUser_Call{Call: _e.mock.On("HandleOAuthUser", ctx, userInfo)}
+}
+
+func (_c *AuthService_HandleOAuthUser_Call) Run(run func(ctx context.Context, userInfo *providers.UserInfo)) *AuthService_HandleOAuthUser_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(*providers.UserInfo))
+	})
+	return _c
+}
+
+func (_c *AuthService_HandleOAuthUser_Call) Return(_a0 string, _a1 string, _a2 error) *AuthService_HandleOAuthUser_Call {
+	_c.Call.Return(_a0, _a1, _a2)
+	return _c
+}
+
+func (_c *AuthService_HandleOAuthUser_Call) RunAndReturn(run func(context.Context, *providers.UserInfo) (string, string, error)) *AuthService_HandleOAuthUser_Call {
+	_c.Call.Return(run)
+	return _c
 }
 
 // Login provides a mock function with given fields: ctx, email, password
@@ -84,6 +121,36 @@ func (_m *AuthService) Login(ctx context.Context, email string, password string)
 	return r0, r1, r2
 }
 
+// AuthService_Login_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Login'
+type AuthService_Login_Call struct {
+	*mock.Call
+}
+
+// Login is a helper method to define mock.On call
+//   - ctx context.Context
+//   - email string
+//   - password string
+func (_e *AuthService_Expecter) Login(ctx interface{}, email interface{}, password interface{}) *AuthService_Login_Call {
+	return &AuthService_Login_Call{Call: _e.mock.On("Login", ctx, email, password)}
+}
+
+func (_c *AuthService_Login_Call) Run(run func(ctx context.Context, email string, password string)) *AuthService_Login_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(string), args[2].(string))
+	})
+	return _c
+}
+
+func (_c *AuthService_Login_Call) Return(_a0 string, _a1 string, _a2 error) *AuthService_Login_Call {
+	_c.Call.Return(_a0, _a1, _a2)
+	return _c
+}
+
+func (_c *AuthService_Login_Call) RunAndReturn(run func(context.Context, string, string) (string, string, error)) *AuthService_Login_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // Logout provides a mock function with given fields: ctx, token
 func (_m *AuthService) Logout(ctx context.Context, token string) error {
 	ret := _m.Called(ctx, token)
@@ -100,6 +167,35 @@ func (_m *AuthService) Logout(ctx context.Context, token string) error {
 	}
 
 	return r0
+}
+
+// AuthService_Logout_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Logout'
+type AuthService_Logout_Call struct {
+	*mock.Call
+}
+
+// Logout is a helper method to define mock.On call
+//   - ctx context.Context
+//   - token string
+func (_e *AuthService_Expecter) Logout(ctx interface{}, token interface{}) *AuthService_Logout_Call {
+	return &AuthService_Logout_Call{Call: _e.mock.On("Logout", ctx, token)}
+}
+
+func (_c *AuthService_Logout_Call) Run(run func(ctx context.Context, token string)) *AuthService_Logout_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(string))
+	})
+	return _c
+}
+
+func (_c *AuthService_Logout_Call) Return(_a0 error) *AuthService_Logout_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *AuthService_Logout_Call) RunAndReturn(run func(context.Context, string) error) *AuthService_Logout_Call {
+	_c.Call.Return(run)
+	return _c
 }
 
 // NewAuthService creates a new instance of AuthService. It also registers a testing interface on the mock and a cleanup function to assert the mocks expectations.

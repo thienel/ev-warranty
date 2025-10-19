@@ -14,6 +14,14 @@ type CloudinaryService struct {
 	mock.Mock
 }
 
+type CloudinaryService_Expecter struct {
+	mock *mock.Mock
+}
+
+func (_m *CloudinaryService) EXPECT() *CloudinaryService_Expecter {
+	return &CloudinaryService_Expecter{mock: &_m.Mock}
+}
+
 // DeleteFile provides a mock function with given fields: ctx, publicID, resourceType
 func (_m *CloudinaryService) DeleteFile(ctx context.Context, publicID string, resourceType string) error {
 	ret := _m.Called(ctx, publicID, resourceType)
@@ -32,6 +40,36 @@ func (_m *CloudinaryService) DeleteFile(ctx context.Context, publicID string, re
 	return r0
 }
 
+// CloudinaryService_DeleteFile_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'DeleteFile'
+type CloudinaryService_DeleteFile_Call struct {
+	*mock.Call
+}
+
+// DeleteFile is a helper method to define mock.On call
+//   - ctx context.Context
+//   - publicID string
+//   - resourceType string
+func (_e *CloudinaryService_Expecter) DeleteFile(ctx interface{}, publicID interface{}, resourceType interface{}) *CloudinaryService_DeleteFile_Call {
+	return &CloudinaryService_DeleteFile_Call{Call: _e.mock.On("DeleteFile", ctx, publicID, resourceType)}
+}
+
+func (_c *CloudinaryService_DeleteFile_Call) Run(run func(ctx context.Context, publicID string, resourceType string)) *CloudinaryService_DeleteFile_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(string), args[2].(string))
+	})
+	return _c
+}
+
+func (_c *CloudinaryService_DeleteFile_Call) Return(_a0 error) *CloudinaryService_DeleteFile_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *CloudinaryService_DeleteFile_Call) RunAndReturn(run func(context.Context, string, string) error) *CloudinaryService_DeleteFile_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // DeleteFileByURL provides a mock function with given fields: ctx, fileURL
 func (_m *CloudinaryService) DeleteFileByURL(ctx context.Context, fileURL string) error {
 	ret := _m.Called(ctx, fileURL)
@@ -48,6 +86,35 @@ func (_m *CloudinaryService) DeleteFileByURL(ctx context.Context, fileURL string
 	}
 
 	return r0
+}
+
+// CloudinaryService_DeleteFileByURL_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'DeleteFileByURL'
+type CloudinaryService_DeleteFileByURL_Call struct {
+	*mock.Call
+}
+
+// DeleteFileByURL is a helper method to define mock.On call
+//   - ctx context.Context
+//   - fileURL string
+func (_e *CloudinaryService_Expecter) DeleteFileByURL(ctx interface{}, fileURL interface{}) *CloudinaryService_DeleteFileByURL_Call {
+	return &CloudinaryService_DeleteFileByURL_Call{Call: _e.mock.On("DeleteFileByURL", ctx, fileURL)}
+}
+
+func (_c *CloudinaryService_DeleteFileByURL_Call) Run(run func(ctx context.Context, fileURL string)) *CloudinaryService_DeleteFileByURL_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(string))
+	})
+	return _c
+}
+
+func (_c *CloudinaryService_DeleteFileByURL_Call) Return(_a0 error) *CloudinaryService_DeleteFileByURL_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *CloudinaryService_DeleteFileByURL_Call) RunAndReturn(run func(context.Context, string) error) *CloudinaryService_DeleteFileByURL_Call {
+	_c.Call.Return(run)
+	return _c
 }
 
 // UploadFile provides a mock function with given fields: ctx, file, resourceType
@@ -76,6 +143,36 @@ func (_m *CloudinaryService) UploadFile(ctx context.Context, file multipart.File
 	}
 
 	return r0, r1
+}
+
+// CloudinaryService_UploadFile_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'UploadFile'
+type CloudinaryService_UploadFile_Call struct {
+	*mock.Call
+}
+
+// UploadFile is a helper method to define mock.On call
+//   - ctx context.Context
+//   - file multipart.File
+//   - resourceType string
+func (_e *CloudinaryService_Expecter) UploadFile(ctx interface{}, file interface{}, resourceType interface{}) *CloudinaryService_UploadFile_Call {
+	return &CloudinaryService_UploadFile_Call{Call: _e.mock.On("UploadFile", ctx, file, resourceType)}
+}
+
+func (_c *CloudinaryService_UploadFile_Call) Run(run func(ctx context.Context, file multipart.File, resourceType string)) *CloudinaryService_UploadFile_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(multipart.File), args[2].(string))
+	})
+	return _c
+}
+
+func (_c *CloudinaryService_UploadFile_Call) Return(_a0 string, _a1 error) *CloudinaryService_UploadFile_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *CloudinaryService_UploadFile_Call) RunAndReturn(run func(context.Context, multipart.File, string) (string, error)) *CloudinaryService_UploadFile_Call {
+	_c.Call.Return(run)
+	return _c
 }
 
 // NewCloudinaryService creates a new instance of CloudinaryService. It also registers a testing interface on the mock and a cleanup function to assert the mocks expectations.

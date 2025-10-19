@@ -35,6 +35,11 @@ func NewOfficeHandler(log logger.Logger, service services.OfficeService) OfficeH
 }
 
 func (h *officeHandler) Create(c *gin.Context) {
+	if err := allowedRoles(c, entities.UserRoleAdmin); err != nil {
+		handleError(h.log, c, err)
+		return
+	}
+
 	ctx, cancel := context.WithTimeout(c.Request.Context(), requestTimeout)
 	defer cancel()
 
@@ -110,6 +115,11 @@ func (h *officeHandler) GetAll(c *gin.Context) {
 }
 
 func (h *officeHandler) Update(c *gin.Context) {
+	if err := allowedRoles(c, entities.UserRoleAdmin); err != nil {
+		handleError(h.log, c, err)
+		return
+	}
+
 	ctx, cancel := context.WithTimeout(c.Request.Context(), requestTimeout)
 	defer cancel()
 
@@ -148,6 +158,11 @@ func (h *officeHandler) Update(c *gin.Context) {
 }
 
 func (h *officeHandler) Delete(c *gin.Context) {
+	if err := allowedRoles(c, entities.UserRoleAdmin); err != nil {
+		handleError(h.log, c, err)
+		return
+	}
+
 	ctx, cancel := context.WithTimeout(c.Request.Context(), requestTimeout)
 	defer cancel()
 

@@ -87,6 +87,11 @@ func (h *claimHandler) GetAll(c *gin.Context) {
 }
 
 func (h *claimHandler) Create(c *gin.Context) {
+	if err := allowedRoles(c, entities.UserRoleScTechnician, entities.UserRoleScStaff); err != nil {
+		handleError(h.log, c, err)
+		return
+	}
+
 	var req dtos.CreateClaimRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		handleError(h.log, c, apperrors.NewInvalidJsonRequest())
@@ -122,6 +127,11 @@ func (h *claimHandler) Create(c *gin.Context) {
 }
 
 func (h *claimHandler) Update(c *gin.Context) {
+	if err := allowedRoles(c, entities.UserRoleScStaff); err != nil {
+		handleError(h.log, c, err)
+		return
+	}
+
 	idParam := c.Param("id")
 	id, err := uuid.Parse(idParam)
 	if err != nil {
@@ -152,6 +162,10 @@ func (h *claimHandler) Update(c *gin.Context) {
 }
 
 func (h *claimHandler) Delete(c *gin.Context) {
+	if err := allowedRoles(c, entities.UserRoleScStaff, entities.UserRoleEvmStaff); err != nil {
+		handleError(h.log, c, err)
+	}
+
 	idParam := c.Param("id")
 	id, err := uuid.Parse(idParam)
 	if err != nil {
@@ -160,7 +174,11 @@ func (h *claimHandler) Delete(c *gin.Context) {
 	}
 
 	err = h.txManager.Do(c.Request.Context(), func(tx application.Tx) error {
-		return h.service.Delete(tx, id)
+		role, _ := getUserRoleFromHeader(c)
+		if role == entities.UserRoleScStaff {
+			return h.service.HardDelete(tx, id)
+		}
+		return h.service.SoftDelete(tx, id)
 	})
 
 	if err != nil {
@@ -172,6 +190,10 @@ func (h *claimHandler) Delete(c *gin.Context) {
 }
 
 func (h *claimHandler) Submit(c *gin.Context) {
+	if err := allowedRoles(c, entities.UserRoleScStaff); err != nil {
+		handleError(h.log, c, err)
+	}
+
 	idParam := c.Param("id")
 	id, err := uuid.Parse(idParam)
 	if err != nil {
@@ -198,6 +220,10 @@ func (h *claimHandler) Submit(c *gin.Context) {
 }
 
 func (h *claimHandler) Review(c *gin.Context) {
+	if err := allowedRoles(c, entities.UserRoleEvmStaff); err != nil {
+		handleError(h.log, c, err)
+	}
+
 	idParam := c.Param("id")
 	id, err := uuid.Parse(idParam)
 	if err != nil {
@@ -224,6 +250,10 @@ func (h *claimHandler) Review(c *gin.Context) {
 }
 
 func (h *claimHandler) RequestInfo(c *gin.Context) {
+	if err := allowedRoles(c, entities.UserRoleEvmStaff); err != nil {
+		handleError(h.log, c, err)
+	}
+
 	idParam := c.Param("id")
 	id, err := uuid.Parse(idParam)
 	if err != nil {
@@ -250,6 +280,10 @@ func (h *claimHandler) RequestInfo(c *gin.Context) {
 }
 
 func (h *claimHandler) Cancel(c *gin.Context) {
+	if err := allowedRoles(c, entities.UserRoleScStaff); err != nil {
+		handleError(h.log, c, err)
+	}
+
 	idParam := c.Param("id")
 	id, err := uuid.Parse(idParam)
 	if err != nil {
@@ -276,6 +310,10 @@ func (h *claimHandler) Cancel(c *gin.Context) {
 }
 
 func (h *claimHandler) Complete(c *gin.Context) {
+	if err := allowedRoles(c, entities.UserRoleEvmStaff); err != nil {
+		handleError(h.log, c, err)
+	}
+
 	idParam := c.Param("id")
 	id, err := uuid.Parse(idParam)
 	if err != nil {

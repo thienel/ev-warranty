@@ -20,6 +20,14 @@ type ClaimService struct {
 	mock.Mock
 }
 
+type ClaimService_Expecter struct {
+	mock *mock.Mock
+}
+
+func (_m *ClaimService) EXPECT() *ClaimService_Expecter {
+	return &ClaimService_Expecter{mock: &_m.Mock}
+}
+
 // Complete provides a mock function with given fields: tx, id, changedBy
 func (_m *ClaimService) Complete(tx application.Tx, id uuid.UUID, changedBy uuid.UUID) error {
 	ret := _m.Called(tx, id, changedBy)
@@ -36,6 +44,36 @@ func (_m *ClaimService) Complete(tx application.Tx, id uuid.UUID, changedBy uuid
 	}
 
 	return r0
+}
+
+// ClaimService_Complete_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Complete'
+type ClaimService_Complete_Call struct {
+	*mock.Call
+}
+
+// Complete is a helper method to define mock.On call
+//   - tx application.Tx
+//   - id uuid.UUID
+//   - changedBy uuid.UUID
+func (_e *ClaimService_Expecter) Complete(tx interface{}, id interface{}, changedBy interface{}) *ClaimService_Complete_Call {
+	return &ClaimService_Complete_Call{Call: _e.mock.On("Complete", tx, id, changedBy)}
+}
+
+func (_c *ClaimService_Complete_Call) Run(run func(tx application.Tx, id uuid.UUID, changedBy uuid.UUID)) *ClaimService_Complete_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(application.Tx), args[1].(uuid.UUID), args[2].(uuid.UUID))
+	})
+	return _c
+}
+
+func (_c *ClaimService_Complete_Call) Return(_a0 error) *ClaimService_Complete_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *ClaimService_Complete_Call) RunAndReturn(run func(application.Tx, uuid.UUID, uuid.UUID) error) *ClaimService_Complete_Call {
+	_c.Call.Return(run)
+	return _c
 }
 
 // Create provides a mock function with given fields: tx, cmd
@@ -68,22 +106,33 @@ func (_m *ClaimService) Create(tx application.Tx, cmd *services.CreateClaimComma
 	return r0, r1
 }
 
-// Delete provides a mock function with given fields: tx, id
-func (_m *ClaimService) Delete(tx application.Tx, id uuid.UUID) error {
-	ret := _m.Called(tx, id)
+// ClaimService_Create_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Create'
+type ClaimService_Create_Call struct {
+	*mock.Call
+}
 
-	if len(ret) == 0 {
-		panic("no return value specified for Delete")
-	}
+// Create is a helper method to define mock.On call
+//   - tx application.Tx
+//   - cmd *services.CreateClaimCommand
+func (_e *ClaimService_Expecter) Create(tx interface{}, cmd interface{}) *ClaimService_Create_Call {
+	return &ClaimService_Create_Call{Call: _e.mock.On("Create", tx, cmd)}
+}
 
-	var r0 error
-	if rf, ok := ret.Get(0).(func(application.Tx, uuid.UUID) error); ok {
-		r0 = rf(tx, id)
-	} else {
-		r0 = ret.Error(0)
-	}
+func (_c *ClaimService_Create_Call) Run(run func(tx application.Tx, cmd *services.CreateClaimCommand)) *ClaimService_Create_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(application.Tx), args[1].(*services.CreateClaimCommand))
+	})
+	return _c
+}
 
-	return r0
+func (_c *ClaimService_Create_Call) Return(_a0 *entities.Claim, _a1 error) *ClaimService_Create_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *ClaimService_Create_Call) RunAndReturn(run func(application.Tx, *services.CreateClaimCommand) (*entities.Claim, error)) *ClaimService_Create_Call {
+	_c.Call.Return(run)
+	return _c
 }
 
 // GetAll provides a mock function with given fields: ctx, filters, pagination
@@ -116,6 +165,36 @@ func (_m *ClaimService) GetAll(ctx context.Context, filters services.ClaimFilter
 	return r0, r1
 }
 
+// ClaimService_GetAll_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetAll'
+type ClaimService_GetAll_Call struct {
+	*mock.Call
+}
+
+// GetAll is a helper method to define mock.On call
+//   - ctx context.Context
+//   - filters services.ClaimFilters
+//   - pagination services.Pagination
+func (_e *ClaimService_Expecter) GetAll(ctx interface{}, filters interface{}, pagination interface{}) *ClaimService_GetAll_Call {
+	return &ClaimService_GetAll_Call{Call: _e.mock.On("GetAll", ctx, filters, pagination)}
+}
+
+func (_c *ClaimService_GetAll_Call) Run(run func(ctx context.Context, filters services.ClaimFilters, pagination services.Pagination)) *ClaimService_GetAll_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(services.ClaimFilters), args[2].(services.Pagination))
+	})
+	return _c
+}
+
+func (_c *ClaimService_GetAll_Call) Return(_a0 *services.ClaimListResult, _a1 error) *ClaimService_GetAll_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *ClaimService_GetAll_Call) RunAndReturn(run func(context.Context, services.ClaimFilters, services.Pagination) (*services.ClaimListResult, error)) *ClaimService_GetAll_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // GetByID provides a mock function with given fields: ctx, id
 func (_m *ClaimService) GetByID(ctx context.Context, id uuid.UUID) (*entities.Claim, error) {
 	ret := _m.Called(ctx, id)
@@ -144,6 +223,35 @@ func (_m *ClaimService) GetByID(ctx context.Context, id uuid.UUID) (*entities.Cl
 	}
 
 	return r0, r1
+}
+
+// ClaimService_GetByID_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetByID'
+type ClaimService_GetByID_Call struct {
+	*mock.Call
+}
+
+// GetByID is a helper method to define mock.On call
+//   - ctx context.Context
+//   - id uuid.UUID
+func (_e *ClaimService_Expecter) GetByID(ctx interface{}, id interface{}) *ClaimService_GetByID_Call {
+	return &ClaimService_GetByID_Call{Call: _e.mock.On("GetByID", ctx, id)}
+}
+
+func (_c *ClaimService_GetByID_Call) Run(run func(ctx context.Context, id uuid.UUID)) *ClaimService_GetByID_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(uuid.UUID))
+	})
+	return _c
+}
+
+func (_c *ClaimService_GetByID_Call) Return(_a0 *entities.Claim, _a1 error) *ClaimService_GetByID_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *ClaimService_GetByID_Call) RunAndReturn(run func(context.Context, uuid.UUID) (*entities.Claim, error)) *ClaimService_GetByID_Call {
+	_c.Call.Return(run)
+	return _c
 }
 
 // GetHistory provides a mock function with given fields: ctx, claimID
@@ -176,6 +284,129 @@ func (_m *ClaimService) GetHistory(ctx context.Context, claimID uuid.UUID) ([]*e
 	return r0, r1
 }
 
+// ClaimService_GetHistory_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetHistory'
+type ClaimService_GetHistory_Call struct {
+	*mock.Call
+}
+
+// GetHistory is a helper method to define mock.On call
+//   - ctx context.Context
+//   - claimID uuid.UUID
+func (_e *ClaimService_Expecter) GetHistory(ctx interface{}, claimID interface{}) *ClaimService_GetHistory_Call {
+	return &ClaimService_GetHistory_Call{Call: _e.mock.On("GetHistory", ctx, claimID)}
+}
+
+func (_c *ClaimService_GetHistory_Call) Run(run func(ctx context.Context, claimID uuid.UUID)) *ClaimService_GetHistory_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(uuid.UUID))
+	})
+	return _c
+}
+
+func (_c *ClaimService_GetHistory_Call) Return(_a0 []*entities.ClaimHistory, _a1 error) *ClaimService_GetHistory_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *ClaimService_GetHistory_Call) RunAndReturn(run func(context.Context, uuid.UUID) ([]*entities.ClaimHistory, error)) *ClaimService_GetHistory_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// HardDelete provides a mock function with given fields: tx, id
+func (_m *ClaimService) HardDelete(tx application.Tx, id uuid.UUID) error {
+	ret := _m.Called(tx, id)
+
+	if len(ret) == 0 {
+		panic("no return value specified for HardDelete")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(application.Tx, uuid.UUID) error); ok {
+		r0 = rf(tx, id)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// ClaimService_HardDelete_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'HardDelete'
+type ClaimService_HardDelete_Call struct {
+	*mock.Call
+}
+
+// HardDelete is a helper method to define mock.On call
+//   - tx application.Tx
+//   - id uuid.UUID
+func (_e *ClaimService_Expecter) HardDelete(tx interface{}, id interface{}) *ClaimService_HardDelete_Call {
+	return &ClaimService_HardDelete_Call{Call: _e.mock.On("HardDelete", tx, id)}
+}
+
+func (_c *ClaimService_HardDelete_Call) Run(run func(tx application.Tx, id uuid.UUID)) *ClaimService_HardDelete_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(application.Tx), args[1].(uuid.UUID))
+	})
+	return _c
+}
+
+func (_c *ClaimService_HardDelete_Call) Return(_a0 error) *ClaimService_HardDelete_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *ClaimService_HardDelete_Call) RunAndReturn(run func(application.Tx, uuid.UUID) error) *ClaimService_HardDelete_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// SoftDelete provides a mock function with given fields: tx, id
+func (_m *ClaimService) SoftDelete(tx application.Tx, id uuid.UUID) error {
+	ret := _m.Called(tx, id)
+
+	if len(ret) == 0 {
+		panic("no return value specified for SoftDelete")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(application.Tx, uuid.UUID) error); ok {
+		r0 = rf(tx, id)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// ClaimService_SoftDelete_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'SoftDelete'
+type ClaimService_SoftDelete_Call struct {
+	*mock.Call
+}
+
+// SoftDelete is a helper method to define mock.On call
+//   - tx application.Tx
+//   - id uuid.UUID
+func (_e *ClaimService_Expecter) SoftDelete(tx interface{}, id interface{}) *ClaimService_SoftDelete_Call {
+	return &ClaimService_SoftDelete_Call{Call: _e.mock.On("SoftDelete", tx, id)}
+}
+
+func (_c *ClaimService_SoftDelete_Call) Run(run func(tx application.Tx, id uuid.UUID)) *ClaimService_SoftDelete_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(application.Tx), args[1].(uuid.UUID))
+	})
+	return _c
+}
+
+func (_c *ClaimService_SoftDelete_Call) Return(_a0 error) *ClaimService_SoftDelete_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *ClaimService_SoftDelete_Call) RunAndReturn(run func(application.Tx, uuid.UUID) error) *ClaimService_SoftDelete_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // Submit provides a mock function with given fields: tx, id, changedBy
 func (_m *ClaimService) Submit(tx application.Tx, id uuid.UUID, changedBy uuid.UUID) error {
 	ret := _m.Called(tx, id, changedBy)
@@ -192,6 +423,36 @@ func (_m *ClaimService) Submit(tx application.Tx, id uuid.UUID, changedBy uuid.U
 	}
 
 	return r0
+}
+
+// ClaimService_Submit_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Submit'
+type ClaimService_Submit_Call struct {
+	*mock.Call
+}
+
+// Submit is a helper method to define mock.On call
+//   - tx application.Tx
+//   - id uuid.UUID
+//   - changedBy uuid.UUID
+func (_e *ClaimService_Expecter) Submit(tx interface{}, id interface{}, changedBy interface{}) *ClaimService_Submit_Call {
+	return &ClaimService_Submit_Call{Call: _e.mock.On("Submit", tx, id, changedBy)}
+}
+
+func (_c *ClaimService_Submit_Call) Run(run func(tx application.Tx, id uuid.UUID, changedBy uuid.UUID)) *ClaimService_Submit_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(application.Tx), args[1].(uuid.UUID), args[2].(uuid.UUID))
+	})
+	return _c
+}
+
+func (_c *ClaimService_Submit_Call) Return(_a0 error) *ClaimService_Submit_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *ClaimService_Submit_Call) RunAndReturn(run func(application.Tx, uuid.UUID, uuid.UUID) error) *ClaimService_Submit_Call {
+	_c.Call.Return(run)
+	return _c
 }
 
 // Update provides a mock function with given fields: tx, id, cmd
@@ -212,6 +473,36 @@ func (_m *ClaimService) Update(tx application.Tx, id uuid.UUID, cmd *services.Up
 	return r0
 }
 
+// ClaimService_Update_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Update'
+type ClaimService_Update_Call struct {
+	*mock.Call
+}
+
+// Update is a helper method to define mock.On call
+//   - tx application.Tx
+//   - id uuid.UUID
+//   - cmd *services.UpdateClaimCommand
+func (_e *ClaimService_Expecter) Update(tx interface{}, id interface{}, cmd interface{}) *ClaimService_Update_Call {
+	return &ClaimService_Update_Call{Call: _e.mock.On("Update", tx, id, cmd)}
+}
+
+func (_c *ClaimService_Update_Call) Run(run func(tx application.Tx, id uuid.UUID, cmd *services.UpdateClaimCommand)) *ClaimService_Update_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(application.Tx), args[1].(uuid.UUID), args[2].(*services.UpdateClaimCommand))
+	})
+	return _c
+}
+
+func (_c *ClaimService_Update_Call) Return(_a0 error) *ClaimService_Update_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *ClaimService_Update_Call) RunAndReturn(run func(application.Tx, uuid.UUID, *services.UpdateClaimCommand) error) *ClaimService_Update_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // UpdateStatus provides a mock function with given fields: tx, id, status, changedBy
 func (_m *ClaimService) UpdateStatus(tx application.Tx, id uuid.UUID, status string, changedBy uuid.UUID) error {
 	ret := _m.Called(tx, id, status, changedBy)
@@ -228,6 +519,37 @@ func (_m *ClaimService) UpdateStatus(tx application.Tx, id uuid.UUID, status str
 	}
 
 	return r0
+}
+
+// ClaimService_UpdateStatus_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'UpdateStatus'
+type ClaimService_UpdateStatus_Call struct {
+	*mock.Call
+}
+
+// UpdateStatus is a helper method to define mock.On call
+//   - tx application.Tx
+//   - id uuid.UUID
+//   - status string
+//   - changedBy uuid.UUID
+func (_e *ClaimService_Expecter) UpdateStatus(tx interface{}, id interface{}, status interface{}, changedBy interface{}) *ClaimService_UpdateStatus_Call {
+	return &ClaimService_UpdateStatus_Call{Call: _e.mock.On("UpdateStatus", tx, id, status, changedBy)}
+}
+
+func (_c *ClaimService_UpdateStatus_Call) Run(run func(tx application.Tx, id uuid.UUID, status string, changedBy uuid.UUID)) *ClaimService_UpdateStatus_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(application.Tx), args[1].(uuid.UUID), args[2].(string), args[3].(uuid.UUID))
+	})
+	return _c
+}
+
+func (_c *ClaimService_UpdateStatus_Call) Return(_a0 error) *ClaimService_UpdateStatus_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *ClaimService_UpdateStatus_Call) RunAndReturn(run func(application.Tx, uuid.UUID, string, uuid.UUID) error) *ClaimService_UpdateStatus_Call {
+	_c.Call.Return(run)
+	return _c
 }
 
 // NewClaimService creates a new instance of ClaimService. It also registers a testing interface on the mock and a cleanup function to assert the mocks expectations.

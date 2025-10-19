@@ -15,6 +15,14 @@ type OAuthService struct {
 	mock.Mock
 }
 
+type OAuthService_Expecter struct {
+	mock *mock.Mock
+}
+
+func (_m *OAuthService) EXPECT() *OAuthService_Expecter {
+	return &OAuthService_Expecter{mock: &_m.Mock}
+}
+
 // GenerateAuthURL provides a mock function with no fields
 func (_m *OAuthService) GenerateAuthURL() (string, error) {
 	ret := _m.Called()
@@ -41,6 +49,33 @@ func (_m *OAuthService) GenerateAuthURL() (string, error) {
 	}
 
 	return r0, r1
+}
+
+// OAuthService_GenerateAuthURL_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GenerateAuthURL'
+type OAuthService_GenerateAuthURL_Call struct {
+	*mock.Call
+}
+
+// GenerateAuthURL is a helper method to define mock.On call
+func (_e *OAuthService_Expecter) GenerateAuthURL() *OAuthService_GenerateAuthURL_Call {
+	return &OAuthService_GenerateAuthURL_Call{Call: _e.mock.On("GenerateAuthURL")}
+}
+
+func (_c *OAuthService_GenerateAuthURL_Call) Run(run func()) *OAuthService_GenerateAuthURL_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run()
+	})
+	return _c
+}
+
+func (_c *OAuthService_GenerateAuthURL_Call) Return(_a0 string, _a1 error) *OAuthService_GenerateAuthURL_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *OAuthService_GenerateAuthURL_Call) RunAndReturn(run func() (string, error)) *OAuthService_GenerateAuthURL_Call {
+	_c.Call.Return(run)
+	return _c
 }
 
 // HandleCallback provides a mock function with given fields: ctx, code, state
@@ -71,6 +106,36 @@ func (_m *OAuthService) HandleCallback(ctx context.Context, code string, state s
 	}
 
 	return r0, r1
+}
+
+// OAuthService_HandleCallback_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'HandleCallback'
+type OAuthService_HandleCallback_Call struct {
+	*mock.Call
+}
+
+// HandleCallback is a helper method to define mock.On call
+//   - ctx context.Context
+//   - code string
+//   - state string
+func (_e *OAuthService_Expecter) HandleCallback(ctx interface{}, code interface{}, state interface{}) *OAuthService_HandleCallback_Call {
+	return &OAuthService_HandleCallback_Call{Call: _e.mock.On("HandleCallback", ctx, code, state)}
+}
+
+func (_c *OAuthService_HandleCallback_Call) Run(run func(ctx context.Context, code string, state string)) *OAuthService_HandleCallback_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(string), args[2].(string))
+	})
+	return _c
+}
+
+func (_c *OAuthService_HandleCallback_Call) Return(_a0 *providers.UserInfo, _a1 error) *OAuthService_HandleCallback_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *OAuthService_HandleCallback_Call) RunAndReturn(run func(context.Context, string, string) (*providers.UserInfo, error)) *OAuthService_HandleCallback_Call {
+	_c.Call.Return(run)
+	return _c
 }
 
 // NewOAuthService creates a new instance of OAuthService. It also registers a testing interface on the mock and a cleanup function to assert the mocks expectations.

@@ -13,6 +13,14 @@ type Tx struct {
 	mock.Mock
 }
 
+type Tx_Expecter struct {
+	mock *mock.Mock
+}
+
+func (_m *Tx) EXPECT() *Tx_Expecter {
+	return &Tx_Expecter{mock: &_m.Mock}
+}
+
 // Commit provides a mock function with no fields
 func (_m *Tx) Commit() error {
 	ret := _m.Called()
@@ -29,6 +37,33 @@ func (_m *Tx) Commit() error {
 	}
 
 	return r0
+}
+
+// Tx_Commit_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Commit'
+type Tx_Commit_Call struct {
+	*mock.Call
+}
+
+// Commit is a helper method to define mock.On call
+func (_e *Tx_Expecter) Commit() *Tx_Commit_Call {
+	return &Tx_Commit_Call{Call: _e.mock.On("Commit")}
+}
+
+func (_c *Tx_Commit_Call) Run(run func()) *Tx_Commit_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run()
+	})
+	return _c
+}
+
+func (_c *Tx_Commit_Call) Return(_a0 error) *Tx_Commit_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *Tx_Commit_Call) RunAndReturn(run func() error) *Tx_Commit_Call {
+	_c.Call.Return(run)
+	return _c
 }
 
 // GetCtx provides a mock function with no fields
@@ -51,6 +86,33 @@ func (_m *Tx) GetCtx() context.Context {
 	return r0
 }
 
+// Tx_GetCtx_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetCtx'
+type Tx_GetCtx_Call struct {
+	*mock.Call
+}
+
+// GetCtx is a helper method to define mock.On call
+func (_e *Tx_Expecter) GetCtx() *Tx_GetCtx_Call {
+	return &Tx_GetCtx_Call{Call: _e.mock.On("GetCtx")}
+}
+
+func (_c *Tx_GetCtx_Call) Run(run func()) *Tx_GetCtx_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run()
+	})
+	return _c
+}
+
+func (_c *Tx_GetCtx_Call) Return(_a0 context.Context) *Tx_GetCtx_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *Tx_GetCtx_Call) RunAndReturn(run func() context.Context) *Tx_GetCtx_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // GetTx provides a mock function with no fields
 func (_m *Tx) GetTx() interface{} {
 	ret := _m.Called()
@@ -71,6 +133,33 @@ func (_m *Tx) GetTx() interface{} {
 	return r0
 }
 
+// Tx_GetTx_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetTx'
+type Tx_GetTx_Call struct {
+	*mock.Call
+}
+
+// GetTx is a helper method to define mock.On call
+func (_e *Tx_Expecter) GetTx() *Tx_GetTx_Call {
+	return &Tx_GetTx_Call{Call: _e.mock.On("GetTx")}
+}
+
+func (_c *Tx_GetTx_Call) Run(run func()) *Tx_GetTx_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run()
+	})
+	return _c
+}
+
+func (_c *Tx_GetTx_Call) Return(_a0 interface{}) *Tx_GetTx_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *Tx_GetTx_Call) RunAndReturn(run func() interface{}) *Tx_GetTx_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // Rollback provides a mock function with no fields
 func (_m *Tx) Rollback() error {
 	ret := _m.Called()
@@ -87,6 +176,33 @@ func (_m *Tx) Rollback() error {
 	}
 
 	return r0
+}
+
+// Tx_Rollback_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Rollback'
+type Tx_Rollback_Call struct {
+	*mock.Call
+}
+
+// Rollback is a helper method to define mock.On call
+func (_e *Tx_Expecter) Rollback() *Tx_Rollback_Call {
+	return &Tx_Rollback_Call{Call: _e.mock.On("Rollback")}
+}
+
+func (_c *Tx_Rollback_Call) Run(run func()) *Tx_Rollback_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run()
+	})
+	return _c
+}
+
+func (_c *Tx_Rollback_Call) Return(_a0 error) *Tx_Rollback_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *Tx_Rollback_Call) RunAndReturn(run func() error) *Tx_Rollback_Call {
+	_c.Call.Return(run)
+	return _c
 }
 
 // NewTx creates a new instance of Tx. It also registers a testing interface on the mock and a cleanup function to assert the mocks expectations.

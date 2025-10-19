@@ -18,6 +18,7 @@ const (
 	requestTimeout  = 30 * time.Second
 	bearerPrefix    = "Bearer "
 	headerUserIDKey = "X-User-ID"
+	headerUserRole  = "X-User-Role"
 )
 
 func handleError(log logger.Logger, c *gin.Context, err error) {
@@ -119,4 +120,22 @@ func getUserIDFromHeader(c *gin.Context) (uuid.UUID, error) {
 	}
 
 	return userID, nil
+}
+
+func getUserRoleFromHeader(c *gin.Context) (string, error) {
+	userRole := c.GetHeader(headerUserRole)
+	if userRole == "" {
+		return "", apperrors.NewMissingUserRole()
+	}
+	return userRole, nil
+}
+
+func allowedRoles(c *gin.Context, allowedRoles ...string) error {
+	userRole := c.GetHeader(headerUserRole)
+	for _, role := range allowedRoles {
+		if userRole == role {
+			return nil
+		}
+	}
+	return apperrors.NewUnauthorizedRoleError()
 }

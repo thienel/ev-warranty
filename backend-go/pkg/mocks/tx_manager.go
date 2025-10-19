@@ -14,6 +14,14 @@ type TxManager struct {
 	mock.Mock
 }
 
+type TxManager_Expecter struct {
+	mock *mock.Mock
+}
+
+func (_m *TxManager) EXPECT() *TxManager_Expecter {
+	return &TxManager_Expecter{mock: &_m.Mock}
+}
+
 // Do provides a mock function with given fields: ctx, fn
 func (_m *TxManager) Do(ctx context.Context, fn func(application.Tx) error) error {
 	ret := _m.Called(ctx, fn)
@@ -30,6 +38,35 @@ func (_m *TxManager) Do(ctx context.Context, fn func(application.Tx) error) erro
 	}
 
 	return r0
+}
+
+// TxManager_Do_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Do'
+type TxManager_Do_Call struct {
+	*mock.Call
+}
+
+// Do is a helper method to define mock.On call
+//   - ctx context.Context
+//   - fn func(application.Tx) error
+func (_e *TxManager_Expecter) Do(ctx interface{}, fn interface{}) *TxManager_Do_Call {
+	return &TxManager_Do_Call{Call: _e.mock.On("Do", ctx, fn)}
+}
+
+func (_c *TxManager_Do_Call) Run(run func(ctx context.Context, fn func(application.Tx) error)) *TxManager_Do_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(func(application.Tx) error))
+	})
+	return _c
+}
+
+func (_c *TxManager_Do_Call) Return(_a0 error) *TxManager_Do_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *TxManager_Do_Call) RunAndReturn(run func(context.Context, func(application.Tx) error) error) *TxManager_Do_Call {
+	_c.Call.Return(run)
+	return _c
 }
 
 // NewTxManager creates a new instance of TxManager. It also registers a testing interface on the mock and a cleanup function to assert the mocks expectations.

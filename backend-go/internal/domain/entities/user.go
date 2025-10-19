@@ -79,11 +79,25 @@ func IsValidPassword(password string) bool {
 	return hasLower && hasUpper && hasDigit && hasSpecial
 }
 
-func (user *User) IsOAuthUser() bool {
-	return user.OAuthProvider != nil && user.OAuthID != nil
+func (u *User) IsValidOfficeByRole(officeType string) bool {
+	switch officeType {
+	case OfficeTypeEVM:
+		if u.Role == UserRoleAdmin || u.Role == UserRoleEvmStaff {
+			return true
+		}
+	case OfficeTypeSC:
+		if u.Role == UserRoleScTechnician || u.Role == UserRoleScStaff {
+			return true
+		}
+	}
+	return false
 }
 
-func (user *User) LinkToOAuth(oauthProvider, oauthID string) {
-	user.OAuthProvider = &oauthProvider
-	user.OAuthID = &oauthID
+func (u *User) IsOAuthUser() bool {
+	return u.OAuthProvider != nil && u.OAuthID != nil
+}
+
+func (u *User) LinkToOAuth(oauthProvider, oauthID string) {
+	u.OAuthProvider = &oauthProvider
+	u.OAuthID = &oauthID
 }

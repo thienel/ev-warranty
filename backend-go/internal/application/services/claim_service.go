@@ -53,7 +53,8 @@ type ClaimService interface {
 
 	Create(tx application.Tx, cmd *CreateClaimCommand) (*entities.Claim, error)
 	Update(tx application.Tx, id uuid.UUID, cmd *UpdateClaimCommand) error
-	Delete(tx application.Tx, id uuid.UUID) error
+	HardDelete(tx application.Tx, id uuid.UUID) error
+	SoftDelete(tx application.Tx, id uuid.UUID) error
 
 	UpdateStatus(tx application.Tx, id uuid.UUID, status string, changedBy uuid.UUID) error
 	Submit(tx application.Tx, id uuid.UUID, changedBy uuid.UUID) error
@@ -162,47 +163,56 @@ func (s *claimService) Update(tx application.Tx, id uuid.UUID, cmd *UpdateClaimC
 	return nil
 }
 
-func (s *claimService) Delete(tx application.Tx, id uuid.UUID) error {
+func (s *claimService) HardDelete(tx application.Tx, id uuid.UUID) error {
 	claim, err := s.claimRepo.FindByID(tx.GetCtx(), id)
 	if err != nil {
 		return err
 	}
 
-	if claim.Status != entities.ClaimStatusDraft && claim.Status != entities.ClaimStatusCancelled {
+	if claim.Status != entities.ClaimStatusDraft {
 		return apperrors.NewNotAllowDeleteClaim()
 	}
 
-	if claim.Status == entities.ClaimStatusCancelled {
-		softDeleters := []func(application.Tx, uuid.UUID) error{
-			s.claimRepo.SoftDelete,
-			s.itemRepo.SoftDeleteByClaimID,
-			s.attachmentRepo.SoftDeleteByClaimID,
-			s.historyRepo.SoftDeleteByClaimID,
-		}
+	attachments, err := s.attachmentRepo.FindByClaimID(tx.GetCtx(), id)
+	if err != nil {
+		return err
+	}
 
-		for _, deleteFn := range softDeleters {
-			if err = deleteFn(tx, id); err != nil {
-				return err
-			}
+	err = s.claimRepo.HardDelete(tx, id)
+	if err == nil {
+		for _, attach := range attachments {
+			go func() {
+				err := s.cloudService.DeleteFileByURL(context.Background(), attach.URL)
+				if err != nil {
+					s.log.Error("[Cloudinary] Failed to delete file in delete claim use case", "error", err)
+				}
+			}()
 		}
-	} else if claim.Status == entities.ClaimStatusDraft {
-		attachments, err := s.attachmentRepo.FindByClaimID(tx.GetCtx(), id)
-		if err != nil {
+	}
+	return err
+}
+
+func (s *claimService) SoftDelete(tx application.Tx, id uuid.UUID) error {
+	claim, err := s.claimRepo.FindByID(tx.GetCtx(), id)
+	if err != nil {
+		return err
+	}
+
+	if claim.Status != entities.ClaimStatusCancelled {
+		return apperrors.NewNotAllowDeleteClaim()
+	}
+
+	softDeleters := []func(application.Tx, uuid.UUID) error{
+		s.claimRepo.SoftDelete,
+		s.itemRepo.SoftDeleteByClaimID,
+		s.attachmentRepo.SoftDeleteByClaimID,
+		s.historyRepo.SoftDeleteByClaimID,
+	}
+
+	for _, deleteFn := range softDeleters {
+		if err = deleteFn(tx, id); err != nil {
 			return err
 		}
-
-		err = s.claimRepo.HardDelete(tx, id)
-		if err == nil {
-			for _, attach := range attachments {
-				go func() {
-					err := s.cloudService.DeleteFileByURL(context.Background(), attach.URL)
-					if err != nil {
-						s.log.Error("[Cloudinary] Failed to delete file in delete claim use case", "error", err)
-					}
-				}()
-			}
-		}
-		return err
 	}
 
 	return nil

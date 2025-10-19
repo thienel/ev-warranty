@@ -16,6 +16,14 @@ type OfficeRepository struct {
 	mock.Mock
 }
 
+type OfficeRepository_Expecter struct {
+	mock *mock.Mock
+}
+
+func (_m *OfficeRepository) EXPECT() *OfficeRepository_Expecter {
+	return &OfficeRepository_Expecter{mock: &_m.Mock}
+}
+
 // Create provides a mock function with given fields: ctx, office
 func (_m *OfficeRepository) Create(ctx context.Context, office *entities.Office) error {
 	ret := _m.Called(ctx, office)
@@ -32,6 +40,35 @@ func (_m *OfficeRepository) Create(ctx context.Context, office *entities.Office)
 	}
 
 	return r0
+}
+
+// OfficeRepository_Create_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Create'
+type OfficeRepository_Create_Call struct {
+	*mock.Call
+}
+
+// Create is a helper method to define mock.On call
+//   - ctx context.Context
+//   - office *entities.Office
+func (_e *OfficeRepository_Expecter) Create(ctx interface{}, office interface{}) *OfficeRepository_Create_Call {
+	return &OfficeRepository_Create_Call{Call: _e.mock.On("Create", ctx, office)}
+}
+
+func (_c *OfficeRepository_Create_Call) Run(run func(ctx context.Context, office *entities.Office)) *OfficeRepository_Create_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(*entities.Office))
+	})
+	return _c
+}
+
+func (_c *OfficeRepository_Create_Call) Return(_a0 error) *OfficeRepository_Create_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *OfficeRepository_Create_Call) RunAndReturn(run func(context.Context, *entities.Office) error) *OfficeRepository_Create_Call {
+	_c.Call.Return(run)
+	return _c
 }
 
 // FindAll provides a mock function with given fields: ctx
@@ -64,6 +101,34 @@ func (_m *OfficeRepository) FindAll(ctx context.Context) ([]*entities.Office, er
 	return r0, r1
 }
 
+// OfficeRepository_FindAll_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'FindAll'
+type OfficeRepository_FindAll_Call struct {
+	*mock.Call
+}
+
+// FindAll is a helper method to define mock.On call
+//   - ctx context.Context
+func (_e *OfficeRepository_Expecter) FindAll(ctx interface{}) *OfficeRepository_FindAll_Call {
+	return &OfficeRepository_FindAll_Call{Call: _e.mock.On("FindAll", ctx)}
+}
+
+func (_c *OfficeRepository_FindAll_Call) Run(run func(ctx context.Context)) *OfficeRepository_FindAll_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context))
+	})
+	return _c
+}
+
+func (_c *OfficeRepository_FindAll_Call) Return(_a0 []*entities.Office, _a1 error) *OfficeRepository_FindAll_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *OfficeRepository_FindAll_Call) RunAndReturn(run func(context.Context) ([]*entities.Office, error)) *OfficeRepository_FindAll_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // FindByID provides a mock function with given fields: ctx, id
 func (_m *OfficeRepository) FindByID(ctx context.Context, id uuid.UUID) (*entities.Office, error) {
 	ret := _m.Called(ctx, id)
@@ -94,6 +159,35 @@ func (_m *OfficeRepository) FindByID(ctx context.Context, id uuid.UUID) (*entiti
 	return r0, r1
 }
 
+// OfficeRepository_FindByID_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'FindByID'
+type OfficeRepository_FindByID_Call struct {
+	*mock.Call
+}
+
+// FindByID is a helper method to define mock.On call
+//   - ctx context.Context
+//   - id uuid.UUID
+func (_e *OfficeRepository_Expecter) FindByID(ctx interface{}, id interface{}) *OfficeRepository_FindByID_Call {
+	return &OfficeRepository_FindByID_Call{Call: _e.mock.On("FindByID", ctx, id)}
+}
+
+func (_c *OfficeRepository_FindByID_Call) Run(run func(ctx context.Context, id uuid.UUID)) *OfficeRepository_FindByID_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(uuid.UUID))
+	})
+	return _c
+}
+
+func (_c *OfficeRepository_FindByID_Call) Return(_a0 *entities.Office, _a1 error) *OfficeRepository_FindByID_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *OfficeRepository_FindByID_Call) RunAndReturn(run func(context.Context, uuid.UUID) (*entities.Office, error)) *OfficeRepository_FindByID_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // SoftDelete provides a mock function with given fields: ctx, id
 func (_m *OfficeRepository) SoftDelete(ctx context.Context, id uuid.UUID) error {
 	ret := _m.Called(ctx, id)
@@ -112,6 +206,35 @@ func (_m *OfficeRepository) SoftDelete(ctx context.Context, id uuid.UUID) error 
 	return r0
 }
 
+// OfficeRepository_SoftDelete_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'SoftDelete'
+type OfficeRepository_SoftDelete_Call struct {
+	*mock.Call
+}
+
+// SoftDelete is a helper method to define mock.On call
+//   - ctx context.Context
+//   - id uuid.UUID
+func (_e *OfficeRepository_Expecter) SoftDelete(ctx interface{}, id interface{}) *OfficeRepository_SoftDelete_Call {
+	return &OfficeRepository_SoftDelete_Call{Call: _e.mock.On("SoftDelete", ctx, id)}
+}
+
+func (_c *OfficeRepository_SoftDelete_Call) Run(run func(ctx context.Context, id uuid.UUID)) *OfficeRepository_SoftDelete_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(uuid.UUID))
+	})
+	return _c
+}
+
+func (_c *OfficeRepository_SoftDelete_Call) Return(_a0 error) *OfficeRepository_SoftDelete_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *OfficeRepository_SoftDelete_Call) RunAndReturn(run func(context.Context, uuid.UUID) error) *OfficeRepository_SoftDelete_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // Update provides a mock function with given fields: ctx, office
 func (_m *OfficeRepository) Update(ctx context.Context, office *entities.Office) error {
 	ret := _m.Called(ctx, office)
@@ -128,6 +251,35 @@ func (_m *OfficeRepository) Update(ctx context.Context, office *entities.Office)
 	}
 
 	return r0
+}
+
+// OfficeRepository_Update_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Update'
+type OfficeRepository_Update_Call struct {
+	*mock.Call
+}
+
+// Update is a helper method to define mock.On call
+//   - ctx context.Context
+//   - office *entities.Office
+func (_e *OfficeRepository_Expecter) Update(ctx interface{}, office interface{}) *OfficeRepository_Update_Call {
+	return &OfficeRepository_Update_Call{Call: _e.mock.On("Update", ctx, office)}
+}
+
+func (_c *OfficeRepository_Update_Call) Run(run func(ctx context.Context, office *entities.Office)) *OfficeRepository_Update_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(*entities.Office))
+	})
+	return _c
+}
+
+func (_c *OfficeRepository_Update_Call) Return(_a0 error) *OfficeRepository_Update_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *OfficeRepository_Update_Call) RunAndReturn(run func(context.Context, *entities.Office) error) *OfficeRepository_Update_Call {
+	_c.Call.Return(run)
+	return _c
 }
 
 // NewOfficeRepository creates a new instance of OfficeRepository. It also registers a testing interface on the mock and a cleanup function to assert the mocks expectations.

@@ -76,6 +76,10 @@ func (h *claimItemHandler) GetByClaimID(c *gin.Context) {
 }
 
 func (h *claimItemHandler) Create(c *gin.Context) {
+	if err := allowedRoles(c, entities.UserRoleScStaff); err != nil {
+		handleError(h.log, c, err)
+	}
+
 	claimID, err := parseClaimIDParam(c)
 	if err != nil {
 		handleError(h.log, c, err)
@@ -119,6 +123,10 @@ func (h *claimItemHandler) Create(c *gin.Context) {
 }
 
 func (h *claimItemHandler) Delete(c *gin.Context) {
+	if err := allowedRoles(c, entities.UserRoleScStaff); err != nil {
+		handleError(h.log, c, err)
+	}
+
 	claimID, err := parseClaimIDParam(c)
 	if err != nil {
 		handleError(h.log, c, err)
@@ -144,6 +152,10 @@ func (h *claimItemHandler) Delete(c *gin.Context) {
 }
 
 func (h *claimItemHandler) Approve(c *gin.Context) {
+	if err := allowedRoles(c, entities.UserRoleEvmStaff); err != nil {
+		handleError(h.log, c, err)
+	}
+
 	claimID, err := parseClaimIDParam(c)
 	if err != nil {
 		handleError(h.log, c, err)
@@ -169,6 +181,10 @@ func (h *claimItemHandler) Approve(c *gin.Context) {
 }
 
 func (h *claimItemHandler) Reject(c *gin.Context) {
+	if err := allowedRoles(c, entities.UserRoleEvmStaff); err != nil {
+		handleError(h.log, c, err)
+	}
+
 	claimID, err := parseClaimIDParam(c)
 	if err != nil {
 		handleError(h.log, c, err)

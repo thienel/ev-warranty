@@ -13,9 +13,45 @@ type OfficeHandler struct {
 	mock.Mock
 }
 
+type OfficeHandler_Expecter struct {
+	mock *mock.Mock
+}
+
+func (_m *OfficeHandler) EXPECT() *OfficeHandler_Expecter {
+	return &OfficeHandler_Expecter{mock: &_m.Mock}
+}
+
 // Create provides a mock function with given fields: c
 func (_m *OfficeHandler) Create(c *gin.Context) {
 	_m.Called(c)
+}
+
+// OfficeHandler_Create_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Create'
+type OfficeHandler_Create_Call struct {
+	*mock.Call
+}
+
+// Create is a helper method to define mock.On call
+//   - c *gin.Context
+func (_e *OfficeHandler_Expecter) Create(c interface{}) *OfficeHandler_Create_Call {
+	return &OfficeHandler_Create_Call{Call: _e.mock.On("Create", c)}
+}
+
+func (_c *OfficeHandler_Create_Call) Run(run func(c *gin.Context)) *OfficeHandler_Create_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(*gin.Context))
+	})
+	return _c
+}
+
+func (_c *OfficeHandler_Create_Call) Return() *OfficeHandler_Create_Call {
+	_c.Call.Return()
+	return _c
+}
+
+func (_c *OfficeHandler_Create_Call) RunAndReturn(run func(*gin.Context)) *OfficeHandler_Create_Call {
+	_c.Run(run)
+	return _c
 }
 
 // Delete provides a mock function with given fields: c
@@ -23,9 +59,65 @@ func (_m *OfficeHandler) Delete(c *gin.Context) {
 	_m.Called(c)
 }
 
+// OfficeHandler_Delete_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Delete'
+type OfficeHandler_Delete_Call struct {
+	*mock.Call
+}
+
+// Delete is a helper method to define mock.On call
+//   - c *gin.Context
+func (_e *OfficeHandler_Expecter) Delete(c interface{}) *OfficeHandler_Delete_Call {
+	return &OfficeHandler_Delete_Call{Call: _e.mock.On("Delete", c)}
+}
+
+func (_c *OfficeHandler_Delete_Call) Run(run func(c *gin.Context)) *OfficeHandler_Delete_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(*gin.Context))
+	})
+	return _c
+}
+
+func (_c *OfficeHandler_Delete_Call) Return() *OfficeHandler_Delete_Call {
+	_c.Call.Return()
+	return _c
+}
+
+func (_c *OfficeHandler_Delete_Call) RunAndReturn(run func(*gin.Context)) *OfficeHandler_Delete_Call {
+	_c.Run(run)
+	return _c
+}
+
 // GetAll provides a mock function with given fields: c
 func (_m *OfficeHandler) GetAll(c *gin.Context) {
 	_m.Called(c)
+}
+
+// OfficeHandler_GetAll_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetAll'
+type OfficeHandler_GetAll_Call struct {
+	*mock.Call
+}
+
+// GetAll is a helper method to define mock.On call
+//   - c *gin.Context
+func (_e *OfficeHandler_Expecter) GetAll(c interface{}) *OfficeHandler_GetAll_Call {
+	return &OfficeHandler_GetAll_Call{Call: _e.mock.On("GetAll", c)}
+}
+
+func (_c *OfficeHandler_GetAll_Call) Run(run func(c *gin.Context)) *OfficeHandler_GetAll_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(*gin.Context))
+	})
+	return _c
+}
+
+func (_c *OfficeHandler_GetAll_Call) Return() *OfficeHandler_GetAll_Call {
+	_c.Call.Return()
+	return _c
+}
+
+func (_c *OfficeHandler_GetAll_Call) RunAndReturn(run func(*gin.Context)) *OfficeHandler_GetAll_Call {
+	_c.Run(run)
+	return _c
 }
 
 // GetById provides a mock function with given fields: c
@@ -33,9 +125,65 @@ func (_m *OfficeHandler) GetById(c *gin.Context) {
 	_m.Called(c)
 }
 
+// OfficeHandler_GetById_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetById'
+type OfficeHandler_GetById_Call struct {
+	*mock.Call
+}
+
+// GetById is a helper method to define mock.On call
+//   - c *gin.Context
+func (_e *OfficeHandler_Expecter) GetById(c interface{}) *OfficeHandler_GetById_Call {
+	return &OfficeHandler_GetById_Call{Call: _e.mock.On("GetById", c)}
+}
+
+func (_c *OfficeHandler_GetById_Call) Run(run func(c *gin.Context)) *OfficeHandler_GetById_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(*gin.Context))
+	})
+	return _c
+}
+
+func (_c *OfficeHandler_GetById_Call) Return() *OfficeHandler_GetById_Call {
+	_c.Call.Return()
+	return _c
+}
+
+func (_c *OfficeHandler_GetById_Call) RunAndReturn(run func(*gin.Context)) *OfficeHandler_GetById_Call {
+	_c.Run(run)
+	return _c
+}
+
 // Update provides a mock function with given fields: c
 func (_m *OfficeHandler) Update(c *gin.Context) {
 	_m.Called(c)
+}
+
+// OfficeHandler_Update_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Update'
+type OfficeHandler_Update_Call struct {
+	*mock.Call
+}
+
+// Update is a helper method to define mock.On call
+//   - c *gin.Context
+func (_e *OfficeHandler_Expecter) Update(c interface{}) *OfficeHandler_Update_Call {
+	return &OfficeHandler_Update_Call{Call: _e.mock.On("Update", c)}
+}
+
+func (_c *OfficeHandler_Update_Call) Run(run func(c *gin.Context)) *OfficeHandler_Update_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(*gin.Context))
+	})
+	return _c
+}
+
+func (_c *OfficeHandler_Update_Call) Return() *OfficeHandler_Update_Call {
+	_c.Call.Return()
+	return _c
+}
+
+func (_c *OfficeHandler_Update_Call) RunAndReturn(run func(*gin.Context)) *OfficeHandler_Update_Call {
+	_c.Run(run)
+	return _c
 }
 
 // NewOfficeHandler creates a new instance of OfficeHandler. It also registers a testing interface on the mock and a cleanup function to assert the mocks expectations.

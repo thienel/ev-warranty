@@ -64,3 +64,9 @@ audit:
 	staticcheck ./...
 	@echo 'Running tests...'
 	go test -race -vet=off ./...
+
+.PHONY: mocks
+mocks:
+	mockery --all --with-expecter --case=snake
+	@rm -rf ./pkg/mocks
+	@mv ./mocks ./pkg/mocks

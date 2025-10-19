@@ -59,6 +59,13 @@ func (s *userService) Create(ctx context.Context, cmd *UserCreateCommand) (*enti
 	}
 
 	user := entities.NewUser(cmd.Name, cmd.Email, cmd.Role, passwordHash, cmd.IsActive, cmd.OfficeID)
+	office, err := s.officeService.GetByID(ctx, cmd.OfficeID)
+	if err != nil || office == nil {
+		return nil, err
+	}
+	if !user.IsValidOfficeByRole(office.OfficeType) {
+		return nil, apperrors.NewInvalidOfficeType()
+	}
 
 	if err = s.userRepo.Create(ctx, user); err != nil {
 		return nil, err
@@ -93,8 +100,12 @@ func (s *userService) Update(ctx context.Context, id uuid.UUID, cmd *UserUpdateC
 	user.Name = cmd.Name
 	user.IsActive = cmd.IsActive
 
-	if office, err := s.officeService.GetByID(ctx, cmd.OfficeID); err != nil || office == nil {
+	office, err := s.officeService.GetByID(ctx, cmd.OfficeID)
+	if err != nil || office == nil {
 		return err
+	}
+	if !user.IsValidOfficeByRole(office.OfficeType) {
+		return apperrors.NewInvalidOfficeType()
 	}
 	user.OfficeID = cmd.OfficeID
 
