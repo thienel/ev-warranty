@@ -1,6 +1,18 @@
 import React, { useEffect, useState } from 'react'
 import { Layout, Menu } from 'antd'
-import { UserOutlined, ThunderboltFilled, BankOutlined } from '@ant-design/icons'
+import {
+  UserOutlined,
+  ThunderboltFilled,
+  FileTextOutlined,
+  SafetyOutlined,
+  CarOutlined,
+  InboxOutlined,
+  AppstoreOutlined,
+  ToolOutlined,
+  OrderedListOutlined,
+  TeamOutlined,
+  HomeOutlined,
+} from '@ant-design/icons'
 import './Sidebar.less'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { useSelector } from 'react-redux'
@@ -16,16 +28,7 @@ const Sidebar = ({ collapsed }) => {
   const [menuItems, setMenuItems] = useState([])
 
   useEffect(() => {
-    switch (user.role) {
-      case USER_ROLES.ADMIN:
-        setMenuItems([
-          { key: 'users', icon: <UserOutlined />, label: 'Users', path: '/admin/users' },
-          { key: 'offices', icon: <BankOutlined />, label: 'Offices', path: '/admin/offices' },
-        ])
-        break
-      default:
-        setMenuItems([])
-    }
+    setMenuItems(MENU_ITEMS[user.role] || [])
   }, [user.role])
 
   useEffect(() => {
@@ -72,6 +75,65 @@ const Sidebar = ({ collapsed }) => {
       />
     </Sider>
   )
+}
+
+const MENU_ITEMS = {
+  [USER_ROLES.ADMIN]: [
+    { key: 'users', icon: <UserOutlined />, label: 'Users', path: '/admin/users' },
+    { key: 'offices', icon: <HomeOutlined />, label: 'Offices', path: '/admin/offices' },
+  ],
+  [USER_ROLES.EVM_STAFF]: [
+    { key: 'claims', icon: <FileTextOutlined />, label: 'Claims', path: '/evm-staff/claims' },
+    {
+      key: 'policies',
+      icon: <SafetyOutlined />,
+      label: 'Policies',
+      path: '/evm-staff/policies',
+    },
+    {
+      key: 'vehicles',
+      icon: <CarOutlined />,
+      label: 'Vehicles',
+      path: '/evm-staff/vehicles',
+    },
+    {
+      key: 'inventories',
+      icon: <InboxOutlined />,
+      label: 'Inventories',
+      path: '/evm-staff/inventories',
+    },
+    { key: 'models', icon: <AppstoreOutlined />, label: 'Models', path: '/evm-staff/models' },
+    { key: 'parts', icon: <ToolOutlined />, label: 'Parts', path: '/evm-staff/parts' },
+  ],
+  [USER_ROLES.SC_STAFF]: [
+    { key: 'claims', icon: <FileTextOutlined />, label: 'Claims', path: '/sc-staff/claims' },
+    {
+      key: 'work-orders',
+      icon: <OrderedListOutlined />,
+      label: 'Work Orders',
+      path: '/sc-staff/work-orders',
+    },
+    {
+      key: 'customers',
+      icon: <TeamOutlined />,
+      label: 'Customers',
+      path: '/sc-staff/customers',
+    },
+  ],
+  [USER_ROLES.SC_TECHNICIAN]: [
+    {
+      key: 'work-orders',
+      icon: <OrderedListOutlined />,
+      label: 'Work Orders',
+      path: '/sc-technician/work-orders',
+    },
+    {
+      key: 'claims',
+      icon: <FileTextOutlined />,
+      label: 'Claims',
+      path: '/sc-technician/claims',
+    },
+  ],
 }
 
 export default Sidebar
