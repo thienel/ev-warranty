@@ -16,9 +16,16 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Build & Push Docker image
+      - name: Build & Push Go Docker image
         run: |
           docker build \
             -t lethiendev/ev-warranty-go:latest \
             ./backend-go
           docker push lethiendev/ev-warranty-go:latest
+
+      - name: Build & Push .NET Docker image
+        run: |
+          docker build \
+            -t lethiendev/ev-warranty-dotnet:latest \
+            ./backend-dotnet
+          docker push lethiendev/ev-warranty-dotnet:latest
