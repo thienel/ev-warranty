@@ -14,6 +14,14 @@ type RefreshTokenRepository struct {
 	mock.Mock
 }
 
+type RefreshTokenRepository_Expecter struct {
+	mock *mock.Mock
+}
+
+func (_m *RefreshTokenRepository) EXPECT() *RefreshTokenRepository_Expecter {
+	return &RefreshTokenRepository_Expecter{mock: &_m.Mock}
+}
+
 // Create provides a mock function with given fields: ctx, token
 func (_m *RefreshTokenRepository) Create(ctx context.Context, token *entities.RefreshToken) error {
 	ret := _m.Called(ctx, token)
@@ -30,6 +38,35 @@ func (_m *RefreshTokenRepository) Create(ctx context.Context, token *entities.Re
 	}
 
 	return r0
+}
+
+// RefreshTokenRepository_Create_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Create'
+type RefreshTokenRepository_Create_Call struct {
+	*mock.Call
+}
+
+// Create is a helper method to define mock.On call
+//   - ctx context.Context
+//   - token *entities.RefreshToken
+func (_e *RefreshTokenRepository_Expecter) Create(ctx interface{}, token interface{}) *RefreshTokenRepository_Create_Call {
+	return &RefreshTokenRepository_Create_Call{Call: _e.mock.On("Create", ctx, token)}
+}
+
+func (_c *RefreshTokenRepository_Create_Call) Run(run func(ctx context.Context, token *entities.RefreshToken)) *RefreshTokenRepository_Create_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(*entities.RefreshToken))
+	})
+	return _c
+}
+
+func (_c *RefreshTokenRepository_Create_Call) Return(_a0 error) *RefreshTokenRepository_Create_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *RefreshTokenRepository_Create_Call) RunAndReturn(run func(context.Context, *entities.RefreshToken) error) *RefreshTokenRepository_Create_Call {
+	_c.Call.Return(run)
+	return _c
 }
 
 // Find provides a mock function with given fields: ctx, tokenStr
@@ -62,6 +99,35 @@ func (_m *RefreshTokenRepository) Find(ctx context.Context, tokenStr string) (*e
 	return r0, r1
 }
 
+// RefreshTokenRepository_Find_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Find'
+type RefreshTokenRepository_Find_Call struct {
+	*mock.Call
+}
+
+// Find is a helper method to define mock.On call
+//   - ctx context.Context
+//   - tokenStr string
+func (_e *RefreshTokenRepository_Expecter) Find(ctx interface{}, tokenStr interface{}) *RefreshTokenRepository_Find_Call {
+	return &RefreshTokenRepository_Find_Call{Call: _e.mock.On("Find", ctx, tokenStr)}
+}
+
+func (_c *RefreshTokenRepository_Find_Call) Run(run func(ctx context.Context, tokenStr string)) *RefreshTokenRepository_Find_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(string))
+	})
+	return _c
+}
+
+func (_c *RefreshTokenRepository_Find_Call) Return(_a0 *entities.RefreshToken, _a1 error) *RefreshTokenRepository_Find_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *RefreshTokenRepository_Find_Call) RunAndReturn(run func(context.Context, string) (*entities.RefreshToken, error)) *RefreshTokenRepository_Find_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // Revoke provides a mock function with given fields: ctx, tokenStr
 func (_m *RefreshTokenRepository) Revoke(ctx context.Context, tokenStr string) error {
 	ret := _m.Called(ctx, tokenStr)
@@ -80,6 +146,35 @@ func (_m *RefreshTokenRepository) Revoke(ctx context.Context, tokenStr string) e
 	return r0
 }
 
+// RefreshTokenRepository_Revoke_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Revoke'
+type RefreshTokenRepository_Revoke_Call struct {
+	*mock.Call
+}
+
+// Revoke is a helper method to define mock.On call
+//   - ctx context.Context
+//   - tokenStr string
+func (_e *RefreshTokenRepository_Expecter) Revoke(ctx interface{}, tokenStr interface{}) *RefreshTokenRepository_Revoke_Call {
+	return &RefreshTokenRepository_Revoke_Call{Call: _e.mock.On("Revoke", ctx, tokenStr)}
+}
+
+func (_c *RefreshTokenRepository_Revoke_Call) Run(run func(ctx context.Context, tokenStr string)) *RefreshTokenRepository_Revoke_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(string))
+	})
+	return _c
+}
+
+func (_c *RefreshTokenRepository_Revoke_Call) Return(_a0 error) *RefreshTokenRepository_Revoke_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *RefreshTokenRepository_Revoke_Call) RunAndReturn(run func(context.Context, string) error) *RefreshTokenRepository_Revoke_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // Update provides a mock function with given fields: ctx, token
 func (_m *RefreshTokenRepository) Update(ctx context.Context, token *entities.RefreshToken) error {
 	ret := _m.Called(ctx, token)
@@ -96,6 +191,35 @@ func (_m *RefreshTokenRepository) Update(ctx context.Context, token *entities.Re
 	}
 
 	return r0
+}
+
+// RefreshTokenRepository_Update_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Update'
+type RefreshTokenRepository_Update_Call struct {
+	*mock.Call
+}
+
+// Update is a helper method to define mock.On call
+//   - ctx context.Context
+//   - token *entities.RefreshToken
+func (_e *RefreshTokenRepository_Expecter) Update(ctx interface{}, token interface{}) *RefreshTokenRepository_Update_Call {
+	return &RefreshTokenRepository_Update_Call{Call: _e.mock.On("Update", ctx, token)}
+}
+
+func (_c *RefreshTokenRepository_Update_Call) Run(run func(ctx context.Context, token *entities.RefreshToken)) *RefreshTokenRepository_Update_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(*entities.RefreshToken))
+	})
+	return _c
+}
+
+func (_c *RefreshTokenRepository_Update_Call) Return(_a0 error) *RefreshTokenRepository_Update_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *RefreshTokenRepository_Update_Call) RunAndReturn(run func(context.Context, *entities.RefreshToken) error) *RefreshTokenRepository_Update_Call {
+	_c.Call.Return(run)
+	return _c
 }
 
 // NewRefreshTokenRepository creates a new instance of RefreshTokenRepository. It also registers a testing interface on the mock and a cleanup function to assert the mocks expectations.

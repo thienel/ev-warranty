@@ -20,6 +20,14 @@ type ClaimHistoryRepository struct {
 	mock.Mock
 }
 
+type ClaimHistoryRepository_Expecter struct {
+	mock *mock.Mock
+}
+
+func (_m *ClaimHistoryRepository) EXPECT() *ClaimHistoryRepository_Expecter {
+	return &ClaimHistoryRepository_Expecter{mock: &_m.Mock}
+}
+
 // Create provides a mock function with given fields: tx, history
 func (_m *ClaimHistoryRepository) Create(tx application.Tx, history *entities.ClaimHistory) error {
 	ret := _m.Called(tx, history)
@@ -36,6 +44,35 @@ func (_m *ClaimHistoryRepository) Create(tx application.Tx, history *entities.Cl
 	}
 
 	return r0
+}
+
+// ClaimHistoryRepository_Create_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Create'
+type ClaimHistoryRepository_Create_Call struct {
+	*mock.Call
+}
+
+// Create is a helper method to define mock.On call
+//   - tx application.Tx
+//   - history *entities.ClaimHistory
+func (_e *ClaimHistoryRepository_Expecter) Create(tx interface{}, history interface{}) *ClaimHistoryRepository_Create_Call {
+	return &ClaimHistoryRepository_Create_Call{Call: _e.mock.On("Create", tx, history)}
+}
+
+func (_c *ClaimHistoryRepository_Create_Call) Run(run func(tx application.Tx, history *entities.ClaimHistory)) *ClaimHistoryRepository_Create_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(application.Tx), args[1].(*entities.ClaimHistory))
+	})
+	return _c
+}
+
+func (_c *ClaimHistoryRepository_Create_Call) Return(_a0 error) *ClaimHistoryRepository_Create_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *ClaimHistoryRepository_Create_Call) RunAndReturn(run func(application.Tx, *entities.ClaimHistory) error) *ClaimHistoryRepository_Create_Call {
+	_c.Call.Return(run)
+	return _c
 }
 
 // FindByClaimID provides a mock function with given fields: ctx, claimID
@@ -68,6 +105,35 @@ func (_m *ClaimHistoryRepository) FindByClaimID(ctx context.Context, claimID uui
 	return r0, r1
 }
 
+// ClaimHistoryRepository_FindByClaimID_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'FindByClaimID'
+type ClaimHistoryRepository_FindByClaimID_Call struct {
+	*mock.Call
+}
+
+// FindByClaimID is a helper method to define mock.On call
+//   - ctx context.Context
+//   - claimID uuid.UUID
+func (_e *ClaimHistoryRepository_Expecter) FindByClaimID(ctx interface{}, claimID interface{}) *ClaimHistoryRepository_FindByClaimID_Call {
+	return &ClaimHistoryRepository_FindByClaimID_Call{Call: _e.mock.On("FindByClaimID", ctx, claimID)}
+}
+
+func (_c *ClaimHistoryRepository_FindByClaimID_Call) Run(run func(ctx context.Context, claimID uuid.UUID)) *ClaimHistoryRepository_FindByClaimID_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(uuid.UUID))
+	})
+	return _c
+}
+
+func (_c *ClaimHistoryRepository_FindByClaimID_Call) Return(_a0 []*entities.ClaimHistory, _a1 error) *ClaimHistoryRepository_FindByClaimID_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *ClaimHistoryRepository_FindByClaimID_Call) RunAndReturn(run func(context.Context, uuid.UUID) ([]*entities.ClaimHistory, error)) *ClaimHistoryRepository_FindByClaimID_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // FindByDateRange provides a mock function with given fields: ctx, claimID, startDate, endDate
 func (_m *ClaimHistoryRepository) FindByDateRange(ctx context.Context, claimID uuid.UUID, startDate time.Time, endDate time.Time) ([]*entities.ClaimHistory, error) {
 	ret := _m.Called(ctx, claimID, startDate, endDate)
@@ -96,6 +162,37 @@ func (_m *ClaimHistoryRepository) FindByDateRange(ctx context.Context, claimID u
 	}
 
 	return r0, r1
+}
+
+// ClaimHistoryRepository_FindByDateRange_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'FindByDateRange'
+type ClaimHistoryRepository_FindByDateRange_Call struct {
+	*mock.Call
+}
+
+// FindByDateRange is a helper method to define mock.On call
+//   - ctx context.Context
+//   - claimID uuid.UUID
+//   - startDate time.Time
+//   - endDate time.Time
+func (_e *ClaimHistoryRepository_Expecter) FindByDateRange(ctx interface{}, claimID interface{}, startDate interface{}, endDate interface{}) *ClaimHistoryRepository_FindByDateRange_Call {
+	return &ClaimHistoryRepository_FindByDateRange_Call{Call: _e.mock.On("FindByDateRange", ctx, claimID, startDate, endDate)}
+}
+
+func (_c *ClaimHistoryRepository_FindByDateRange_Call) Run(run func(ctx context.Context, claimID uuid.UUID, startDate time.Time, endDate time.Time)) *ClaimHistoryRepository_FindByDateRange_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(uuid.UUID), args[2].(time.Time), args[3].(time.Time))
+	})
+	return _c
+}
+
+func (_c *ClaimHistoryRepository_FindByDateRange_Call) Return(_a0 []*entities.ClaimHistory, _a1 error) *ClaimHistoryRepository_FindByDateRange_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *ClaimHistoryRepository_FindByDateRange_Call) RunAndReturn(run func(context.Context, uuid.UUID, time.Time, time.Time) ([]*entities.ClaimHistory, error)) *ClaimHistoryRepository_FindByDateRange_Call {
+	_c.Call.Return(run)
+	return _c
 }
 
 // FindLatestByClaimID provides a mock function with given fields: ctx, claimID
@@ -128,6 +225,35 @@ func (_m *ClaimHistoryRepository) FindLatestByClaimID(ctx context.Context, claim
 	return r0, r1
 }
 
+// ClaimHistoryRepository_FindLatestByClaimID_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'FindLatestByClaimID'
+type ClaimHistoryRepository_FindLatestByClaimID_Call struct {
+	*mock.Call
+}
+
+// FindLatestByClaimID is a helper method to define mock.On call
+//   - ctx context.Context
+//   - claimID uuid.UUID
+func (_e *ClaimHistoryRepository_Expecter) FindLatestByClaimID(ctx interface{}, claimID interface{}) *ClaimHistoryRepository_FindLatestByClaimID_Call {
+	return &ClaimHistoryRepository_FindLatestByClaimID_Call{Call: _e.mock.On("FindLatestByClaimID", ctx, claimID)}
+}
+
+func (_c *ClaimHistoryRepository_FindLatestByClaimID_Call) Run(run func(ctx context.Context, claimID uuid.UUID)) *ClaimHistoryRepository_FindLatestByClaimID_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(uuid.UUID))
+	})
+	return _c
+}
+
+func (_c *ClaimHistoryRepository_FindLatestByClaimID_Call) Return(_a0 *entities.ClaimHistory, _a1 error) *ClaimHistoryRepository_FindLatestByClaimID_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *ClaimHistoryRepository_FindLatestByClaimID_Call) RunAndReturn(run func(context.Context, uuid.UUID) (*entities.ClaimHistory, error)) *ClaimHistoryRepository_FindLatestByClaimID_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // SoftDeleteByClaimID provides a mock function with given fields: tx, claimID
 func (_m *ClaimHistoryRepository) SoftDeleteByClaimID(tx application.Tx, claimID uuid.UUID) error {
 	ret := _m.Called(tx, claimID)
@@ -144,6 +270,35 @@ func (_m *ClaimHistoryRepository) SoftDeleteByClaimID(tx application.Tx, claimID
 	}
 
 	return r0
+}
+
+// ClaimHistoryRepository_SoftDeleteByClaimID_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'SoftDeleteByClaimID'
+type ClaimHistoryRepository_SoftDeleteByClaimID_Call struct {
+	*mock.Call
+}
+
+// SoftDeleteByClaimID is a helper method to define mock.On call
+//   - tx application.Tx
+//   - claimID uuid.UUID
+func (_e *ClaimHistoryRepository_Expecter) SoftDeleteByClaimID(tx interface{}, claimID interface{}) *ClaimHistoryRepository_SoftDeleteByClaimID_Call {
+	return &ClaimHistoryRepository_SoftDeleteByClaimID_Call{Call: _e.mock.On("SoftDeleteByClaimID", tx, claimID)}
+}
+
+func (_c *ClaimHistoryRepository_SoftDeleteByClaimID_Call) Run(run func(tx application.Tx, claimID uuid.UUID)) *ClaimHistoryRepository_SoftDeleteByClaimID_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(application.Tx), args[1].(uuid.UUID))
+	})
+	return _c
+}
+
+func (_c *ClaimHistoryRepository_SoftDeleteByClaimID_Call) Return(_a0 error) *ClaimHistoryRepository_SoftDeleteByClaimID_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *ClaimHistoryRepository_SoftDeleteByClaimID_Call) RunAndReturn(run func(application.Tx, uuid.UUID) error) *ClaimHistoryRepository_SoftDeleteByClaimID_Call {
+	_c.Call.Return(run)
+	return _c
 }
 
 // NewClaimHistoryRepository creates a new instance of ClaimHistoryRepository. It also registers a testing interface on the mock and a cleanup function to assert the mocks expectations.

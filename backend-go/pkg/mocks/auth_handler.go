@@ -13,9 +13,45 @@ type AuthHandler struct {
 	mock.Mock
 }
 
+type AuthHandler_Expecter struct {
+	mock *mock.Mock
+}
+
+func (_m *AuthHandler) EXPECT() *AuthHandler_Expecter {
+	return &AuthHandler_Expecter{mock: &_m.Mock}
+}
+
 // Login provides a mock function with given fields: c
 func (_m *AuthHandler) Login(c *gin.Context) {
 	_m.Called(c)
+}
+
+// AuthHandler_Login_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Login'
+type AuthHandler_Login_Call struct {
+	*mock.Call
+}
+
+// Login is a helper method to define mock.On call
+//   - c *gin.Context
+func (_e *AuthHandler_Expecter) Login(c interface{}) *AuthHandler_Login_Call {
+	return &AuthHandler_Login_Call{Call: _e.mock.On("Login", c)}
+}
+
+func (_c *AuthHandler_Login_Call) Run(run func(c *gin.Context)) *AuthHandler_Login_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(*gin.Context))
+	})
+	return _c
+}
+
+func (_c *AuthHandler_Login_Call) Return() *AuthHandler_Login_Call {
+	_c.Call.Return()
+	return _c
+}
+
+func (_c *AuthHandler_Login_Call) RunAndReturn(run func(*gin.Context)) *AuthHandler_Login_Call {
+	_c.Run(run)
+	return _c
 }
 
 // Logout provides a mock function with given fields: c
@@ -23,14 +59,98 @@ func (_m *AuthHandler) Logout(c *gin.Context) {
 	_m.Called(c)
 }
 
+// AuthHandler_Logout_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Logout'
+type AuthHandler_Logout_Call struct {
+	*mock.Call
+}
+
+// Logout is a helper method to define mock.On call
+//   - c *gin.Context
+func (_e *AuthHandler_Expecter) Logout(c interface{}) *AuthHandler_Logout_Call {
+	return &AuthHandler_Logout_Call{Call: _e.mock.On("Logout", c)}
+}
+
+func (_c *AuthHandler_Logout_Call) Run(run func(c *gin.Context)) *AuthHandler_Logout_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(*gin.Context))
+	})
+	return _c
+}
+
+func (_c *AuthHandler_Logout_Call) Return() *AuthHandler_Logout_Call {
+	_c.Call.Return()
+	return _c
+}
+
+func (_c *AuthHandler_Logout_Call) RunAndReturn(run func(*gin.Context)) *AuthHandler_Logout_Call {
+	_c.Run(run)
+	return _c
+}
+
 // RefreshToken provides a mock function with given fields: c
 func (_m *AuthHandler) RefreshToken(c *gin.Context) {
 	_m.Called(c)
 }
 
+// AuthHandler_RefreshToken_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'RefreshToken'
+type AuthHandler_RefreshToken_Call struct {
+	*mock.Call
+}
+
+// RefreshToken is a helper method to define mock.On call
+//   - c *gin.Context
+func (_e *AuthHandler_Expecter) RefreshToken(c interface{}) *AuthHandler_RefreshToken_Call {
+	return &AuthHandler_RefreshToken_Call{Call: _e.mock.On("RefreshToken", c)}
+}
+
+func (_c *AuthHandler_RefreshToken_Call) Run(run func(c *gin.Context)) *AuthHandler_RefreshToken_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(*gin.Context))
+	})
+	return _c
+}
+
+func (_c *AuthHandler_RefreshToken_Call) Return() *AuthHandler_RefreshToken_Call {
+	_c.Call.Return()
+	return _c
+}
+
+func (_c *AuthHandler_RefreshToken_Call) RunAndReturn(run func(*gin.Context)) *AuthHandler_RefreshToken_Call {
+	_c.Run(run)
+	return _c
+}
+
 // ValidateToken provides a mock function with given fields: c
 func (_m *AuthHandler) ValidateToken(c *gin.Context) {
 	_m.Called(c)
+}
+
+// AuthHandler_ValidateToken_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'ValidateToken'
+type AuthHandler_ValidateToken_Call struct {
+	*mock.Call
+}
+
+// ValidateToken is a helper method to define mock.On call
+//   - c *gin.Context
+func (_e *AuthHandler_Expecter) ValidateToken(c interface{}) *AuthHandler_ValidateToken_Call {
+	return &AuthHandler_ValidateToken_Call{Call: _e.mock.On("ValidateToken", c)}
+}
+
+func (_c *AuthHandler_ValidateToken_Call) Run(run func(c *gin.Context)) *AuthHandler_ValidateToken_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(*gin.Context))
+	})
+	return _c
+}
+
+func (_c *AuthHandler_ValidateToken_Call) Return() *AuthHandler_ValidateToken_Call {
+	_c.Call.Return()
+	return _c
+}
+
+func (_c *AuthHandler_ValidateToken_Call) RunAndReturn(run func(*gin.Context)) *AuthHandler_ValidateToken_Call {
+	_c.Run(run)
+	return _c
 }
 
 // NewAuthHandler creates a new instance of AuthHandler. It also registers a testing interface on the mock and a cleanup function to assert the mocks expectations.

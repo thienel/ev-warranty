@@ -18,6 +18,14 @@ type OfficeService struct {
 	mock.Mock
 }
 
+type OfficeService_Expecter struct {
+	mock *mock.Mock
+}
+
+func (_m *OfficeService) EXPECT() *OfficeService_Expecter {
+	return &OfficeService_Expecter{mock: &_m.Mock}
+}
+
 // Create provides a mock function with given fields: ctx, cmd
 func (_m *OfficeService) Create(ctx context.Context, cmd *services.CreateOfficeCommand) (*entities.Office, error) {
 	ret := _m.Called(ctx, cmd)
@@ -48,6 +56,35 @@ func (_m *OfficeService) Create(ctx context.Context, cmd *services.CreateOfficeC
 	return r0, r1
 }
 
+// OfficeService_Create_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Create'
+type OfficeService_Create_Call struct {
+	*mock.Call
+}
+
+// Create is a helper method to define mock.On call
+//   - ctx context.Context
+//   - cmd *services.CreateOfficeCommand
+func (_e *OfficeService_Expecter) Create(ctx interface{}, cmd interface{}) *OfficeService_Create_Call {
+	return &OfficeService_Create_Call{Call: _e.mock.On("Create", ctx, cmd)}
+}
+
+func (_c *OfficeService_Create_Call) Run(run func(ctx context.Context, cmd *services.CreateOfficeCommand)) *OfficeService_Create_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(*services.CreateOfficeCommand))
+	})
+	return _c
+}
+
+func (_c *OfficeService_Create_Call) Return(_a0 *entities.Office, _a1 error) *OfficeService_Create_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *OfficeService_Create_Call) RunAndReturn(run func(context.Context, *services.CreateOfficeCommand) (*entities.Office, error)) *OfficeService_Create_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // DeleteByID provides a mock function with given fields: ctx, id
 func (_m *OfficeService) DeleteByID(ctx context.Context, id uuid.UUID) error {
 	ret := _m.Called(ctx, id)
@@ -64,6 +101,35 @@ func (_m *OfficeService) DeleteByID(ctx context.Context, id uuid.UUID) error {
 	}
 
 	return r0
+}
+
+// OfficeService_DeleteByID_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'DeleteByID'
+type OfficeService_DeleteByID_Call struct {
+	*mock.Call
+}
+
+// DeleteByID is a helper method to define mock.On call
+//   - ctx context.Context
+//   - id uuid.UUID
+func (_e *OfficeService_Expecter) DeleteByID(ctx interface{}, id interface{}) *OfficeService_DeleteByID_Call {
+	return &OfficeService_DeleteByID_Call{Call: _e.mock.On("DeleteByID", ctx, id)}
+}
+
+func (_c *OfficeService_DeleteByID_Call) Run(run func(ctx context.Context, id uuid.UUID)) *OfficeService_DeleteByID_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(uuid.UUID))
+	})
+	return _c
+}
+
+func (_c *OfficeService_DeleteByID_Call) Return(_a0 error) *OfficeService_DeleteByID_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *OfficeService_DeleteByID_Call) RunAndReturn(run func(context.Context, uuid.UUID) error) *OfficeService_DeleteByID_Call {
+	_c.Call.Return(run)
+	return _c
 }
 
 // GetAll provides a mock function with given fields: ctx
@@ -96,6 +162,34 @@ func (_m *OfficeService) GetAll(ctx context.Context) ([]*entities.Office, error)
 	return r0, r1
 }
 
+// OfficeService_GetAll_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetAll'
+type OfficeService_GetAll_Call struct {
+	*mock.Call
+}
+
+// GetAll is a helper method to define mock.On call
+//   - ctx context.Context
+func (_e *OfficeService_Expecter) GetAll(ctx interface{}) *OfficeService_GetAll_Call {
+	return &OfficeService_GetAll_Call{Call: _e.mock.On("GetAll", ctx)}
+}
+
+func (_c *OfficeService_GetAll_Call) Run(run func(ctx context.Context)) *OfficeService_GetAll_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context))
+	})
+	return _c
+}
+
+func (_c *OfficeService_GetAll_Call) Return(_a0 []*entities.Office, _a1 error) *OfficeService_GetAll_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *OfficeService_GetAll_Call) RunAndReturn(run func(context.Context) ([]*entities.Office, error)) *OfficeService_GetAll_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // GetByID provides a mock function with given fields: ctx, id
 func (_m *OfficeService) GetByID(ctx context.Context, id uuid.UUID) (*entities.Office, error) {
 	ret := _m.Called(ctx, id)
@@ -126,6 +220,35 @@ func (_m *OfficeService) GetByID(ctx context.Context, id uuid.UUID) (*entities.O
 	return r0, r1
 }
 
+// OfficeService_GetByID_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetByID'
+type OfficeService_GetByID_Call struct {
+	*mock.Call
+}
+
+// GetByID is a helper method to define mock.On call
+//   - ctx context.Context
+//   - id uuid.UUID
+func (_e *OfficeService_Expecter) GetByID(ctx interface{}, id interface{}) *OfficeService_GetByID_Call {
+	return &OfficeService_GetByID_Call{Call: _e.mock.On("GetByID", ctx, id)}
+}
+
+func (_c *OfficeService_GetByID_Call) Run(run func(ctx context.Context, id uuid.UUID)) *OfficeService_GetByID_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(uuid.UUID))
+	})
+	return _c
+}
+
+func (_c *OfficeService_GetByID_Call) Return(_a0 *entities.Office, _a1 error) *OfficeService_GetByID_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *OfficeService_GetByID_Call) RunAndReturn(run func(context.Context, uuid.UUID) (*entities.Office, error)) *OfficeService_GetByID_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // Update provides a mock function with given fields: ctx, id, cmd
 func (_m *OfficeService) Update(ctx context.Context, id uuid.UUID, cmd *services.UpdateOfficeCommand) error {
 	ret := _m.Called(ctx, id, cmd)
@@ -142,6 +265,36 @@ func (_m *OfficeService) Update(ctx context.Context, id uuid.UUID, cmd *services
 	}
 
 	return r0
+}
+
+// OfficeService_Update_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Update'
+type OfficeService_Update_Call struct {
+	*mock.Call
+}
+
+// Update is a helper method to define mock.On call
+//   - ctx context.Context
+//   - id uuid.UUID
+//   - cmd *services.UpdateOfficeCommand
+func (_e *OfficeService_Expecter) Update(ctx interface{}, id interface{}, cmd interface{}) *OfficeService_Update_Call {
+	return &OfficeService_Update_Call{Call: _e.mock.On("Update", ctx, id, cmd)}
+}
+
+func (_c *OfficeService_Update_Call) Run(run func(ctx context.Context, id uuid.UUID, cmd *services.UpdateOfficeCommand)) *OfficeService_Update_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(uuid.UUID), args[2].(*services.UpdateOfficeCommand))
+	})
+	return _c
+}
+
+func (_c *OfficeService_Update_Call) Return(_a0 error) *OfficeService_Update_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *OfficeService_Update_Call) RunAndReturn(run func(context.Context, uuid.UUID, *services.UpdateOfficeCommand) error) *OfficeService_Update_Call {
+	_c.Call.Return(run)
+	return _c
 }
 
 // NewOfficeService creates a new instance of OfficeService. It also registers a testing interface on the mock and a cleanup function to assert the mocks expectations.

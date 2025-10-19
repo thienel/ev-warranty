@@ -18,6 +18,14 @@ type UserService struct {
 	mock.Mock
 }
 
+type UserService_Expecter struct {
+	mock *mock.Mock
+}
+
+func (_m *UserService) EXPECT() *UserService_Expecter {
+	return &UserService_Expecter{mock: &_m.Mock}
+}
+
 // Create provides a mock function with given fields: ctx, cmd
 func (_m *UserService) Create(ctx context.Context, cmd *services.UserCreateCommand) (*entities.User, error) {
 	ret := _m.Called(ctx, cmd)
@@ -48,6 +56,35 @@ func (_m *UserService) Create(ctx context.Context, cmd *services.UserCreateComma
 	return r0, r1
 }
 
+// UserService_Create_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Create'
+type UserService_Create_Call struct {
+	*mock.Call
+}
+
+// Create is a helper method to define mock.On call
+//   - ctx context.Context
+//   - cmd *services.UserCreateCommand
+func (_e *UserService_Expecter) Create(ctx interface{}, cmd interface{}) *UserService_Create_Call {
+	return &UserService_Create_Call{Call: _e.mock.On("Create", ctx, cmd)}
+}
+
+func (_c *UserService_Create_Call) Run(run func(ctx context.Context, cmd *services.UserCreateCommand)) *UserService_Create_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(*services.UserCreateCommand))
+	})
+	return _c
+}
+
+func (_c *UserService_Create_Call) Return(_a0 *entities.User, _a1 error) *UserService_Create_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *UserService_Create_Call) RunAndReturn(run func(context.Context, *services.UserCreateCommand) (*entities.User, error)) *UserService_Create_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // Delete provides a mock function with given fields: ctx, id
 func (_m *UserService) Delete(ctx context.Context, id uuid.UUID) error {
 	ret := _m.Called(ctx, id)
@@ -64,6 +101,35 @@ func (_m *UserService) Delete(ctx context.Context, id uuid.UUID) error {
 	}
 
 	return r0
+}
+
+// UserService_Delete_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Delete'
+type UserService_Delete_Call struct {
+	*mock.Call
+}
+
+// Delete is a helper method to define mock.On call
+//   - ctx context.Context
+//   - id uuid.UUID
+func (_e *UserService_Expecter) Delete(ctx interface{}, id interface{}) *UserService_Delete_Call {
+	return &UserService_Delete_Call{Call: _e.mock.On("Delete", ctx, id)}
+}
+
+func (_c *UserService_Delete_Call) Run(run func(ctx context.Context, id uuid.UUID)) *UserService_Delete_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(uuid.UUID))
+	})
+	return _c
+}
+
+func (_c *UserService_Delete_Call) Return(_a0 error) *UserService_Delete_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *UserService_Delete_Call) RunAndReturn(run func(context.Context, uuid.UUID) error) *UserService_Delete_Call {
+	_c.Call.Return(run)
+	return _c
 }
 
 // GetAll provides a mock function with given fields: ctx
@@ -96,6 +162,34 @@ func (_m *UserService) GetAll(ctx context.Context) ([]*entities.User, error) {
 	return r0, r1
 }
 
+// UserService_GetAll_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetAll'
+type UserService_GetAll_Call struct {
+	*mock.Call
+}
+
+// GetAll is a helper method to define mock.On call
+//   - ctx context.Context
+func (_e *UserService_Expecter) GetAll(ctx interface{}) *UserService_GetAll_Call {
+	return &UserService_GetAll_Call{Call: _e.mock.On("GetAll", ctx)}
+}
+
+func (_c *UserService_GetAll_Call) Run(run func(ctx context.Context)) *UserService_GetAll_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context))
+	})
+	return _c
+}
+
+func (_c *UserService_GetAll_Call) Return(_a0 []*entities.User, _a1 error) *UserService_GetAll_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *UserService_GetAll_Call) RunAndReturn(run func(context.Context) ([]*entities.User, error)) *UserService_GetAll_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // GetByID provides a mock function with given fields: ctx, id
 func (_m *UserService) GetByID(ctx context.Context, id uuid.UUID) (*entities.User, error) {
 	ret := _m.Called(ctx, id)
@@ -126,6 +220,35 @@ func (_m *UserService) GetByID(ctx context.Context, id uuid.UUID) (*entities.Use
 	return r0, r1
 }
 
+// UserService_GetByID_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetByID'
+type UserService_GetByID_Call struct {
+	*mock.Call
+}
+
+// GetByID is a helper method to define mock.On call
+//   - ctx context.Context
+//   - id uuid.UUID
+func (_e *UserService_Expecter) GetByID(ctx interface{}, id interface{}) *UserService_GetByID_Call {
+	return &UserService_GetByID_Call{Call: _e.mock.On("GetByID", ctx, id)}
+}
+
+func (_c *UserService_GetByID_Call) Run(run func(ctx context.Context, id uuid.UUID)) *UserService_GetByID_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(uuid.UUID))
+	})
+	return _c
+}
+
+func (_c *UserService_GetByID_Call) Return(_a0 *entities.User, _a1 error) *UserService_GetByID_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *UserService_GetByID_Call) RunAndReturn(run func(context.Context, uuid.UUID) (*entities.User, error)) *UserService_GetByID_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // Update provides a mock function with given fields: ctx, id, cmd
 func (_m *UserService) Update(ctx context.Context, id uuid.UUID, cmd *services.UserUpdateCommand) error {
 	ret := _m.Called(ctx, id, cmd)
@@ -142,6 +265,36 @@ func (_m *UserService) Update(ctx context.Context, id uuid.UUID, cmd *services.U
 	}
 
 	return r0
+}
+
+// UserService_Update_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Update'
+type UserService_Update_Call struct {
+	*mock.Call
+}
+
+// Update is a helper method to define mock.On call
+//   - ctx context.Context
+//   - id uuid.UUID
+//   - cmd *services.UserUpdateCommand
+func (_e *UserService_Expecter) Update(ctx interface{}, id interface{}, cmd interface{}) *UserService_Update_Call {
+	return &UserService_Update_Call{Call: _e.mock.On("Update", ctx, id, cmd)}
+}
+
+func (_c *UserService_Update_Call) Run(run func(ctx context.Context, id uuid.UUID, cmd *services.UserUpdateCommand)) *UserService_Update_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(uuid.UUID), args[2].(*services.UserUpdateCommand))
+	})
+	return _c
+}
+
+func (_c *UserService_Update_Call) Return(_a0 error) *UserService_Update_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *UserService_Update_Call) RunAndReturn(run func(context.Context, uuid.UUID, *services.UserUpdateCommand) error) *UserService_Update_Call {
+	_c.Call.Return(run)
+	return _c
 }
 
 // NewUserService creates a new instance of UserService. It also registers a testing interface on the mock and a cleanup function to assert the mocks expectations.

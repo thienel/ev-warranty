@@ -18,6 +18,14 @@ type ClaimAttachmentRepository struct {
 	mock.Mock
 }
 
+type ClaimAttachmentRepository_Expecter struct {
+	mock *mock.Mock
+}
+
+func (_m *ClaimAttachmentRepository) EXPECT() *ClaimAttachmentRepository_Expecter {
+	return &ClaimAttachmentRepository_Expecter{mock: &_m.Mock}
+}
+
 // CountByClaimID provides a mock function with given fields: ctx, claimID
 func (_m *ClaimAttachmentRepository) CountByClaimID(ctx context.Context, claimID uuid.UUID) (int64, error) {
 	ret := _m.Called(ctx, claimID)
@@ -46,6 +54,35 @@ func (_m *ClaimAttachmentRepository) CountByClaimID(ctx context.Context, claimID
 	return r0, r1
 }
 
+// ClaimAttachmentRepository_CountByClaimID_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'CountByClaimID'
+type ClaimAttachmentRepository_CountByClaimID_Call struct {
+	*mock.Call
+}
+
+// CountByClaimID is a helper method to define mock.On call
+//   - ctx context.Context
+//   - claimID uuid.UUID
+func (_e *ClaimAttachmentRepository_Expecter) CountByClaimID(ctx interface{}, claimID interface{}) *ClaimAttachmentRepository_CountByClaimID_Call {
+	return &ClaimAttachmentRepository_CountByClaimID_Call{Call: _e.mock.On("CountByClaimID", ctx, claimID)}
+}
+
+func (_c *ClaimAttachmentRepository_CountByClaimID_Call) Run(run func(ctx context.Context, claimID uuid.UUID)) *ClaimAttachmentRepository_CountByClaimID_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(uuid.UUID))
+	})
+	return _c
+}
+
+func (_c *ClaimAttachmentRepository_CountByClaimID_Call) Return(_a0 int64, _a1 error) *ClaimAttachmentRepository_CountByClaimID_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *ClaimAttachmentRepository_CountByClaimID_Call) RunAndReturn(run func(context.Context, uuid.UUID) (int64, error)) *ClaimAttachmentRepository_CountByClaimID_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // Create provides a mock function with given fields: tx, attachment
 func (_m *ClaimAttachmentRepository) Create(tx application.Tx, attachment *entities.ClaimAttachment) error {
 	ret := _m.Called(tx, attachment)
@@ -62,6 +99,35 @@ func (_m *ClaimAttachmentRepository) Create(tx application.Tx, attachment *entit
 	}
 
 	return r0
+}
+
+// ClaimAttachmentRepository_Create_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Create'
+type ClaimAttachmentRepository_Create_Call struct {
+	*mock.Call
+}
+
+// Create is a helper method to define mock.On call
+//   - tx application.Tx
+//   - attachment *entities.ClaimAttachment
+func (_e *ClaimAttachmentRepository_Expecter) Create(tx interface{}, attachment interface{}) *ClaimAttachmentRepository_Create_Call {
+	return &ClaimAttachmentRepository_Create_Call{Call: _e.mock.On("Create", tx, attachment)}
+}
+
+func (_c *ClaimAttachmentRepository_Create_Call) Run(run func(tx application.Tx, attachment *entities.ClaimAttachment)) *ClaimAttachmentRepository_Create_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(application.Tx), args[1].(*entities.ClaimAttachment))
+	})
+	return _c
+}
+
+func (_c *ClaimAttachmentRepository_Create_Call) Return(_a0 error) *ClaimAttachmentRepository_Create_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *ClaimAttachmentRepository_Create_Call) RunAndReturn(run func(application.Tx, *entities.ClaimAttachment) error) *ClaimAttachmentRepository_Create_Call {
+	_c.Call.Return(run)
+	return _c
 }
 
 // FindByClaimID provides a mock function with given fields: ctx, claimID
@@ -94,6 +160,35 @@ func (_m *ClaimAttachmentRepository) FindByClaimID(ctx context.Context, claimID 
 	return r0, r1
 }
 
+// ClaimAttachmentRepository_FindByClaimID_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'FindByClaimID'
+type ClaimAttachmentRepository_FindByClaimID_Call struct {
+	*mock.Call
+}
+
+// FindByClaimID is a helper method to define mock.On call
+//   - ctx context.Context
+//   - claimID uuid.UUID
+func (_e *ClaimAttachmentRepository_Expecter) FindByClaimID(ctx interface{}, claimID interface{}) *ClaimAttachmentRepository_FindByClaimID_Call {
+	return &ClaimAttachmentRepository_FindByClaimID_Call{Call: _e.mock.On("FindByClaimID", ctx, claimID)}
+}
+
+func (_c *ClaimAttachmentRepository_FindByClaimID_Call) Run(run func(ctx context.Context, claimID uuid.UUID)) *ClaimAttachmentRepository_FindByClaimID_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(uuid.UUID))
+	})
+	return _c
+}
+
+func (_c *ClaimAttachmentRepository_FindByClaimID_Call) Return(_a0 []*entities.ClaimAttachment, _a1 error) *ClaimAttachmentRepository_FindByClaimID_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *ClaimAttachmentRepository_FindByClaimID_Call) RunAndReturn(run func(context.Context, uuid.UUID) ([]*entities.ClaimAttachment, error)) *ClaimAttachmentRepository_FindByClaimID_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // FindByID provides a mock function with given fields: ctx, id
 func (_m *ClaimAttachmentRepository) FindByID(ctx context.Context, id uuid.UUID) (*entities.ClaimAttachment, error) {
 	ret := _m.Called(ctx, id)
@@ -122,6 +217,35 @@ func (_m *ClaimAttachmentRepository) FindByID(ctx context.Context, id uuid.UUID)
 	}
 
 	return r0, r1
+}
+
+// ClaimAttachmentRepository_FindByID_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'FindByID'
+type ClaimAttachmentRepository_FindByID_Call struct {
+	*mock.Call
+}
+
+// FindByID is a helper method to define mock.On call
+//   - ctx context.Context
+//   - id uuid.UUID
+func (_e *ClaimAttachmentRepository_Expecter) FindByID(ctx interface{}, id interface{}) *ClaimAttachmentRepository_FindByID_Call {
+	return &ClaimAttachmentRepository_FindByID_Call{Call: _e.mock.On("FindByID", ctx, id)}
+}
+
+func (_c *ClaimAttachmentRepository_FindByID_Call) Run(run func(ctx context.Context, id uuid.UUID)) *ClaimAttachmentRepository_FindByID_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(uuid.UUID))
+	})
+	return _c
+}
+
+func (_c *ClaimAttachmentRepository_FindByID_Call) Return(_a0 *entities.ClaimAttachment, _a1 error) *ClaimAttachmentRepository_FindByID_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *ClaimAttachmentRepository_FindByID_Call) RunAndReturn(run func(context.Context, uuid.UUID) (*entities.ClaimAttachment, error)) *ClaimAttachmentRepository_FindByID_Call {
+	_c.Call.Return(run)
+	return _c
 }
 
 // FindByType provides a mock function with given fields: ctx, claimID, attachmentType
@@ -154,6 +278,36 @@ func (_m *ClaimAttachmentRepository) FindByType(ctx context.Context, claimID uui
 	return r0, r1
 }
 
+// ClaimAttachmentRepository_FindByType_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'FindByType'
+type ClaimAttachmentRepository_FindByType_Call struct {
+	*mock.Call
+}
+
+// FindByType is a helper method to define mock.On call
+//   - ctx context.Context
+//   - claimID uuid.UUID
+//   - attachmentType string
+func (_e *ClaimAttachmentRepository_Expecter) FindByType(ctx interface{}, claimID interface{}, attachmentType interface{}) *ClaimAttachmentRepository_FindByType_Call {
+	return &ClaimAttachmentRepository_FindByType_Call{Call: _e.mock.On("FindByType", ctx, claimID, attachmentType)}
+}
+
+func (_c *ClaimAttachmentRepository_FindByType_Call) Run(run func(ctx context.Context, claimID uuid.UUID, attachmentType string)) *ClaimAttachmentRepository_FindByType_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(uuid.UUID), args[2].(string))
+	})
+	return _c
+}
+
+func (_c *ClaimAttachmentRepository_FindByType_Call) Return(_a0 []*entities.ClaimAttachment, _a1 error) *ClaimAttachmentRepository_FindByType_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *ClaimAttachmentRepository_FindByType_Call) RunAndReturn(run func(context.Context, uuid.UUID, string) ([]*entities.ClaimAttachment, error)) *ClaimAttachmentRepository_FindByType_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // HardDelete provides a mock function with given fields: tx, id
 func (_m *ClaimAttachmentRepository) HardDelete(tx application.Tx, id uuid.UUID) error {
 	ret := _m.Called(tx, id)
@@ -172,6 +326,35 @@ func (_m *ClaimAttachmentRepository) HardDelete(tx application.Tx, id uuid.UUID)
 	return r0
 }
 
+// ClaimAttachmentRepository_HardDelete_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'HardDelete'
+type ClaimAttachmentRepository_HardDelete_Call struct {
+	*mock.Call
+}
+
+// HardDelete is a helper method to define mock.On call
+//   - tx application.Tx
+//   - id uuid.UUID
+func (_e *ClaimAttachmentRepository_Expecter) HardDelete(tx interface{}, id interface{}) *ClaimAttachmentRepository_HardDelete_Call {
+	return &ClaimAttachmentRepository_HardDelete_Call{Call: _e.mock.On("HardDelete", tx, id)}
+}
+
+func (_c *ClaimAttachmentRepository_HardDelete_Call) Run(run func(tx application.Tx, id uuid.UUID)) *ClaimAttachmentRepository_HardDelete_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(application.Tx), args[1].(uuid.UUID))
+	})
+	return _c
+}
+
+func (_c *ClaimAttachmentRepository_HardDelete_Call) Return(_a0 error) *ClaimAttachmentRepository_HardDelete_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *ClaimAttachmentRepository_HardDelete_Call) RunAndReturn(run func(application.Tx, uuid.UUID) error) *ClaimAttachmentRepository_HardDelete_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // SoftDeleteByClaimID provides a mock function with given fields: tx, id
 func (_m *ClaimAttachmentRepository) SoftDeleteByClaimID(tx application.Tx, id uuid.UUID) error {
 	ret := _m.Called(tx, id)
@@ -188,6 +371,35 @@ func (_m *ClaimAttachmentRepository) SoftDeleteByClaimID(tx application.Tx, id u
 	}
 
 	return r0
+}
+
+// ClaimAttachmentRepository_SoftDeleteByClaimID_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'SoftDeleteByClaimID'
+type ClaimAttachmentRepository_SoftDeleteByClaimID_Call struct {
+	*mock.Call
+}
+
+// SoftDeleteByClaimID is a helper method to define mock.On call
+//   - tx application.Tx
+//   - id uuid.UUID
+func (_e *ClaimAttachmentRepository_Expecter) SoftDeleteByClaimID(tx interface{}, id interface{}) *ClaimAttachmentRepository_SoftDeleteByClaimID_Call {
+	return &ClaimAttachmentRepository_SoftDeleteByClaimID_Call{Call: _e.mock.On("SoftDeleteByClaimID", tx, id)}
+}
+
+func (_c *ClaimAttachmentRepository_SoftDeleteByClaimID_Call) Run(run func(tx application.Tx, id uuid.UUID)) *ClaimAttachmentRepository_SoftDeleteByClaimID_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(application.Tx), args[1].(uuid.UUID))
+	})
+	return _c
+}
+
+func (_c *ClaimAttachmentRepository_SoftDeleteByClaimID_Call) Return(_a0 error) *ClaimAttachmentRepository_SoftDeleteByClaimID_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *ClaimAttachmentRepository_SoftDeleteByClaimID_Call) RunAndReturn(run func(application.Tx, uuid.UUID) error) *ClaimAttachmentRepository_SoftDeleteByClaimID_Call {
+	_c.Call.Return(run)
+	return _c
 }
 
 // NewClaimAttachmentRepository creates a new instance of ClaimAttachmentRepository. It also registers a testing interface on the mock and a cleanup function to assert the mocks expectations.

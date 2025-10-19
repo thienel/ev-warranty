@@ -18,6 +18,14 @@ type TokenService struct {
 	mock.Mock
 }
 
+type TokenService_Expecter struct {
+	mock *mock.Mock
+}
+
+func (_m *TokenService) EXPECT() *TokenService_Expecter {
+	return &TokenService_Expecter{mock: &_m.Mock}
+}
+
 // GenerateAccessToken provides a mock function with given fields: userID
 func (_m *TokenService) GenerateAccessToken(userID uuid.UUID) (string, error) {
 	ret := _m.Called(userID)
@@ -44,6 +52,34 @@ func (_m *TokenService) GenerateAccessToken(userID uuid.UUID) (string, error) {
 	}
 
 	return r0, r1
+}
+
+// TokenService_GenerateAccessToken_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GenerateAccessToken'
+type TokenService_GenerateAccessToken_Call struct {
+	*mock.Call
+}
+
+// GenerateAccessToken is a helper method to define mock.On call
+//   - userID uuid.UUID
+func (_e *TokenService_Expecter) GenerateAccessToken(userID interface{}) *TokenService_GenerateAccessToken_Call {
+	return &TokenService_GenerateAccessToken_Call{Call: _e.mock.On("GenerateAccessToken", userID)}
+}
+
+func (_c *TokenService_GenerateAccessToken_Call) Run(run func(userID uuid.UUID)) *TokenService_GenerateAccessToken_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(uuid.UUID))
+	})
+	return _c
+}
+
+func (_c *TokenService_GenerateAccessToken_Call) Return(_a0 string, _a1 error) *TokenService_GenerateAccessToken_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *TokenService_GenerateAccessToken_Call) RunAndReturn(run func(uuid.UUID) (string, error)) *TokenService_GenerateAccessToken_Call {
+	_c.Call.Return(run)
+	return _c
 }
 
 // GenerateRefreshToken provides a mock function with given fields: ctx, userID
@@ -74,6 +110,35 @@ func (_m *TokenService) GenerateRefreshToken(ctx context.Context, userID uuid.UU
 	return r0, r1
 }
 
+// TokenService_GenerateRefreshToken_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GenerateRefreshToken'
+type TokenService_GenerateRefreshToken_Call struct {
+	*mock.Call
+}
+
+// GenerateRefreshToken is a helper method to define mock.On call
+//   - ctx context.Context
+//   - userID uuid.UUID
+func (_e *TokenService_Expecter) GenerateRefreshToken(ctx interface{}, userID interface{}) *TokenService_GenerateRefreshToken_Call {
+	return &TokenService_GenerateRefreshToken_Call{Call: _e.mock.On("GenerateRefreshToken", ctx, userID)}
+}
+
+func (_c *TokenService_GenerateRefreshToken_Call) Run(run func(ctx context.Context, userID uuid.UUID)) *TokenService_GenerateRefreshToken_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(uuid.UUID))
+	})
+	return _c
+}
+
+func (_c *TokenService_GenerateRefreshToken_Call) Return(_a0 string, _a1 error) *TokenService_GenerateRefreshToken_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *TokenService_GenerateRefreshToken_Call) RunAndReturn(run func(context.Context, uuid.UUID) (string, error)) *TokenService_GenerateRefreshToken_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // RefreshAccessToken provides a mock function with given fields: ctx, refreshToken
 func (_m *TokenService) RefreshAccessToken(ctx context.Context, refreshToken string) (string, error) {
 	ret := _m.Called(ctx, refreshToken)
@@ -102,6 +167,35 @@ func (_m *TokenService) RefreshAccessToken(ctx context.Context, refreshToken str
 	return r0, r1
 }
 
+// TokenService_RefreshAccessToken_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'RefreshAccessToken'
+type TokenService_RefreshAccessToken_Call struct {
+	*mock.Call
+}
+
+// RefreshAccessToken is a helper method to define mock.On call
+//   - ctx context.Context
+//   - refreshToken string
+func (_e *TokenService_Expecter) RefreshAccessToken(ctx interface{}, refreshToken interface{}) *TokenService_RefreshAccessToken_Call {
+	return &TokenService_RefreshAccessToken_Call{Call: _e.mock.On("RefreshAccessToken", ctx, refreshToken)}
+}
+
+func (_c *TokenService_RefreshAccessToken_Call) Run(run func(ctx context.Context, refreshToken string)) *TokenService_RefreshAccessToken_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(string))
+	})
+	return _c
+}
+
+func (_c *TokenService_RefreshAccessToken_Call) Return(_a0 string, _a1 error) *TokenService_RefreshAccessToken_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *TokenService_RefreshAccessToken_Call) RunAndReturn(run func(context.Context, string) (string, error)) *TokenService_RefreshAccessToken_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // RevokeRefreshToken provides a mock function with given fields: ctx, token
 func (_m *TokenService) RevokeRefreshToken(ctx context.Context, token string) error {
 	ret := _m.Called(ctx, token)
@@ -118,6 +212,35 @@ func (_m *TokenService) RevokeRefreshToken(ctx context.Context, token string) er
 	}
 
 	return r0
+}
+
+// TokenService_RevokeRefreshToken_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'RevokeRefreshToken'
+type TokenService_RevokeRefreshToken_Call struct {
+	*mock.Call
+}
+
+// RevokeRefreshToken is a helper method to define mock.On call
+//   - ctx context.Context
+//   - token string
+func (_e *TokenService_Expecter) RevokeRefreshToken(ctx interface{}, token interface{}) *TokenService_RevokeRefreshToken_Call {
+	return &TokenService_RevokeRefreshToken_Call{Call: _e.mock.On("RevokeRefreshToken", ctx, token)}
+}
+
+func (_c *TokenService_RevokeRefreshToken_Call) Run(run func(ctx context.Context, token string)) *TokenService_RevokeRefreshToken_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(string))
+	})
+	return _c
+}
+
+func (_c *TokenService_RevokeRefreshToken_Call) Return(_a0 error) *TokenService_RevokeRefreshToken_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *TokenService_RevokeRefreshToken_Call) RunAndReturn(run func(context.Context, string) error) *TokenService_RevokeRefreshToken_Call {
+	_c.Call.Return(run)
+	return _c
 }
 
 // ValidateAccessToken provides a mock function with given fields: ctx, token
@@ -150,6 +273,35 @@ func (_m *TokenService) ValidateAccessToken(ctx context.Context, token string) (
 	return r0, r1
 }
 
+// TokenService_ValidateAccessToken_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'ValidateAccessToken'
+type TokenService_ValidateAccessToken_Call struct {
+	*mock.Call
+}
+
+// ValidateAccessToken is a helper method to define mock.On call
+//   - ctx context.Context
+//   - token string
+func (_e *TokenService_Expecter) ValidateAccessToken(ctx interface{}, token interface{}) *TokenService_ValidateAccessToken_Call {
+	return &TokenService_ValidateAccessToken_Call{Call: _e.mock.On("ValidateAccessToken", ctx, token)}
+}
+
+func (_c *TokenService_ValidateAccessToken_Call) Run(run func(ctx context.Context, token string)) *TokenService_ValidateAccessToken_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(string))
+	})
+	return _c
+}
+
+func (_c *TokenService_ValidateAccessToken_Call) Return(_a0 *services.CustomClaims, _a1 error) *TokenService_ValidateAccessToken_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *TokenService_ValidateAccessToken_Call) RunAndReturn(run func(context.Context, string) (*services.CustomClaims, error)) *TokenService_ValidateAccessToken_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // ValidateRefreshToken provides a mock function with given fields: ctx, token
 func (_m *TokenService) ValidateRefreshToken(ctx context.Context, token string) (*entities.RefreshToken, error) {
 	ret := _m.Called(ctx, token)
@@ -178,6 +330,35 @@ func (_m *TokenService) ValidateRefreshToken(ctx context.Context, token string) 
 	}
 
 	return r0, r1
+}
+
+// TokenService_ValidateRefreshToken_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'ValidateRefreshToken'
+type TokenService_ValidateRefreshToken_Call struct {
+	*mock.Call
+}
+
+// ValidateRefreshToken is a helper method to define mock.On call
+//   - ctx context.Context
+//   - token string
+func (_e *TokenService_Expecter) ValidateRefreshToken(ctx interface{}, token interface{}) *TokenService_ValidateRefreshToken_Call {
+	return &TokenService_ValidateRefreshToken_Call{Call: _e.mock.On("ValidateRefreshToken", ctx, token)}
+}
+
+func (_c *TokenService_ValidateRefreshToken_Call) Run(run func(ctx context.Context, token string)) *TokenService_ValidateRefreshToken_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(string))
+	})
+	return _c
+}
+
+func (_c *TokenService_ValidateRefreshToken_Call) Return(_a0 *entities.RefreshToken, _a1 error) *TokenService_ValidateRefreshToken_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *TokenService_ValidateRefreshToken_Call) RunAndReturn(run func(context.Context, string) (*entities.RefreshToken, error)) *TokenService_ValidateRefreshToken_Call {
+	_c.Call.Return(run)
+	return _c
 }
 
 // NewTokenService creates a new instance of TokenService. It also registers a testing interface on the mock and a cleanup function to assert the mocks expectations.
