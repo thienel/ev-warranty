@@ -1,31 +1,85 @@
 name: CD Pipeline
 
 on:
-  pull_request:
+  push:
     branches: ["main"]
+  workflow_dispatch:
 
 jobs:
-  docker-build:
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      go_changed: ${{ steps.filter.outputs.go }}
+      dotnet_changed: ${{ steps.filter.outputs.dotnet }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            go:
+              - 'backend-go/**'
+            dotnet:
+              - 'backend-dotnet/**'
+
+  build-go:
+    needs: changes
+    if: needs.changes.outputs.go_changed == 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
       - name: Log in to Docker Hub
-        uses: docker/login-action@v2
+        uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
+      - name: Generate version
+        id: version
+        run: echo "VERSION=$(date +%Y%m%d)-${GITHUB_SHA::7}" >> $GITHUB_OUTPUT
+
       - name: Build & Push Go Docker image
-        run: |
-          docker build \
-            -t lethiendev/ev-warranty-go:latest \
-            ./backend-go
-          docker push lethiendev/ev-warranty-go:latest
+        uses: docker/build-push-action@v5
+        with:
+          context: ./backend-go
+          push: true
+          tags: |
+            lethiendev/ev-warranty-go:latest
+            lethiendev/ev-warranty-go:${{ steps.version.outputs.VERSION }}
+          cache-from: type=registry,ref=lethiendev/ev-warranty-go:buildcache
+          cache-to: type=registry,ref=lethiendev/ev-warranty-go:buildcache,mode=max
+
+  build-dotnet:
+    needs: changes
+    if: needs.changes.outputs.dotnet_changed == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Generate version
+        id: version
+        run: echo "VERSION=$(date +%Y%m%d)-${GITHUB_SHA::7}" >> $GITHUB_OUTPUT
 
       - name: Build & Push .NET Docker image
-        run: |
-          docker build \
-            -t lethiendev/ev-warranty-dotnet:latest \
-            ./backend-dotnet
-          docker push lethiendev/ev-warranty-dotnet:latest
+        uses: docker/build-push-action@v5
+        with:
+          context: ./backend-dotnet
+          push: true
+          tags: |
+            lethiendev/ev-warranty-dotnet:latest
+            lethiendev/ev-warranty-dotnet:${{ steps.version.outputs.VERSION }}
+          cache-from: type=registry,ref=lethiendev/ev-warranty-dotnet:buildcache
+          cache-to: type=registry,ref=lethiendev/ev-warranty-dotnet:buildcache,mode=max
