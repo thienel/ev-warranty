@@ -47,7 +47,7 @@ func (h *officeHandler) Create(c *gin.Context) {
 	}
 
 	if !entities.IsValidOfficeType(req.OfficeType) {
-		handleError(h.log, c, apperrors.NewInvalidCredentials())
+		handleError(h.log, c, apperrors.NewInvalidOfficeType())
 		return
 	}
 
@@ -79,7 +79,7 @@ func (h *officeHandler) GetById(c *gin.Context) {
 	officeIDStr := c.Param("id")
 	officeID, err := uuid.Parse(officeIDStr)
 	if err != nil {
-		handleError(h.log, c, apperrors.NewInvalidCredentials())
+		handleError(h.log, c, apperrors.NewInvalidUUID())
 		return
 	}
 
@@ -118,7 +118,7 @@ func (h *officeHandler) Update(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := uuid.Parse(idStr)
 	if err != nil {
-		handleError(h.log, c, apperrors.NewInvalidCredentials())
+		handleError(h.log, c, apperrors.NewInvalidUUID())
 		return
 	}
 
@@ -156,7 +156,7 @@ func (h *officeHandler) Delete(c *gin.Context) {
 	officeIDStr := c.Param("id")
 	officeID, err := uuid.Parse(officeIDStr)
 	if err != nil {
-		handleError(h.log, c, apperrors.NewInvalidCredentials())
+		handleError(h.log, c, apperrors.NewInvalidUUID())
 		return
 	}
 

@@ -52,7 +52,7 @@ func (h *claimHandler) GetByID(c *gin.Context) {
 	idParam := c.Param("id")
 	id, err := uuid.Parse(idParam)
 	if err != nil {
-		handleError(h.log, c, apperrors.NewInvalidCredentials())
+		handleError(h.log, c, apperrors.NewInvalidUUID())
 		return
 	}
 
@@ -125,7 +125,7 @@ func (h *claimHandler) Update(c *gin.Context) {
 	idParam := c.Param("id")
 	id, err := uuid.Parse(idParam)
 	if err != nil {
-		handleError(h.log, c, apperrors.NewInvalidCredentials())
+		handleError(h.log, c, apperrors.NewInvalidUUID())
 		return
 	}
 
@@ -155,7 +155,7 @@ func (h *claimHandler) Delete(c *gin.Context) {
 	idParam := c.Param("id")
 	id, err := uuid.Parse(idParam)
 	if err != nil {
-		handleError(h.log, c, apperrors.NewInvalidCredentials())
+		handleError(h.log, c, apperrors.NewInvalidUUID())
 		return
 	}
 
@@ -175,7 +175,7 @@ func (h *claimHandler) Submit(c *gin.Context) {
 	idParam := c.Param("id")
 	id, err := uuid.Parse(idParam)
 	if err != nil {
-		handleError(h.log, c, apperrors.NewInvalidCredentials())
+		handleError(h.log, c, apperrors.NewInvalidUUID())
 		return
 	}
 
@@ -201,7 +201,7 @@ func (h *claimHandler) Review(c *gin.Context) {
 	idParam := c.Param("id")
 	id, err := uuid.Parse(idParam)
 	if err != nil {
-		handleError(h.log, c, apperrors.NewInvalidCredentials())
+		handleError(h.log, c, apperrors.NewInvalidUUID())
 		return
 	}
 
@@ -227,7 +227,7 @@ func (h *claimHandler) RequestInfo(c *gin.Context) {
 	idParam := c.Param("id")
 	id, err := uuid.Parse(idParam)
 	if err != nil {
-		handleError(h.log, c, apperrors.NewInvalidCredentials())
+		handleError(h.log, c, apperrors.NewInvalidUUID())
 		return
 	}
 
@@ -253,7 +253,7 @@ func (h *claimHandler) Cancel(c *gin.Context) {
 	idParam := c.Param("id")
 	id, err := uuid.Parse(idParam)
 	if err != nil {
-		handleError(h.log, c, apperrors.NewInvalidCredentials())
+		handleError(h.log, c, apperrors.NewInvalidUUID())
 		return
 	}
 
@@ -279,7 +279,7 @@ func (h *claimHandler) Complete(c *gin.Context) {
 	idParam := c.Param("id")
 	id, err := uuid.Parse(idParam)
 	if err != nil {
-		handleError(h.log, c, apperrors.NewInvalidCredentials())
+		handleError(h.log, c, apperrors.NewInvalidUUID())
 		return
 	}
 
@@ -308,7 +308,7 @@ func (h *claimHandler) History(c *gin.Context) {
 	idParam := c.Param("id")
 	id, err := uuid.Parse(idParam)
 	if err != nil {
-		handleError(h.log, c, apperrors.NewInvalidCredentials())
+		handleError(h.log, c, apperrors.NewInvalidUUID())
 		return
 	}
 

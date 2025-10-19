@@ -56,7 +56,7 @@ func (s *cloudinaryService) UploadFile(ctx context.Context, file multipart.File,
 
 func (s *cloudinaryService) DeleteFile(ctx context.Context, publicID string, resourceType string) error {
 	if publicID == "" {
-		return apperrors.NewInvalidCredentials()
+		return apperrors.NewEmptyCloudinaryParameter("publicID")
 	}
 
 	_, err := s.cld.Upload.Destroy(ctx, uploader.DestroyParams{
@@ -71,12 +71,12 @@ func (s *cloudinaryService) DeleteFile(ctx context.Context, publicID string, res
 
 func (s *cloudinaryService) DeleteFileByURL(ctx context.Context, fileURL string) error {
 	if fileURL == "" {
-		return apperrors.NewInvalidCredentials()
+		return apperrors.NewEmptyCloudinaryParameter("fileURL")
 	}
 
 	publicID, resourceType, err := parseCloudinaryURL(fileURL)
 	if err != nil {
-		return apperrors.NewInvalidCredentials()
+		return err
 	}
 
 	return s.DeleteFile(ctx, publicID, resourceType)
@@ -85,13 +85,13 @@ func (s *cloudinaryService) DeleteFileByURL(ctx context.Context, fileURL string)
 func parseCloudinaryURL(fileURL string) (publicID, resourceType string, err error) {
 	parsedURL, err := url.Parse(fileURL)
 	if err != nil {
-		return "", "", apperrors.NewInvalidCredentials()
+		return "", "", apperrors.NewInvalidCloudinaryURL()
 	}
 
 	parts := strings.Split(strings.TrimPrefix(parsedURL.Path, "/"), "/")
 
 	if len(parts) < 5 {
-		return "", "", apperrors.NewInvalidCredentials()
+		return "", "", apperrors.NewInvalidCloudinaryURL()
 	}
 
 	// parts[0] = cloud-name

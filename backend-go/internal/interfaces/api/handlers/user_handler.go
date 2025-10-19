@@ -76,7 +76,7 @@ func (h userHandler) Update(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := uuid.Parse(idStr)
 	if err != nil {
-		handleError(h.log, c, apperrors.NewInvalidCredentials())
+		handleError(h.log, c, apperrors.NewInvalidUUID())
 		return
 	}
 
@@ -114,7 +114,7 @@ func (h userHandler) GetByID(c *gin.Context) {
 	userIDStr := c.Param("id")
 	userID, err := uuid.Parse(userIDStr)
 	if err != nil {
-		handleError(h.log, c, apperrors.NewInvalidCredentials())
+		handleError(h.log, c, apperrors.NewInvalidUUID())
 		return
 	}
 
@@ -154,7 +154,7 @@ func (h userHandler) Delete(c *gin.Context) {
 	userIDStr := c.Param("id")
 	userID, err := uuid.Parse(userIDStr)
 	if err != nil {
-		handleError(h.log, c, apperrors.NewInvalidCredentials())
+		handleError(h.log, c, apperrors.NewInvalidUUID())
 		return
 	}
 

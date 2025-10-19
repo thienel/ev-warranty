@@ -148,7 +148,7 @@ func (h *authHandler) ValidateToken(c *gin.Context) {
 
 	userID, err := uuid.Parse(claims.UserID)
 	if err != nil {
-		handleError(h.log, c, apperrors.NewInvalidCredentials())
+		handleError(h.log, c, apperrors.NewInvalidUserID())
 		return
 	}
 
@@ -186,7 +186,7 @@ func (h *authHandler) extractUserIDFromToken(ctx context.Context, accessToken st
 
 	userID, err := uuid.Parse(claims.UserID)
 	if err != nil {
-		return uuid.Nil, apperrors.NewInvalidCredentials()
+		return uuid.Nil, apperrors.NewInvalidUserID()
 	}
 
 	return userID, nil

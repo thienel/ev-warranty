@@ -210,7 +210,7 @@ func (s *claimService) Delete(tx application.Tx, id uuid.UUID) error {
 
 func (s *claimService) UpdateStatus(tx application.Tx, id uuid.UUID, status string, changedBy uuid.UUID) error {
 	if !entities.IsValidClaimStatus(status) {
-		return apperrors.NewInvalidCredentials()
+		return apperrors.NewInvalidClaimStatus()
 	}
 
 	claim, err := s.claimRepo.FindByID(tx.GetCtx(), id)

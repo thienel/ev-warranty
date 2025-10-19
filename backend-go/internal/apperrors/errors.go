@@ -87,6 +87,10 @@ func NewUserPasswordInvalid() *AppError {
 	return New(http.StatusUnauthorized, ErrorCodeUserPasswordInvalid, errors.New("invalid user password"))
 }
 
+func NewInvalidUserInput() *AppError {
+	return New(http.StatusBadRequest, ErrorCodeInvalidUserInput, errors.New("invalid user input"))
+}
+
 func NewDBOperationError(err error) *AppError {
 	return New(http.StatusInternalServerError, ErrorCodeDBOperation, err)
 }
@@ -182,4 +186,33 @@ func NewFailedDeleteCloudinary() *AppError {
 
 func NewInvalidMultipartFormRequest() *AppError {
 	return New(http.StatusBadRequest, ErrorCodeInvalidMultipartFormRequest, errors.New("invalid multipart form request"))
+}
+
+func NewInvalidUUID() *AppError {
+	return New(http.StatusBadRequest, ErrorCodeInvalidUUID, errors.New("invalid UUID format"))
+}
+
+func NewInvalidClaimStatus() *AppError {
+	return New(http.StatusBadRequest, ErrorCodeInvalidClaimStatus, errors.New("invalid claim status"))
+}
+
+func NewInvalidClaimItemStatus() *AppError {
+	return New(http.StatusBadRequest, ErrorCodeInvalidClaimItemStatus, errors.New("invalid claim item status"))
+}
+
+func NewInvalidClaimItemType() *AppError {
+	return New(http.StatusBadRequest, ErrorCodeInvalidClaimItemType, errors.New("invalid claim item type"))
+}
+
+func NewInvalidAttachmentType() *AppError {
+	return New(http.StatusBadRequest, ErrorCodeInvalidAttachmentType, errors.New("invalid attachment type"))
+}
+
+func NewEmptyCloudinaryParameter(param string) *AppError {
+	return New(http.StatusBadRequest, ErrorCodeEmptyCloudinaryParameter,
+		fmt.Errorf("empty cloudinary parameter: %s", param))
+}
+
+func NewInvalidCloudinaryURL() *AppError {
+	return New(http.StatusBadRequest, ErrorCodeInvalidCloudinaryURL, errors.New("invalid cloudinary URL"))
 }

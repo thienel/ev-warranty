@@ -38,7 +38,7 @@ func (s *oauthService) GenerateAuthURL() (string, error) {
 
 func (s *oauthService) HandleCallback(ctx context.Context, code, state string) (*providers.UserInfo, error) {
 	if !s.states[state] {
-		return nil, apperrors.NewInvalidCredentials()
+		return nil, apperrors.NewInvalidAuthHeader()
 	}
 	delete(s.states, state)
 

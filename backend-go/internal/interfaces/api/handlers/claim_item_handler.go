@@ -89,7 +89,7 @@ func (h *claimItemHandler) Create(c *gin.Context) {
 	}
 
 	if !entities.IsValidClaimItemType(req.Type) {
-		handleError(h.log, c, apperrors.NewInvalidCredentials())
+		handleError(h.log, c, apperrors.NewInvalidClaimItemType())
 		return
 	}
 
@@ -197,7 +197,7 @@ func parseItemIDParam(c *gin.Context) (uuid.UUID, error) {
 	itemIDStr := c.Param("itemID")
 	itemID, err := uuid.Parse(itemIDStr)
 	if err != nil {
-		return uuid.Nil, apperrors.NewInvalidCredentials()
+		return uuid.Nil, apperrors.NewInvalidUUID()
 	}
 	return itemID, nil
 }
@@ -206,7 +206,7 @@ func parseClaimIDParam(c *gin.Context) (uuid.UUID, error) {
 	claimIDStr := c.Param("id")
 	claimID, err := uuid.Parse(claimIDStr)
 	if err != nil {
-		return uuid.Nil, apperrors.NewInvalidCredentials()
+		return uuid.Nil, apperrors.NewInvalidUUID()
 	}
 	return claimID, nil
 }
