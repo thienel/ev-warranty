@@ -1,7 +1,7 @@
 import axios from 'axios'
 import store, { persistor } from '@/redux/store'
 import { setToken, logout } from '@/redux/authSlice'
-import { API_BASE_URL, API_ENDPOINTS } from '@constants'
+import { API_BASE_URL, API_ENDPOINTS } from '@constants/common-constants.js'
 
 const api = axios.create({
   baseURL: API_BASE_URL,

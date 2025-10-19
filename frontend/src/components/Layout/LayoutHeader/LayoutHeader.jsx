@@ -9,7 +9,7 @@ import {
 } from '@ant-design/icons'
 import './LayoutHeader.less'
 import api from '@services/api.js'
-import { API_ENDPOINTS } from '@constants'
+import { API_ENDPOINTS } from '@constants/common-constants.js'
 import { useDispatch } from 'react-redux'
 import { logout } from '@redux/authSlice.js'
 import { persistor } from '@redux/store.js'

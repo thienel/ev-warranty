@@ -8,7 +8,7 @@ import AppLayout from '@components/Layout/Layout.jsx'
 import Offices from '@pages/admin/Offices.jsx'
 import Error from '@pages/Error/Error.jsx'
 import useCheckRole from '@/hooks/useCheckRole.js'
-import { USER_ROLES } from '@constants'
+import { USER_ROLES } from '@constants/common-constants.js'
 
 export const ProtectedRoute = () => {
   const { isAuthenticated } = useSelector((state) => state.auth)

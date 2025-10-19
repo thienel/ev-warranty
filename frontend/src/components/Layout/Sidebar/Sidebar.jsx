@@ -16,7 +16,7 @@ import {
 import './Sidebar.less'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { useSelector } from 'react-redux'
-import { USER_ROLES } from '@constants'
+import { USER_ROLES } from '@constants/common-constants.js'
 
 const { Sider } = Layout
 
