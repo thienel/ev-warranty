@@ -51,6 +51,6 @@ jobs:
       run: |
         make frontend-build
         make go-build
-#        make dotnet-restore
-#        make dotnet-build
-#        make ci-test
+        make dotnet-restore
+        make dotnet-build
+        make ci-test

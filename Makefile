@@ -13,15 +13,15 @@ go-test:
 
 .PHONY: dotnet-restore
 dotnet-restore:
-	cd customer-vehicle-service && dotnet restore
+	cd backend-dotnet && dotnet restore
 
 .PHONY: dotnet-build
 dotnet-build:
-	cd customer-vehicle-service && dotnet build --no-restore --configuration Release
+	cd backend-dotnet && dotnet build --no-restore --configuration Release
 
 .PHONY: dotnet-test
 dotnet-test:
-	cd customer-vehicle-service && dotnet test --no-build --verbosity normal
+	cd backend-dotnet && dotnet test --no-build --verbosity normal
 
 .PHONY: docker-compose-down
 docker-compose-down:
