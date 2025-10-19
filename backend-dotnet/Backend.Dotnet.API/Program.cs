@@ -42,6 +42,7 @@ namespace Backend.Dotnet.API
             app.UseHttpsRedirection();
             app.UseAuthorization();
             app.MapControllers();
+            app.MapHealthChecks("/health");
             app.Run();
         }
     }
