@@ -48,7 +48,7 @@ func Load() *Config {
 		panic("Cloudinary URL are not set in environment variables")
 	}
 	return &Config{
-		Port:            getEnv("PORT", "8888"),
+		Port:            getEnv("PORT", "8080"),
 		DatabaseURL:     getEnv("DATABASE_URL", "postgres://auth_service:password@localhost:5432/auth_service?sslmode=disable"),
 		LogLevel:        getEnv("LOG_LEVEL", "info"),
 		PublicKeyPath:   getEnv("PUBLIC_KEY_PATH", "./keys/public.pem"),

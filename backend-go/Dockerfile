@@ -11,5 +11,5 @@ WORKDIR /root/
 COPY --from=builder /app/main .
 COPY --from=builder /app/entrypoint.sh .
 RUN chmod +x entrypoint.sh
-EXPOSE 8888
+EXPOSE 8080
 ENTRYPOINT ["./entrypoint.sh"]
