@@ -5,10 +5,10 @@ import { useDispatch } from 'react-redux'
 import { API_BASE_URL, API_ENDPOINTS } from '@constants'
 import api from '@services/api.js'
 import { loginSuccess } from '@redux/authSlice.js'
-import Logo from '@pages/auth/Login/Logo/Logo.jsx'
-import { useDelay } from '@/hooks/index.js'
+import  useDelay  from '@/hooks/useDelay.js'
 import { useNavigate, useSearchParams } from 'react-router-dom'
-import LoginForm from '@pages/auth/Login/LoginForm/LoginForm.jsx'
+import LoginForm from '@pages/Login/LoginForm/LoginForm.jsx'
+import { ThunderboltOutlined } from '@ant-design/icons'
 
 const { Title } = Typography
 
@@ -38,8 +38,8 @@ const Login = () => {
         message.success('Login successful!')
         dispatch(loginSuccess({ user, token: token, remember: values.remember }))
       } catch (error) {
-        console.error(error.response.data)
         message.error('Login failed. Please check your credentials.')
+        console.error(error.response.data)
       } finally {
         setLoginLoading(false)
       }
@@ -57,7 +57,9 @@ const Login = () => {
     <div className={`login-container ${loginLoading ? 'login-loading' : ''}`}>
       <Card className="login-card">
         <div className="login-header">
-          <Logo />
+          <div className="main-logo">
+            <ThunderboltOutlined />
+          </div>
           <Title level={2} className="login-title">
             EV Warranty System
           </Title>

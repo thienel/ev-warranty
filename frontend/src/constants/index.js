@@ -37,10 +37,10 @@ export const EMAIL_RULES = [
 ]
 
 export const USER_ROLES = {
-  ADMIN: 'admin',
-  SC_STAFF: 'sc staff',
-  SC_TECHNICIAN: 'sc technician',
-  EVM_STAFF: 'evm staff',
+  ADMIN: 'ADMIN',
+  SC_STAFF: 'SC_STAFF',
+  SC_TECHNICIAN: 'SC_TECHNICIAN',
+  EVM_STAFF: 'EVM_STAFF',
 }
 
 export const ROLE_LABELS = {
@@ -48,6 +48,12 @@ export const ROLE_LABELS = {
   [USER_ROLES.SC_STAFF]: 'SC Staff',
   [USER_ROLES.SC_TECHNICIAN]: 'SC Technician',
   [USER_ROLES.EVM_STAFF]: 'EVM Staff',
+}
+
+export const ERROR_MESSAGES = {
+  [403]: 'Sorry, you are not authorized to access this page.',
+  [500]: 'Sorry, something went wrong on the server.',
+  [404]: 'Sorry, the page you visited does not exist.',
 }
 
 export const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost/api/v1'
@@ -59,6 +65,6 @@ export const API_ENDPOINTS = {
     GOOGLE: '/auth/google',
     TOKEN: '/auth/token',
   },
-  USER: '/users/',
-  OFFICE: '/offices/',
+  USER: '/users',
+  OFFICE: '/offices',
 }

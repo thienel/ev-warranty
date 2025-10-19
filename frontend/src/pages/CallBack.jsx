@@ -7,7 +7,7 @@ import { useDispatch } from 'react-redux'
 import api from '@services/api.js'
 import { API_ENDPOINTS } from '@constants'
 
-const AuthCallBack = () => {
+const CallBack = () => {
   const [searchParams] = useSearchParams()
   const dispatch = useDispatch()
   const navigate = useNavigate()
@@ -38,4 +38,4 @@ const AuthCallBack = () => {
   return <LoadingOverlay loading={true} />
 }
 
-export default AuthCallBack
+export default CallBack

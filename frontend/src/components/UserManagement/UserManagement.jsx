@@ -27,9 +27,7 @@ const UserManagement = () => {
   const fetchOffices = async () => {
     try {
       const response = await api.get(API_ENDPOINTS.OFFICE)
-      if (response.data.success) {
-        setOffices(response.data.data || [])
-      }
+      setOffices(response.data.data || [])
     } catch (error) {
       message.error(error.response?.data?.message || 'Failed to load offices')
       console.error('Error fetching offices:', error)

@@ -1,11 +1,14 @@
 import React from 'react'
 import { Navigate, Outlet, useRoutes } from 'react-router-dom'
-import Login from '@pages/auth/Login/Login.jsx'
+import Login from '@pages/Login/Login.jsx'
 import { useSelector } from 'react-redux'
-import AuthCallBack from '@pages/auth/AuthCallBack.jsx'
-import Users from '@pages/Users.jsx'
+import CallBack from '@pages/CallBack.jsx'
+import Users from '@pages/admin/Users.jsx'
 import AppLayout from '@components/Layout/Layout.jsx'
-import Offices from '@pages/Offices.jsx'
+import Offices from '@pages/admin/Offices.jsx'
+import Error from '@pages/Error/Error.jsx'
+import useCheckRole from '@/hooks/useCheckRole.js'
+import { USER_ROLES } from '@constants'
 
 export const ProtectedRoute = () => {
   const { isAuthenticated } = useSelector((state) => state.auth)
@@ -19,6 +22,12 @@ export const PublicRoute = () => {
   return !isAuthenticated ? <Outlet /> : <Navigate to="/" replace />
 }
 
+export const AdminRoute = () => {
+  const isRightRole = useCheckRole(USER_ROLES.ADMIN)
+
+  return isRightRole ? <Outlet /> : <Navigate to="/unauthorized" replace />
+}
+
 const App = () => {
   const routes = [
     {
@@ -26,12 +35,18 @@ const App = () => {
       children: [
         { path: '/', element: <AppLayout /> },
         {
-          path: '/users',
-          element: <Users />,
-        },
-        {
-          path: '/offices',
-          element: <Offices />,
+          path: '/admin',
+          element: <AdminRoute />,
+          children: [
+            {
+              path: 'users',
+              element: <Users />,
+            },
+            {
+              path: 'offices',
+              element: <Offices />,
+            },
+          ],
         },
       ],
     },
@@ -39,8 +54,20 @@ const App = () => {
       element: <PublicRoute />,
       children: [
         { path: '/login', element: <Login /> },
-        { path: '/auth/callback', element: <AuthCallBack /> },
+        { path: '/callback', element: <CallBack /> },
       ],
+    },
+    {
+      path: '/unauthorized',
+      element: <Error code={403} />,
+    },
+    {
+      path: '/servererror',
+      element: <Error code={500} />,
+    },
+    {
+      path: '*',
+      element: <Error code={404} />,
     },
   ]
 
