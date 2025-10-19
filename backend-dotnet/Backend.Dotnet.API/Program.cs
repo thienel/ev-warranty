@@ -13,6 +13,7 @@ namespace Backend.Dotnet.API
             builder.Services.AddControllers();
             builder.Services.AddOpenApi();
             builder.Services.AddInfrastructure(builder.Configuration);
+            builder.Services.AddHealthChecks();
 
             var app = builder.Build();
 
