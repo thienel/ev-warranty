@@ -20,10 +20,8 @@ const useManagement = (apiEndpoint, itemName = 'item') => {
   const fetchItems = async () => {
     try {
       const response = await api.get(apiEndpoint)
-      if (response.data.success) {
-        const itemData = response.data.data || []
-        setItems(itemData)
-      }
+      const itemData = response.data.data || []
+      setItems(itemData)
     } catch (error) {
       message.error(error.response?.data?.message || `Failed to load ${itemName}s`)
       console.error(`Error fetching ${itemName}s:`, error)

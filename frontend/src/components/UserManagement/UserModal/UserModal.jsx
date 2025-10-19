@@ -19,7 +19,6 @@ const UserModal = ({
   const handleSubmit = async (values) => {
     setLoading(true)
     try {
-      let response
       const payload = { ...values }
 
       if (!isUpdate && !payload.password) {
@@ -31,17 +30,11 @@ const UserModal = ({
       if (isUpdate) {
         delete payload.password
         delete payload.email
-        response = await api.put(`${API_ENDPOINTS.USER}/${user.id}`, payload)
-
-        if (response.data.success) {
-          message.success('User updated successfully')
-        }
+        await api.put(`${API_ENDPOINTS.USER}/${user.id}`, payload)
+        message.success('User updated successfully')
       } else {
-        response = await api.post(API_ENDPOINTS.USER, payload)
-
-        if (response.data.success) {
-          message.success('User created successfully')
-        }
+        await api.post(API_ENDPOINTS.USER, payload)
+        message.success('User created successfully')
       }
 
       form.resetFields()

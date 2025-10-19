@@ -11,21 +11,14 @@ const OfficeModal = ({ loading, setLoading, onClose, office = null, opened = fal
   const handleSubmit = async (values) => {
     setLoading(true)
     try {
-      let response
       const payload = { ...values }
 
       if (isUpdate) {
-        response = await api.put(`${API_ENDPOINTS.OFFICE}/${office.id}`, payload)
-
-        if (response.data.success) {
-          message.success('Office updated successfully')
-        }
+        await api.put(`${API_ENDPOINTS.OFFICE}/${office.id}`, payload)
+        message.success('Office updated successfully')
       } else {
-        response = await api.post(API_ENDPOINTS.OFFICE, payload)
-
-        if (response.data.success) {
-          message.success('Office created successfully')
-        }
+        await api.post(API_ENDPOINTS.OFFICE, payload)
+        message.success('Office created successfully')
       }
 
       form.resetFields()
