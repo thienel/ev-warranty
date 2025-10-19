@@ -9,6 +9,7 @@ import  useDelay  from '@/hooks/useDelay.js'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import LoginForm from '@pages/Login/LoginForm/LoginForm.jsx'
 import { ThunderboltOutlined } from '@ant-design/icons'
+import useHandleApiError from '@/hooks/useHandleApiError.js'
 
 const { Title } = Typography
 
@@ -20,6 +21,7 @@ const Login = () => {
   const dispatch = useDispatch()
   const [searchParams] = useSearchParams()
   const delay = useDelay(500)
+  const handleError = useHandleApiError()
 
   useEffect(() => {
     const error = searchParams.get('error')
@@ -38,8 +40,7 @@ const Login = () => {
         message.success('Login successful!')
         dispatch(loginSuccess({ user, token: token, remember: values.remember }))
       } catch (error) {
-        message.error('Login failed. Please check your credentials.')
-        console.error(error.response.data)
+        handleError(error)
       } finally {
         setLoginLoading(false)
       }

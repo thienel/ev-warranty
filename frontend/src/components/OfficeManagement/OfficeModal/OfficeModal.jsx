@@ -3,10 +3,12 @@ import { Modal, Button, Form, Input, message, Select, Space, Switch } from 'antd
 import { BankOutlined } from '@ant-design/icons'
 import { API_ENDPOINTS } from '@constants/common-constants.js'
 import api from '@services/api.js'
+import useHandleApiError from '@/hooks/useHandleApiError.js'
 
 const OfficeModal = ({ loading, setLoading, onClose, office = null, opened = false, isUpdate }) => {
   const [form] = Form.useForm()
   const { Option } = Select
+  const handleError = useHandleApiError()
 
   const handleSubmit = async (values) => {
     setLoading(true)
@@ -24,11 +26,7 @@ const OfficeModal = ({ loading, setLoading, onClose, office = null, opened = fal
       form.resetFields()
       onClose()
     } catch (error) {
-      const errorMsg =
-        error.response?.data?.message ||
-        (isUpdate ? 'Failed to update office' : 'Failed to create office')
-      message.error(errorMsg)
-      console.error('Error saving office:', error)
+      handleError(error)
     } finally {
       setLoading(false)
     }
