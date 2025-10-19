@@ -1,5 +1,5 @@
 import React from 'react'
-import { API_ENDPOINTS } from '@constants'
+import { API_ENDPOINTS } from '@constants/common-constants.js'
 import OfficeModal from '@components/OfficeManagement/OfficeModal/OfficeModal.jsx'
 import useManagement from '@/hooks/useManagement.js'
 import GenericActionBar from '@components/common/GenericActionBar/GenericActionBar.jsx'

@@ -1,7 +1,7 @@
 import React from 'react'
 import { Modal, Button, Form, Input, message, Select, Space, Switch } from 'antd'
 import { HomeOutlined, LockOutlined, MailOutlined, UserOutlined } from '@ant-design/icons'
-import { API_ENDPOINTS, PASSWORD_RULES, ROLE_LABELS, USER_ROLES } from '@constants'
+import { API_ENDPOINTS, PASSWORD_RULES, ROLE_LABELS, USER_ROLES } from '@constants/common-constants.js'
 import api from '@services/api.js'
 
 const UserModal = ({

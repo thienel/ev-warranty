@@ -1,7 +1,7 @@
 import React from 'react'
 import { Modal, Button, Form, Input, message, Select, Space, Switch } from 'antd'
 import { BankOutlined } from '@ant-design/icons'
-import { API_ENDPOINTS } from '@constants'
+import { API_ENDPOINTS } from '@constants/common-constants.js'
 import api from '@services/api.js'
 
 const OfficeModal = ({ loading, setLoading, onClose, office = null, opened = false, isUpdate }) => {

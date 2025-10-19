@@ -1,4 +1,4 @@
-import { ROLE_LABELS, USER_ROLES } from '@constants'
+import { ROLE_LABELS, USER_ROLES } from '@constants/common-constants.js'
 import { Button, Popconfirm, Space, Tag } from 'antd'
 import {
   CheckCircleOutlined,

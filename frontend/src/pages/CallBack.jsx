@@ -5,7 +5,7 @@ import { loginSuccess, setToken } from '@redux/authSlice.js'
 import { message } from 'antd'
 import { useDispatch } from 'react-redux'
 import api from '@services/api.js'
-import { API_ENDPOINTS } from '@constants'
+import { API_ENDPOINTS } from '@constants/common-constants.js'
 
 const CallBack = () => {
   const [searchParams] = useSearchParams()

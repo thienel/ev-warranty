@@ -8,7 +8,7 @@ import {
   UserOutlined,
 } from '@ant-design/icons'
 import './LoginForm.less'
-import { EMAIL_RULES, PASSWORD_RULES } from '@constants'
+import { EMAIL_RULES, PASSWORD_RULES } from '@constants/common-constants.js'
 
 const LoginForm = ({ form, onLogin, onGoogleLogin, loginLoading, googleLoading }) => {
   return (

@@ -2,7 +2,7 @@ import React from 'react'
 import { Button, Result } from 'antd'
 import { useNavigate } from 'react-router-dom'
 import './Error.less'
-import { ERROR_MESSAGES } from '@constants'
+import { ERROR_MESSAGES } from '@constants/common-constants.js'
 
 const Error = ({ code = 404 }) => {
   const navigate = useNavigate()

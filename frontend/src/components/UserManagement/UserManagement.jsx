@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { message } from 'antd'
 import api from '@services/api'
-import { API_ENDPOINTS, ROLE_LABELS } from '@constants'
+import { API_ENDPOINTS, ROLE_LABELS } from '@constants/common-constants.js'
 import UserModal from '@components/UserManagement/UserModal/UserModal.jsx'
 import useManagement from '@/hooks/useManagement.js'
 import GenericActionBar from '@components/common/GenericActionBar/GenericActionBar.jsx'
