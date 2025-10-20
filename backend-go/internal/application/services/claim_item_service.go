@@ -113,7 +113,7 @@ func (s *claimItemService) Update(tx application.Tx, claimID, itemID uuid.UUID, 
 	}
 
 	switch item.Status {
-	case entities.ClaimItemStatusApproved, entities.ClaimItemStatusRejected:
+	case entities.ClaimItemStatusPending:
 	default:
 		return apperrors.NewNotAllowUpdateClaim()
 	}
