@@ -1,8 +1,6 @@
 package handlers_test
 
 import (
-	"bytes"
-	"encoding/json"
 	"errors"
 	"ev-warranty-go/internal/apperrors"
 	"ev-warranty-go/internal/application/services"
@@ -25,21 +23,14 @@ var _ = Describe("OfficeHandler", func() {
 		mockLogger  *mocks.Logger
 		mockService *mocks.OfficeService
 		handler     handlers.OfficeHandler
-		router      *gin.Engine
+		r           *gin.Engine
 		w           *httptest.ResponseRecorder
 	)
 
 	BeforeEach(func() {
-		gin.SetMode(gin.TestMode)
-		mockLogger = mocks.NewLogger(GinkgoT())
+		mockLogger, r, w = SetupMock(GinkgoT())
 		mockService = mocks.NewOfficeService(GinkgoT())
 		handler = handlers.NewOfficeHandler(mockLogger, mockService)
-		router = gin.New()
-		w = httptest.NewRecorder()
-
-		mockLogger.On("Info", mock.Anything, mock.Anything, mock.Anything).Maybe().Return()
-		mockLogger.On("Info", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Maybe().Return()
-		mockLogger.On("Error", mock.Anything, mock.Anything, mock.Anything).Maybe().Return()
 	})
 
 	Describe("Create", func() {
@@ -58,13 +49,7 @@ var _ = Describe("OfficeHandler", func() {
 
 		Context("when office is created successfully", func() {
 			It("should return 201 with created office", func() {
-				office := &entities.Office{
-					ID:         uuid.New(),
-					OfficeName: validReq.OfficeName,
-					OfficeType: validReq.OfficeType,
-					Address:    validReq.Address,
-					IsActive:   validReq.IsActive,
-				}
+				office := CreateOfficeFromRequest(validReq)
 
 				mockService.EXPECT().Create(mock.Anything, mock.MatchedBy(func(cmd *services.CreateOfficeCommand) bool {
 					return cmd.OfficeName == validReq.OfficeName &&
@@ -73,66 +58,40 @@ var _ = Describe("OfficeHandler", func() {
 						cmd.IsActive == validReq.IsActive
 				})).Return(office, nil).Once()
 
-				router.POST("/offices", func(c *gin.Context) {
-					c.Request.Header.Set("X-User-Role", entities.UserRoleAdmin)
+				r.POST("/offices", func(c *gin.Context) {
+					SetHeaderRole(c, entities.UserRoleAdmin)
+					SetContentTypeJSON(c)
 					handler.Create(c)
 				})
 
-				body, _ := json.Marshal(validReq)
-				req, _ := http.NewRequest(http.MethodPost, "/offices", bytes.NewBuffer(body))
-				req.Header.Set("Content-Type", "application/json")
-				req.Header.Set("X-User-Role", entities.UserRoleAdmin)
-
-				router.ServeHTTP(w, req)
-
-				Expect(w.Code).To(Equal(http.StatusCreated))
-				var response dtos.APIResponse
-				err := json.Unmarshal(w.Body.Bytes(), &response)
-				Expect(err).NotTo(HaveOccurred())
-				Expect(response.Data).NotTo(BeNil())
+				SendRequest(r, http.MethodPost, "/offices", w, validReq)
+				ExpectResponseNotNil(w, http.StatusCreated)
 			})
 		})
 
 		Context("when user is not admin", func() {
-			It("should return 403 unauthorized role error", func() {
-				router.POST("/offices", func(c *gin.Context) {
-					c.Request.Header.Set("X-User-Role", entities.UserRoleScStaff)
+			It("should return 403 forbidden role error", func() {
+				r.POST("/offices", func(c *gin.Context) {
+					SetHeaderRole(c, entities.UserRoleScStaff)
+					SetContentTypeJSON(c)
 					handler.Create(c)
 				})
 
-				body, _ := json.Marshal(validReq)
-				req, _ := http.NewRequest(http.MethodPost, "/offices", bytes.NewBuffer(body))
-				req.Header.Set("Content-Type", "application/json")
-				req.Header.Set("X-User-Role", entities.UserRoleScStaff)
-
-				router.ServeHTTP(w, req)
-
-				Expect(w.Code).To(Equal(http.StatusForbidden))
-				var response dtos.APIResponse
-				err := json.Unmarshal(w.Body.Bytes(), &response)
-				Expect(err).NotTo(HaveOccurred())
-				Expect(response.Error).To(Equal(apperrors.ErrorCodeUnauthorizedRole))
+				SendRequest(r, http.MethodPost, "/offices", w, validReq)
+				ExpectErrorCode(w, http.StatusForbidden, apperrors.ErrorCodeUnauthorizedRole)
 			})
 		})
 
 		Context("when request body is invalid JSON", func() {
 			It("should return 400 bad request", func() {
-				router.POST("/offices", func(c *gin.Context) {
-					c.Request.Header.Set("X-User-Role", entities.UserRoleAdmin)
+				r.POST("/offices", func(c *gin.Context) {
+					SetHeaderRole(c, entities.UserRoleAdmin)
+					SetContentTypeJSON(c)
 					handler.Create(c)
 				})
 
-				req, _ := http.NewRequest(http.MethodPost, "/offices", bytes.NewBuffer([]byte("invalid json")))
-				req.Header.Set("Content-Type", "application/json")
-				req.Header.Set("X-User-Role", entities.UserRoleAdmin)
-
-				router.ServeHTTP(w, req)
-
-				Expect(w.Code).To(Equal(http.StatusBadRequest))
-				var response dtos.APIResponse
-				err := json.Unmarshal(w.Body.Bytes(), &response)
-				Expect(err).NotTo(HaveOccurred())
-				Expect(response.Error).To(Equal(apperrors.ErrorCodeInvalidJsonRequest))
+				SendRequest(r, http.MethodPost, "/offices", w, "invalid json")
+				ExpectErrorCode(w, http.StatusBadRequest, apperrors.ErrorCodeInvalidJsonRequest)
 			})
 		})
 
@@ -141,23 +100,14 @@ var _ = Describe("OfficeHandler", func() {
 				invalidReq := validReq
 				invalidReq.OfficeType = "INVALID_TYPE"
 
-				router.POST("/offices", func(c *gin.Context) {
-					c.Request.Header.Set("X-User-Role", entities.UserRoleAdmin)
+				r.POST("/offices", func(c *gin.Context) {
+					SetHeaderRole(c, entities.UserRoleAdmin)
+					SetContentTypeJSON(c)
 					handler.Create(c)
 				})
 
-				body, _ := json.Marshal(invalidReq)
-				req, _ := http.NewRequest(http.MethodPost, "/offices", bytes.NewBuffer(body))
-				req.Header.Set("Content-Type", "application/json")
-				req.Header.Set("X-User-Role", entities.UserRoleAdmin)
-
-				router.ServeHTTP(w, req)
-
-				Expect(w.Code).To(Equal(http.StatusBadRequest))
-				var response dtos.APIResponse
-				err := json.Unmarshal(w.Body.Bytes(), &response)
-				Expect(err).NotTo(HaveOccurred())
-				Expect(response.Error).To(Equal(apperrors.ErrorCodeInvalidOfficeType))
+				SendRequest(r, http.MethodPost, "/offices", w, invalidReq)
+				ExpectErrorCode(w, http.StatusBadRequest, apperrors.ErrorCodeInvalidOfficeType)
 			})
 		})
 
@@ -166,23 +116,14 @@ var _ = Describe("OfficeHandler", func() {
 				dbErr := apperrors.NewDBOperationError(errors.New("database error"))
 				mockService.EXPECT().Create(mock.Anything, mock.Anything).Return(nil, dbErr).Once()
 
-				router.POST("/offices", func(c *gin.Context) {
-					c.Request.Header.Set("X-User-Role", entities.UserRoleAdmin)
+				r.POST("/offices", func(c *gin.Context) {
+					SetHeaderRole(c, entities.UserRoleAdmin)
+					SetContentTypeJSON(c)
 					handler.Create(c)
 				})
 
-				body, _ := json.Marshal(validReq)
-				req, _ := http.NewRequest(http.MethodPost, "/offices", bytes.NewBuffer(body))
-				req.Header.Set("Content-Type", "application/json")
-				req.Header.Set("X-User-Role", entities.UserRoleAdmin)
-
-				router.ServeHTTP(w, req)
-
-				Expect(w.Code).To(Equal(http.StatusInternalServerError))
-				var response dtos.APIResponse
-				err := json.Unmarshal(w.Body.Bytes(), &response)
-				Expect(err).NotTo(HaveOccurred())
-				Expect(response.Error).To(Equal(apperrors.ErrorCodeDBOperation))
+				SendRequest(r, http.MethodPost, "/offices", w, validReq)
+				ExpectErrorCode(w, http.StatusInternalServerError, apperrors.ErrorCodeDBOperation)
 			})
 		})
 
@@ -191,18 +132,13 @@ var _ = Describe("OfficeHandler", func() {
 				invalidReq := validReq
 				invalidReq.OfficeName = ""
 
-				router.POST("/offices", func(c *gin.Context) {
-					c.Request.Header.Set("X-User-Role", entities.UserRoleAdmin)
+				r.POST("/offices", func(c *gin.Context) {
+					SetHeaderRole(c, entities.UserRoleAdmin)
+					SetContentTypeJSON(c)
 					handler.Create(c)
 				})
 
-				body, _ := json.Marshal(invalidReq)
-				req, _ := http.NewRequest(http.MethodPost, "/offices", bytes.NewBuffer(body))
-				req.Header.Set("Content-Type", "application/json")
-				req.Header.Set("X-User-Role", entities.UserRoleAdmin)
-
-				router.ServeHTTP(w, req)
-
+				SendRequest(r, http.MethodPost, "/offices", w, invalidReq)
 				Expect(w.Code).To(Equal(http.StatusBadRequest))
 			})
 		})
@@ -211,31 +147,19 @@ var _ = Describe("OfficeHandler", func() {
 			It("should create office with SC type successfully", func() {
 				scReq := validReq
 				scReq.OfficeType = entities.OfficeTypeSC
-
-				office := &entities.Office{
-					ID:         uuid.New(),
-					OfficeName: scReq.OfficeName,
-					OfficeType: scReq.OfficeType,
-					Address:    scReq.Address,
-					IsActive:   scReq.IsActive,
-				}
+				office := CreateOfficeFromRequest(scReq)
 
 				mockService.EXPECT().Create(mock.Anything, mock.MatchedBy(func(cmd *services.CreateOfficeCommand) bool {
 					return cmd.OfficeType == entities.OfficeTypeSC
 				})).Return(office, nil).Once()
 
-				router.POST("/offices", func(c *gin.Context) {
-					c.Request.Header.Set("X-User-Role", entities.UserRoleAdmin)
+				r.POST("/offices", func(c *gin.Context) {
+					SetHeaderRole(c, entities.UserRoleAdmin)
+					SetContentTypeJSON(c)
 					handler.Create(c)
 				})
 
-				body, _ := json.Marshal(scReq)
-				req, _ := http.NewRequest(http.MethodPost, "/offices", bytes.NewBuffer(body))
-				req.Header.Set("Content-Type", "application/json")
-				req.Header.Set("X-User-Role", entities.UserRoleAdmin)
-
-				router.ServeHTTP(w, req)
-
+				SendRequest(r, http.MethodPost, "/offices", w, scReq)
 				Expect(w.Code).To(Equal(http.StatusCreated))
 			})
 		})
@@ -244,31 +168,19 @@ var _ = Describe("OfficeHandler", func() {
 			It("should create inactive office successfully", func() {
 				inactiveReq := validReq
 				inactiveReq.IsActive = false
-
-				office := &entities.Office{
-					ID:         uuid.New(),
-					OfficeName: inactiveReq.OfficeName,
-					OfficeType: inactiveReq.OfficeType,
-					Address:    inactiveReq.Address,
-					IsActive:   false,
-				}
+				office := CreateOfficeFromRequest(inactiveReq)
 
 				mockService.EXPECT().Create(mock.Anything, mock.MatchedBy(func(cmd *services.CreateOfficeCommand) bool {
 					return cmd.IsActive == false
 				})).Return(office, nil).Once()
 
-				router.POST("/offices", func(c *gin.Context) {
-					c.Request.Header.Set("X-User-Role", entities.UserRoleAdmin)
+				r.POST("/offices", func(c *gin.Context) {
+					SetHeaderRole(c, entities.UserRoleAdmin)
+					SetContentTypeJSON(c)
 					handler.Create(c)
 				})
 
-				body, _ := json.Marshal(inactiveReq)
-				req, _ := http.NewRequest(http.MethodPost, "/offices", bytes.NewBuffer(body))
-				req.Header.Set("Content-Type", "application/json")
-				req.Header.Set("X-User-Role", entities.UserRoleAdmin)
-
-				router.ServeHTTP(w, req)
-
+				SendRequest(r, http.MethodPost, "/offices", w, inactiveReq)
 				Expect(w.Code).To(Equal(http.StatusCreated))
 			})
 		})
@@ -290,34 +202,21 @@ var _ = Describe("OfficeHandler", func() {
 					Address:    "123 Test Street",
 					IsActive:   true,
 				}
-
 				mockService.EXPECT().GetByID(mock.Anything, officeID).Return(office, nil).Once()
 
-				router.GET("/offices/:id", handler.GetById)
+				r.GET("/offices/:id", handler.GetById)
 
-				req, _ := http.NewRequest(http.MethodGet, "/offices/"+officeID.String(), nil)
-				router.ServeHTTP(w, req)
-
-				Expect(w.Code).To(Equal(http.StatusOK))
-				var response dtos.APIResponse
-				err := json.Unmarshal(w.Body.Bytes(), &response)
-				Expect(err).NotTo(HaveOccurred())
-				Expect(response.Data).NotTo(BeNil())
+				SendRequest(r, http.MethodGet, "/offices/"+officeID.String(), w, nil)
+				ExpectResponseNotNil(w, http.StatusOK)
 			})
 		})
 
 		Context("when office ID is invalid UUID", func() {
 			It("should return 400 bad request", func() {
-				router.GET("/offices/:id", handler.GetById)
+				r.GET("/offices/:id", handler.GetById)
 
-				req, _ := http.NewRequest(http.MethodGet, "/offices/invalid-uuid", nil)
-				router.ServeHTTP(w, req)
-
-				Expect(w.Code).To(Equal(http.StatusBadRequest))
-				var response dtos.APIResponse
-				err := json.Unmarshal(w.Body.Bytes(), &response)
-				Expect(err).NotTo(HaveOccurred())
-				Expect(response.Error).To(Equal(apperrors.ErrorCodeInvalidUUID))
+				SendRequest(r, http.MethodGet, "/offices/invalid-uuid", w, nil)
+				ExpectErrorCode(w, http.StatusBadRequest, apperrors.ErrorCodeInvalidUUID)
 			})
 		})
 
@@ -326,16 +225,10 @@ var _ = Describe("OfficeHandler", func() {
 				notFoundErr := apperrors.NewOfficeNotFound()
 				mockService.EXPECT().GetByID(mock.Anything, officeID).Return(nil, notFoundErr).Once()
 
-				router.GET("/offices/:id", handler.GetById)
+				r.GET("/offices/:id", handler.GetById)
 
-				req, _ := http.NewRequest(http.MethodGet, "/offices/"+officeID.String(), nil)
-				router.ServeHTTP(w, req)
-
-				Expect(w.Code).To(Equal(http.StatusNotFound))
-				var response dtos.APIResponse
-				err := json.Unmarshal(w.Body.Bytes(), &response)
-				Expect(err).NotTo(HaveOccurred())
-				Expect(response.Error).To(Equal(apperrors.ErrorCodeOfficeNotFound))
+				SendRequest(r, http.MethodGet, "/offices/"+officeID.String(), w, nil)
+				ExpectErrorCode(w, http.StatusNotFound, apperrors.ErrorCodeOfficeNotFound)
 			})
 		})
 
@@ -344,11 +237,9 @@ var _ = Describe("OfficeHandler", func() {
 				dbErr := apperrors.NewDBOperationError(errors.New("database error"))
 				mockService.EXPECT().GetByID(mock.Anything, officeID).Return(nil, dbErr).Once()
 
-				router.GET("/offices/:id", handler.GetById)
+				r.GET("/offices/:id", handler.GetById)
 
-				req, _ := http.NewRequest(http.MethodGet, "/offices/"+officeID.String(), nil)
-				router.ServeHTTP(w, req)
-
+				SendRequest(r, http.MethodGet, "/offices/"+officeID.String(), w, nil)
 				Expect(w.Code).To(Equal(http.StatusInternalServerError))
 			})
 		})
@@ -376,16 +267,10 @@ var _ = Describe("OfficeHandler", func() {
 
 				mockService.EXPECT().GetAll(mock.Anything).Return(offices, nil).Once()
 
-				router.GET("/offices", handler.GetAll)
+				r.GET("/offices", handler.GetAll)
 
-				req, _ := http.NewRequest(http.MethodGet, "/offices", nil)
-				router.ServeHTTP(w, req)
-
-				Expect(w.Code).To(Equal(http.StatusOK))
-				var response dtos.APIResponse
-				err := json.Unmarshal(w.Body.Bytes(), &response)
-				Expect(err).NotTo(HaveOccurred())
-				Expect(response.Data).NotTo(BeNil())
+				SendRequest(r, http.MethodGet, "/offices", w, nil)
+				ExpectResponseNotNil(w, http.StatusOK)
 			})
 		})
 
@@ -393,11 +278,9 @@ var _ = Describe("OfficeHandler", func() {
 			It("should return 200 with empty array", func() {
 				mockService.EXPECT().GetAll(mock.Anything).Return([]*entities.Office{}, nil).Once()
 
-				router.GET("/offices", handler.GetAll)
+				r.GET("/offices", handler.GetAll)
 
-				req, _ := http.NewRequest(http.MethodGet, "/offices", nil)
-				router.ServeHTTP(w, req)
-
+				SendRequest(r, http.MethodGet, "/offices", w, nil)
 				Expect(w.Code).To(Equal(http.StatusOK))
 			})
 		})
@@ -407,11 +290,9 @@ var _ = Describe("OfficeHandler", func() {
 				dbErr := apperrors.NewDBOperationError(errors.New("database error"))
 				mockService.EXPECT().GetAll(mock.Anything).Return(nil, dbErr).Once()
 
-				router.GET("/offices", handler.GetAll)
+				r.GET("/offices", handler.GetAll)
 
-				req, _ := http.NewRequest(http.MethodGet, "/offices", nil)
-				router.ServeHTTP(w, req)
-
+				SendRequest(r, http.MethodGet, "/offices", w, nil)
 				Expect(w.Code).To(Equal(http.StatusInternalServerError))
 			})
 		})
@@ -442,80 +323,53 @@ var _ = Describe("OfficeHandler", func() {
 						cmd.IsActive == validReq.IsActive
 				})).Return(nil).Once()
 
-				router.PUT("/offices/:id", func(c *gin.Context) {
-					c.Request.Header.Set("X-User-Role", entities.UserRoleAdmin)
+				r.PUT("/offices/:id", func(c *gin.Context) {
+					SetHeaderRole(c, entities.UserRoleAdmin)
+					SetContentTypeJSON(c)
 					handler.Update(c)
 				})
 
-				body, _ := json.Marshal(validReq)
-				req, _ := http.NewRequest(http.MethodPut, "/offices/"+officeID.String(), bytes.NewBuffer(body))
-				req.Header.Set("Content-Type", "application/json")
-				req.Header.Set("X-User-Role", entities.UserRoleAdmin)
-
-				router.ServeHTTP(w, req)
-
+				SendRequest(r, http.MethodPut, "/offices/"+officeID.String(), w, validReq)
 				Expect(w.Code).To(Equal(http.StatusNoContent))
 			})
 		})
 
 		Context("when user is not admin", func() {
 			It("should return 403 unauthorized role error", func() {
-				router.PUT("/offices/:id", func(c *gin.Context) {
-					c.Request.Header.Set("X-User-Role", entities.UserRoleEvmStaff)
+				r.PUT("/offices/:id", func(c *gin.Context) {
+					SetHeaderRole(c, entities.UserRoleEvmStaff)
+					SetContentTypeJSON(c)
 					handler.Update(c)
 				})
 
-				body, _ := json.Marshal(validReq)
-				req, _ := http.NewRequest(http.MethodPut, "/offices/"+officeID.String(), bytes.NewBuffer(body))
-				req.Header.Set("Content-Type", "application/json")
-				req.Header.Set("X-User-Role", entities.UserRoleEvmStaff)
-
-				router.ServeHTTP(w, req)
-
+				SendRequest(r, http.MethodPut, "/offices/"+officeID.String(), w, validReq)
 				Expect(w.Code).To(Equal(http.StatusForbidden))
 			})
 		})
 
 		Context("when office ID is invalid UUID", func() {
 			It("should return 400 bad request", func() {
-				router.PUT("/offices/:id", func(c *gin.Context) {
-					c.Request.Header.Set("X-User-Role", entities.UserRoleAdmin)
+				r.PUT("/offices/:id", func(c *gin.Context) {
+					SetHeaderRole(c, entities.UserRoleAdmin)
+					SetContentTypeJSON(c)
 					handler.Update(c)
 				})
 
-				body, _ := json.Marshal(validReq)
-				req, _ := http.NewRequest(http.MethodPut, "/offices/invalid-uuid", bytes.NewBuffer(body))
-				req.Header.Set("Content-Type", "application/json")
-				req.Header.Set("X-User-Role", entities.UserRoleAdmin)
-
-				router.ServeHTTP(w, req)
-
-				Expect(w.Code).To(Equal(http.StatusBadRequest))
-				var response dtos.APIResponse
-				err := json.Unmarshal(w.Body.Bytes(), &response)
-				Expect(err).NotTo(HaveOccurred())
-				Expect(response.Error).To(Equal(apperrors.ErrorCodeInvalidUUID))
+				SendRequest(r, http.MethodPut, "/offices/invalid-uuid", w, validReq)
+				ExpectErrorCode(w, http.StatusBadRequest, apperrors.ErrorCodeInvalidUUID)
 			})
 		})
 
 		Context("when request body is invalid JSON", func() {
 			It("should return 400 bad request", func() {
-				router.PUT("/offices/:id", func(c *gin.Context) {
-					c.Request.Header.Set("X-User-Role", entities.UserRoleAdmin)
+				r.PUT("/offices/:id", func(c *gin.Context) {
+					SetHeaderRole(c, entities.UserRoleAdmin)
+					SetContentTypeJSON(c)
 					handler.Update(c)
 				})
 
-				req, _ := http.NewRequest(http.MethodPut, "/offices/"+officeID.String(), bytes.NewBuffer([]byte("invalid json")))
-				req.Header.Set("Content-Type", "application/json")
-				req.Header.Set("X-User-Role", entities.UserRoleAdmin)
-
-				router.ServeHTTP(w, req)
-
-				Expect(w.Code).To(Equal(http.StatusBadRequest))
-				var response dtos.APIResponse
-				err := json.Unmarshal(w.Body.Bytes(), &response)
-				Expect(err).NotTo(HaveOccurred())
-				Expect(response.Error).To(Equal(apperrors.ErrorCodeInvalidJsonRequest))
+				SendRequest(r, http.MethodPut, "/offices/"+officeID.String(), w, "invalid json")
+				ExpectErrorCode(w, http.StatusBadRequest, apperrors.ErrorCodeInvalidJsonRequest)
 			})
 		})
 
@@ -524,18 +378,13 @@ var _ = Describe("OfficeHandler", func() {
 				notFoundErr := apperrors.NewOfficeNotFound()
 				mockService.EXPECT().Update(mock.Anything, officeID, mock.Anything).Return(notFoundErr).Once()
 
-				router.PUT("/offices/:id", func(c *gin.Context) {
-					c.Request.Header.Set("X-User-Role", entities.UserRoleAdmin)
+				r.PUT("/offices/:id", func(c *gin.Context) {
+					SetHeaderRole(c, entities.UserRoleAdmin)
+					SetContentTypeJSON(c)
 					handler.Update(c)
 				})
 
-				body, _ := json.Marshal(validReq)
-				req, _ := http.NewRequest(http.MethodPut, "/offices/"+officeID.String(), bytes.NewBuffer(body))
-				req.Header.Set("Content-Type", "application/json")
-				req.Header.Set("X-User-Role", entities.UserRoleAdmin)
-
-				router.ServeHTTP(w, req)
-
+				SendRequest(r, http.MethodPut, "/offices/"+officeID.String(), w, validReq)
 				Expect(w.Code).To(Equal(http.StatusNotFound))
 			})
 		})
@@ -545,18 +394,13 @@ var _ = Describe("OfficeHandler", func() {
 				invalidTypeErr := apperrors.NewInvalidOfficeType()
 				mockService.EXPECT().Update(mock.Anything, officeID, mock.Anything).Return(invalidTypeErr).Once()
 
-				router.PUT("/offices/:id", func(c *gin.Context) {
-					c.Request.Header.Set("X-User-Role", entities.UserRoleAdmin)
+				r.PUT("/offices/:id", func(c *gin.Context) {
+					SetHeaderRole(c, entities.UserRoleAdmin)
+					SetContentTypeJSON(c)
 					handler.Update(c)
 				})
 
-				body, _ := json.Marshal(validReq)
-				req, _ := http.NewRequest(http.MethodPut, "/offices/"+officeID.String(), bytes.NewBuffer(body))
-				req.Header.Set("Content-Type", "application/json")
-				req.Header.Set("X-User-Role", entities.UserRoleAdmin)
-
-				router.ServeHTTP(w, req)
-
+				SendRequest(r, http.MethodPut, "/offices/"+officeID.String(), w, validReq)
 				Expect(w.Code).To(Equal(http.StatusBadRequest))
 			})
 		})
@@ -570,18 +414,13 @@ var _ = Describe("OfficeHandler", func() {
 					return cmd.OfficeType == entities.OfficeTypeSC
 				})).Return(nil).Once()
 
-				router.PUT("/offices/:id", func(c *gin.Context) {
-					c.Request.Header.Set("X-User-Role", entities.UserRoleAdmin)
+				r.PUT("/offices/:id", func(c *gin.Context) {
+					SetHeaderRole(c, entities.UserRoleAdmin)
+					SetContentTypeJSON(c)
 					handler.Update(c)
 				})
 
-				body, _ := json.Marshal(scReq)
-				req, _ := http.NewRequest(http.MethodPut, "/offices/"+officeID.String(), bytes.NewBuffer(body))
-				req.Header.Set("Content-Type", "application/json")
-				req.Header.Set("X-User-Role", entities.UserRoleAdmin)
-
-				router.ServeHTTP(w, req)
-
+				SendRequest(r, http.MethodPut, "/offices/"+officeID.String(), w, scReq)
 				Expect(w.Code).To(Equal(http.StatusNoContent))
 			})
 		})
@@ -595,18 +434,13 @@ var _ = Describe("OfficeHandler", func() {
 					return cmd.IsActive == false
 				})).Return(nil).Once()
 
-				router.PUT("/offices/:id", func(c *gin.Context) {
-					c.Request.Header.Set("X-User-Role", entities.UserRoleAdmin)
+				r.PUT("/offices/:id", func(c *gin.Context) {
+					SetHeaderRole(c, entities.UserRoleAdmin)
+					SetContentTypeJSON(c)
 					handler.Update(c)
 				})
 
-				body, _ := json.Marshal(inactiveReq)
-				req, _ := http.NewRequest(http.MethodPut, "/offices/"+officeID.String(), bytes.NewBuffer(body))
-				req.Header.Set("Content-Type", "application/json")
-				req.Header.Set("X-User-Role", entities.UserRoleAdmin)
-
-				router.ServeHTTP(w, req)
-
+				SendRequest(r, http.MethodPut, "/offices/"+officeID.String(), w, inactiveReq)
 				Expect(w.Code).To(Equal(http.StatusNoContent))
 			})
 		})
@@ -616,18 +450,13 @@ var _ = Describe("OfficeHandler", func() {
 				dbErr := apperrors.NewDBOperationError(errors.New("database error"))
 				mockService.EXPECT().Update(mock.Anything, officeID, mock.Anything).Return(dbErr).Once()
 
-				router.PUT("/offices/:id", func(c *gin.Context) {
-					c.Request.Header.Set("X-User-Role", entities.UserRoleAdmin)
+				r.PUT("/offices/:id", func(c *gin.Context) {
+					SetHeaderRole(c, entities.UserRoleAdmin)
+					SetContentTypeJSON(c)
 					handler.Update(c)
 				})
 
-				body, _ := json.Marshal(validReq)
-				req, _ := http.NewRequest(http.MethodPut, "/offices/"+officeID.String(), bytes.NewBuffer(body))
-				req.Header.Set("Content-Type", "application/json")
-				req.Header.Set("X-User-Role", entities.UserRoleAdmin)
-
-				router.ServeHTTP(w, req)
-
+				SendRequest(r, http.MethodPut, "/offices/"+officeID.String(), w, validReq)
 				Expect(w.Code).To(Equal(http.StatusInternalServerError))
 			})
 		})
@@ -644,57 +473,40 @@ var _ = Describe("OfficeHandler", func() {
 			It("should return 204 no content", func() {
 				mockService.EXPECT().DeleteByID(mock.Anything, officeID).Return(nil).Once()
 
-				router.DELETE("/offices/:id", func(c *gin.Context) {
-					c.Request.Header.Set("X-User-Role", entities.UserRoleAdmin)
+				r.DELETE("/offices/:id", func(c *gin.Context) {
+					SetHeaderRole(c, entities.UserRoleAdmin)
+					SetContentTypeJSON(c)
 					handler.Delete(c)
 				})
 
-				req, _ := http.NewRequest(http.MethodDelete, "/offices/"+officeID.String(), nil)
-				req.Header.Set("X-User-Role", entities.UserRoleAdmin)
-
-				router.ServeHTTP(w, req)
-
+				SendRequest(r, http.MethodDelete, "/offices/"+officeID.String(), w, nil)
 				Expect(w.Code).To(Equal(http.StatusNoContent))
 			})
 		})
 
 		Context("when user is not admin", func() {
 			It("should return 403 unauthorized role error", func() {
-				router.DELETE("/offices/:id", func(c *gin.Context) {
-					c.Request.Header.Set("X-User-Role", entities.UserRoleScTechnician)
+				r.DELETE("/offices/:id", func(c *gin.Context) {
+					SetHeaderRole(c, entities.UserRoleScTechnician)
+					SetContentTypeJSON(c)
 					handler.Delete(c)
 				})
 
-				req, _ := http.NewRequest(http.MethodDelete, "/offices/"+officeID.String(), nil)
-				req.Header.Set("X-User-Role", entities.UserRoleScTechnician)
-
-				router.ServeHTTP(w, req)
-
-				Expect(w.Code).To(Equal(http.StatusForbidden))
-				var response dtos.APIResponse
-				err := json.Unmarshal(w.Body.Bytes(), &response)
-				Expect(err).NotTo(HaveOccurred())
-				Expect(response.Error).To(Equal(apperrors.ErrorCodeUnauthorizedRole))
+				SendRequest(r, http.MethodDelete, "/offices/"+officeID.String(), w, nil)
+				ExpectErrorCode(w, http.StatusForbidden, apperrors.ErrorCodeUnauthorizedRole)
 			})
 		})
 
 		Context("when office ID is invalid UUID", func() {
 			It("should return 400 bad request", func() {
-				router.DELETE("/offices/:id", func(c *gin.Context) {
-					c.Request.Header.Set("X-User-Role", entities.UserRoleAdmin)
+				r.DELETE("/offices/:id", func(c *gin.Context) {
+					SetHeaderRole(c, entities.UserRoleAdmin)
+					SetContentTypeJSON(c)
 					handler.Delete(c)
 				})
 
-				req, _ := http.NewRequest(http.MethodDelete, "/offices/invalid-uuid", nil)
-				req.Header.Set("X-User-Role", entities.UserRoleAdmin)
-
-				router.ServeHTTP(w, req)
-
-				Expect(w.Code).To(Equal(http.StatusBadRequest))
-				var response dtos.APIResponse
-				err := json.Unmarshal(w.Body.Bytes(), &response)
-				Expect(err).NotTo(HaveOccurred())
-				Expect(response.Error).To(Equal(apperrors.ErrorCodeInvalidUUID))
+				SendRequest(r, http.MethodDelete, "/offices/invalid-uuid", w, nil)
+				ExpectErrorCode(w, http.StatusBadRequest, apperrors.ErrorCodeInvalidUUID)
 			})
 		})
 
@@ -703,16 +515,13 @@ var _ = Describe("OfficeHandler", func() {
 				notFoundErr := apperrors.NewOfficeNotFound()
 				mockService.EXPECT().DeleteByID(mock.Anything, officeID).Return(notFoundErr).Once()
 
-				router.DELETE("/offices/:id", func(c *gin.Context) {
-					c.Request.Header.Set("X-User-Role", entities.UserRoleAdmin)
+				r.DELETE("/offices/:id", func(c *gin.Context) {
+					SetHeaderRole(c, entities.UserRoleAdmin)
+					SetContentTypeJSON(c)
 					handler.Delete(c)
 				})
 
-				req, _ := http.NewRequest(http.MethodDelete, "/offices/"+officeID.String(), nil)
-				req.Header.Set("X-User-Role", entities.UserRoleAdmin)
-
-				router.ServeHTTP(w, req)
-
+				SendRequest(r, http.MethodDelete, "/offices/"+officeID.String(), w, nil)
 				Expect(w.Code).To(Equal(http.StatusNotFound))
 			})
 		})
@@ -722,18 +531,19 @@ var _ = Describe("OfficeHandler", func() {
 				dbErr := apperrors.NewDBOperationError(errors.New("database error"))
 				mockService.EXPECT().DeleteByID(mock.Anything, officeID).Return(dbErr).Once()
 
-				router.DELETE("/offices/:id", func(c *gin.Context) {
-					c.Request.Header.Set("X-User-Role", entities.UserRoleAdmin)
+				r.DELETE("/offices/:id", func(c *gin.Context) {
+					SetHeaderRole(c, entities.UserRoleAdmin)
+					SetContentTypeJSON(c)
 					handler.Delete(c)
 				})
 
-				req, _ := http.NewRequest(http.MethodDelete, "/offices/"+officeID.String(), nil)
-				req.Header.Set("X-User-Role", entities.UserRoleAdmin)
-
-				router.ServeHTTP(w, req)
-
+				SendRequest(r, http.MethodDelete, "/offices/"+officeID.String(), w, nil)
 				Expect(w.Code).To(Equal(http.StatusInternalServerError))
 			})
 		})
 	})
 })
+
+func CreateOfficeFromRequest(req dtos.CreateOfficeRequest) *entities.Office {
+	return entities.NewOffice(req.OfficeName, req.OfficeType, req.Address, req.IsActive)
+}
