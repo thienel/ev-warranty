@@ -3,7 +3,7 @@ package dtos
 type CreateOfficeRequest struct {
 	OfficeName string `json:"office_name" binding:"required"`
 	OfficeType string `json:"office_type" binding:"required"`
-	IsActive   bool   `json:"is_active" binding:"required"`
+	IsActive   bool   `json:"is_active"`
 	Address    string `json:"address" binding:"required"`
 }
 

@@ -11,7 +11,7 @@ type CreateUserRequest struct {
 	Email    string    `json:"email" binding:"required,email,max=100"`
 	Password string    `json:"password" binding:"required"`
 	Role     string    `json:"role" binding:"required,max=20"`
-	IsActive bool      `json:"is_active" binding:"required"`
+	IsActive bool      `json:"is_active"`
 	OfficeID uuid.UUID `json:"office_id" binding:"required"`
 }
 
@@ -27,7 +27,7 @@ type UserDTO struct {
 	Name     string    `json:"name" binding:"required"`
 	Email    string    `json:"email" binding:"required,email,max=100"`
 	Role     string    `json:"role" binding:"required,max=20"`
-	IsActive bool      `json:"is_active" binding:"required"`
+	IsActive bool      `json:"is_active"`
 	OfficeID uuid.UUID `json:"office_id" binding:"required"`
 }
 
