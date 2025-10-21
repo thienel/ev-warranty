@@ -64,10 +64,7 @@ var _ = Describe("ClaimRepository", func() {
 
 				err := repository.Create(mockTx, claim)
 
-				Expect(err).To(HaveOccurred())
-				var appErr *apperrors.AppError
-				Expect(errors.As(err, &appErr)).To(BeTrue())
-				Expect(appErr.ErrorCode).To(Equal(apperrors.ErrorCodeDuplicateKey))
+				ExpectAppError(err, apperrors.ErrorCodeDuplicateKey)
 			})
 		})
 
@@ -79,10 +76,7 @@ var _ = Describe("ClaimRepository", func() {
 
 				err := repository.Create(mockTx, claim)
 
-				Expect(err).To(HaveOccurred())
-				var appErr *apperrors.AppError
-				Expect(errors.As(err, &appErr)).To(BeTrue())
-				Expect(appErr.ErrorCode).To(Equal(apperrors.ErrorCodeDBOperation))
+				ExpectAppError(err, apperrors.ErrorCodeDBOperation)
 			})
 		})
 	})
@@ -116,10 +110,7 @@ var _ = Describe("ClaimRepository", func() {
 
 				err := repository.Update(mockTx, claim)
 
-				Expect(err).To(HaveOccurred())
-				var appErr *apperrors.AppError
-				Expect(errors.As(err, &appErr)).To(BeTrue())
-				Expect(appErr.ErrorCode).To(Equal(apperrors.ErrorCodeDBOperation))
+				ExpectAppError(err, apperrors.ErrorCodeDBOperation)
 			})
 		})
 	})
@@ -159,10 +150,7 @@ var _ = Describe("ClaimRepository", func() {
 
 				err := repository.HardDelete(mockTx, claimID)
 
-				Expect(err).To(HaveOccurred())
-				var appErr *apperrors.AppError
-				Expect(errors.As(err, &appErr)).To(BeTrue())
-				Expect(appErr.ErrorCode).To(Equal(apperrors.ErrorCodeDBOperation))
+				ExpectAppError(err, apperrors.ErrorCodeDBOperation)
 			})
 		})
 	})
@@ -194,10 +182,7 @@ var _ = Describe("ClaimRepository", func() {
 
 				err := repository.SoftDelete(mockTx, claimID)
 
-				Expect(err).To(HaveOccurred())
-				var appErr *apperrors.AppError
-				Expect(errors.As(err, &appErr)).To(BeTrue())
-				Expect(appErr.ErrorCode).To(Equal(apperrors.ErrorCodeDBOperation))
+				ExpectAppError(err, apperrors.ErrorCodeDBOperation)
 			})
 		})
 	})
@@ -239,10 +224,7 @@ var _ = Describe("ClaimRepository", func() {
 
 				err := repository.UpdateStatus(mockTx, claimID, status)
 
-				Expect(err).To(HaveOccurred())
-				var appErr *apperrors.AppError
-				Expect(errors.As(err, &appErr)).To(BeTrue())
-				Expect(appErr.ErrorCode).To(Equal(apperrors.ErrorCodeDBOperation))
+				ExpectAppError(err, apperrors.ErrorCodeDBOperation)
 			})
 		})
 
@@ -313,11 +295,8 @@ var _ = Describe("ClaimRepository", func() {
 
 				claim, err := repository.FindByID(ctx, claimID)
 
-				Expect(err).To(HaveOccurred())
 				Expect(claim).To(BeNil())
-				var appErr *apperrors.AppError
-				Expect(errors.As(err, &appErr)).To(BeTrue())
-				Expect(appErr.ErrorCode).To(Equal(apperrors.ErrorCodeClaimNotFound))
+				ExpectAppError(err, apperrors.ErrorCodeClaimNotFound)
 			})
 		})
 
@@ -327,11 +306,8 @@ var _ = Describe("ClaimRepository", func() {
 
 				claim, err := repository.FindByID(ctx, claimID)
 
-				Expect(err).To(HaveOccurred())
 				Expect(claim).To(BeNil())
-				var appErr *apperrors.AppError
-				Expect(errors.As(err, &appErr)).To(BeTrue())
-				Expect(appErr.ErrorCode).To(Equal(apperrors.ErrorCodeDBOperation))
+				ExpectAppError(err, apperrors.ErrorCodeDBOperation)
 			})
 		})
 	})
@@ -358,7 +334,7 @@ var _ = Describe("ClaimRepository", func() {
 				customerID := uuid.New()
 
 				countRows := sqlmock.NewRows([]string{"count"}).AddRow(2)
-				mock.ExpectQuery(`SELECT count\(\*\) FROM "claims" WHERE "claims"."deleted_at" IS NULL`).
+				mock.ExpectQuery(regexp.QuoteMeta(`SELECT count(*) FROM "claims" WHERE "claims"."deleted_at" IS NULL`)).
 					WillReturnRows(countRows)
 
 				rows := sqlmock.NewRows([]string{
@@ -372,7 +348,7 @@ var _ = Describe("ClaimRepository", func() {
 					2000.0, nil, time.Now(), time.Now(), nil,
 				)
 
-				mock.ExpectQuery(`SELECT \* FROM "claims" WHERE "claims"."deleted_at" IS NULL ORDER BY created_at DESC LIMIT \$1`).
+				mock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "claims" WHERE "claims"."deleted_at" IS NULL ORDER BY created_at DESC LIMIT $1`)).
 					WithArgs(10).
 					WillReturnRows(rows)
 
@@ -390,7 +366,7 @@ var _ = Describe("ClaimRepository", func() {
 				filters.CustomerID = &customerID
 
 				countRows := sqlmock.NewRows([]string{"count"}).AddRow(1)
-				mock.ExpectQuery(`SELECT count\(\*\) FROM "claims" WHERE customer_id = \$1 AND "claims"."deleted_at" IS NULL`).
+				mock.ExpectQuery(regexp.QuoteMeta(`SELECT count(*) FROM "claims" WHERE customer_id = $1 AND "claims"."deleted_at" IS NULL`)).
 					WithArgs(customerID).
 					WillReturnRows(countRows)
 
@@ -404,7 +380,7 @@ var _ = Describe("ClaimRepository", func() {
 					1000.0, nil, time.Now(), time.Now(), nil,
 				)
 
-				mock.ExpectQuery(`SELECT \* FROM "claims" WHERE customer_id = \$1 AND "claims"."deleted_at" IS NULL ORDER BY created_at DESC LIMIT \$2`).
+				mock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "claims" WHERE customer_id = $1 AND "claims"."deleted_at" IS NULL ORDER BY created_at DESC LIMIT $2`)).
 					WithArgs(customerID, 10).
 					WillReturnRows(rows)
 
@@ -423,7 +399,7 @@ var _ = Describe("ClaimRepository", func() {
 				filters.VehicleID = &vehicleID
 
 				countRows := sqlmock.NewRows([]string{"count"}).AddRow(1)
-				mock.ExpectQuery(`SELECT count\(\*\) FROM "claims" WHERE vehicle_id = \$1 AND "claims"."deleted_at" IS NULL`).
+				mock.ExpectQuery(regexp.QuoteMeta(`SELECT count(*) FROM "claims" WHERE vehicle_id = $1 AND "claims"."deleted_at" IS NULL`)).
 					WithArgs(vehicleID).
 					WillReturnRows(countRows)
 
@@ -437,7 +413,7 @@ var _ = Describe("ClaimRepository", func() {
 					1000.0, nil, time.Now(), time.Now(), nil,
 				)
 
-				mock.ExpectQuery(`SELECT \* FROM "claims" WHERE vehicle_id = \$1 AND "claims"."deleted_at" IS NULL ORDER BY created_at DESC LIMIT \$2`).
+				mock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "claims" WHERE vehicle_id = $1 AND "claims"."deleted_at" IS NULL ORDER BY created_at DESC LIMIT $2`)).
 					WithArgs(vehicleID, 10).
 					WillReturnRows(rows)
 
@@ -456,7 +432,7 @@ var _ = Describe("ClaimRepository", func() {
 				filters.Status = &status
 
 				countRows := sqlmock.NewRows([]string{"count"}).AddRow(1)
-				mock.ExpectQuery(`SELECT count\(\*\) FROM "claims" WHERE status = \$1 AND "claims"."deleted_at" IS NULL`).
+				mock.ExpectQuery(regexp.QuoteMeta(`SELECT count(*) FROM "claims" WHERE status = $1 AND "claims"."deleted_at" IS NULL`)).
 					WithArgs(status).
 					WillReturnRows(countRows)
 
@@ -471,7 +447,7 @@ var _ = Describe("ClaimRepository", func() {
 					1000.0, nil, time.Now(), time.Now(), nil,
 				)
 
-				mock.ExpectQuery(`SELECT \* FROM "claims" WHERE status = \$1 AND "claims"."deleted_at" IS NULL ORDER BY created_at DESC LIMIT \$2`).
+				mock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "claims" WHERE status = $1 AND "claims"."deleted_at" IS NULL ORDER BY created_at DESC LIMIT $2`)).
 					WithArgs(status, 10).
 					WillReturnRows(rows)
 
@@ -492,7 +468,7 @@ var _ = Describe("ClaimRepository", func() {
 				filters.ToDate = &toDate
 
 				countRows := sqlmock.NewRows([]string{"count"}).AddRow(1)
-				mock.ExpectQuery(`SELECT count\(\*\) FROM "claims" WHERE created_at >= \$1 AND created_at <= \$2 AND "claims"."deleted_at" IS NULL`).
+				mock.ExpectQuery(regexp.QuoteMeta(`SELECT count(*) FROM "claims" WHERE created_at >= $1 AND created_at <= $2 AND "claims"."deleted_at" IS NULL`)).
 					WithArgs(fromDate, toDate).
 					WillReturnRows(countRows)
 
@@ -507,7 +483,7 @@ var _ = Describe("ClaimRepository", func() {
 					1000.0, nil, time.Now(), time.Now(), nil,
 				)
 
-				mock.ExpectQuery(`SELECT \* FROM "claims" WHERE created_at >= \$1 AND created_at <= \$2 AND "claims"."deleted_at" IS NULL ORDER BY created_at DESC LIMIT \$3`).
+				mock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "claims" WHERE created_at >= $1 AND created_at <= $2 AND "claims"."deleted_at" IS NULL ORDER BY created_at DESC LIMIT $3`)).
 					WithArgs(fromDate, toDate, 10).
 					WillReturnRows(rows)
 
@@ -524,7 +500,7 @@ var _ = Describe("ClaimRepository", func() {
 				pagination.PageSize = 0
 
 				countRows := sqlmock.NewRows([]string{"count"}).AddRow(0)
-				mock.ExpectQuery(`SELECT count\(\*\) FROM "claims" WHERE "claims"."deleted_at" IS NULL`).
+				mock.ExpectQuery(regexp.QuoteMeta(`SELECT count(*) FROM "claims" WHERE "claims"."deleted_at" IS NULL`)).
 					WillReturnRows(countRows)
 
 				rows := sqlmock.NewRows([]string{
@@ -532,7 +508,7 @@ var _ = Describe("ClaimRepository", func() {
 					"total_cost", "approved_by", "created_at", "updated_at", "deleted_at",
 				})
 
-				mock.ExpectQuery(`SELECT \* FROM "claims" WHERE "claims"."deleted_at" IS NULL ORDER BY created_at DESC`).
+				mock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "claims" WHERE "claims"."deleted_at" IS NULL ORDER BY created_at DESC`)).
 					WillReturnRows(rows)
 
 				claims, total, err := repository.FindAll(ctx, filters, pagination)
@@ -547,7 +523,7 @@ var _ = Describe("ClaimRepository", func() {
 				offset := (100 - 1) * 10
 
 				countRows := sqlmock.NewRows([]string{"count"}).AddRow(0)
-				mock.ExpectQuery(`SELECT count\(\*\) FROM "claims" WHERE "claims"."deleted_at" IS NULL`).
+				mock.ExpectQuery(regexp.QuoteMeta(`SELECT count(*) FROM "claims" WHERE "claims"."deleted_at" IS NULL`)).
 					WillReturnRows(countRows)
 
 				rows := sqlmock.NewRows([]string{
@@ -555,7 +531,7 @@ var _ = Describe("ClaimRepository", func() {
 					"total_cost", "approved_by", "created_at", "updated_at", "deleted_at",
 				})
 
-				mock.ExpectQuery(`SELECT \* FROM "claims" WHERE "claims"."deleted_at" IS NULL ORDER BY created_at DESC LIMIT \$1 OFFSET \$2`).
+				mock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "claims" WHERE "claims"."deleted_at" IS NULL ORDER BY created_at DESC LIMIT $1 OFFSET $2`)).
 					WithArgs(10, offset).
 					WillReturnRows(rows)
 
@@ -569,35 +545,29 @@ var _ = Describe("ClaimRepository", func() {
 
 		Context("when there is a database error", func() {
 			It("should return DBOperationError on count", func() {
-				mock.ExpectQuery(`SELECT count\(\*\) FROM "claims" WHERE "claims"."deleted_at" IS NULL`).
+				mock.ExpectQuery(regexp.QuoteMeta(`SELECT count(*) FROM "claims" WHERE "claims"."deleted_at" IS NULL`)).
 					WillReturnError(errors.New("database connection failed"))
 
 				claims, total, err := repository.FindAll(ctx, filters, pagination)
 
-				Expect(err).To(HaveOccurred())
 				Expect(claims).To(BeNil())
 				Expect(total).To(Equal(int64(0)))
-				var appErr *apperrors.AppError
-				Expect(errors.As(err, &appErr)).To(BeTrue())
-				Expect(appErr.ErrorCode).To(Equal(apperrors.ErrorCodeDBOperation))
+				ExpectAppError(err, apperrors.ErrorCodeDBOperation)
 			})
 
 			It("should return DBOperationError on find", func() {
 				countRows := sqlmock.NewRows([]string{"count"}).AddRow(1)
-				mock.ExpectQuery(`SELECT count\(\*\) FROM "claims" WHERE "claims"."deleted_at" IS NULL`).
+				mock.ExpectQuery(regexp.QuoteMeta(`SELECT count(*) FROM "claims" WHERE "claims"."deleted_at" IS NULL`)).
 					WillReturnRows(countRows)
 
-				mock.ExpectQuery(`SELECT \* FROM "claims" WHERE "claims"."deleted_at" IS NULL`).
+				mock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "claims" WHERE "claims"."deleted_at" IS NULL`)).
 					WillReturnError(errors.New("database connection failed"))
 
 				claims, total, err := repository.FindAll(ctx, filters, pagination)
 
-				Expect(err).To(HaveOccurred())
 				Expect(claims).To(BeNil())
 				Expect(total).To(Equal(int64(0)))
-				var appErr *apperrors.AppError
-				Expect(errors.As(err, &appErr)).To(BeTrue())
-				Expect(appErr.ErrorCode).To(Equal(apperrors.ErrorCodeDBOperation))
+				ExpectAppError(err, apperrors.ErrorCodeDBOperation)
 			})
 		})
 	})
@@ -625,7 +595,7 @@ var _ = Describe("ClaimRepository", func() {
 					2000.0, nil, time.Now(), time.Now(), nil,
 				)
 
-				mock.ExpectQuery(`SELECT \* FROM "claims" WHERE customer_id = \$1 AND "claims"."deleted_at" IS NULL ORDER BY created_at DESC`).
+				mock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "claims" WHERE customer_id = $1 AND "claims"."deleted_at" IS NULL ORDER BY created_at DESC`)).
 					WithArgs(customerID).
 					WillReturnRows(rows)
 
@@ -645,7 +615,7 @@ var _ = Describe("ClaimRepository", func() {
 					"total_cost", "approved_by", "created_at", "updated_at", "deleted_at",
 				})
 
-				mock.ExpectQuery(`SELECT \* FROM "claims" WHERE customer_id = \$1 AND "claims"."deleted_at" IS NULL ORDER BY created_at DESC`).
+				mock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "claims" WHERE customer_id = $1 AND "claims"."deleted_at" IS NULL ORDER BY created_at DESC`)).
 					WithArgs(customerID).
 					WillReturnRows(rows)
 
@@ -658,17 +628,14 @@ var _ = Describe("ClaimRepository", func() {
 
 		Context("when there is a database error", func() {
 			It("should return DBOperationError", func() {
-				mock.ExpectQuery(`SELECT \* FROM "claims" WHERE customer_id = \$1 AND "claims"."deleted_at" IS NULL`).
+				mock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "claims" WHERE customer_id = $1 AND "claims"."deleted_at" IS NULL`)).
 					WithArgs(customerID).
 					WillReturnError(errors.New("database connection failed"))
 
 				claims, err := repository.FindByCustomerID(ctx, customerID)
 
-				Expect(err).To(HaveOccurred())
 				Expect(claims).To(BeNil())
-				var appErr *apperrors.AppError
-				Expect(errors.As(err, &appErr)).To(BeTrue())
-				Expect(appErr.ErrorCode).To(Equal(apperrors.ErrorCodeDBOperation))
+				ExpectAppError(err, apperrors.ErrorCodeDBOperation)
 			})
 		})
 	})
@@ -696,7 +663,7 @@ var _ = Describe("ClaimRepository", func() {
 					2000.0, nil, time.Now(), time.Now(), nil,
 				)
 
-				mock.ExpectQuery(`SELECT \* FROM "claims" WHERE vehicle_id = \$1 AND "claims"."deleted_at" IS NULL ORDER BY created_at DESC`).
+				mock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "claims" WHERE vehicle_id = $1 AND "claims"."deleted_at" IS NULL ORDER BY created_at DESC`)).
 					WithArgs(vehicleID).
 					WillReturnRows(rows)
 
@@ -716,7 +683,7 @@ var _ = Describe("ClaimRepository", func() {
 					"total_cost", "approved_by", "created_at", "updated_at", "deleted_at",
 				})
 
-				mock.ExpectQuery(`SELECT \* FROM "claims" WHERE vehicle_id = \$1 AND "claims"."deleted_at" IS NULL ORDER BY created_at DESC`).
+				mock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "claims" WHERE vehicle_id = $1 AND "claims"."deleted_at" IS NULL ORDER BY created_at DESC`)).
 					WithArgs(vehicleID).
 					WillReturnRows(rows)
 
@@ -729,17 +696,14 @@ var _ = Describe("ClaimRepository", func() {
 
 		Context("when there is a database error", func() {
 			It("should return DBOperationError", func() {
-				mock.ExpectQuery(`SELECT \* FROM "claims" WHERE vehicle_id = \$1 AND "claims"."deleted_at" IS NULL`).
+				mock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "claims" WHERE vehicle_id = $1 AND "claims"."deleted_at" IS NULL`)).
 					WithArgs(vehicleID).
 					WillReturnError(errors.New("database connection failed"))
 
 				claims, err := repository.FindByVehicleID(ctx, vehicleID)
 
-				Expect(err).To(HaveOccurred())
 				Expect(claims).To(BeNil())
-				var appErr *apperrors.AppError
-				Expect(errors.As(err, &appErr)).To(BeTrue())
-				Expect(appErr.ErrorCode).To(Equal(apperrors.ErrorCodeDBOperation))
+				ExpectAppError(err, apperrors.ErrorCodeDBOperation)
 			})
 		})
 	})

@@ -68,11 +68,8 @@ var _ = Describe("ClaimItemService", func() {
 
 				item, err := service.GetByID(ctx, itemID)
 
-				Expect(err).To(HaveOccurred())
 				Expect(item).To(BeNil())
-				var appErr *apperrors.AppError
-				Expect(errors.As(err, &appErr)).To(BeTrue())
-				Expect(appErr.ErrorCode).To(Equal(apperrors.ErrorCodeClaimItemNotFound))
+				ExpectAppError(err, apperrors.ErrorCodeClaimItemNotFound)
 			})
 		})
 
@@ -224,11 +221,8 @@ var _ = Describe("ClaimItemService", func() {
 
 				item, err := service.Create(mockTx, claimID, cmd)
 
-				Expect(err).To(HaveOccurred())
 				Expect(item).To(BeNil())
-				var appErr *apperrors.AppError
-				Expect(errors.As(err, &appErr)).To(BeTrue())
-				Expect(appErr.ErrorCode).To(Equal(apperrors.ErrorCodeInvalidClaimItemStatus))
+				ExpectAppError(err, apperrors.ErrorCodeInvalidClaimItemStatus)
 			})
 		})
 
@@ -247,11 +241,8 @@ var _ = Describe("ClaimItemService", func() {
 
 				item, err := service.Create(mockTx, claimID, cmd)
 
-				Expect(err).To(HaveOccurred())
 				Expect(item).To(BeNil())
-				var appErr *apperrors.AppError
-				Expect(errors.As(err, &appErr)).To(BeTrue())
-				Expect(appErr.ErrorCode).To(Equal(apperrors.ErrorCodeInvalidClaimItemType))
+				ExpectAppError(err, apperrors.ErrorCodeInvalidClaimItemType)
 			})
 		})
 
@@ -333,10 +324,7 @@ var _ = Describe("ClaimItemService", func() {
 
 				err := service.Update(mockTx, claimID, itemID, cmd)
 
-				Expect(err).To(HaveOccurred())
-				var appErr *apperrors.AppError
-				Expect(errors.As(err, &appErr)).To(BeTrue())
-				Expect(appErr.ErrorCode).To(Equal(apperrors.ErrorCodeClaimStatusNotAllowedUpdate))
+				ExpectAppError(err, apperrors.ErrorCodeClaimStatusNotAllowedUpdate)
 			})
 		})
 
@@ -357,10 +345,7 @@ var _ = Describe("ClaimItemService", func() {
 
 				err := service.Update(mockTx, claimID, itemID, cmd)
 
-				Expect(err).To(HaveOccurred())
-				var appErr *apperrors.AppError
-				Expect(errors.As(err, &appErr)).To(BeTrue())
-				Expect(appErr.ErrorCode).To(Equal(apperrors.ErrorCodeClaimStatusNotAllowedUpdate))
+				ExpectAppError(err, apperrors.ErrorCodeClaimStatusNotAllowedUpdate)
 			})
 		})
 
@@ -435,10 +420,7 @@ var _ = Describe("ClaimItemService", func() {
 
 				err := service.Update(mockTx, claimID, itemID, cmd)
 
-				Expect(err).To(HaveOccurred())
-				var appErr *apperrors.AppError
-				Expect(errors.As(err, &appErr)).To(BeTrue())
-				Expect(appErr.ErrorCode).To(Equal(apperrors.ErrorCodeClaimStatusNotAllowedUpdate))
+				ExpectAppError(err, apperrors.ErrorCodeClaimStatusNotAllowedUpdate)
 			})
 		})
 
@@ -463,10 +445,7 @@ var _ = Describe("ClaimItemService", func() {
 
 				err := service.Update(mockTx, claimID, itemID, cmd)
 
-				Expect(err).To(HaveOccurred())
-				var appErr *apperrors.AppError
-				Expect(errors.As(err, &appErr)).To(BeTrue())
-				Expect(appErr.ErrorCode).To(Equal(apperrors.ErrorCodeInvalidClaimItemType))
+				ExpectAppError(err, apperrors.ErrorCodeInvalidClaimItemType)
 			})
 		})
 
@@ -587,10 +566,7 @@ var _ = Describe("ClaimItemService", func() {
 
 				err := service.HardDelete(mockTx, claimID, itemID)
 
-				Expect(err).To(HaveOccurred())
-				var appErr *apperrors.AppError
-				Expect(errors.As(err, &appErr)).To(BeTrue())
-				Expect(appErr.ErrorCode).To(Equal(apperrors.ErrorCodeClaimStatusNotAllowedDelete))
+				ExpectAppError(err, apperrors.ErrorCodeClaimStatusNotAllowedDelete)
 			})
 		})
 
@@ -705,10 +681,7 @@ var _ = Describe("ClaimItemService", func() {
 
 				err := service.Approve(mockTx, claimID, itemID)
 
-				Expect(err).To(HaveOccurred())
-				var appErr *apperrors.AppError
-				Expect(errors.As(err, &appErr)).To(BeTrue())
-				Expect(appErr.ErrorCode).To(Equal(apperrors.ErrorCodeClaimStatusNotAllowedUpdate))
+				ExpectAppError(err, apperrors.ErrorCodeClaimStatusNotAllowedUpdate)
 			})
 		})
 
@@ -823,10 +796,7 @@ var _ = Describe("ClaimItemService", func() {
 
 				err := service.Reject(mockTx, claimID, itemID)
 
-				Expect(err).To(HaveOccurred())
-				var appErr *apperrors.AppError
-				Expect(errors.As(err, &appErr)).To(BeTrue())
-				Expect(appErr.ErrorCode).To(Equal(apperrors.ErrorCodeClaimStatusNotAllowedUpdate))
+				ExpectAppError(err, apperrors.ErrorCodeClaimStatusNotAllowedUpdate)
 			})
 		})
 

@@ -64,10 +64,7 @@ var _ = Describe("ClaimItemRepository", func() {
 
 				err := repository.Create(mockTx, item)
 
-				Expect(err).To(HaveOccurred())
-				var appErr *apperrors.AppError
-				Expect(errors.As(err, &appErr)).To(BeTrue())
-				Expect(appErr.ErrorCode).To(Equal(apperrors.ErrorCodeDuplicateKey))
+				ExpectAppError(err, apperrors.ErrorCodeDuplicateKey)
 			})
 		})
 
@@ -79,10 +76,7 @@ var _ = Describe("ClaimItemRepository", func() {
 
 				err := repository.Create(mockTx, item)
 
-				Expect(err).To(HaveOccurred())
-				var appErr *apperrors.AppError
-				Expect(errors.As(err, &appErr)).To(BeTrue())
-				Expect(appErr.ErrorCode).To(Equal(apperrors.ErrorCodeDBOperation))
+				ExpectAppError(err, apperrors.ErrorCodeDBOperation)
 			})
 		})
 
@@ -140,10 +134,7 @@ var _ = Describe("ClaimItemRepository", func() {
 
 				err := repository.Update(mockTx, item)
 
-				Expect(err).To(HaveOccurred())
-				var appErr *apperrors.AppError
-				Expect(errors.As(err, &appErr)).To(BeTrue())
-				Expect(appErr.ErrorCode).To(Equal(apperrors.ErrorCodeDBOperation))
+				ExpectAppError(err, apperrors.ErrorCodeDBOperation)
 			})
 		})
 
@@ -218,10 +209,7 @@ var _ = Describe("ClaimItemRepository", func() {
 
 				err := repository.HardDelete(mockTx, itemID)
 
-				Expect(err).To(HaveOccurred())
-				var appErr *apperrors.AppError
-				Expect(errors.As(err, &appErr)).To(BeTrue())
-				Expect(appErr.ErrorCode).To(Equal(apperrors.ErrorCodeDBOperation))
+				ExpectAppError(err, apperrors.ErrorCodeDBOperation)
 			})
 		})
 	})
@@ -261,10 +249,7 @@ var _ = Describe("ClaimItemRepository", func() {
 
 				err := repository.SoftDeleteByClaimID(mockTx, claimID)
 
-				Expect(err).To(HaveOccurred())
-				var appErr *apperrors.AppError
-				Expect(errors.As(err, &appErr)).To(BeTrue())
-				Expect(appErr.ErrorCode).To(Equal(apperrors.ErrorCodeDBOperation))
+				ExpectAppError(err, apperrors.ErrorCodeDBOperation)
 			})
 		})
 	})
@@ -306,10 +291,7 @@ var _ = Describe("ClaimItemRepository", func() {
 
 				err := repository.UpdateStatus(mockTx, itemID, status)
 
-				Expect(err).To(HaveOccurred())
-				var appErr *apperrors.AppError
-				Expect(errors.As(err, &appErr)).To(BeTrue())
-				Expect(appErr.ErrorCode).To(Equal(apperrors.ErrorCodeDBOperation))
+				ExpectAppError(err, apperrors.ErrorCodeDBOperation)
 			})
 		})
 
@@ -388,11 +370,8 @@ var _ = Describe("ClaimItemRepository", func() {
 
 				totalCost, err := repository.SumCostByClaimID(mockTx, claimID)
 
-				Expect(err).To(HaveOccurred())
 				Expect(totalCost).To(Equal(0.0))
-				var appErr *apperrors.AppError
-				Expect(errors.As(err, &appErr)).To(BeTrue())
-				Expect(appErr.ErrorCode).To(Equal(apperrors.ErrorCodeDBOperation))
+				ExpectAppError(err, apperrors.ErrorCodeDBOperation)
 			})
 		})
 
@@ -453,11 +432,8 @@ var _ = Describe("ClaimItemRepository", func() {
 
 				item, err := repository.FindByID(ctx, itemID)
 
-				Expect(err).To(HaveOccurred())
 				Expect(item).To(BeNil())
-				var appErr *apperrors.AppError
-				Expect(errors.As(err, &appErr)).To(BeTrue())
-				Expect(appErr.ErrorCode).To(Equal(apperrors.ErrorCodeClaimItemNotFound))
+				ExpectAppError(err, apperrors.ErrorCodeClaimItemNotFound)
 			})
 		})
 
@@ -467,11 +443,8 @@ var _ = Describe("ClaimItemRepository", func() {
 
 				item, err := repository.FindByID(ctx, itemID)
 
-				Expect(err).To(HaveOccurred())
 				Expect(item).To(BeNil())
-				var appErr *apperrors.AppError
-				Expect(errors.As(err, &appErr)).To(BeTrue())
-				Expect(appErr.ErrorCode).To(Equal(apperrors.ErrorCodeDBOperation))
+				ExpectAppError(err, apperrors.ErrorCodeDBOperation)
 			})
 		})
 	})
@@ -542,11 +515,8 @@ var _ = Describe("ClaimItemRepository", func() {
 
 				items, err := repository.FindByClaimID(ctx, claimID)
 
-				Expect(err).To(HaveOccurred())
 				Expect(items).To(BeNil())
-				var appErr *apperrors.AppError
-				Expect(errors.As(err, &appErr)).To(BeTrue())
-				Expect(appErr.ErrorCode).To(Equal(apperrors.ErrorCodeDBOperation))
+				ExpectAppError(err, apperrors.ErrorCodeDBOperation)
 			})
 		})
 

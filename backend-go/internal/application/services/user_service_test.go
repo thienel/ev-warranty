@@ -84,11 +84,8 @@ var _ = Describe("UserService", func() {
 			It("should return InvalidUserInput error", func() {
 				user, err := service.Create(ctx, cmd)
 
-				Expect(err).To(HaveOccurred())
 				Expect(user).To(BeNil())
-				var appErr *apperrors.AppError
-				Expect(errors.As(err, &appErr)).To(BeTrue())
-				Expect(appErr.ErrorCode).To(Equal(apperrors.ErrorCodeInvalidUserInput))
+				ExpectAppError(err, apperrors.ErrorCodeInvalidUserInput)
 			})
 		})
 
@@ -107,11 +104,8 @@ var _ = Describe("UserService", func() {
 			It("should return InvalidUserInput error", func() {
 				user, err := service.Create(ctx, cmd)
 
-				Expect(err).To(HaveOccurred())
 				Expect(user).To(BeNil())
-				var appErr *apperrors.AppError
-				Expect(errors.As(err, &appErr)).To(BeTrue())
-				Expect(appErr.ErrorCode).To(Equal(apperrors.ErrorCodeInvalidUserInput))
+				ExpectAppError(err, apperrors.ErrorCodeInvalidUserInput)
 			})
 		})
 
@@ -130,11 +124,8 @@ var _ = Describe("UserService", func() {
 			It("should return InvalidUserInput error", func() {
 				user, err := service.Create(ctx, cmd)
 
-				Expect(err).To(HaveOccurred())
 				Expect(user).To(BeNil())
-				var appErr *apperrors.AppError
-				Expect(errors.As(err, &appErr)).To(BeTrue())
-				Expect(appErr.ErrorCode).To(Equal(apperrors.ErrorCodeInvalidUserInput))
+				ExpectAppError(err, apperrors.ErrorCodeInvalidUserInput)
 			})
 		})
 
@@ -153,11 +144,8 @@ var _ = Describe("UserService", func() {
 			It("should return InvalidUserInput error", func() {
 				user, err := service.Create(ctx, cmd)
 
-				Expect(err).To(HaveOccurred())
 				Expect(user).To(BeNil())
-				var appErr *apperrors.AppError
-				Expect(errors.As(err, &appErr)).To(BeTrue())
-				Expect(appErr.ErrorCode).To(Equal(apperrors.ErrorCodeInvalidUserInput))
+				ExpectAppError(err, apperrors.ErrorCodeInvalidUserInput)
 			})
 		})
 
@@ -206,11 +194,8 @@ var _ = Describe("UserService", func() {
 
 				user, err := service.Create(ctx, cmd)
 
-				Expect(err).To(HaveOccurred())
 				Expect(user).To(BeNil())
-				var appErr *apperrors.AppError
-				Expect(errors.As(err, &appErr)).To(BeTrue())
-				Expect(appErr.ErrorCode).To(Equal(apperrors.ErrorCodeInvalidOfficeType))
+				ExpectAppError(err, apperrors.ErrorCodeInvalidOfficeType)
 			})
 		})
 
@@ -308,11 +293,8 @@ var _ = Describe("UserService", func() {
 
 				user, err := service.GetByID(ctx, userID)
 
-				Expect(err).To(HaveOccurred())
 				Expect(user).To(BeNil())
-				var appErr *apperrors.AppError
-				Expect(errors.As(err, &appErr)).To(BeTrue())
-				Expect(appErr.ErrorCode).To(Equal(apperrors.ErrorCodeUserNotFound))
+				ExpectAppError(err, apperrors.ErrorCodeUserNotFound)
 			})
 		})
 	})
@@ -438,10 +420,7 @@ var _ = Describe("UserService", func() {
 
 				err := service.Update(ctx, userID, cmd)
 
-				Expect(err).To(HaveOccurred())
-				var appErr *apperrors.AppError
-				Expect(errors.As(err, &appErr)).To(BeTrue())
-				Expect(appErr.ErrorCode).To(Equal(apperrors.ErrorCodeUserNotFound))
+				ExpectAppError(err, apperrors.ErrorCodeUserNotFound)
 			})
 		})
 
@@ -460,10 +439,7 @@ var _ = Describe("UserService", func() {
 
 				err := service.Update(ctx, userID, cmd)
 
-				Expect(err).To(HaveOccurred())
-				var appErr *apperrors.AppError
-				Expect(errors.As(err, &appErr)).To(BeTrue())
-				Expect(appErr.ErrorCode).To(Equal(apperrors.ErrorCodeInvalidUserInput))
+				ExpectAppError(err, apperrors.ErrorCodeInvalidUserInput)
 			})
 		})
 
@@ -482,10 +458,7 @@ var _ = Describe("UserService", func() {
 
 				err := service.Update(ctx, userID, cmd)
 
-				Expect(err).To(HaveOccurred())
-				var appErr *apperrors.AppError
-				Expect(errors.As(err, &appErr)).To(BeTrue())
-				Expect(appErr.ErrorCode).To(Equal(apperrors.ErrorCodeInvalidUserInput))
+				ExpectAppError(err, apperrors.ErrorCodeInvalidUserInput)
 			})
 		})
 
@@ -531,10 +504,7 @@ var _ = Describe("UserService", func() {
 
 				err := service.Update(ctx, userID, cmd)
 
-				Expect(err).To(HaveOccurred())
-				var appErr *apperrors.AppError
-				Expect(errors.As(err, &appErr)).To(BeTrue())
-				Expect(appErr.ErrorCode).To(Equal(apperrors.ErrorCodeInvalidOfficeType))
+				ExpectAppError(err, apperrors.ErrorCodeInvalidOfficeType)
 			})
 		})
 

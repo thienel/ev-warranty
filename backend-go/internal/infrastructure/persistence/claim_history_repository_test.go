@@ -64,10 +64,7 @@ var _ = Describe("ClaimHistoryRepository", func() {
 
 				err := repository.Create(mockTx, history)
 
-				Expect(err).To(HaveOccurred())
-				var appErr *apperrors.AppError
-				Expect(errors.As(err, &appErr)).To(BeTrue())
-				Expect(appErr.ErrorCode).To(Equal(apperrors.ErrorCodeDuplicateKey))
+				ExpectAppError(err, apperrors.ErrorCodeDuplicateKey)
 			})
 		})
 
@@ -79,10 +76,7 @@ var _ = Describe("ClaimHistoryRepository", func() {
 
 				err := repository.Create(mockTx, history)
 
-				Expect(err).To(HaveOccurred())
-				var appErr *apperrors.AppError
-				Expect(errors.As(err, &appErr)).To(BeTrue())
-				Expect(appErr.ErrorCode).To(Equal(apperrors.ErrorCodeDBOperation))
+				ExpectAppError(err, apperrors.ErrorCodeDBOperation)
 			})
 		})
 
@@ -145,10 +139,7 @@ var _ = Describe("ClaimHistoryRepository", func() {
 
 				err := repository.SoftDeleteByClaimID(mockTx, claimID)
 
-				Expect(err).To(HaveOccurred())
-				var appErr *apperrors.AppError
-				Expect(errors.As(err, &appErr)).To(BeTrue())
-				Expect(appErr.ErrorCode).To(Equal(apperrors.ErrorCodeDBOperation))
+				ExpectAppError(err, apperrors.ErrorCodeDBOperation)
 			})
 		})
 	})
@@ -213,11 +204,8 @@ var _ = Describe("ClaimHistoryRepository", func() {
 
 				histories, err := repository.FindByClaimID(ctx, claimID)
 
-				Expect(err).To(HaveOccurred())
 				Expect(histories).To(BeNil())
-				var appErr *apperrors.AppError
-				Expect(errors.As(err, &appErr)).To(BeTrue())
-				Expect(appErr.ErrorCode).To(Equal(apperrors.ErrorCodeDBOperation))
+				ExpectAppError(err, apperrors.ErrorCodeDBOperation)
 			})
 		})
 
@@ -307,11 +295,8 @@ var _ = Describe("ClaimHistoryRepository", func() {
 
 				history, err := repository.FindLatestByClaimID(ctx, claimID)
 
-				Expect(err).To(HaveOccurred())
 				Expect(history).To(BeNil())
-				var appErr *apperrors.AppError
-				Expect(errors.As(err, &appErr)).To(BeTrue())
-				Expect(appErr.ErrorCode).To(Equal(apperrors.ErrorCodeClaimHistoryNotFound))
+				ExpectAppError(err, apperrors.ErrorCodeClaimHistoryNotFound)
 			})
 		})
 
@@ -323,11 +308,8 @@ var _ = Describe("ClaimHistoryRepository", func() {
 
 				history, err := repository.FindLatestByClaimID(ctx, claimID)
 
-				Expect(err).To(HaveOccurred())
 				Expect(history).To(BeNil())
-				var appErr *apperrors.AppError
-				Expect(errors.As(err, &appErr)).To(BeTrue())
-				Expect(appErr.ErrorCode).To(Equal(apperrors.ErrorCodeDBOperation))
+				ExpectAppError(err, apperrors.ErrorCodeDBOperation)
 			})
 		})
 	})
@@ -396,11 +378,8 @@ var _ = Describe("ClaimHistoryRepository", func() {
 
 				histories, err := repository.FindByDateRange(ctx, claimID, startDate, endDate)
 
-				Expect(err).To(HaveOccurred())
 				Expect(histories).To(BeNil())
-				var appErr *apperrors.AppError
-				Expect(errors.As(err, &appErr)).To(BeTrue())
-				Expect(appErr.ErrorCode).To(Equal(apperrors.ErrorCodeDBOperation))
+				ExpectAppError(err, apperrors.ErrorCodeDBOperation)
 			})
 		})
 

@@ -100,12 +100,9 @@ var _ = Describe("AuthService", func() {
 
 				at, rt, err := service.Login(ctx, email, password)
 
-				Expect(err).To(HaveOccurred())
 				Expect(at).To(BeEmpty())
 				Expect(rt).To(BeEmpty())
-				var appErr *apperrors.AppError
-				Expect(errors.As(err, &appErr)).To(BeTrue())
-				Expect(appErr.ErrorCode).To(Equal(apperrors.ErrorCodeInvalidCredentials))
+				ExpectAppError(err, apperrors.ErrorCodeInvalidCredentials)
 			})
 		})
 
@@ -123,12 +120,9 @@ var _ = Describe("AuthService", func() {
 
 				at, rt, err := service.Login(ctx, email, password)
 
-				Expect(err).To(HaveOccurred())
 				Expect(at).To(BeEmpty())
 				Expect(rt).To(BeEmpty())
-				var appErr *apperrors.AppError
-				Expect(errors.As(err, &appErr)).To(BeTrue())
-				Expect(appErr.ErrorCode).To(Equal(apperrors.ErrorCodeUserInactive))
+				ExpectAppError(err, apperrors.ErrorCodeUserInactive)
 			})
 		})
 
@@ -146,12 +140,9 @@ var _ = Describe("AuthService", func() {
 
 				at, rt, err := service.Login(ctx, email, password)
 
-				Expect(err).To(HaveOccurred())
 				Expect(at).To(BeEmpty())
 				Expect(rt).To(BeEmpty())
-				var appErr *apperrors.AppError
-				Expect(errors.As(err, &appErr)).To(BeTrue())
-				Expect(appErr.ErrorCode).To(Equal(apperrors.ErrorCodeUserPasswordInvalid))
+				ExpectAppError(err, apperrors.ErrorCodeUserPasswordInvalid)
 			})
 		})
 

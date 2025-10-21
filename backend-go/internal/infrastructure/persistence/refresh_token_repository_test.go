@@ -59,10 +59,7 @@ var _ = Describe("RefreshTokenRepository", func() {
 
 				err := repository.Create(ctx, token)
 
-				Expect(err).To(HaveOccurred())
-				var appErr *apperrors.AppError
-				Expect(errors.As(err, &appErr)).To(BeTrue())
-				Expect(appErr.ErrorCode).To(Equal(apperrors.ErrorCodeDuplicateKey))
+				ExpectAppError(err, apperrors.ErrorCodeDuplicateKey)
 			})
 		})
 
@@ -72,10 +69,7 @@ var _ = Describe("RefreshTokenRepository", func() {
 
 				err := repository.Create(ctx, token)
 
-				Expect(err).To(HaveOccurred())
-				var appErr *apperrors.AppError
-				Expect(errors.As(err, &appErr)).To(BeTrue())
-				Expect(appErr.ErrorCode).To(Equal(apperrors.ErrorCodeDBOperation))
+				ExpectAppError(err, apperrors.ErrorCodeDBOperation)
 			})
 		})
 
@@ -144,10 +138,7 @@ var _ = Describe("RefreshTokenRepository", func() {
 
 				err := repository.Update(ctx, token)
 
-				Expect(err).To(HaveOccurred())
-				var appErr *apperrors.AppError
-				Expect(errors.As(err, &appErr)).To(BeTrue())
-				Expect(appErr.ErrorCode).To(Equal(apperrors.ErrorCodeDBOperation))
+				ExpectAppError(err, apperrors.ErrorCodeDBOperation)
 			})
 		})
 
@@ -211,11 +202,8 @@ var _ = Describe("RefreshTokenRepository", func() {
 
 				token, err := repository.Find(ctx, tokenStr)
 
-				Expect(err).To(HaveOccurred())
 				Expect(token).To(BeNil())
-				var appErr *apperrors.AppError
-				Expect(errors.As(err, &appErr)).To(BeTrue())
-				Expect(appErr.ErrorCode).To(Equal(apperrors.ErrorCodeRefreshTokenNotFound))
+				ExpectAppError(err, apperrors.ErrorCodeRefreshTokenNotFound)
 			})
 		})
 
@@ -227,11 +215,8 @@ var _ = Describe("RefreshTokenRepository", func() {
 
 				token, err := repository.Find(ctx, tokenStr)
 
-				Expect(err).To(HaveOccurred())
 				Expect(token).To(BeNil())
-				var appErr *apperrors.AppError
-				Expect(errors.As(err, &appErr)).To(BeTrue())
-				Expect(appErr.ErrorCode).To(Equal(apperrors.ErrorCodeDBOperation))
+				ExpectAppError(err, apperrors.ErrorCodeDBOperation)
 			})
 		})
 
@@ -390,10 +375,7 @@ var _ = Describe("RefreshTokenRepository", func() {
 
 				err := repository.Revoke(ctx, tokenStr)
 
-				Expect(err).To(HaveOccurred())
-				var appErr *apperrors.AppError
-				Expect(errors.As(err, &appErr)).To(BeTrue())
-				Expect(appErr.ErrorCode).To(Equal(apperrors.ErrorCodeDBOperation))
+				ExpectAppError(err, apperrors.ErrorCodeDBOperation)
 			})
 		})
 

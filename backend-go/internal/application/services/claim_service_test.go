@@ -75,11 +75,8 @@ var _ = Describe("ClaimService", func() {
 
 				claim, err := service.GetByID(ctx, claimID)
 
-				Expect(err).To(HaveOccurred())
 				Expect(claim).To(BeNil())
-				var appErr *apperrors.AppError
-				Expect(errors.As(err, &appErr)).To(BeTrue())
-				Expect(appErr.ErrorCode).To(Equal(apperrors.ErrorCodeClaimNotFound))
+				ExpectAppError(err, apperrors.ErrorCodeClaimNotFound)
 			})
 		})
 	})
@@ -272,10 +269,7 @@ var _ = Describe("ClaimService", func() {
 
 				err := service.Update(mockTx, claimID, cmd)
 
-				Expect(err).To(HaveOccurred())
-				var appErr *apperrors.AppError
-				Expect(errors.As(err, &appErr)).To(BeTrue())
-				Expect(appErr.ErrorCode).To(Equal(apperrors.ErrorCodeClaimStatusNotAllowedUpdate))
+				ExpectAppError(err, apperrors.ErrorCodeClaimStatusNotAllowedUpdate)
 			})
 		})
 
@@ -368,10 +362,7 @@ var _ = Describe("ClaimService", func() {
 
 				err := service.HardDelete(mockTx, claimID)
 
-				Expect(err).To(HaveOccurred())
-				var appErr *apperrors.AppError
-				Expect(errors.As(err, &appErr)).To(BeTrue())
-				Expect(appErr.ErrorCode).To(Equal(apperrors.ErrorCodeClaimStatusNotAllowedDelete))
+				ExpectAppError(err, apperrors.ErrorCodeClaimStatusNotAllowedDelete)
 			})
 		})
 
@@ -463,10 +454,7 @@ var _ = Describe("ClaimService", func() {
 
 				err := service.SoftDelete(mockTx, claimID)
 
-				Expect(err).To(HaveOccurred())
-				var appErr *apperrors.AppError
-				Expect(errors.As(err, &appErr)).To(BeTrue())
-				Expect(appErr.ErrorCode).To(Equal(apperrors.ErrorCodeClaimStatusNotAllowedDelete))
+				ExpectAppError(err, apperrors.ErrorCodeClaimStatusNotAllowedDelete)
 			})
 		})
 
@@ -598,10 +586,7 @@ var _ = Describe("ClaimService", func() {
 			It("should return InvalidClaimStatus error", func() {
 				err := service.UpdateStatus(mockTx, claimID, "INVALID_STATUS", changedBy)
 
-				Expect(err).To(HaveOccurred())
-				var appErr *apperrors.AppError
-				Expect(errors.As(err, &appErr)).To(BeTrue())
-				Expect(appErr.ErrorCode).To(Equal(apperrors.ErrorCodeInvalidClaimStatus))
+				ExpectAppError(err, apperrors.ErrorCodeInvalidClaimStatus)
 			})
 		})
 
@@ -616,10 +601,7 @@ var _ = Describe("ClaimService", func() {
 
 				err := service.UpdateStatus(mockTx, claimID, entities.ClaimStatusDraft, changedBy)
 
-				Expect(err).To(HaveOccurred())
-				var appErr *apperrors.AppError
-				Expect(errors.As(err, &appErr)).To(BeTrue())
-				Expect(appErr.ErrorCode).To(Equal(apperrors.ErrorCodeInvalidClaimAction))
+				ExpectAppError(err, apperrors.ErrorCodeInvalidClaimAction)
 			})
 		})
 
@@ -728,10 +710,7 @@ var _ = Describe("ClaimService", func() {
 
 				err := service.Submit(mockTx, claimID, changedBy)
 
-				Expect(err).To(HaveOccurred())
-				var appErr *apperrors.AppError
-				Expect(errors.As(err, &appErr)).To(BeTrue())
-				Expect(appErr.ErrorCode).To(Equal(apperrors.ErrorCodeClaimMissingInformation))
+				ExpectAppError(err, apperrors.ErrorCodeClaimMissingInformation)
 			})
 		})
 
@@ -751,10 +730,7 @@ var _ = Describe("ClaimService", func() {
 
 				err := service.Submit(mockTx, claimID, changedBy)
 
-				Expect(err).To(HaveOccurred())
-				var appErr *apperrors.AppError
-				Expect(errors.As(err, &appErr)).To(BeTrue())
-				Expect(appErr.ErrorCode).To(Equal(apperrors.ErrorCodeClaimMissingInformation))
+				ExpectAppError(err, apperrors.ErrorCodeClaimMissingInformation)
 			})
 		})
 
@@ -781,10 +757,7 @@ var _ = Describe("ClaimService", func() {
 
 				err := service.Submit(mockTx, claimID, changedBy)
 
-				Expect(err).To(HaveOccurred())
-				var appErr *apperrors.AppError
-				Expect(errors.As(err, &appErr)).To(BeTrue())
-				Expect(appErr.ErrorCode).To(Equal(apperrors.ErrorCodeInvalidClaimAction))
+				ExpectAppError(err, apperrors.ErrorCodeInvalidClaimAction)
 			})
 		})
 
@@ -947,10 +920,7 @@ var _ = Describe("ClaimService", func() {
 
 				err := service.Complete(mockTx, claimID, changedBy)
 
-				Expect(err).To(HaveOccurred())
-				var appErr *apperrors.AppError
-				Expect(errors.As(err, &appErr)).To(BeTrue())
-				Expect(appErr.ErrorCode).To(Equal(apperrors.ErrorCodeInvalidClaimAction))
+				ExpectAppError(err, apperrors.ErrorCodeInvalidClaimAction)
 			})
 		})
 
@@ -999,10 +969,7 @@ var _ = Describe("ClaimService", func() {
 
 				err := service.Complete(mockTx, claimID, changedBy)
 
-				Expect(err).To(HaveOccurred())
-				var appErr *apperrors.AppError
-				Expect(errors.As(err, &appErr)).To(BeTrue())
-				Expect(appErr.ErrorCode).To(Equal(apperrors.ErrorCodeInvalidClaimAction))
+				ExpectAppError(err, apperrors.ErrorCodeInvalidClaimAction)
 			})
 		})
 
