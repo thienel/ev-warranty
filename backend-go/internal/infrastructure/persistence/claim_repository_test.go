@@ -518,6 +518,66 @@ var _ = Describe("ClaimRepository", func() {
 				Expect(total).To(Equal(int64(0)))
 			})
 
+			It("should handle sorting with empty SortDir (defaults to ASC)", func() {
+				pagination.SortBy = "status"
+				pagination.SortDir = ""
+
+				countRows := sqlmock.NewRows([]string{"count"}).AddRow(1)
+				mock.ExpectQuery(regexp.QuoteMeta(`SELECT count(*) FROM "claims" WHERE "claims"."deleted_at" IS NULL`)).
+					WillReturnRows(countRows)
+
+				claimID := uuid.New()
+				vehicleID := uuid.New()
+				customerID := uuid.New()
+				rows := sqlmock.NewRows([]string{
+					"id", "vehicle_id", "customer_id", "description", "status",
+					"total_cost", "approved_by", "created_at", "updated_at", "deleted_at",
+				}).AddRow(
+					claimID, vehicleID, customerID, "Claim", entities.ClaimStatusDraft,
+					1000.0, nil, time.Now(), time.Now(), nil,
+				)
+
+				mock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "claims" WHERE "claims"."deleted_at" IS NULL ORDER BY status ASC LIMIT $1`)).
+					WithArgs(10).
+					WillReturnRows(rows)
+
+				claims, total, err := repository.FindAll(ctx, filters, pagination)
+
+				Expect(err).NotTo(HaveOccurred())
+				Expect(claims).To(HaveLen(1))
+				Expect(total).To(Equal(int64(1)))
+			})
+
+			It("should handle empty SortBy (defaults to created_at DESC)", func() {
+				pagination.SortBy = ""
+				pagination.SortDir = ""
+
+				countRows := sqlmock.NewRows([]string{"count"}).AddRow(1)
+				mock.ExpectQuery(regexp.QuoteMeta(`SELECT count(*) FROM "claims" WHERE "claims"."deleted_at" IS NULL`)).
+					WillReturnRows(countRows)
+
+				claimID := uuid.New()
+				vehicleID := uuid.New()
+				customerID := uuid.New()
+				rows := sqlmock.NewRows([]string{
+					"id", "vehicle_id", "customer_id", "description", "status",
+					"total_cost", "approved_by", "created_at", "updated_at", "deleted_at",
+				}).AddRow(
+					claimID, vehicleID, customerID, "Claim", entities.ClaimStatusDraft,
+					1000.0, nil, time.Now(), time.Now(), nil,
+				)
+
+				mock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "claims" WHERE "claims"."deleted_at" IS NULL ORDER BY created_at DESC LIMIT $1`)).
+					WithArgs(10).
+					WillReturnRows(rows)
+
+				claims, total, err := repository.FindAll(ctx, filters, pagination)
+
+				Expect(err).NotTo(HaveOccurred())
+				Expect(claims).To(HaveLen(1))
+				Expect(total).To(Equal(int64(1)))
+			})
+
 			It("should handle large page numbers", func() {
 				pagination.Page = 100
 				offset := (100 - 1) * 10

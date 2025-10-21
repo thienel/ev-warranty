@@ -400,6 +400,19 @@ var _ = Describe("UserRepository", func() {
 			})
 		})
 
+		Context("when there is a database error", func() {
+			It("should return DBOperationError", func() {
+				mock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "users" WHERE (oauth_provider = $1 AND oauth_id = $2) AND "users"."deleted_at" IS NULL ORDER BY "users"."id" LIMIT $3`)).
+					WithArgs(provider, oauthID, 1).
+					WillReturnError(errors.New("database connection failed"))
+
+				user, err := repository.FindByOAuth(ctx, provider, oauthID)
+
+				Expect(user).To(BeNil())
+				ExpectAppError(err, apperrors.ErrorCodeDBOperation)
+			})
+		})
+
 		Context("boundary cases for OAuth", func() {
 			It("should handle empty provider", func() {
 				mock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "users" WHERE (oauth_provider = $1 AND oauth_id = $2) AND "users"."deleted_at" IS NULL ORDER BY "users"."id" LIMIT $3`)).

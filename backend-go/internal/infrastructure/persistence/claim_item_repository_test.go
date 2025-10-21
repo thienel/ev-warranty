@@ -546,6 +546,180 @@ var _ = Describe("ClaimItemRepository", func() {
 			})
 		})
 	})
+
+	Describe("CountByClaimID", func() {
+		var claimID uuid.UUID
+
+		BeforeEach(func() {
+			claimID = uuid.New()
+		})
+
+		Context("when count is successful", func() {
+			It("should return the correct count", func() {
+				rows := sqlmock.NewRows([]string{"count"}).AddRow(5)
+
+				mock.ExpectQuery(regexp.QuoteMeta(`SELECT count(*) FROM "claim_items" WHERE claim_id = $1 AND "claim_items"."deleted_at" IS NULL`)).
+					WithArgs(claimID).
+					WillReturnRows(rows)
+
+				count, err := repository.CountByClaimID(ctx, claimID)
+
+				Expect(err).NotTo(HaveOccurred())
+				Expect(count).To(Equal(int64(5)))
+			})
+		})
+
+		Context("when no items exist", func() {
+			It("should return zero", func() {
+				rows := sqlmock.NewRows([]string{"count"}).AddRow(0)
+
+				mock.ExpectQuery(regexp.QuoteMeta(`SELECT count(*) FROM "claim_items" WHERE claim_id = $1 AND "claim_items"."deleted_at" IS NULL`)).
+					WithArgs(claimID).
+					WillReturnRows(rows)
+
+				count, err := repository.CountByClaimID(ctx, claimID)
+
+				Expect(err).NotTo(HaveOccurred())
+				Expect(count).To(Equal(int64(0)))
+			})
+		})
+
+		Context("when there is a database error", func() {
+			It("should return DBOperationError", func() {
+				mock.ExpectQuery(regexp.QuoteMeta(`SELECT count(*) FROM "claim_items" WHERE claim_id = $1 AND "claim_items"."deleted_at" IS NULL`)).
+					WithArgs(claimID).
+					WillReturnError(errors.New("database connection failed"))
+
+				count, err := repository.CountByClaimID(ctx, claimID)
+
+				Expect(count).To(Equal(int64(0)))
+				ExpectAppError(err, apperrors.ErrorCodeDBOperation)
+			})
+		})
+	})
+
+	Describe("FindByStatus", func() {
+		var claimID uuid.UUID
+		var status string
+
+		BeforeEach(func() {
+			claimID = uuid.New()
+			status = entities.ClaimItemStatusApproved
+		})
+
+		Context("when items are found with specified status", func() {
+			It("should return all items with that status", func() {
+				itemID1 := uuid.New()
+				itemID2 := uuid.New()
+				partID := uuid.New()
+
+				rows := sqlmock.NewRows([]string{
+					"id", "claim_id", "part_category_id", "faulty_part_id", "replacement_part_id",
+					"issue_description", "status", "type", "cost", "created_at", "updated_at", "deleted_at",
+				}).AddRow(
+					itemID1, claimID, 1, partID, nil, "Issue 1",
+					entities.ClaimItemStatusApproved, entities.ClaimItemTypeReplacement,
+					1000.0, time.Now(), time.Now(), nil,
+				).AddRow(
+					itemID2, claimID, 2, partID, nil, "Issue 2",
+					entities.ClaimItemStatusApproved, entities.ClaimItemTypeRepair,
+					2000.0, time.Now(), time.Now(), nil,
+				)
+
+				mock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "claim_items" WHERE (claim_id = $1 AND line_status = $2) AND "claim_items"."deleted_at" IS NULL ORDER BY created_at ASC`)).
+					WithArgs(claimID, status).
+					WillReturnRows(rows)
+
+				items, err := repository.FindByStatus(ctx, claimID, status)
+
+				Expect(err).NotTo(HaveOccurred())
+				Expect(items).To(HaveLen(2))
+				Expect(items[0].Status).To(Equal(entities.ClaimItemStatusApproved))
+				Expect(items[1].Status).To(Equal(entities.ClaimItemStatusApproved))
+			})
+		})
+
+		Context("when no items match the status", func() {
+			It("should return empty slice", func() {
+				rows := sqlmock.NewRows([]string{
+					"id", "claim_id", "part_category_id", "faulty_part_id", "replacement_part_id",
+					"issue_description", "status", "type", "cost", "created_at", "updated_at", "deleted_at",
+				})
+
+				mock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "claim_items" WHERE (claim_id = $1 AND line_status = $2) AND "claim_items"."deleted_at" IS NULL ORDER BY created_at ASC`)).
+					WithArgs(claimID, status).
+					WillReturnRows(rows)
+
+				items, err := repository.FindByStatus(ctx, claimID, status)
+
+				Expect(err).NotTo(HaveOccurred())
+				Expect(items).To(BeEmpty())
+			})
+		})
+
+		Context("when there is a database error", func() {
+			It("should return DBOperationError", func() {
+				mock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "claim_items" WHERE (claim_id = $1 AND line_status = $2) AND "claim_items"."deleted_at" IS NULL ORDER BY created_at ASC`)).
+					WithArgs(claimID, status).
+					WillReturnError(errors.New("database connection failed"))
+
+				items, err := repository.FindByStatus(ctx, claimID, status)
+
+				Expect(items).To(BeNil())
+				ExpectAppError(err, apperrors.ErrorCodeDBOperation)
+			})
+		})
+
+		Context("boundary cases for different statuses", func() {
+			It("should handle pending status", func() {
+				itemID := uuid.New()
+				partID := uuid.New()
+
+				rows := sqlmock.NewRows([]string{
+					"id", "claim_id", "part_category_id", "faulty_part_id", "replacement_part_id",
+					"issue_description", "status", "type", "cost", "created_at", "updated_at", "deleted_at",
+				}).AddRow(
+					itemID, claimID, 1, partID, nil, "Pending item",
+					entities.ClaimItemStatusPending, entities.ClaimItemTypeRepair,
+					500.0, time.Now(), time.Now(), nil,
+				)
+
+				mock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "claim_items" WHERE (claim_id = $1 AND line_status = $2) AND "claim_items"."deleted_at" IS NULL ORDER BY created_at ASC`)).
+					WithArgs(claimID, entities.ClaimItemStatusPending).
+					WillReturnRows(rows)
+
+				items, err := repository.FindByStatus(ctx, claimID, entities.ClaimItemStatusPending)
+
+				Expect(err).NotTo(HaveOccurred())
+				Expect(items).To(HaveLen(1))
+				Expect(items[0].Status).To(Equal(entities.ClaimItemStatusPending))
+			})
+
+			It("should handle rejected status", func() {
+				itemID := uuid.New()
+				partID := uuid.New()
+
+				rows := sqlmock.NewRows([]string{
+					"id", "claim_id", "part_category_id", "faulty_part_id", "replacement_part_id",
+					"issue_description", "status", "type", "cost", "created_at", "updated_at", "deleted_at",
+				}).AddRow(
+					itemID, claimID, 1, partID, nil, "Rejected item",
+					entities.ClaimItemStatusRejected, entities.ClaimItemTypeRepair,
+					500.0, time.Now(), time.Now(), nil,
+				)
+
+				mock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "claim_items" WHERE (claim_id = $1 AND line_status = $2) AND "claim_items"."deleted_at" IS NULL ORDER BY created_at ASC`)).
+					WithArgs(claimID, entities.ClaimItemStatusRejected).
+					WillReturnRows(rows)
+
+				items, err := repository.FindByStatus(ctx, claimID, entities.ClaimItemStatusRejected)
+
+				Expect(err).NotTo(HaveOccurred())
+				Expect(items).To(HaveLen(1))
+				Expect(items[0].Status).To(Equal(entities.ClaimItemStatusRejected))
+			})
+		})
+	})
 })
 
 func newClaimItem() *entities.ClaimItem {
