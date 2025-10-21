@@ -47,7 +47,7 @@ var _ = Describe("ClaimRepository", func() {
 		Context("when claim is created successfully", func() {
 			It("should return nil error", func() {
 				mockTx := mocks.NewTx(GinkgoT())
-				mockTx.On("GetTx").Return(db)
+				mockTx.EXPECT().GetTx().Return(db)
 				MockSuccessfulInsert(mock, "claims", claim.ID)
 
 				err := repository.Create(mockTx, claim)
@@ -59,7 +59,7 @@ var _ = Describe("ClaimRepository", func() {
 		Context("when there is a duplicate key constraint", func() {
 			It("should return DBDuplicateKeyError", func() {
 				mockTx := mocks.NewTx(GinkgoT())
-				mockTx.On("GetTx").Return(db)
+				mockTx.EXPECT().GetTx().Return(db)
 				MockDuplicateKeyError(mock, "claims", "claims_unique_key")
 
 				err := repository.Create(mockTx, claim)
@@ -134,7 +134,7 @@ var _ = Describe("ClaimRepository", func() {
 		Context("when claim is hard deleted successfully", func() {
 			It("should return nil error", func() {
 				mockTx := mocks.NewTx(GinkgoT())
-				mockTx.On("GetTx").Return(db)
+				mockTx.EXPECT().GetTx().Return(db)
 				mock.ExpectBegin()
 				mock.ExpectExec(regexp.QuoteMeta(`DELETE FROM "claims" WHERE id = $1`)).
 					WithArgs(claimID).
@@ -150,7 +150,7 @@ var _ = Describe("ClaimRepository", func() {
 		Context("when there is a database error", func() {
 			It("should return DBOperationError", func() {
 				mockTx := mocks.NewTx(GinkgoT())
-				mockTx.On("GetTx").Return(db)
+				mockTx.EXPECT().GetTx().Return(db)
 				mock.ExpectBegin()
 				mock.ExpectExec(regexp.QuoteMeta(`DELETE FROM "claims" WHERE id = $1`)).
 					WithArgs(claimID).
@@ -177,7 +177,7 @@ var _ = Describe("ClaimRepository", func() {
 		Context("when claim is soft deleted successfully", func() {
 			It("should return nil error", func() {
 				mockTx := mocks.NewTx(GinkgoT())
-				mockTx.On("GetTx").Return(db)
+				mockTx.EXPECT().GetTx().Return(db)
 				MockSoftDelete(mock, "claims", claimID)
 
 				err := repository.SoftDelete(mockTx, claimID)
@@ -189,7 +189,7 @@ var _ = Describe("ClaimRepository", func() {
 		Context("when there is a database error", func() {
 			It("should return DBOperationError", func() {
 				mockTx := mocks.NewTx(GinkgoT())
-				mockTx.On("GetTx").Return(db)
+				mockTx.EXPECT().GetTx().Return(db)
 				MockDeleteError(mock, "claims")
 
 				err := repository.SoftDelete(mockTx, claimID)
@@ -214,7 +214,7 @@ var _ = Describe("ClaimRepository", func() {
 		Context("when status is updated successfully", func() {
 			It("should return nil error", func() {
 				mockTx := mocks.NewTx(GinkgoT())
-				mockTx.On("GetTx").Return(db)
+				mockTx.EXPECT().GetTx().Return(db)
 				mock.ExpectBegin()
 				mock.ExpectExec(regexp.QuoteMeta(`UPDATE "claims" SET "status"=$1,"updated_at"=$2 WHERE id = $3 AND "claims"."deleted_at" IS NULL`)).
 					WithArgs(status, sqlmock.AnyArg(), claimID).
@@ -230,7 +230,7 @@ var _ = Describe("ClaimRepository", func() {
 		Context("when there is a database error", func() {
 			It("should return DBOperationError", func() {
 				mockTx := mocks.NewTx(GinkgoT())
-				mockTx.On("GetTx").Return(db)
+				mockTx.EXPECT().GetTx().Return(db)
 				mock.ExpectBegin()
 				mock.ExpectExec(regexp.QuoteMeta(`UPDATE "claims" SET "status"=$1,"updated_at"=$2 WHERE id = $3 AND "claims"."deleted_at" IS NULL`)).
 					WithArgs(status, sqlmock.AnyArg(), claimID).
@@ -259,7 +259,7 @@ var _ = Describe("ClaimRepository", func() {
 
 				for _, s := range statuses {
 					mockTx := mocks.NewTx(GinkgoT())
-					mockTx.On("GetTx").Return(db)
+					mockTx.EXPECT().GetTx().Return(db)
 					mock.ExpectBegin()
 					mock.ExpectExec(regexp.QuoteMeta(`UPDATE "claims" SET "status"=$1,"updated_at"=$2 WHERE id = $3 AND "claims"."deleted_at" IS NULL`)).
 						WithArgs(s, sqlmock.AnyArg(), claimID).

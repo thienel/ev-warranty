@@ -47,7 +47,7 @@ var _ = Describe("ClaimAttachmentRepository", func() {
 		Context("when attachment is created successfully", func() {
 			It("should return nil error", func() {
 				mockTx := mocks.NewTx(GinkgoT())
-				mockTx.On("GetTx").Return(db)
+				mockTx.EXPECT().GetTx().Return(db)
 				MockSuccessfulInsert(mock, "claim_attachments", attachment.ID)
 
 				err := repository.Create(mockTx, attachment)
@@ -59,7 +59,7 @@ var _ = Describe("ClaimAttachmentRepository", func() {
 		Context("when there is a duplicate key constraint", func() {
 			It("should return DBDuplicateKeyError", func() {
 				mockTx := mocks.NewTx(GinkgoT())
-				mockTx.On("GetTx").Return(db)
+				mockTx.EXPECT().GetTx().Return(db)
 				MockDuplicateKeyError(mock, "claim_attachments", "claim_attachments_unique_key")
 
 				err := repository.Create(mockTx, attachment)
@@ -74,7 +74,7 @@ var _ = Describe("ClaimAttachmentRepository", func() {
 		Context("when there is a database error", func() {
 			It("should return DBOperationError", func() {
 				mockTx := mocks.NewTx(GinkgoT())
-				mockTx.On("GetTx").Return(db)
+				mockTx.EXPECT().GetTx().Return(db)
 				MockInsertError(mock, "claim_attachments")
 
 				err := repository.Create(mockTx, attachment)
@@ -89,7 +89,7 @@ var _ = Describe("ClaimAttachmentRepository", func() {
 		Context("boundary cases for attachment types", func() {
 			It("should handle image type", func() {
 				mockTx := mocks.NewTx(GinkgoT())
-				mockTx.On("GetTx").Return(db)
+				mockTx.EXPECT().GetTx().Return(db)
 				attachment.Type = entities.AttachmentTypeImage
 				MockSuccessfulInsert(mock, "claim_attachments", attachment.ID)
 
@@ -100,7 +100,7 @@ var _ = Describe("ClaimAttachmentRepository", func() {
 
 			It("should handle video type", func() {
 				mockTx := mocks.NewTx(GinkgoT())
-				mockTx.On("GetTx").Return(db)
+				mockTx.EXPECT().GetTx().Return(db)
 				attachment.Type = entities.AttachmentTypeVideo
 				MockSuccessfulInsert(mock, "claim_attachments", attachment.ID)
 
@@ -113,7 +113,7 @@ var _ = Describe("ClaimAttachmentRepository", func() {
 		Context("boundary cases for URL", func() {
 			It("should handle empty URL", func() {
 				mockTx := mocks.NewTx(GinkgoT())
-				mockTx.On("GetTx").Return(db)
+				mockTx.EXPECT().GetTx().Return(db)
 				attachment.URL = ""
 				MockSuccessfulInsert(mock, "claim_attachments", attachment.ID)
 
@@ -124,7 +124,7 @@ var _ = Describe("ClaimAttachmentRepository", func() {
 
 			It("should handle very long URL", func() {
 				mockTx := mocks.NewTx(GinkgoT())
-				mockTx.On("GetTx").Return(db)
+				mockTx.EXPECT().GetTx().Return(db)
 				attachment.URL = "https://example.com/" + string(make([]byte, 1000))
 				MockSuccessfulInsert(mock, "claim_attachments", attachment.ID)
 
@@ -145,7 +145,7 @@ var _ = Describe("ClaimAttachmentRepository", func() {
 		Context("when attachment is hard deleted successfully", func() {
 			It("should return nil error", func() {
 				mockTx := mocks.NewTx(GinkgoT())
-				mockTx.On("GetTx").Return(db)
+				mockTx.EXPECT().GetTx().Return(db)
 				mock.ExpectBegin()
 				mock.ExpectExec(regexp.QuoteMeta(`DELETE FROM "claim_attachments" WHERE id = $1`)).
 					WithArgs(attachmentID).
@@ -161,7 +161,7 @@ var _ = Describe("ClaimAttachmentRepository", func() {
 		Context("when there is a database error", func() {
 			It("should return DBOperationError", func() {
 				mockTx := mocks.NewTx(GinkgoT())
-				mockTx.On("GetTx").Return(db)
+				mockTx.EXPECT().GetTx().Return(db)
 				mock.ExpectBegin()
 				mock.ExpectExec(regexp.QuoteMeta(`DELETE FROM "claim_attachments" WHERE id = $1`)).
 					WithArgs(attachmentID).
@@ -188,7 +188,7 @@ var _ = Describe("ClaimAttachmentRepository", func() {
 		Context("when attachments are soft deleted successfully", func() {
 			It("should return nil error", func() {
 				mockTx := mocks.NewTx(GinkgoT())
-				mockTx.On("GetTx").Return(db)
+				mockTx.EXPECT().GetTx().Return(db)
 				mock.ExpectBegin()
 				mock.ExpectExec(regexp.QuoteMeta(`UPDATE "claim_attachments" SET "deleted_at"=$1 WHERE claim_id = $2`)).
 					WithArgs(sqlmock.AnyArg(), claimID).
@@ -204,7 +204,7 @@ var _ = Describe("ClaimAttachmentRepository", func() {
 		Context("when there is a database error", func() {
 			It("should return DBOperationError", func() {
 				mockTx := mocks.NewTx(GinkgoT())
-				mockTx.On("GetTx").Return(db)
+				mockTx.EXPECT().GetTx().Return(db)
 				mock.ExpectBegin()
 				mock.ExpectExec(regexp.QuoteMeta(`UPDATE "claim_attachments" SET "deleted_at"=$1 WHERE claim_id = $2`)).
 					WithArgs(sqlmock.AnyArg(), claimID).

@@ -47,7 +47,7 @@ var _ = Describe("ClaimItemRepository", func() {
 		Context("when claim item is created successfully", func() {
 			It("should return nil error", func() {
 				mockTx := mocks.NewTx(GinkgoT())
-				mockTx.On("GetTx").Return(db)
+				mockTx.EXPECT().GetTx().Return(db)
 				MockSuccessfulInsert(mock, "claim_items", item.ID)
 
 				err := repository.Create(mockTx, item)
@@ -59,7 +59,7 @@ var _ = Describe("ClaimItemRepository", func() {
 		Context("when there is a duplicate key constraint", func() {
 			It("should return DBDuplicateKeyError", func() {
 				mockTx := mocks.NewTx(GinkgoT())
-				mockTx.On("GetTx").Return(db)
+				mockTx.EXPECT().GetTx().Return(db)
 				MockDuplicateKeyError(mock, "claim_items", "claim_items_unique_key")
 
 				err := repository.Create(mockTx, item)
@@ -74,7 +74,7 @@ var _ = Describe("ClaimItemRepository", func() {
 		Context("when there is a database error", func() {
 			It("should return DBOperationError", func() {
 				mockTx := mocks.NewTx(GinkgoT())
-				mockTx.On("GetTx").Return(db)
+				mockTx.EXPECT().GetTx().Return(db)
 				MockInsertError(mock, "claim_items")
 
 				err := repository.Create(mockTx, item)
@@ -89,7 +89,7 @@ var _ = Describe("ClaimItemRepository", func() {
 		Context("boundary cases for item types", func() {
 			It("should handle replacement type", func() {
 				mockTx := mocks.NewTx(GinkgoT())
-				mockTx.On("GetTx").Return(db)
+				mockTx.EXPECT().GetTx().Return(db)
 				item.Type = entities.ClaimItemTypeReplacement
 				MockSuccessfulInsert(mock, "claim_items", item.ID)
 
@@ -100,7 +100,7 @@ var _ = Describe("ClaimItemRepository", func() {
 
 			It("should handle repair type", func() {
 				mockTx := mocks.NewTx(GinkgoT())
-				mockTx.On("GetTx").Return(db)
+				mockTx.EXPECT().GetTx().Return(db)
 				item.Type = entities.ClaimItemTypeRepair
 				MockSuccessfulInsert(mock, "claim_items", item.ID)
 
@@ -123,7 +123,7 @@ var _ = Describe("ClaimItemRepository", func() {
 		Context("when claim item is updated successfully", func() {
 			It("should return nil error", func() {
 				mockTx := mocks.NewTx(GinkgoT())
-				mockTx.On("GetTx").Return(db)
+				mockTx.EXPECT().GetTx().Return(db)
 				MockSuccessfulUpdate(mock, "claim_items")
 
 				err := repository.Update(mockTx, item)
@@ -135,7 +135,7 @@ var _ = Describe("ClaimItemRepository", func() {
 		Context("when there is a database error", func() {
 			It("should return DBOperationError", func() {
 				mockTx := mocks.NewTx(GinkgoT())
-				mockTx.On("GetTx").Return(db)
+				mockTx.EXPECT().GetTx().Return(db)
 				MockUpdateError(mock, "claim_items")
 
 				err := repository.Update(mockTx, item)
@@ -150,7 +150,7 @@ var _ = Describe("ClaimItemRepository", func() {
 		Context("boundary cases for cost", func() {
 			It("should handle zero cost", func() {
 				mockTx := mocks.NewTx(GinkgoT())
-				mockTx.On("GetTx").Return(db)
+				mockTx.EXPECT().GetTx().Return(db)
 				item.Cost = 0.0
 				MockSuccessfulUpdate(mock, "claim_items")
 
@@ -161,7 +161,7 @@ var _ = Describe("ClaimItemRepository", func() {
 
 			It("should handle negative cost", func() {
 				mockTx := mocks.NewTx(GinkgoT())
-				mockTx.On("GetTx").Return(db)
+				mockTx.EXPECT().GetTx().Return(db)
 				item.Cost = -100.0
 				MockSuccessfulUpdate(mock, "claim_items")
 
@@ -209,7 +209,7 @@ var _ = Describe("ClaimItemRepository", func() {
 		Context("when there is a database error", func() {
 			It("should return DBOperationError", func() {
 				mockTx := mocks.NewTx(GinkgoT())
-				mockTx.On("GetTx").Return(db)
+				mockTx.EXPECT().GetTx().Return(db)
 				mock.ExpectBegin()
 				mock.ExpectExec(regexp.QuoteMeta(`DELETE FROM "claim_items" WHERE id = $1`)).
 					WithArgs(itemID).
@@ -236,7 +236,7 @@ var _ = Describe("ClaimItemRepository", func() {
 		Context("when claim items are soft deleted successfully", func() {
 			It("should return nil error", func() {
 				mockTx := mocks.NewTx(GinkgoT())
-				mockTx.On("GetTx").Return(db)
+				mockTx.EXPECT().GetTx().Return(db)
 				mock.ExpectBegin()
 				mock.ExpectExec(regexp.QuoteMeta(`UPDATE "claim_items" SET "deleted_at"=$1 WHERE claim_id = $2`)).
 					WithArgs(sqlmock.AnyArg(), claimID).
@@ -252,7 +252,7 @@ var _ = Describe("ClaimItemRepository", func() {
 		Context("when there is a database error", func() {
 			It("should return DBOperationError", func() {
 				mockTx := mocks.NewTx(GinkgoT())
-				mockTx.On("GetTx").Return(db)
+				mockTx.EXPECT().GetTx().Return(db)
 				mock.ExpectBegin()
 				mock.ExpectExec(regexp.QuoteMeta(`UPDATE "claim_items" SET "deleted_at"=$1 WHERE claim_id = $2`)).
 					WithArgs(sqlmock.AnyArg(), claimID).
@@ -281,7 +281,7 @@ var _ = Describe("ClaimItemRepository", func() {
 		Context("when status is updated successfully", func() {
 			It("should return nil error", func() {
 				mockTx := mocks.NewTx(GinkgoT())
-				mockTx.On("GetTx").Return(db)
+				mockTx.EXPECT().GetTx().Return(db)
 				mock.ExpectBegin()
 				mock.ExpectExec(regexp.QuoteMeta(`UPDATE "claim_items" SET "line_status"=$1,"updated_at"=$2 WHERE id = $3 AND "claim_items"."deleted_at" IS NULL`)).
 					WithArgs(status, sqlmock.AnyArg(), itemID).
@@ -297,7 +297,7 @@ var _ = Describe("ClaimItemRepository", func() {
 		Context("when there is a database error", func() {
 			It("should return DBOperationError", func() {
 				mockTx := mocks.NewTx(GinkgoT())
-				mockTx.On("GetTx").Return(db)
+				mockTx.EXPECT().GetTx().Return(db)
 				mock.ExpectBegin()
 				mock.ExpectExec(regexp.QuoteMeta(`UPDATE "claim_items" SET "line_status"=$1,"updated_at"=$2 WHERE id = $3 AND "claim_items"."deleted_at" IS NULL`)).
 					WithArgs(status, sqlmock.AnyArg(), itemID).
@@ -323,7 +323,7 @@ var _ = Describe("ClaimItemRepository", func() {
 
 				for _, s := range statuses {
 					mockTx := mocks.NewTx(GinkgoT())
-					mockTx.On("GetTx").Return(db)
+					mockTx.EXPECT().GetTx().Return(db)
 					mock.ExpectBegin()
 					mock.ExpectExec(regexp.QuoteMeta(`UPDATE "claim_items" SET "line_status"=$1,"updated_at"=$2 WHERE id = $3 AND "claim_items"."deleted_at" IS NULL`)).
 						WithArgs(s, sqlmock.AnyArg(), itemID).
@@ -347,7 +347,7 @@ var _ = Describe("ClaimItemRepository", func() {
 		Context("when sum is calculated successfully", func() {
 			It("should return total cost", func() {
 				mockTx := mocks.NewTx(GinkgoT())
-				mockTx.On("GetTx").Return(db)
+				mockTx.EXPECT().GetTx().Return(db)
 				rows := sqlmock.NewRows([]string{"sum"}).AddRow(5000.0)
 
 				mock.ExpectQuery(regexp.QuoteMeta(`SELECT COALESCE(SUM(cost), 0) FROM "claim_items" WHERE (claim_id = $1 AND status = 'APPROVED') AND "claim_items"."deleted_at" IS NULL`)).
@@ -364,7 +364,7 @@ var _ = Describe("ClaimItemRepository", func() {
 		Context("when no approved items exist", func() {
 			It("should return zero", func() {
 				mockTx := mocks.NewTx(GinkgoT())
-				mockTx.On("GetTx").Return(db)
+				mockTx.EXPECT().GetTx().Return(db)
 				rows := sqlmock.NewRows([]string{"sum"}).AddRow(0.0)
 
 				mock.ExpectQuery(regexp.QuoteMeta(`SELECT COALESCE(SUM(cost), 0) FROM "claim_items" WHERE (claim_id = $1 AND status = 'APPROVED') AND "claim_items"."deleted_at" IS NULL`)).
@@ -381,7 +381,7 @@ var _ = Describe("ClaimItemRepository", func() {
 		Context("when there is a database error", func() {
 			It("should return DBOperationError", func() {
 				mockTx := mocks.NewTx(GinkgoT())
-				mockTx.On("GetTx").Return(db)
+				mockTx.EXPECT().GetTx().Return(db)
 				mock.ExpectQuery(regexp.QuoteMeta(`SELECT COALESCE(SUM(cost), 0) FROM "claim_items" WHERE (claim_id = $1 AND status = 'APPROVED') AND "claim_items"."deleted_at" IS NULL`)).
 					WithArgs(claimID).
 					WillReturnError(errors.New("database connection failed"))
