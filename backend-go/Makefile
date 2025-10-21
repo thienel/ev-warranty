@@ -1,10 +1,5 @@
 include .envrc
 
-.PHONY: help
-help:
-	@echo 'Usage:'
-	@sed -n 's/^##//p' ${MAKEFILE_LIST} | column -t -s ':' | sed -e 's/^/ /'
-
 .PHONY: confirm
 confirm:
 	@printf 'Are you sure? [y/N]' && read ans && [ $${ans:-N} = y ]
@@ -22,35 +17,28 @@ check:
 db/psql:
 	psql ${DATABASE_URL}
 
-.PHONY: install-migrate
-install-migrate:
-	@which migrate > /dev/null 2>&1 || { \
-		echo "Installing golang-migrate..."; \
-		go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@latest; \
-	}
-
 .PHONY: db/migrations/new
-db/migrations/new: install-migrate
+db/migrations/new:
 	@echo 'Creating migration files for ${name}'
 	migrate create -seq -ext .sql -dir ./migrations ${name}
 
 .PHONY: db/migrations/up
-db/migrations/up: confirm install-migrate
+db/migrations/up: confirm
 	@echo 'running up migrations...'
 	migrate -path ./migrations -database ${DATABASE_URL} up
 
 .PHONY: db/migrations/down
-db/migrations/down: confirm install-migrate
+db/migrations/down: confirm
 	@echo 'running down migrations...'
 	migrate -path ./migrations -database ${DATABASE_URL} down
 
 .PHONY: db/migrations/force
-db/migrations/force: confirm install-migrate
+db/migrations/force: confirm
 	@echo 'forcing migration version to ${version}...'
 	migrate -path ./migrations -database ${DATABASE_URL} force ${version}
 
 .PHONY: db/migrations/version
-db/migrations/version: install-migrate
+db/migrations/version:
 	migrate -path ./migrations -database ${DATABASE_URL} version
 
 .PHONY: audit
