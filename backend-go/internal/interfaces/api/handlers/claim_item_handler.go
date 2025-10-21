@@ -148,7 +148,7 @@ func (h *claimItemHandler) Delete(c *gin.Context) {
 		return
 	}
 
-	writeSuccessResponse(c, http.StatusOK, gin.H{"message": "Claim item deleted successfully"})
+	writeSuccessResponse(c, http.StatusNoContent, gin.H{"message": "Claim item deleted successfully"})
 }
 
 func (h *claimItemHandler) Approve(c *gin.Context) {
