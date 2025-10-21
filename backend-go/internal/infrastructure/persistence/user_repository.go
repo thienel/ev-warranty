@@ -55,9 +55,6 @@ func (u *userRepository) FindByEmail(ctx context.Context, email string) (*entiti
 func (u *userRepository) FindAll(ctx context.Context) ([]*entities.User, error) {
 	var users []*entities.User
 	if err := u.db.WithContext(ctx).Find(&users).Error; err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, apperrors.NewUserNotFound()
-		}
 		return nil, apperrors.NewDBOperationError(err)
 	}
 	return users, nil
