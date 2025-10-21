@@ -53,8 +53,18 @@ audit:
 	@echo 'Running tests...'
 	go test -race -vet=off ./...
 
-.PHONY: mocks
-mocks:
+.PHONY: test/mocks
+test/mocks:
 	mockery --all --with-expecter --case=snake
 	@rm -rf ./pkg/mocks
 	@mv ./mocks ./pkg/mocks
+
+.PHONY: test/cover/html
+test/cover/html:
+	ginkgo -cover ./...
+	go tool cover -html=coverprofile.out
+
+.PHONY: test/cover/func
+test/cover/func:
+	ginkgo -cover ./...
+	go tool cover -func=coverprofile.out
