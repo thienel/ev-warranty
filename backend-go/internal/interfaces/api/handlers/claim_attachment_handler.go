@@ -75,6 +75,7 @@ func (h *claimAttachmentHandler) GetByClaimID(c *gin.Context) {
 func (h *claimAttachmentHandler) Create(c *gin.Context) {
 	if err := allowedRoles(c, entities.UserRoleScTechnician); err != nil {
 		handleError(h.log, c, err)
+		return
 	}
 
 	claimID, err := parseClaimIDParam(c)
@@ -124,6 +125,7 @@ func (h *claimAttachmentHandler) Create(c *gin.Context) {
 func (h *claimAttachmentHandler) Delete(c *gin.Context) {
 	if err := allowedRoles(c, entities.UserRoleScTechnician); err != nil {
 		handleError(h.log, c, err)
+		return
 	}
 
 	claimID, err := parseClaimIDParam(c)
