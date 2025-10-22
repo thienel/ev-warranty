@@ -68,7 +68,7 @@ namespace Backend.Dotnet.Application.DTOs
             [StringLength(500, ErrorMessage = "Address cannot exceed 500 characters")]
             public string? Address { get; set; }
 
-            [JsonPropertyName("updateMask")]
+            [JsonPropertyName("update_mask")]
             [Required(ErrorMessage = "updateMask is required")]
             public List<string> UpdateMask { get; set; } = new();
         }

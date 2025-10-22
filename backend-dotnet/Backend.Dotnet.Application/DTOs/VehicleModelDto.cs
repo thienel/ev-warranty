@@ -49,7 +49,7 @@ namespace Backend.Dotnet.Application.DTOs
             [Range(2000, 2100, ErrorMessage = "Year must be between 2000 and 2100")]
             public int Year { get; set; }
 
-            [JsonPropertyName("updateMask")]
+            [JsonPropertyName("update_mask")]
             [Required(ErrorMessage = "updateMask is required")]
             public List<string> UpdateMask { get; set; } = new();
         }
