@@ -414,6 +414,30 @@ var _ = Describe("ClaimService", func() {
 				Expect(err).To(Equal(dbErr))
 			})
 		})
+
+		Context("when cloud service delete fails", func() {
+			It("should log the error", func() {
+				claim := &entities.Claim{
+					ID:     claimID,
+					Status: entities.ClaimStatusDraft,
+				}
+				attachments := []*entities.ClaimAttachment{
+					{ID: uuid.New(), URL: "https://example.com/file1.jpg"},
+					{ID: uuid.New(), URL: "https://example.com/file2.jpg"},
+				}
+
+				mockClaimRepo.EXPECT().FindByID(ctx, claimID).Return(claim, nil).Once()
+				mockAttachRepo.EXPECT().FindByClaimID(ctx, claimID).Return(attachments, nil).Once()
+				mockClaimRepo.EXPECT().HardDelete(mockTx, claimID).Return(nil).Once()
+				mockCloudServ.EXPECT().DeleteFileByURL(ctx, attachments[0].URL).Return(errors.New("cloud error")).Once()
+				mockCloudServ.EXPECT().DeleteFileByURL(ctx, attachments[1].URL).Return(errors.New("cloud error")).Once()
+				mockLogger.EXPECT().Error(mock.Anything, mock.Anything, mock.Anything).Return().Times(2)
+
+				err := service.HardDelete(mockTx, claimID)
+
+				Expect(err).NotTo(HaveOccurred())
+			})
+		})
 	})
 
 	Describe("SoftDelete", func() {
@@ -874,7 +898,29 @@ var _ = Describe("ClaimService", func() {
 
 				mockClaimRepo.EXPECT().FindByID(ctx, claimID).Return(claim, nil).Once()
 				mockItemRepo.EXPECT().FindByClaimID(ctx, claimID).Return(items, nil).Once()
-				mockClaimRepo.EXPECT().UpdateStatus(mockTx, claimID, entities.ClaimStatusPartiallyApproved).Return(nil).Once()
+				mockClaimRepo.EXPECT().UpdateStatus(mockTx, claimID, entities.ClaimStatusApproved).Return(nil).Once()
+				mockHistRepo.EXPECT().Create(mockTx, mock.AnythingOfType("*entities.ClaimHistory")).Return(nil).Once()
+
+				err := service.Complete(mockTx, claimID, changedBy)
+
+				Expect(err).NotTo(HaveOccurred())
+			})
+		})
+
+		Context("when all items are rejected", func() {
+			It("should set status to rejected", func() {
+				claim := &entities.Claim{
+					ID:     claimID,
+					Status: entities.ClaimStatusReviewing,
+				}
+				items := []*entities.ClaimItem{
+					{ID: uuid.New(), Status: entities.ClaimItemStatusRejected},
+					{ID: uuid.New(), Status: entities.ClaimItemStatusRejected},
+				}
+
+				mockClaimRepo.EXPECT().FindByID(ctx, claimID).Return(claim, nil).Once()
+				mockItemRepo.EXPECT().FindByClaimID(ctx, claimID).Return(items, nil).Once()
+				mockClaimRepo.EXPECT().UpdateStatus(mockTx, claimID, entities.ClaimStatusRejected).Return(nil).Once()
 				mockHistRepo.EXPECT().Create(mockTx, mock.AnythingOfType("*entities.ClaimHistory")).Return(nil).Once()
 
 				err := service.Complete(mockTx, claimID, changedBy)
@@ -986,7 +1032,7 @@ var _ = Describe("ClaimService", func() {
 
 				mockClaimRepo.EXPECT().FindByID(ctx, claimID).Return(claim, nil).Once()
 				mockItemRepo.EXPECT().FindByClaimID(ctx, claimID).Return(items, nil).Once()
-				mockClaimRepo.EXPECT().UpdateStatus(mockTx, claimID, entities.ClaimStatusPartiallyApproved).Return(dbErr).Once()
+				mockClaimRepo.EXPECT().UpdateStatus(mockTx, claimID, entities.ClaimStatusApproved).Return(dbErr).Once()
 
 				err := service.Complete(mockTx, claimID, changedBy)
 
@@ -1008,7 +1054,7 @@ var _ = Describe("ClaimService", func() {
 
 				mockClaimRepo.EXPECT().FindByID(ctx, claimID).Return(claim, nil).Once()
 				mockItemRepo.EXPECT().FindByClaimID(ctx, claimID).Return(items, nil).Once()
-				mockClaimRepo.EXPECT().UpdateStatus(mockTx, claimID, entities.ClaimStatusPartiallyApproved).Return(nil).Once()
+				mockClaimRepo.EXPECT().UpdateStatus(mockTx, claimID, entities.ClaimStatusApproved).Return(nil).Once()
 				mockHistRepo.EXPECT().Create(mockTx, mock.AnythingOfType("*entities.ClaimHistory")).Return(dbErr).Once()
 
 				err := service.Complete(mockTx, claimID, changedBy)
