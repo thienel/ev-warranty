@@ -70,23 +70,18 @@ var _ = Describe("OfficeHandler", func() {
 			})
 
 			DescribeTable("should handle validation errors",
-				func(setupMock func(), modifyReq func(*dtos.CreateOfficeRequest), expectedError string) {
+				func(modifyReq func(*dtos.CreateOfficeRequest), expectedError string) {
 					req := validReq
 					if modifyReq != nil {
 						modifyReq(&req)
-					}
-					if setupMock != nil {
-						setupMock()
 					}
 					SendRequest(r, http.MethodPost, "/offices", w, req)
 					ExpectErrorCode(w, http.StatusBadRequest, expectedError)
 				},
 				Entry("invalid office type",
-					func() {
-						mockService.EXPECT().Create(mock.Anything, mock.Anything).
-							Return(nil, apperrors.NewInvalidOfficeType()).Once()
+					func(req *dtos.CreateOfficeRequest) {
+						req.OfficeType = "INVALID_TYPE"
 					},
-					func(req *dtos.CreateOfficeRequest) { req.OfficeType = "INVALID_TYPE" },
 					apperrors.ErrorCodeInvalidOfficeType),
 			)
 
@@ -205,7 +200,7 @@ var _ = Describe("OfficeHandler", func() {
 			})).Return(nil).Once()
 
 			SendRequest(r, http.MethodPut, "/offices/"+officeID.String(), w, updateReq)
-			ExpectResponseNotNil(w, http.StatusOK)
+			Expect(w.Code).To(Equal(http.StatusNoContent))
 		})
 
 		DescribeTable("should handle error scenarios",

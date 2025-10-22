@@ -79,15 +79,17 @@ var _ = Describe("UserHandler", func() {
 					SendRequest(r, http.MethodPost, "/users", w, req)
 					ExpectErrorCode(w, http.StatusBadRequest, expectedError)
 				},
-				Entry("invalid JSON", func(req *dtos.CreateUserRequest) {
-					// This will be handled by sending invalid JSON string
-				}, apperrors.ErrorCodeInvalidJsonRequest),
 				Entry("invalid role", func(req *dtos.CreateUserRequest) {
 					req.Role = "INVALID_ROLE"
 					mockService.EXPECT().Create(mock.Anything, mock.Anything).
 						Return(nil, apperrors.NewInvalidUserInput()).Once()
 				}, apperrors.ErrorCodeInvalidUserInput),
 			)
+
+			It("should handle invalid JSON", func() {
+				SendRequest(r, http.MethodPost, "/users", w, "invalid json")
+				ExpectErrorCode(w, http.StatusBadRequest, apperrors.ErrorCodeInvalidJsonRequest)
+			})
 
 			It("should handle invalid JSON", func() {
 				SendRequest(r, http.MethodPost, "/users", w, "invalid json")
@@ -205,7 +207,7 @@ var _ = Describe("UserHandler", func() {
 			})).Return(nil).Once()
 
 			SendRequest(r, http.MethodPut, "/users/"+userID.String(), w, updateReq)
-			ExpectResponseNotNil(w, http.StatusOK)
+			Expect(w.Code).To(Equal(http.StatusNoContent))
 		})
 
 		DescribeTable("should handle error scenarios",
