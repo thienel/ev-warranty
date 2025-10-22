@@ -68,3 +68,17 @@ func ExpectErrorCode(w *httptest.ResponseRecorder, httpStatus int, error string)
 	Expect(err).NotTo(HaveOccurred())
 	Expect(response.Error).To(Equal(error))
 }
+
+func ExpectCookieRefreshToken(w *httptest.ResponseRecorder, token string) {
+	GinkgoHelper()
+	cookies := w.Result().Cookies()
+	Expect(cookies).To(HaveLen(1))
+	Expect(cookies[0].Name).To(Equal("refreshToken"))
+	Expect(cookies[0].Value).To(Equal(token))
+	Expect(cookies[0].HttpOnly).To(BeTrue())
+	Expect(cookies[0].MaxAge).To(Equal(60 * 60 * 24 * 7))
+}
+
+func decodeResponse(w *httptest.ResponseRecorder, response *dtos.APIResponse) error {
+	return json.Unmarshal(w.Body.Bytes(), response)
+}

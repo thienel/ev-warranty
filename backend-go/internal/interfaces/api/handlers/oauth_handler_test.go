@@ -96,13 +96,7 @@ var _ = Describe("OAuthHandler", func() {
 				Expect(w.Code).To(Equal(http.StatusFound))
 				expectedLocation := fmt.Sprintf("%s/auth/callback?token=%s", frontendBaseURL, accessToken)
 				Expect(w.Header().Get("Location")).To(Equal(expectedLocation))
-
-				cookies := w.Result().Cookies()
-				Expect(cookies).To(HaveLen(1))
-				Expect(cookies[0].Name).To(Equal("refreshToken"))
-				Expect(cookies[0].Value).To(Equal(refreshToken))
-				Expect(cookies[0].HttpOnly).To(BeTrue())
-				Expect(cookies[0].MaxAge).To(Equal(60 * 60 * 24 * 7))
+				ExpectCookieRefreshToken(w, refreshToken)
 			})
 		})
 
