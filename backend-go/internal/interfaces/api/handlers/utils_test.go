@@ -79,6 +79,12 @@ func ExpectCookieRefreshToken(w *httptest.ResponseRecorder, token string) {
 	Expect(cookies[0].MaxAge).To(Equal(60 * 60 * 24 * 7))
 }
 
-func decodeResponse(w *httptest.ResponseRecorder, response *dtos.APIResponse) error {
-	return json.Unmarshal(w.Body.Bytes(), response)
+func uuidPtrEqual(a, b *uuid.UUID) bool {
+	if a == nil && b == nil {
+		return true
+	}
+	if a == nil || b == nil {
+		return false
+	}
+	return *a == *b
 }
