@@ -59,6 +59,10 @@ test/mocks:
 	@rm -rf ./pkg/mocks
 	@mv ./mocks ./pkg/mocks
 
+.PHONY: test/cover
+test/cover:
+	ginkgo -cover ./...
+
 .PHONY: test/cover/html
 test/cover/html:
 	ginkgo -cover ./...
