@@ -20,6 +20,7 @@ func SetupMock(t FullGinkgoTInterface) (*mocks.Logger, *gin.Engine, *httptest.Re
 	mockLogger.EXPECT().Info(mock.Anything, mock.Anything, mock.Anything).Return().Maybe()
 	mockLogger.EXPECT().Info(mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return().Maybe()
 	mockLogger.EXPECT().Error(mock.Anything, mock.Anything, mock.Anything).Return().Maybe()
+	mockLogger.EXPECT().Error(mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return().Maybe()
 
 	gin.SetMode(gin.TestMode)
 	router := gin.New()
