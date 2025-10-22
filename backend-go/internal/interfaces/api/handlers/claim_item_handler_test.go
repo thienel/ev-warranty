@@ -22,18 +22,38 @@ import (
 
 var _ = Describe("ClaimItemHandler", func() {
 	var (
-		mockLogger        *mocks.Logger
-		mockTxManager     *mocks.TxManager
-		mockService       *mocks.ClaimItemService
-		mockTx            *mocks.Tx
-		handler           handlers.ClaimItemHandler
-		r                 *gin.Engine
-		w                 *httptest.ResponseRecorder
-		claimID           uuid.UUID
-		itemID            uuid.UUID
-		replacementPartID uuid.UUID
-		faultyPartID      uuid.UUID
+		mockLogger      *mocks.Logger
+		mockTxManager   *mocks.TxManager
+		mockService     *mocks.ClaimItemService
+		mockTx          *mocks.Tx
+		handler         handlers.ClaimItemHandler
+		r               *gin.Engine
+		w               *httptest.ResponseRecorder
+		claimID         uuid.UUID
+		itemID          uuid.UUID
+		sampleClaimItem *entities.ClaimItem
+		validReq        dtos.CreateClaimItemRequest
 	)
+
+	// Helper function to setup transaction mock
+	setupTxMock := func(serviceMockFn func()) {
+		mockTxManager.EXPECT().Do(mock.Anything, mock.AnythingOfType("func(application.Tx) error")).
+			Run(func(ctx context.Context, fn func(application.Tx) error) {
+				serviceMockFn()
+				_ = fn(mockTx)
+			}).Return(nil).Once()
+	}
+
+	// Helper function to setup route with role
+	setupRoute := func(method, path string, role string, handlerFunc gin.HandlerFunc) {
+		r.Handle(method, path, func(c *gin.Context) {
+			if role != "" {
+				SetHeaderRole(c, role)
+			}
+			SetContentTypeJSON(c)
+			handlerFunc(c)
+		})
+	}
 
 	BeforeEach(func() {
 		mockLogger, r, w = SetupMock(GinkgoT())
@@ -44,525 +64,230 @@ var _ = Describe("ClaimItemHandler", func() {
 
 		claimID = uuid.New()
 		itemID = uuid.New()
-		replacementPartID = uuid.New()
-		faultyPartID = uuid.New()
+		validReq = dtos.CreateClaimItemRequest{
+			PartCategoryID:    1,
+			FaultyPartID:      uuid.New(),
+			ReplacementPartID: func() *uuid.UUID { id := uuid.New(); return &id }(),
+			IssueDescription:  "Test issue description for replacement",
+			Type:              entities.ClaimItemTypeReplacement,
+			Cost:              100.50,
+		}
+		sampleClaimItem = &entities.ClaimItem{
+			ID:                itemID,
+			ClaimID:           claimID,
+			PartCategoryID:    validReq.PartCategoryID,
+			FaultyPartID:      validReq.FaultyPartID,
+			ReplacementPartID: validReq.ReplacementPartID,
+			IssueDescription:  validReq.IssueDescription,
+			Status:            entities.ClaimItemStatusPending,
+			Type:              validReq.Type,
+			Cost:              validReq.Cost,
+		}
 	})
 
 	Describe("GetByID", func() {
-		Context("when claim item is found successfully", func() {
-			It("should return the claim item", func() {
-				claimItem := &entities.ClaimItem{
-					ID:                itemID,
-					ClaimID:           claimID,
-					PartCategoryID:    1,
-					FaultyPartID:      faultyPartID,
-					ReplacementPartID: &replacementPartID,
-					IssueDescription:  "Test issue description",
-					Status:            entities.ClaimItemStatusPending,
-					Type:              entities.ClaimItemTypeReplacement,
-					Cost:              100.50,
-				}
-
-				mockService.EXPECT().GetByID(mock.Anything, itemID).Return(claimItem, nil).Once()
-
-				r.GET("/claims/:id/items/:itemID", handler.GetByID)
-				req, _ := http.NewRequest(http.MethodGet, "/claims/"+claimID.String()+"/items/"+itemID.String(), nil)
-				r.ServeHTTP(w, req)
-
-				Expect(w.Code).To(Equal(http.StatusOK))
-				ExpectResponseNotNil(w, http.StatusOK)
-			})
+		BeforeEach(func() {
+			r.GET("/claims/:id/items/:itemID", handler.GetByID)
 		})
 
-		Context("when item ID is invalid UUID", func() {
-			It("should return invalid UUID error", func() {
-				r.GET("/claims/:id/items/:itemID", handler.GetByID)
-				req, _ := http.NewRequest(http.MethodGet, "/claims/"+claimID.String()+"/items/invalid-uuid", nil)
-				r.ServeHTTP(w, req)
-
-				Expect(w.Code).To(Equal(http.StatusBadRequest))
-				ExpectErrorCode(w, http.StatusBadRequest, apperrors.ErrorCodeInvalidUUID)
-			})
+		It("should handle successful retrieval", func() {
+			mockService.EXPECT().GetByID(mock.Anything, itemID).Return(sampleClaimItem, nil).Once()
+			req, _ := http.NewRequest(http.MethodGet, "/claims/"+claimID.String()+"/items/"+itemID.String(), nil)
+			r.ServeHTTP(w, req)
+			ExpectResponseNotNil(w, http.StatusOK)
 		})
 
-		Context("when claim item is not found", func() {
-			It("should return not found error", func() {
-				mockService.EXPECT().GetByID(mock.Anything, itemID).
-					Return(nil, apperrors.NewClaimItemNotFound()).Once()
-
-				r.GET("/claims/:id/items/:itemID", handler.GetByID)
-				req, _ := http.NewRequest(http.MethodGet, "/claims/"+claimID.String()+"/items/"+itemID.String(), nil)
-				r.ServeHTTP(w, req)
-
-				Expect(w.Code).To(Equal(http.StatusNotFound))
-				ExpectErrorCode(w, http.StatusNotFound, apperrors.ErrorCodeClaimItemNotFound)
-			})
+		It("should handle invalid item UUID", func() {
+			req, _ := http.NewRequest(http.MethodGet, "/claims/"+claimID.String()+"/items/invalid-uuid", nil)
+			r.ServeHTTP(w, req)
+			ExpectErrorCode(w, http.StatusBadRequest, apperrors.ErrorCodeInvalidUUID)
 		})
 
-		Context("when service returns error", func() {
-			It("should return internal server error", func() {
-				mockService.EXPECT().GetByID(mock.Anything, itemID).
-					Return(nil, errors.New("database error")).Once()
+		It("should handle item not found", func() {
+			mockService.EXPECT().GetByID(mock.Anything, itemID).
+				Return(nil, apperrors.NewClaimItemNotFound()).Once()
+			req, _ := http.NewRequest(http.MethodGet, "/claims/"+claimID.String()+"/items/"+itemID.String(), nil)
+			r.ServeHTTP(w, req)
+			ExpectErrorCode(w, http.StatusNotFound, apperrors.ErrorCodeClaimItemNotFound)
+		})
 
-				r.GET("/claims/:id/items/:itemID", handler.GetByID)
-				req, _ := http.NewRequest(http.MethodGet, "/claims/"+claimID.String()+"/items/"+itemID.String(), nil)
-				r.ServeHTTP(w, req)
-
-				Expect(w.Code).To(Equal(http.StatusInternalServerError))
-				ExpectErrorCode(w, http.StatusInternalServerError, apperrors.ErrorCodeInternalServerError)
-			})
+		It("should handle service error", func() {
+			mockService.EXPECT().GetByID(mock.Anything, itemID).
+				Return(nil, errors.New("database error")).Once()
+			req, _ := http.NewRequest(http.MethodGet, "/claims/"+claimID.String()+"/items/"+itemID.String(), nil)
+			r.ServeHTTP(w, req)
+			ExpectErrorCode(w, http.StatusInternalServerError, apperrors.ErrorCodeInternalServerError)
 		})
 	})
 
 	Describe("GetByClaimID", func() {
-		Context("when claim items are found successfully", func() {
-			It("should return the claim items", func() {
-				claimItems := []*entities.ClaimItem{
-					{
-						ID:                itemID,
-						ClaimID:           claimID,
-						PartCategoryID:    1,
-						FaultyPartID:      faultyPartID,
-						ReplacementPartID: &replacementPartID,
-						IssueDescription:  "Test issue description",
-						Status:            entities.ClaimItemStatusPending,
-						Type:              entities.ClaimItemTypeReplacement,
-						Cost:              100.50,
-					},
-				}
-
-				mockService.EXPECT().GetByClaimID(mock.Anything, claimID).Return(claimItems, nil).Once()
-
-				r.GET("/claims/:id/items", handler.GetByClaimID)
-				req, _ := http.NewRequest(http.MethodGet, "/claims/"+claimID.String()+"/items", nil)
-				r.ServeHTTP(w, req)
-
-				Expect(w.Code).To(Equal(http.StatusOK))
-				ExpectResponseNotNil(w, http.StatusOK)
-			})
+		BeforeEach(func() {
+			r.GET("/claims/:id/items", handler.GetByClaimID)
 		})
 
-		Context("when claim ID is invalid UUID", func() {
-			It("should return invalid UUID error", func() {
-				r.GET("/claims/:id/items", handler.GetByClaimID)
-				req, _ := http.NewRequest(http.MethodGet, "/claims/invalid-uuid/items", nil)
-				r.ServeHTTP(w, req)
-
-				Expect(w.Code).To(Equal(http.StatusBadRequest))
-				ExpectErrorCode(w, http.StatusBadRequest, apperrors.ErrorCodeInvalidUUID)
-			})
+		It("should handle successful retrieval with items", func() {
+			items := []*entities.ClaimItem{sampleClaimItem}
+			mockService.EXPECT().GetByClaimID(mock.Anything, claimID).Return(items, nil).Once()
+			req, _ := http.NewRequest(http.MethodGet, "/claims/"+claimID.String()+"/items", nil)
+			r.ServeHTTP(w, req)
+			ExpectResponseNotNil(w, http.StatusOK)
 		})
 
-		Context("when no claim items are found", func() {
-			It("should return empty array", func() {
-				mockService.EXPECT().GetByClaimID(mock.Anything, claimID).Return([]*entities.ClaimItem{}, nil).Once()
-
-				r.GET("/claims/:id/items", handler.GetByClaimID)
-				req, _ := http.NewRequest(http.MethodGet, "/claims/"+claimID.String()+"/items", nil)
-				r.ServeHTTP(w, req)
-
-				Expect(w.Code).To(Equal(http.StatusOK))
-				ExpectResponseNotNil(w, http.StatusOK)
-			})
+		It("should handle invalid claim UUID", func() {
+			req, _ := http.NewRequest(http.MethodGet, "/claims/invalid-uuid/items", nil)
+			r.ServeHTTP(w, req)
+			ExpectErrorCode(w, http.StatusBadRequest, apperrors.ErrorCodeInvalidUUID)
 		})
 
-		Context("when service returns error", func() {
-			It("should return internal server error", func() {
-				mockService.EXPECT().GetByClaimID(mock.Anything, claimID).
-					Return(nil, errors.New("database error")).Once()
-
-				r.GET("/claims/:id/items", handler.GetByClaimID)
-				req, _ := http.NewRequest(http.MethodGet, "/claims/"+claimID.String()+"/items", nil)
-				r.ServeHTTP(w, req)
-
-				Expect(w.Code).To(Equal(http.StatusInternalServerError))
-				ExpectErrorCode(w, http.StatusInternalServerError, apperrors.ErrorCodeInternalServerError)
-			})
+		It("should handle empty results", func() {
+			mockService.EXPECT().GetByClaimID(mock.Anything, claimID).Return([]*entities.ClaimItem{}, nil).Once()
+			req, _ := http.NewRequest(http.MethodGet, "/claims/"+claimID.String()+"/items", nil)
+			r.ServeHTTP(w, req)
+			ExpectResponseNotNil(w, http.StatusOK)
 		})
 	})
 
 	Describe("Create", func() {
-		var validRequest dtos.CreateClaimItemRequest
+		Context("when authorized as SC_STAFF", func() {
+			BeforeEach(func() {
+				setupRoute("POST", "/claims/:id/items", entities.UserRoleScStaff, handler.Create)
+			})
 
-		BeforeEach(func() {
-			validRequest = dtos.CreateClaimItemRequest{
-				PartCategoryID:    1,
-				FaultyPartID:      faultyPartID,
-				ReplacementPartID: &replacementPartID,
-				IssueDescription:  "Test issue description for replacement",
-				Type:              entities.ClaimItemTypeReplacement,
-				Cost:              100.50,
-			}
-		})
-
-		Context("when creation is successful", func() {
-			It("should create and return the claim item", func() {
-				createdItem := &entities.ClaimItem{
-					ID:                itemID,
-					ClaimID:           claimID,
-					PartCategoryID:    validRequest.PartCategoryID,
-					FaultyPartID:      validRequest.FaultyPartID,
-					ReplacementPartID: validRequest.ReplacementPartID,
-					IssueDescription:  validRequest.IssueDescription,
-					Status:            entities.ClaimItemStatusPending,
-					Type:              validRequest.Type,
-					Cost:              validRequest.Cost,
-				}
-
-				mockService.EXPECT().Create(mockTx, claimID, mock.MatchedBy(func(cmd *services.CreateClaimItemCommand) bool {
-					return cmd.PartCategoryID == validRequest.PartCategoryID &&
-						cmd.FaultyPartID == validRequest.FaultyPartID &&
-						uuidPtrEqual(cmd.ReplacementPartID, validRequest.ReplacementPartID) &&
-						cmd.IssueDescription == validRequest.IssueDescription &&
-						cmd.Status == entities.ClaimItemStatusPending &&
-						cmd.Type == validRequest.Type &&
-						cmd.Cost == validRequest.Cost
-				})).Return(createdItem, nil).Once()
-
-				mockTxManager.EXPECT().Do(mock.Anything, mock.Anything).
-					Run(func(ctx context.Context, fn func(application.Tx) error) {
-						_ = fn(mockTx)
-					}).Return(nil).Once()
-
-				r.POST("/claims/:id/items", func(c *gin.Context) {
-					SetHeaderRole(c, entities.UserRoleScStaff)
-					SetContentTypeJSON(c)
-					handler.Create(c)
+			It("should create claim item successfully", func() {
+				setupTxMock(func() {
+					mockService.EXPECT().Create(mockTx, claimID, mock.MatchedBy(func(cmd *services.CreateClaimItemCommand) bool {
+						return cmd.PartCategoryID == validReq.PartCategoryID && cmd.Type == validReq.Type
+					})).Return(sampleClaimItem, nil).Once()
 				})
 
-				SendRequest(r, http.MethodPost, "/claims/"+claimID.String()+"/items", w, validRequest)
+				SendRequest(r, http.MethodPost, "/claims/"+claimID.String()+"/items", w, validReq)
 				ExpectResponseNotNil(w, http.StatusCreated)
 			})
-		})
 
-		Context("when user is not authorized", func() {
-			It("should return forbidden error", func() {
-				r.POST("/claims/:id/items", func(c *gin.Context) {
-					SetHeaderRole(c, entities.UserRoleEvmStaff)
-					SetContentTypeJSON(c)
-					handler.Create(c)
-				})
+			DescribeTable("should handle error scenarios",
+				func(setupMock func(), url string, reqBody interface{}, expectedStatus int, expectedError string) {
+					if setupMock != nil {
+						setupMock()
+					}
+					SendRequest(r, http.MethodPost, url, w, reqBody)
+					ExpectErrorCode(w, expectedStatus, expectedError)
+				},
+				Entry("invalid claim UUID",
+					nil,
+					"/claims/invalid-uuid/items", validReq, http.StatusBadRequest, apperrors.ErrorCodeInvalidUUID),
+				Entry("invalid JSON",
+					nil,
+					"/claims/"+claimID.String()+"/items", "invalid json", http.StatusBadRequest, apperrors.ErrorCodeInvalidJsonRequest),
+			)
 
-				SendRequest(r, http.MethodPost, "/claims/"+claimID.String()+"/items", w, validRequest)
-				ExpectErrorCode(w, http.StatusForbidden, apperrors.ErrorCodeUnauthorizedRole)
-			})
-		})
-
-		Context("when claim ID is invalid UUID", func() {
-			It("should return invalid UUID error", func() {
-				r.POST("/claims/:id/items", func(c *gin.Context) {
-					SetHeaderRole(c, entities.UserRoleScStaff)
-					SetContentTypeJSON(c)
-					handler.Create(c)
-				})
-
-				SendRequest(r, http.MethodPost, "/claims/invalid-uuid/items", w, validRequest)
-				ExpectErrorCode(w, http.StatusBadRequest, apperrors.ErrorCodeInvalidUUID)
-			})
-		})
-
-		Context("when request body is invalid JSON", func() {
-			It("should return invalid JSON error", func() {
-				r.POST("/claims/:id/items", func(c *gin.Context) {
-					SetHeaderRole(c, entities.UserRoleScStaff)
-					SetContentTypeJSON(c)
-					handler.Create(c)
-				})
-
-				SendRequest(r, http.MethodPost, "/claims/"+claimID.String()+"/items", w, "invalid json")
-				ExpectErrorCode(w, http.StatusBadRequest, apperrors.ErrorCodeInvalidJsonRequest)
-			})
-		})
-
-		Context("when claim item type is invalid", func() {
-			It("should return invalid claim item type error", func() {
-				invalidRequest := validRequest
-				invalidRequest.Type = "INVALID_TYPE"
-
-				r.POST("/claims/:id/items", func(c *gin.Context) {
-					SetHeaderRole(c, entities.UserRoleScStaff)
-					SetContentTypeJSON(c)
-					handler.Create(c)
-				})
-
-				SendRequest(r, http.MethodPost, "/claims/"+claimID.String()+"/items", w, invalidRequest)
+			It("should handle invalid claim item type", func() {
+				invalidReq := validReq
+				invalidReq.Type = "INVALID_TYPE"
+				SendRequest(r, http.MethodPost, "/claims/"+claimID.String()+"/items", w, invalidReq)
 				ExpectErrorCode(w, http.StatusBadRequest, apperrors.ErrorCodeInvalidClaimItemType)
 			})
-		})
 
-		Context("when service returns error", func() {
-			It("should return the service error", func() {
-				mockTxManager.EXPECT().Do(mock.Anything, mock.AnythingOfType("func(application.Tx) error")).
-					Run(func(ctx context.Context, fn func(application.Tx) error) {
-						mockService.EXPECT().Create(mockTx, claimID, mock.Anything).
-							Return(nil, apperrors.NewClaimNotFound()).Once()
-						_ = fn(mockTx)
-					}).Return(apperrors.NewClaimNotFound()).Once()
-
-				r.POST("/claims/:id/items", func(c *gin.Context) {
-					SetHeaderRole(c, entities.UserRoleScStaff)
-					SetContentTypeJSON(c)
-					handler.Create(c)
+			It("should handle service error during creation", func() {
+				setupTxMock(func() {
+					mockService.EXPECT().Create(mockTx, claimID, mock.Anything).
+						Return(nil, apperrors.NewClaimNotFound()).Once()
 				})
+				mockTxManager.ExpectedCalls[0].ReturnArguments = []interface{}{apperrors.NewClaimNotFound()}
 
-				SendRequest(r, http.MethodPost, "/claims/"+claimID.String()+"/items", w, validRequest)
+				SendRequest(r, http.MethodPost, "/claims/"+claimID.String()+"/items", w, validReq)
 				ExpectErrorCode(w, http.StatusNotFound, apperrors.ErrorCodeClaimNotFound)
 			})
+		})
+
+		It("should deny access for unauthorized roles", func() {
+			setupRoute("POST", "/claims/:id/items", entities.UserRoleEvmStaff, handler.Create)
+			SendRequest(r, http.MethodPost, "/claims/"+claimID.String()+"/items", w, validReq)
+			ExpectErrorCode(w, http.StatusForbidden, apperrors.ErrorCodeUnauthorizedRole)
 		})
 	})
 
 	Describe("Delete", func() {
-		Context("when deletion is successful", func() {
-			It("should delete the claim item and return no content", func() {
-				mockTxManager.EXPECT().Do(mock.Anything, mock.AnythingOfType("func(application.Tx) error")).
-					Run(func(ctx context.Context, fn func(application.Tx) error) {
-						mockService.EXPECT().HardDelete(mockTx, claimID, itemID).Return(nil).Once()
-						_ = fn(mockTx)
-					}).Return(nil).Once()
+		Context("when authorized as SC_STAFF", func() {
+			BeforeEach(func() {
+				setupRoute("DELETE", "/claims/:id/items/:itemID", entities.UserRoleScStaff, handler.Delete)
+			})
 
-				r.DELETE("/claims/:id/items/:itemID", func(c *gin.Context) {
-					SetHeaderRole(c, entities.UserRoleScStaff)
-					handler.Delete(c)
+			It("should delete claim item successfully", func() {
+				setupTxMock(func() {
+					mockService.EXPECT().HardDelete(mockTx, claimID, itemID).Return(nil).Once()
 				})
 
 				req, _ := http.NewRequest(http.MethodDelete, "/claims/"+claimID.String()+"/items/"+itemID.String(), nil)
 				r.ServeHTTP(w, req)
-
 				Expect(w.Code).To(Equal(http.StatusNoContent))
 			})
-		})
 
-		Context("when user is not authorized", func() {
-			It("should return forbidden error", func() {
-				r.DELETE("/claims/:id/items/:itemID", func(c *gin.Context) {
-					SetHeaderRole(c, entities.UserRoleEvmStaff) // Wrong role
-					handler.Delete(c)
-				})
-
-				req, _ := http.NewRequest(http.MethodDelete, "/claims/"+claimID.String()+"/items/"+itemID.String(), nil)
-				r.ServeHTTP(w, req)
-
-				ExpectErrorCode(w, http.StatusForbidden, apperrors.ErrorCodeUnauthorizedRole)
-			})
-		})
-
-		Context("when claim ID is invalid UUID", func() {
-			It("should return invalid UUID error", func() {
-				r.DELETE("/claims/:id/items/:itemID", func(c *gin.Context) {
-					SetHeaderRole(c, entities.UserRoleScStaff)
-					handler.Delete(c)
-				})
-
-				req, _ := http.NewRequest(http.MethodDelete, "/claims/invalid-uuid/items/"+itemID.String(), nil)
-				r.ServeHTTP(w, req)
-
-				ExpectErrorCode(w, http.StatusBadRequest, apperrors.ErrorCodeInvalidUUID)
-			})
-		})
-
-		Context("when item ID is invalid UUID", func() {
-			It("should return invalid UUID error", func() {
-				r.DELETE("/claims/:id/items/:itemID", func(c *gin.Context) {
-					SetHeaderRole(c, entities.UserRoleScStaff)
-					handler.Delete(c)
-				})
-
-				req, _ := http.NewRequest(http.MethodDelete, "/claims/"+claimID.String()+"/items/invalid-uuid", nil)
-				r.ServeHTTP(w, req)
-
-				ExpectErrorCode(w, http.StatusBadRequest, apperrors.ErrorCodeInvalidUUID)
-			})
-		})
-
-		Context("when claim item is not found", func() {
-			It("should return not found error", func() {
-				mockTxManager.EXPECT().Do(mock.Anything, mock.AnythingOfType("func(application.Tx) error")).
-					Run(func(ctx context.Context, fn func(application.Tx) error) {
-						mockService.EXPECT().HardDelete(mockTx, claimID, itemID).
-							Return(apperrors.NewClaimItemNotFound()).Once()
-						_ = fn(mockTx)
-					}).Return(apperrors.NewClaimItemNotFound()).Once()
-
-				r.DELETE("/claims/:id/items/:itemID", func(c *gin.Context) {
-					SetHeaderRole(c, entities.UserRoleScStaff)
-					handler.Delete(c)
-				})
-
-				req, _ := http.NewRequest(http.MethodDelete, "/claims/"+claimID.String()+"/items/"+itemID.String(), nil)
-				r.ServeHTTP(w, req)
-
-				ExpectErrorCode(w, http.StatusNotFound, apperrors.ErrorCodeClaimItemNotFound)
-			})
+			DescribeTable("should handle error scenarios",
+				func(setupMock func(), url string, expectedStatus int, expectedError string) {
+					if setupMock != nil {
+						setupMock()
+					}
+					req, _ := http.NewRequest(http.MethodDelete, url, nil)
+					r.ServeHTTP(w, req)
+					ExpectErrorCode(w, expectedStatus, expectedError)
+				},
+				Entry("invalid claim UUID",
+					nil,
+					"/claims/invalid-uuid/items/"+itemID.String(), http.StatusBadRequest, apperrors.ErrorCodeInvalidUUID),
+				Entry("invalid item UUID",
+					nil,
+					"/claims/"+claimID.String()+"/items/invalid-uuid", http.StatusBadRequest, apperrors.ErrorCodeInvalidUUID),
+			)
 		})
 	})
 
 	Describe("Approve", func() {
-		Context("when approval is successful", func() {
-			It("should approve the claim item and return no content", func() {
-				mockTxManager.EXPECT().Do(mock.Anything, mock.AnythingOfType("func(application.Tx) error")).
-					Run(func(ctx context.Context, fn func(application.Tx) error) {
-						mockService.EXPECT().Approve(mockTx, claimID, itemID).Return(nil).Once()
-						_ = fn(mockTx)
-					}).Return(nil).Once()
+		Context("when authorized as EVM_STAFF", func() {
+			BeforeEach(func() {
+				setupRoute("POST", "/claims/:id/items/:itemID/approve", entities.UserRoleEvmStaff, handler.Approve)
+			})
 
-				r.POST("/claims/:id/items/:itemID/approve", func(c *gin.Context) {
-					SetHeaderRole(c, entities.UserRoleEvmStaff)
-					handler.Approve(c)
+			It("should approve claim item successfully", func() {
+				setupTxMock(func() {
+					mockService.EXPECT().Approve(mockTx, claimID, itemID).Return(nil).Once()
 				})
 
 				req, _ := http.NewRequest(http.MethodPost, "/claims/"+claimID.String()+"/items/"+itemID.String()+"/approve", nil)
 				r.ServeHTTP(w, req)
-
 				Expect(w.Code).To(Equal(http.StatusNoContent))
 			})
 		})
 
-		Context("when user is not authorized", func() {
-			It("should return forbidden error", func() {
-				r.POST("/claims/:id/items/:itemID/approve", func(c *gin.Context) {
-					SetHeaderRole(c, entities.UserRoleScStaff) // Wrong role
-					handler.Approve(c)
-				})
-
-				req, _ := http.NewRequest(http.MethodPost, "/claims/"+claimID.String()+"/items/"+itemID.String()+"/approve", nil)
-				r.ServeHTTP(w, req)
-
-				ExpectErrorCode(w, http.StatusForbidden, apperrors.ErrorCodeUnauthorizedRole)
-			})
-		})
-
-		Context("when claim ID is invalid UUID", func() {
-			It("should return invalid UUID error", func() {
-				r.POST("/claims/:id/items/:itemID/approve", func(c *gin.Context) {
-					SetHeaderRole(c, entities.UserRoleEvmStaff)
-					handler.Approve(c)
-				})
-
-				req, _ := http.NewRequest(http.MethodPost, "/claims/invalid-uuid/items/"+itemID.String()+"/approve", nil)
-				r.ServeHTTP(w, req)
-
-				ExpectErrorCode(w, http.StatusBadRequest, apperrors.ErrorCodeInvalidUUID)
-			})
-		})
-
-		Context("when item ID is invalid UUID", func() {
-			It("should return invalid UUID error", func() {
-				r.POST("/claims/:id/items/:itemID/approve", func(c *gin.Context) {
-					SetHeaderRole(c, entities.UserRoleEvmStaff)
-					handler.Approve(c)
-				})
-
-				req, _ := http.NewRequest(http.MethodPost, "/claims/"+claimID.String()+"/items/invalid-uuid/approve", nil)
-				r.ServeHTTP(w, req)
-
-				ExpectErrorCode(w, http.StatusBadRequest, apperrors.ErrorCodeInvalidUUID)
-			})
-		})
-
-		Context("when claim item is not found", func() {
-			It("should return not found error", func() {
-				mockTxManager.EXPECT().Do(mock.Anything, mock.AnythingOfType("func(application.Tx) error")).
-					Run(func(ctx context.Context, fn func(application.Tx) error) {
-						mockService.EXPECT().Approve(mockTx, claimID, itemID).
-							Return(apperrors.NewClaimItemNotFound()).Once()
-						_ = fn(mockTx)
-					}).Return(apperrors.NewClaimItemNotFound()).Once()
-
-				r.POST("/claims/:id/items/:itemID/approve", func(c *gin.Context) {
-					SetHeaderRole(c, entities.UserRoleEvmStaff)
-					handler.Approve(c)
-				})
-
-				req, _ := http.NewRequest(http.MethodPost, "/claims/"+claimID.String()+"/items/"+itemID.String()+"/approve", nil)
-				r.ServeHTTP(w, req)
-
-				ExpectErrorCode(w, http.StatusNotFound, apperrors.ErrorCodeClaimItemNotFound)
-			})
+		It("should deny access for unauthorized roles", func() {
+			setupRoute("POST", "/claims/:id/items/:itemID/approve", entities.UserRoleScStaff, handler.Approve)
+			req, _ := http.NewRequest(http.MethodPost, "/claims/"+claimID.String()+"/items/"+itemID.String()+"/approve", nil)
+			r.ServeHTTP(w, req)
+			ExpectErrorCode(w, http.StatusForbidden, apperrors.ErrorCodeUnauthorizedRole)
 		})
 	})
 
 	Describe("Reject", func() {
-		Context("when rejection is successful", func() {
-			It("should reject the claim item and return no content", func() {
-				mockTxManager.EXPECT().Do(mock.Anything, mock.AnythingOfType("func(application.Tx) error")).
-					Run(func(ctx context.Context, fn func(application.Tx) error) {
-						mockService.EXPECT().Reject(mockTx, claimID, itemID).Return(nil).Once()
-						_ = fn(mockTx)
-					}).Return(nil).Once()
+		Context("when authorized as EVM_STAFF", func() {
+			BeforeEach(func() {
+				setupRoute("POST", "/claims/:id/items/:itemID/reject", entities.UserRoleEvmStaff, handler.Reject)
+			})
 
-				r.POST("/claims/:id/items/:itemID/reject", func(c *gin.Context) {
-					SetHeaderRole(c, entities.UserRoleEvmStaff)
-					handler.Reject(c)
+			It("should reject claim item successfully", func() {
+				setupTxMock(func() {
+					mockService.EXPECT().Reject(mockTx, claimID, itemID).Return(nil).Once()
 				})
 
 				req, _ := http.NewRequest(http.MethodPost, "/claims/"+claimID.String()+"/items/"+itemID.String()+"/reject", nil)
 				r.ServeHTTP(w, req)
-
 				Expect(w.Code).To(Equal(http.StatusNoContent))
 			})
 		})
 
-		Context("when user is not authorized", func() {
-			It("should return forbidden error", func() {
-				r.POST("/claims/:id/items/:itemID/reject", func(c *gin.Context) {
-					SetHeaderRole(c, entities.UserRoleScStaff) // Wrong role
-					handler.Reject(c)
-				})
-
-				req, _ := http.NewRequest(http.MethodPost, "/claims/"+claimID.String()+"/items/"+itemID.String()+"/reject", nil)
-				r.ServeHTTP(w, req)
-
-				ExpectErrorCode(w, http.StatusForbidden, apperrors.ErrorCodeUnauthorizedRole)
-			})
-		})
-
-		Context("when claim ID is invalid UUID", func() {
-			It("should return invalid UUID error", func() {
-				r.POST("/claims/:id/items/:itemID/reject", func(c *gin.Context) {
-					SetHeaderRole(c, entities.UserRoleEvmStaff)
-					handler.Reject(c)
-				})
-
-				req, _ := http.NewRequest(http.MethodPost, "/claims/invalid-uuid/items/"+itemID.String()+"/reject", nil)
-				r.ServeHTTP(w, req)
-
-				ExpectErrorCode(w, http.StatusBadRequest, apperrors.ErrorCodeInvalidUUID)
-			})
-		})
-
-		Context("when item ID is invalid UUID", func() {
-			It("should return invalid UUID error", func() {
-				r.POST("/claims/:id/items/:itemID/reject", func(c *gin.Context) {
-					SetHeaderRole(c, entities.UserRoleEvmStaff)
-					handler.Reject(c)
-				})
-
-				req, _ := http.NewRequest(http.MethodPost, "/claims/"+claimID.String()+"/items/invalid-uuid/reject", nil)
-				r.ServeHTTP(w, req)
-
-				ExpectErrorCode(w, http.StatusBadRequest, apperrors.ErrorCodeInvalidUUID)
-			})
-		})
-
-		Context("when claim item is not found", func() {
-			It("should return not found error", func() {
-				mockTxManager.EXPECT().Do(mock.Anything, mock.AnythingOfType("func(application.Tx) error")).
-					Run(func(ctx context.Context, fn func(application.Tx) error) {
-						mockService.EXPECT().Reject(mockTx, claimID, itemID).
-							Return(apperrors.NewClaimItemNotFound()).Once()
-						_ = fn(mockTx)
-					}).Return(apperrors.NewClaimItemNotFound()).Once()
-
-				r.POST("/claims/:id/items/:itemID/reject", func(c *gin.Context) {
-					SetHeaderRole(c, entities.UserRoleEvmStaff)
-					handler.Reject(c)
-				})
-
-				req, _ := http.NewRequest(http.MethodPost, "/claims/"+claimID.String()+"/items/"+itemID.String()+"/reject", nil)
-				r.ServeHTTP(w, req)
-
-				ExpectErrorCode(w, http.StatusNotFound, apperrors.ErrorCodeClaimItemNotFound)
-			})
+		It("should deny access for unauthorized roles", func() {
+			setupRoute("POST", "/claims/:id/items/:itemID/reject", entities.UserRoleScStaff, handler.Reject)
+			req, _ := http.NewRequest(http.MethodPost, "/claims/"+claimID.String()+"/items/"+itemID.String()+"/reject", nil)
+			r.ServeHTTP(w, req)
+			ExpectErrorCode(w, http.StatusForbidden, apperrors.ErrorCodeUnauthorizedRole)
 		})
 	})
 })
