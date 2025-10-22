@@ -181,7 +181,7 @@ func (s *claimItemService) Approve(tx application.Tx, claimID, itemID uuid.UUID)
 		return apperrors.NewNotAllowUpdateClaim()
 	}
 
-	err = s.itemRepo.UpdateStatus(tx, itemID, entities.ClaimStatusApproved)
+	err = s.itemRepo.UpdateStatus(tx, itemID, entities.ClaimItemStatusApproved)
 	if err != nil {
 		return err
 	}
@@ -209,7 +209,7 @@ func (s *claimItemService) Reject(tx application.Tx, claimID, itemID uuid.UUID) 
 		return apperrors.NewNotAllowUpdateClaim()
 	}
 
-	err = s.itemRepo.UpdateStatus(tx, itemID, entities.ClaimStatusRejected)
+	err = s.itemRepo.UpdateStatus(tx, itemID, entities.ClaimItemStatusRejected)
 	if err != nil {
 		return err
 	}

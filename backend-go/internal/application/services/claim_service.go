@@ -181,12 +181,10 @@ func (s *claimService) HardDelete(tx application.Tx, id uuid.UUID) error {
 	err = s.claimRepo.HardDelete(tx, id)
 	if err == nil {
 		for _, attach := range attachments {
-			go func() {
-				err := s.cloudService.DeleteFileByURL(context.Background(), attach.URL)
-				if err != nil {
-					s.log.Error("[Cloudinary] Failed to delete file in delete claim use case", "error", err)
-				}
-			}()
+			err := s.cloudService.DeleteFileByURL(context.Background(), attach.URL)
+			if err != nil {
+				s.log.Error("[Cloudinary] Failed to delete file in delete claim use case", "error", err)
+			}
 		}
 	}
 	return err
@@ -306,18 +304,20 @@ func (s *claimService) Complete(tx application.Tx, id uuid.UUID, changedBy uuid.
 	newStatus := entities.ClaimStatusPartiallyApproved
 	if approvedCount == len(items) {
 		newStatus = entities.ClaimStatusApproved
+	} else if approvedCount == 0 {
+		newStatus = entities.ClaimStatusRejected
 	}
 
 	if !entities.IsValidClaimStatusTransition(claim.Status, newStatus) {
 		return apperrors.NewInvalidClaimAction()
 	}
 
-	err = s.claimRepo.UpdateStatus(tx, id, entities.ClaimStatusPartiallyApproved)
+	err = s.claimRepo.UpdateStatus(tx, id, newStatus)
 	if err != nil {
 		return err
 	}
 
-	history := entities.NewClaimHistory(claim.ID, entities.ClaimStatusPartiallyApproved, changedBy)
+	history := entities.NewClaimHistory(claim.ID, newStatus, changedBy)
 	if err = s.historyRepo.Create(tx, history); err != nil {
 		return err
 	}

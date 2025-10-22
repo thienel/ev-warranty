@@ -102,8 +102,9 @@ func (s *claimAttachmentService) HardDelete(tx application.Tx, claimID, attachme
 
 	err = s.attachRepo.HardDelete(tx, attachmentID)
 	if err == nil {
-		err := s.cloudService.DeleteFileByURL(tx.GetCtx(), attach.URL)
-		s.log.Error("[Cloudinary] Failed to delete file when hard delete claim attachment", "error", err)
+		if cloudErr := s.cloudService.DeleteFileByURL(tx.GetCtx(), attach.URL); cloudErr != nil {
+			s.log.Error("[Cloudinary] Failed to delete file when hard delete claim attachment", "error", cloudErr)
+		}
 	}
 
 	return err

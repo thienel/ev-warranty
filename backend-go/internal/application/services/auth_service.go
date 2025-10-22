@@ -2,6 +2,7 @@ package services
 
 import (
 	"context"
+	"errors"
 	"ev-warranty-go/internal/apperrors"
 	"ev-warranty-go/internal/application/repositories"
 	"ev-warranty-go/internal/infrastructure/oauth/providers"
@@ -31,9 +32,6 @@ func (s *authService) Login(ctx context.Context, email, password string) (string
 		return "", "", err
 	}
 
-	if user == nil {
-		return "", "", apperrors.NewInvalidCredentials()
-	}
 	if !user.IsActive {
 		return "", "", apperrors.NewUserInactive()
 	}
@@ -64,11 +62,14 @@ func (s *authService) Logout(ctx context.Context, token string) error {
 func (s *authService) HandleOAuthUser(ctx context.Context, userInfo *providers.UserInfo) (string, string, error) {
 	user, err := s.userRepo.FindByOAuth(ctx, userInfo.Provider, userInfo.ProviderID)
 	if err != nil {
-		if err.Error() == "user not found" {
+		var appErr *apperrors.AppError
+		if errors.As(err, &appErr) && appErr.ErrorCode == apperrors.ErrorCodeUserNotFound {
 			user, err = s.userRepo.FindByEmail(ctx, userInfo.Email)
 			if err != nil {
 				return "", "", err
 			}
+		} else {
+			return "", "", err
 		}
 	}
 

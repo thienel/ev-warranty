@@ -35,12 +35,12 @@ type UserService interface {
 }
 
 type userService struct {
-	userRepo      repositories.UserRepository
-	officeService OfficeService
+	userRepo   repositories.UserRepository
+	officeRepo repositories.OfficeRepository
 }
 
-func NewUserService(userRepo repositories.UserRepository, officeService OfficeService) UserService {
-	return &userService{userRepo, officeService}
+func NewUserService(userRepo repositories.UserRepository, officeRepo repositories.OfficeRepository) UserService {
+	return &userService{userRepo, officeRepo}
 }
 
 func (s *userService) Create(ctx context.Context, cmd *UserCreateCommand) (*entities.User, error) {
@@ -49,7 +49,8 @@ func (s *userService) Create(ctx context.Context, cmd *UserCreateCommand) (*enti
 		return nil, apperrors.NewInvalidUserInput()
 	}
 
-	if _, err := s.officeService.GetByID(ctx, cmd.OfficeID); err != nil {
+	office, err := s.officeRepo.FindByID(ctx, cmd.OfficeID)
+	if err != nil {
 		return nil, err
 	}
 
@@ -59,10 +60,6 @@ func (s *userService) Create(ctx context.Context, cmd *UserCreateCommand) (*enti
 	}
 
 	user := entities.NewUser(cmd.Name, cmd.Email, cmd.Role, passwordHash, cmd.IsActive, cmd.OfficeID)
-	office, err := s.officeService.GetByID(ctx, cmd.OfficeID)
-	if err != nil || office == nil {
-		return nil, err
-	}
 	if !user.IsValidOfficeByRole(office.OfficeType) {
 		return nil, apperrors.NewInvalidOfficeType()
 	}
@@ -100,8 +97,8 @@ func (s *userService) Update(ctx context.Context, id uuid.UUID, cmd *UserUpdateC
 	user.Name = cmd.Name
 	user.IsActive = cmd.IsActive
 
-	office, err := s.officeService.GetByID(ctx, cmd.OfficeID)
-	if err != nil || office == nil {
+	office, err := s.officeRepo.FindByID(ctx, cmd.OfficeID)
+	if err != nil {
 		return err
 	}
 	if !user.IsValidOfficeByRole(office.OfficeType) {
