@@ -1,7 +1,6 @@
 package handlers_test
 
 import (
-	"bytes"
 	"encoding/json"
 	"ev-warranty-go/internal/apperrors"
 	"ev-warranty-go/internal/application/services"
@@ -40,381 +39,224 @@ var _ = Describe("AuthHandler", func() {
 
 	Describe("Login", func() {
 		var (
-			loginRequest dtos.LoginRequest
-			userID       uuid.UUID
-			accessToken  string
-			refreshToken string
+			loginRequest = dtos.LoginRequest{Email: "test@example.com", Password: "password123"}
+			userID       = uuid.New()
+			accessToken  = "access-token-123"
+			refreshToken = "refresh-token-456"
 			user         *entities.User
 		)
 
 		BeforeEach(func() {
-			loginRequest = dtos.LoginRequest{
-				Email:    "test@example.com",
-				Password: "password123",
-			}
-			userID = uuid.New()
-			accessToken = "access-token-123"
-			refreshToken = "refresh-token-456"
+			r.POST("/auth/login", handler.Login)
 			user = &entities.User{
-				ID:       userID,
-				Name:     "Test User",
-				Email:    "test@example.com",
-				Role:     entities.UserRoleAdmin,
-				IsActive: true,
-				OfficeID: uuid.New(),
+				ID: userID, Name: "Test User", Email: "test@example.com",
+				Role: entities.UserRoleAdmin, IsActive: true, OfficeID: uuid.New(),
 			}
 		})
 
-		Context("when login is successful", func() {
-			It("should return access token and user info with refresh token cookie", func() {
-				claims := &services.CustomClaims{
-					UserID: userID.String(),
+		It("should return access token and user info with refresh token cookie", func() {
+			claims := &services.CustomClaims{UserID: userID.String()}
+
+			mockAuthSvc.EXPECT().Login(mock.Anything, loginRequest.Email, loginRequest.Password).
+				Return(accessToken, refreshToken, nil).Once()
+			mockTokenSvc.EXPECT().ValidateAccessToken(mock.Anything, accessToken).
+				Return(claims, nil).Once()
+			mockUserSvc.EXPECT().GetByID(mock.Anything, userID).Return(user, nil).Once()
+
+			SendRequest(r, http.MethodPost, "/auth/login", w, loginRequest)
+
+			Expect(w.Code).To(Equal(http.StatusOK))
+			ExpectCookieRefreshToken(w, refreshToken)
+			ExpectResponseNotNil(w, http.StatusOK)
+		})
+
+		DescribeTable("should handle errors",
+			func(setupMocks func(), request interface{}, expectedCode int, expectedError string) {
+				if setupMocks != nil {
+					setupMocks()
 				}
-
-				mockAuthSvc.EXPECT().Login(mock.Anything, loginRequest.Email, loginRequest.Password).
-					Return(accessToken, refreshToken, nil).Once()
-				mockTokenSvc.EXPECT().ValidateAccessToken(mock.Anything, accessToken).
-					Return(claims, nil).Once()
-				mockUserSvc.EXPECT().GetByID(mock.Anything, userID).
-					Return(user, nil).Once()
-
-				r.POST("/auth/login", handler.Login)
-				body, _ := json.Marshal(loginRequest)
-				req, _ := http.NewRequest(http.MethodPost, "/auth/login", bytes.NewBuffer(body))
-				req.Header.Set("Content-Type", "application/json")
-				r.ServeHTTP(w, req)
-
-				Expect(w.Code).To(Equal(http.StatusOK))
-				ExpectCookieRefreshToken(w, refreshToken)
-
-				var response dtos.APIResponse
-				err := json.Unmarshal(w.Body.Bytes(), &response)
-				Expect(err).NotTo(HaveOccurred())
-
-				loginResp, ok := response.Data.(map[string]interface{})
-				Expect(ok).To(BeTrue())
-				Expect(loginResp["token"]).To(Equal(accessToken))
-				Expect(loginResp["user"]).NotTo(BeNil())
-			})
-		})
-
-		Context("when request body is invalid", func() {
-			It("should return bad request error", func() {
-				r.POST("/auth/login", handler.Login)
-				req, _ := http.NewRequest(http.MethodPost, "/auth/login", bytes.NewBuffer([]byte("invalid json")))
-				req.Header.Set("Content-Type", "application/json")
-				r.ServeHTTP(w, req)
-
-				Expect(w.Code).To(Equal(http.StatusBadRequest))
-				ExpectErrorCode(w, http.StatusBadRequest, apperrors.ErrorCodeInvalidJsonRequest)
-			})
-		})
-
-		Context("when auth service login fails", func() {
-			It("should return authentication error", func() {
+				SendRequest(r, http.MethodPost, "/auth/login", w, request)
+				ExpectErrorCode(w, expectedCode, expectedError)
+			},
+			Entry("invalid JSON", nil, "invalid json", http.StatusBadRequest, apperrors.ErrorCodeInvalidJsonRequest),
+			Entry("auth service login fails", func() {
 				mockAuthSvc.EXPECT().Login(mock.Anything, loginRequest.Email, loginRequest.Password).
 					Return("", "", apperrors.NewInvalidCredentials()).Once()
-
-				r.POST("/auth/login", handler.Login)
-				body, _ := json.Marshal(loginRequest)
-				req, _ := http.NewRequest(http.MethodPost, "/auth/login", bytes.NewBuffer(body))
-				req.Header.Set("Content-Type", "application/json")
-				r.ServeHTTP(w, req)
-
-				Expect(w.Code).To(Equal(http.StatusUnauthorized))
-				ExpectErrorCode(w, http.StatusUnauthorized, apperrors.ErrorCodeInvalidCredentials)
-			})
-		})
-
-		Context("when token validation fails", func() {
-			It("should return token validation error", func() {
+			}, loginRequest, http.StatusUnauthorized, apperrors.ErrorCodeInvalidCredentials),
+			Entry("token validation fails", func() {
 				mockAuthSvc.EXPECT().Login(mock.Anything, loginRequest.Email, loginRequest.Password).
 					Return(accessToken, refreshToken, nil).Once()
 				mockTokenSvc.EXPECT().ValidateAccessToken(mock.Anything, accessToken).
 					Return(nil, apperrors.NewInvalidAccessToken()).Once()
-
-				r.POST("/auth/login", handler.Login)
-				body, _ := json.Marshal(loginRequest)
-				req, _ := http.NewRequest(http.MethodPost, "/auth/login", bytes.NewBuffer(body))
-				req.Header.Set("Content-Type", "application/json")
-				r.ServeHTTP(w, req)
-
-				Expect(w.Code).To(Equal(http.StatusUnauthorized))
-				ExpectErrorCode(w, http.StatusUnauthorized, apperrors.ErrorCodeInvalidAccessToken)
-			})
-		})
-
-		Context("when user service GetByID fails", func() {
-			It("should return user not found error", func() {
-				claims := &services.CustomClaims{
-					UserID: userID.String(),
-				}
-
+			}, loginRequest, http.StatusUnauthorized, apperrors.ErrorCodeInvalidAccessToken),
+			Entry("user not found", func() {
+				claims := &services.CustomClaims{UserID: userID.String()}
 				mockAuthSvc.EXPECT().Login(mock.Anything, loginRequest.Email, loginRequest.Password).
 					Return(accessToken, refreshToken, nil).Once()
 				mockTokenSvc.EXPECT().ValidateAccessToken(mock.Anything, accessToken).
 					Return(claims, nil).Once()
 				mockUserSvc.EXPECT().GetByID(mock.Anything, userID).
 					Return(nil, apperrors.NewUserNotFound()).Once()
-
-				r.POST("/auth/login", handler.Login)
-				body, _ := json.Marshal(loginRequest)
-				req, _ := http.NewRequest(http.MethodPost, "/auth/login", bytes.NewBuffer(body))
-				req.Header.Set("Content-Type", "application/json")
-				r.ServeHTTP(w, req)
-
-				Expect(w.Code).To(Equal(http.StatusNotFound))
-				ExpectErrorCode(w, http.StatusNotFound, apperrors.ErrorCodeUserNotFound)
-			})
-		})
+			}, loginRequest, http.StatusNotFound, apperrors.ErrorCodeUserNotFound),
+		)
 	})
 
 	Describe("Logout", func() {
-		var refreshToken string
+		var refreshToken = "refresh-token-456"
 
 		BeforeEach(func() {
-			refreshToken = "refresh-token-456"
+			r.POST("/auth/logout", handler.Logout)
 		})
 
-		Context("when logout is successful", func() {
-			It("should logout user and return success", func() {
-				mockAuthSvc.EXPECT().Logout(mock.Anything, refreshToken).Return(nil).Once()
+		It("should logout user and return success", func() {
+			mockAuthSvc.EXPECT().Logout(mock.Anything, refreshToken).Return(nil).Once()
 
-				r.POST("/auth/logout", handler.Logout)
+			req, _ := http.NewRequest(http.MethodPost, "/auth/logout", nil)
+			req.AddCookie(&http.Cookie{Name: "refreshToken", Value: refreshToken})
+			r.ServeHTTP(w, req)
+
+			Expect(w.Code).To(Equal(http.StatusOK))
+		})
+
+		DescribeTable("should handle errors",
+			func(setupCookie bool, setupMocks func(), expectedCode int, expectedError string) {
+				if setupMocks != nil {
+					setupMocks()
+				}
 				req, _ := http.NewRequest(http.MethodPost, "/auth/logout", nil)
-				req.AddCookie(&http.Cookie{
-					Name:  "refreshToken",
-					Value: refreshToken,
-				})
+				if setupCookie {
+					req.AddCookie(&http.Cookie{Name: "refreshToken", Value: refreshToken})
+				}
 				r.ServeHTTP(w, req)
-
-				Expect(w.Code).To(Equal(http.StatusOK))
-			})
-		})
-
-		Context("when refresh token cookie is missing", func() {
-			It("should return refresh token not found error", func() {
-				r.POST("/auth/logout", handler.Logout)
-				req, _ := http.NewRequest(http.MethodPost, "/auth/logout", nil)
-				r.ServeHTTP(w, req)
-
-				Expect(w.Code).To(Equal(http.StatusNotFound))
-				ExpectErrorCode(w, http.StatusNotFound, apperrors.ErrorCodeRefreshTokenNotFound)
-			})
-		})
-
-		Context("when auth service logout fails", func() {
-			It("should return logout error", func() {
+				ExpectErrorCode(w, expectedCode, expectedError)
+			},
+			Entry("missing refresh token", false, nil, http.StatusNotFound, apperrors.ErrorCodeRefreshTokenNotFound),
+			Entry("auth service logout fails", true, func() {
 				mockAuthSvc.EXPECT().Logout(mock.Anything, refreshToken).
 					Return(apperrors.NewInvalidRefreshToken()).Once()
-
-				r.POST("/auth/logout", handler.Logout)
-				req, _ := http.NewRequest(http.MethodPost, "/auth/logout", nil)
-				req.AddCookie(&http.Cookie{
-					Name:  "refreshToken",
-					Value: refreshToken,
-				})
-				r.ServeHTTP(w, req)
-
-				Expect(w.Code).To(Equal(http.StatusUnauthorized))
-				ExpectErrorCode(w, http.StatusUnauthorized, apperrors.ErrorCodeInvalidRefreshToken)
-			})
-		})
+			}, http.StatusUnauthorized, apperrors.ErrorCodeInvalidRefreshToken),
+		)
 	})
 
 	Describe("RefreshToken", func() {
 		var (
-			refreshToken   string
-			newAccessToken string
+			refreshToken   = "refresh-token-456"
+			newAccessToken = "new-access-token-789"
 		)
 
 		BeforeEach(func() {
-			refreshToken = "refresh-token-456"
-			newAccessToken = "new-access-token-789"
+			r.POST("/auth/refresh", handler.RefreshToken)
 		})
 
-		Context("when token refresh is successful", func() {
-			It("should return new access token", func() {
-				mockTokenSvc.EXPECT().RefreshAccessToken(mock.Anything, refreshToken).
-					Return(newAccessToken, nil).Once()
+		It("should return new access token", func() {
+			mockTokenSvc.EXPECT().RefreshAccessToken(mock.Anything, refreshToken).
+				Return(newAccessToken, nil).Once()
 
-				r.POST("/auth/refresh", handler.RefreshToken)
+			req, _ := http.NewRequest(http.MethodPost, "/auth/refresh", nil)
+			req.AddCookie(&http.Cookie{Name: "refreshToken", Value: refreshToken})
+			r.ServeHTTP(w, req)
+
+			Expect(w.Code).To(Equal(http.StatusOK))
+
+			var response dtos.APIResponse
+			err := json.Unmarshal(w.Body.Bytes(), &response)
+			Expect(err).NotTo(HaveOccurred())
+
+			tokenResp, ok := response.Data.(map[string]interface{})
+			Expect(ok).To(BeTrue())
+			Expect(tokenResp["access_token"]).To(Equal(newAccessToken))
+		})
+
+		DescribeTable("should handle errors",
+			func(setupCookie bool, setupMocks func(), expectedCode int, expectedError string) {
+				if setupMocks != nil {
+					setupMocks()
+				}
 				req, _ := http.NewRequest(http.MethodPost, "/auth/refresh", nil)
-				req.AddCookie(&http.Cookie{
-					Name:  "refreshToken",
-					Value: refreshToken,
-				})
+				if setupCookie {
+					req.AddCookie(&http.Cookie{Name: "refreshToken", Value: refreshToken})
+				}
 				r.ServeHTTP(w, req)
-
-				Expect(w.Code).To(Equal(http.StatusOK))
-
-				var response dtos.APIResponse
-				err := json.Unmarshal(w.Body.Bytes(), &response)
-				Expect(err).NotTo(HaveOccurred())
-
-				tokenResp, ok := response.Data.(map[string]interface{})
-				Expect(ok).To(BeTrue())
-				Expect(tokenResp["access_token"]).To(Equal(newAccessToken))
-			})
-		})
-
-		Context("when refresh token cookie is missing", func() {
-			It("should return refresh token not found error", func() {
-				r.POST("/auth/refresh", handler.RefreshToken)
-				req, _ := http.NewRequest(http.MethodPost, "/auth/refresh", nil)
-				r.ServeHTTP(w, req)
-
-				Expect(w.Code).To(Equal(http.StatusNotFound))
-				ExpectErrorCode(w, http.StatusNotFound, apperrors.ErrorCodeRefreshTokenNotFound)
-			})
-		})
-
-		Context("when token service refresh fails", func() {
-			It("should return refresh token error", func() {
+				ExpectErrorCode(w, expectedCode, expectedError)
+			},
+			Entry("missing refresh token", false, nil, http.StatusNotFound, apperrors.ErrorCodeRefreshTokenNotFound),
+			Entry("token service refresh fails", true, func() {
 				mockTokenSvc.EXPECT().RefreshAccessToken(mock.Anything, refreshToken).
 					Return("", apperrors.NewInvalidRefreshToken()).Once()
-
-				r.POST("/auth/refresh", handler.RefreshToken)
-				req, _ := http.NewRequest(http.MethodPost, "/auth/refresh", nil)
-				req.AddCookie(&http.Cookie{
-					Name:  "refreshToken",
-					Value: refreshToken,
-				})
-				r.ServeHTTP(w, req)
-
-				Expect(w.Code).To(Equal(http.StatusUnauthorized))
-				ExpectErrorCode(w, http.StatusUnauthorized, apperrors.ErrorCodeInvalidRefreshToken)
-			})
-		})
+			}, http.StatusUnauthorized, apperrors.ErrorCodeInvalidRefreshToken),
+		)
 	})
 
 	Describe("ValidateToken", func() {
 		var (
-			accessToken string
-			userID      uuid.UUID
+			accessToken = "valid-access-token"
+			userID      = uuid.New()
 			user        *entities.User
 		)
 
 		BeforeEach(func() {
-			accessToken = "valid-access-token"
-			userID = uuid.New()
+			r.POST("/auth/validate", handler.ValidateToken)
 			user = &entities.User{
-				ID:       userID,
-				Name:     "Test User",
-				Email:    "test@example.com",
-				Role:     entities.UserRoleAdmin,
-				IsActive: true,
-				OfficeID: uuid.New(),
+				ID: userID, Name: "Test User", Email: "test@example.com",
+				Role: entities.UserRoleAdmin, IsActive: true, OfficeID: uuid.New(),
 			}
 		})
 
-		Context("when token validation is successful", func() {
-			It("should return valid token response with user info and headers", func() {
-				claims := &services.CustomClaims{
-					UserID: userID.String(),
+		It("should return valid token response with user info and headers", func() {
+			claims := &services.CustomClaims{UserID: userID.String()}
+
+			mockTokenSvc.EXPECT().ValidateAccessToken(mock.Anything, accessToken).
+				Return(claims, nil).Once()
+			mockUserSvc.EXPECT().GetByID(mock.Anything, userID).Return(user, nil).Once()
+
+			req, _ := http.NewRequest(http.MethodPost, "/auth/validate", nil)
+			req.Header.Set("Authorization", "Bearer "+accessToken)
+			r.ServeHTTP(w, req)
+
+			Expect(w.Code).To(Equal(http.StatusOK))
+			Expect(w.Header().Get("X-User-ID")).To(Equal(userID.String()))
+			Expect(w.Header().Get("X-User-Role")).To(Equal(user.Role))
+
+			var response dtos.APIResponse
+			err := json.Unmarshal(w.Body.Bytes(), &response)
+			Expect(err).NotTo(HaveOccurred())
+
+			validationResp, ok := response.Data.(map[string]interface{})
+			Expect(ok).To(BeTrue())
+			Expect(validationResp["valid"]).To(BeTrue())
+			Expect(validationResp["user"]).NotTo(BeNil())
+		})
+
+		DescribeTable("should handle errors",
+			func(authHeader string, setupMocks func(), expectedCode int, expectedError string) {
+				if setupMocks != nil {
+					setupMocks()
 				}
-
-				mockTokenSvc.EXPECT().ValidateAccessToken(mock.Anything, accessToken).
-					Return(claims, nil).Once()
-				mockUserSvc.EXPECT().GetByID(mock.Anything, userID).
-					Return(user, nil).Once()
-
-				r.POST("/auth/validate", handler.ValidateToken)
 				req, _ := http.NewRequest(http.MethodPost, "/auth/validate", nil)
-				req.Header.Set("Authorization", "Bearer "+accessToken)
+				if authHeader != "" {
+					req.Header.Set("Authorization", authHeader)
+				}
 				r.ServeHTTP(w, req)
-
-				Expect(w.Code).To(Equal(http.StatusOK))
-				Expect(w.Header().Get("X-User-ID")).To(Equal(userID.String()))
-				Expect(w.Header().Get("X-User-Role")).To(Equal(user.Role))
-
-				var response dtos.APIResponse
-				err := json.Unmarshal(w.Body.Bytes(), &response)
-				Expect(err).NotTo(HaveOccurred())
-
-				validationResp, ok := response.Data.(map[string]interface{})
-				Expect(ok).To(BeTrue())
-				Expect(validationResp["valid"]).To(BeTrue())
-				Expect(validationResp["user"]).NotTo(BeNil())
-			})
-		})
-
-		Context("when authorization header is missing", func() {
-			It("should return invalid auth header error", func() {
-				r.POST("/auth/validate", handler.ValidateToken)
-				req, _ := http.NewRequest(http.MethodPost, "/auth/validate", nil)
-				r.ServeHTTP(w, req)
-
-				Expect(w.Code).To(Equal(http.StatusUnauthorized))
-				ExpectErrorCode(w, http.StatusUnauthorized, apperrors.ErrorCodeInvalidAuthHeader)
-			})
-		})
-
-		Context("when authorization header format is invalid", func() {
-			It("should return invalid auth header error", func() {
-				r.POST("/auth/validate", handler.ValidateToken)
-				req, _ := http.NewRequest(http.MethodPost, "/auth/validate", nil)
-				req.Header.Set("Authorization", "InvalidFormat "+accessToken)
-				r.ServeHTTP(w, req)
-
-				Expect(w.Code).To(Equal(http.StatusUnauthorized))
-				ExpectErrorCode(w, http.StatusUnauthorized, apperrors.ErrorCodeInvalidAuthHeader)
-			})
-		})
-
-		Context("when token validation fails", func() {
-			It("should return token validation error", func() {
+				ExpectErrorCode(w, expectedCode, expectedError)
+			},
+			Entry("missing authorization header", "", nil, http.StatusUnauthorized, apperrors.ErrorCodeInvalidAuthHeader),
+			Entry("invalid authorization header format", "InvalidFormat "+accessToken, nil, http.StatusUnauthorized, apperrors.ErrorCodeInvalidAuthHeader),
+			Entry("token validation fails", "Bearer "+accessToken, func() {
 				mockTokenSvc.EXPECT().ValidateAccessToken(mock.Anything, accessToken).
 					Return(nil, apperrors.NewInvalidAccessToken()).Once()
-
-				r.POST("/auth/validate", handler.ValidateToken)
-				req, _ := http.NewRequest(http.MethodPost, "/auth/validate", nil)
-				req.Header.Set("Authorization", "Bearer "+accessToken)
-				r.ServeHTTP(w, req)
-
-				Expect(w.Code).To(Equal(http.StatusUnauthorized))
-				ExpectErrorCode(w, http.StatusUnauthorized, apperrors.ErrorCodeInvalidAccessToken)
-			})
-		})
-
-		Context("when user ID in token is invalid", func() {
-			It("should return invalid user ID error", func() {
-				claims := &services.CustomClaims{
-					UserID: "invalid-uuid",
-				}
-
+			}, http.StatusUnauthorized, apperrors.ErrorCodeInvalidAccessToken),
+			Entry("invalid user ID in token", "Bearer "+accessToken, func() {
+				claims := &services.CustomClaims{UserID: "invalid-uuid"}
 				mockTokenSvc.EXPECT().ValidateAccessToken(mock.Anything, accessToken).
 					Return(claims, nil).Once()
-
-				r.POST("/auth/validate", handler.ValidateToken)
-				req, _ := http.NewRequest(http.MethodPost, "/auth/validate", nil)
-				req.Header.Set("Authorization", "Bearer "+accessToken)
-				r.ServeHTTP(w, req)
-
-				Expect(w.Code).To(Equal(http.StatusBadRequest))
-				ExpectErrorCode(w, http.StatusBadRequest, apperrors.ErrorCodeInvalidUserID)
-			})
-		})
-
-		Context("when user service GetByID fails", func() {
-			It("should return user not found error", func() {
-				claims := &services.CustomClaims{
-					UserID: userID.String(),
-				}
-
+			}, http.StatusBadRequest, apperrors.ErrorCodeInvalidUserID),
+			Entry("user not found", "Bearer "+accessToken, func() {
+				claims := &services.CustomClaims{UserID: userID.String()}
 				mockTokenSvc.EXPECT().ValidateAccessToken(mock.Anything, accessToken).
 					Return(claims, nil).Once()
 				mockUserSvc.EXPECT().GetByID(mock.Anything, userID).
 					Return(nil, apperrors.NewUserNotFound()).Once()
-
-				r.POST("/auth/validate", handler.ValidateToken)
-				req, _ := http.NewRequest(http.MethodPost, "/auth/validate", nil)
-				req.Header.Set("Authorization", "Bearer "+accessToken)
-				r.ServeHTTP(w, req)
-
-				Expect(w.Code).To(Equal(http.StatusNotFound))
-				ExpectErrorCode(w, http.StatusNotFound, apperrors.ErrorCodeUserNotFound)
-			})
-		})
+			}, http.StatusNotFound, apperrors.ErrorCodeUserNotFound),
+		)
 	})
 })
