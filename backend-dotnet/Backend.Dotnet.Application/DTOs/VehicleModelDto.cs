@@ -48,6 +48,10 @@ namespace Backend.Dotnet.Application.DTOs
             [Required(ErrorMessage = "Year is required")]
             [Range(2000, 2100, ErrorMessage = "Year must be between 2000 and 2100")]
             public int Year { get; set; }
+
+            [JsonPropertyName("updateMask")]
+            [Required(ErrorMessage = "updateMask is required")]
+            public List<string> UpdateMask { get; set; } = new();
         }
 
         /// <summary>
@@ -113,7 +117,20 @@ namespace Backend.Dotnet.Application.DTOs
 
         public static void ApplyToEntity(this VehicleModelDto.UpdateVehicleModelRequest request, VehicleModel entity)
         {
-            entity.UpdateModel(request.Brand, request.ModelName, request.Year);
+            if (request.ModelName != null || !request.UpdateMask.Any())
+            {
+                entity.UpdateModel(request.Brand, request.ModelName, request.Year);
+                return;
+            }
+
+            if (request.UpdateMask.Contains("brand", StringComparer.OrdinalIgnoreCase))
+                entity.ChangeBrand(request.Brand ?? string.Empty);
+
+            if (request.UpdateMask.Contains("model_name", StringComparer.OrdinalIgnoreCase))
+                entity.ChangeModelName(request.ModelName ?? string.Empty);
+
+            if (request.UpdateMask.Contains("year", StringComparer.OrdinalIgnoreCase))
+                entity.ChangeYear(request.Year);
         }
 
         public static VehicleModelDto.VehicleModelResponse ToResponse(this VehicleModel entity)

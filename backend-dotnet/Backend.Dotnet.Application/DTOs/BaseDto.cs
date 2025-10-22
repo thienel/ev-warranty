@@ -10,7 +10,7 @@ namespace Backend.Dotnet.Application.DTOs
         [JsonPropertyName("message")]
         public string Message { get; set; } = string.Empty;
 
-        [JsonPropertyName("error_code")]
+        [JsonPropertyName("error")]
         public string? ErrorCode { get; set; }
     }
 

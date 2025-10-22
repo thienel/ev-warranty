@@ -1,5 +1,7 @@
-﻿using Backend.Dotnet.Application.Interfaces;
+﻿using Backend.Dotnet.Application.DTOs;
+using Backend.Dotnet.Application.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using static Backend.Dotnet.Application.DTOs.CustomerDto;
 using static Backend.Dotnet.Application.DTOs.VehicleModelDto;
 
 namespace Backend.Dotnet.API.Controllers
@@ -106,6 +108,9 @@ namespace Backend.Dotnet.API.Controllers
         }
 
         [HttpPut("{id}")]
+        [ProducesResponseType(typeof(BaseResponseDto<VehicleModelResponse>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(BaseResponseDto<VehicleModelResponse>), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(BaseResponseDto<VehicleModelResponse>), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Update(Guid id, [FromBody] UpdateVehicleModelRequest request)
         {
             if (!ModelState.IsValid)
@@ -120,6 +125,8 @@ namespace Backend.Dotnet.API.Controllers
 
         // Hard delete Endpoints
         [HttpDelete("{id}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> Delete(Guid id)
         {
             var result = await _vehicleModelService.DeleteAsync(id);
