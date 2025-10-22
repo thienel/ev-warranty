@@ -82,7 +82,7 @@ func main() {
 	tokenService := services.NewTokenService(tokenRepo,
 		cfg.AccessTokenTTL, cfg.RefreshTokenTTL, security.PrivateKey(), security.PublicKey())
 	authService := services.NewAuthService(userRepo, tokenService)
-	userService := services.NewUserService(userRepo, officeService)
+	userService := services.NewUserService(userRepo, officeRepo)
 	oauthService := oauth.NewOAuthService(googleProvider, userRepo)
 	claimService := services.NewClaimService(log, claimRepo, claimItemRepo, claimAttachmentRepo, claimHistoryRepo, cloudinaryService)
 	claimItemService := services.NewClaimItemService(claimRepo, claimItemRepo)
