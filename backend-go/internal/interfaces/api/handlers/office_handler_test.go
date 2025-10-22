@@ -29,7 +29,6 @@ var _ = Describe("OfficeHandler", func() {
 		sampleOffice *entities.Office
 	)
 
-	// Helper function to setup route with role
 	setupRoute := func(method, path string, role string, handlerFunc gin.HandlerFunc) {
 		r.Handle(method, path, func(c *gin.Context) {
 			if role != "" {
@@ -187,76 +186,96 @@ var _ = Describe("OfficeHandler", func() {
 			IsActive:   false,
 		}
 
-		BeforeEach(func() {
-			setupRoute("PUT", "/offices/:id", entities.UserRoleAdmin, handler.Update)
-		})
+		Context("when authorized as ADMIN", func() {
+			BeforeEach(func() {
+				setupRoute("PUT", "/offices/:id", entities.UserRoleAdmin, handler.Update)
+			})
 
-		It("should update office successfully", func() {
-			updatedOffice := *sampleOffice
-			updatedOffice.OfficeName = updateReq.OfficeName
+			It("should update office successfully", func() {
+				updatedOffice := *sampleOffice
+				updatedOffice.OfficeName = updateReq.OfficeName
 
-			mockService.EXPECT().Update(mock.Anything, officeID, mock.MatchedBy(func(cmd *services.UpdateOfficeCommand) bool {
-				return cmd.OfficeName == updateReq.OfficeName && cmd.Address == updateReq.Address
-			})).Return(nil).Once()
+				mockService.EXPECT().Update(mock.Anything, officeID, mock.MatchedBy(func(cmd *services.UpdateOfficeCommand) bool {
+					return cmd.OfficeName == updateReq.OfficeName && cmd.Address == updateReq.Address
+				})).Return(nil).Once()
 
-			SendRequest(r, http.MethodPut, "/offices/"+officeID.String(), w, updateReq)
-			Expect(w.Code).To(Equal(http.StatusNoContent))
-		})
+				SendRequest(r, http.MethodPut, "/offices/"+officeID.String(), w, updateReq)
+				Expect(w.Code).To(Equal(http.StatusNoContent))
+			})
 
-		DescribeTable("should handle error scenarios",
-			func(setupMock func(), url string, reqBody interface{}, expectedStatus int, expectedError string) {
-				if setupMock != nil {
-					setupMock()
-				}
-				SendRequest(r, http.MethodPut, url, w, reqBody)
-				ExpectErrorCode(w, expectedStatus, expectedError)
-			},
-			Entry("invalid UUID",
-				nil,
-				"/offices/invalid-uuid", updateReq, http.StatusBadRequest, apperrors.ErrorCodeInvalidUUID),
-			Entry("invalid JSON",
-				nil,
-				"/offices/"+officeID.String(), "invalid json", http.StatusBadRequest, apperrors.ErrorCodeInvalidJsonRequest),
-			Entry("office not found",
-				func() {
-					mockService.EXPECT().Update(mock.Anything, officeID, mock.Anything).
-						Return(apperrors.NewOfficeNotFound()).Once()
+			DescribeTable("should handle error scenarios",
+				func(setupMock func(), url string, reqBody interface{}, expectedStatus int, expectedError string) {
+					if setupMock != nil {
+						setupMock()
+					}
+					SendRequest(r, http.MethodPut, url, w, reqBody)
+					ExpectErrorCode(w, expectedStatus, expectedError)
 				},
-				"/offices/"+officeID.String(), updateReq, http.StatusNotFound, apperrors.ErrorCodeOfficeNotFound),
-		)
+				Entry("invalid UUID",
+					nil,
+					"/offices/invalid-uuid", updateReq, http.StatusBadRequest, apperrors.ErrorCodeInvalidUUID),
+				Entry("invalid JSON",
+					nil,
+					"/offices/"+officeID.String(), "invalid json", http.StatusBadRequest, apperrors.ErrorCodeInvalidJsonRequest),
+				Entry("office not found",
+					func() {
+						mockService.EXPECT().Update(mock.Anything, officeID, mock.Anything).
+							Return(apperrors.NewOfficeNotFound()).Once()
+					},
+					"/offices/"+officeID.String(), updateReq, http.StatusNotFound, apperrors.ErrorCodeOfficeNotFound),
+			)
+		})
+
+		Context("when not authorized as ADMIN", func() {
+			It("should deny access", func() {
+				setupRoute("PUT", "/offices/:id", entities.UserRoleScStaff, handler.Update)
+				SendRequest(r, http.MethodPut, "/offices/"+officeID.String(), w, updateReq)
+				ExpectErrorCode(w, http.StatusForbidden, apperrors.ErrorCodeUnauthorizedRole)
+			})
+		})
 	})
 
 	Describe("Delete", func() {
 		officeID := uuid.New()
 
-		BeforeEach(func() {
-			setupRoute("DELETE", "/offices/:id", entities.UserRoleAdmin, handler.Delete)
-		})
+		Context("when authorized as ADMIN", func() {
+			BeforeEach(func() {
+				setupRoute("DELETE", "/offices/:id", entities.UserRoleAdmin, handler.Delete)
+			})
 
-		It("should delete office successfully", func() {
-			mockService.EXPECT().DeleteByID(mock.Anything, officeID).Return(nil).Once()
-			SendRequest(r, http.MethodDelete, "/offices/"+officeID.String(), w, nil)
-			Expect(w.Code).To(Equal(http.StatusNoContent))
-		})
+			It("should delete office successfully", func() {
+				mockService.EXPECT().DeleteByID(mock.Anything, officeID).Return(nil).Once()
+				SendRequest(r, http.MethodDelete, "/offices/"+officeID.String(), w, nil)
+				Expect(w.Code).To(Equal(http.StatusNoContent))
+			})
 
-		DescribeTable("should handle error scenarios",
-			func(setupMock func(), url string, expectedStatus int, expectedError string) {
-				if setupMock != nil {
-					setupMock()
-				}
-				SendRequest(r, http.MethodDelete, url, w, nil)
-				ExpectErrorCode(w, expectedStatus, expectedError)
-			},
-			Entry("invalid UUID",
-				nil,
-				"/offices/invalid-uuid", http.StatusBadRequest, apperrors.ErrorCodeInvalidUUID),
-			Entry("office not found",
-				func() {
-					mockService.EXPECT().DeleteByID(mock.Anything, officeID).
-						Return(apperrors.NewOfficeNotFound()).Once()
+			DescribeTable("should handle error scenarios",
+				func(setupMock func(), url string, expectedStatus int, expectedError string) {
+					if setupMock != nil {
+						setupMock()
+					}
+					SendRequest(r, http.MethodDelete, url, w, nil)
+					ExpectErrorCode(w, expectedStatus, expectedError)
 				},
-				"/offices/"+officeID.String(), http.StatusNotFound, apperrors.ErrorCodeOfficeNotFound),
-		)
+				Entry("invalid UUID",
+					nil,
+					"/offices/invalid-uuid", http.StatusBadRequest, apperrors.ErrorCodeInvalidUUID),
+				Entry("office not found",
+					func() {
+						mockService.EXPECT().DeleteByID(mock.Anything, officeID).
+							Return(apperrors.NewOfficeNotFound()).Once()
+					},
+					"/offices/"+officeID.String(), http.StatusNotFound, apperrors.ErrorCodeOfficeNotFound),
+			)
+		})
+
+		Context("when not authorized as ADMIN", func() {
+			It("should deny access", func() {
+				setupRoute("DELETE", "/offices/:id", entities.UserRoleScStaff, handler.Delete)
+				SendRequest(r, http.MethodDelete, "/offices/"+officeID.String(), w, nil)
+				ExpectErrorCode(w, http.StatusForbidden, apperrors.ErrorCodeUnauthorizedRole)
+			})
+		})
 	})
 })
 

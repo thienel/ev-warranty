@@ -91,9 +91,20 @@ var _ = Describe("UserHandler", func() {
 				ExpectErrorCode(w, http.StatusBadRequest, apperrors.ErrorCodeInvalidJsonRequest)
 			})
 
-			It("should handle invalid JSON", func() {
-				SendRequest(r, http.MethodPost, "/users", w, "invalid json")
-				ExpectErrorCode(w, http.StatusBadRequest, apperrors.ErrorCodeInvalidJsonRequest)
+			It("should handle validation errors from service", func() {
+				mockService.EXPECT().Create(mock.Anything, mock.Anything).
+					Return(nil, apperrors.NewInvalidUserInput()).Once()
+
+				SendRequest(r, http.MethodPost, "/users", w, validReq)
+				ExpectErrorCode(w, http.StatusBadRequest, apperrors.ErrorCodeInvalidUserInput)
+			})
+
+			It("should handle email already exists error", func() {
+				mockService.EXPECT().Create(mock.Anything, mock.Anything).
+					Return(nil, apperrors.NewDBDuplicateKeyError("email")).Once()
+
+				SendRequest(r, http.MethodPost, "/users", w, validReq)
+				ExpectErrorCode(w, http.StatusConflict, apperrors.ErrorCodeDuplicateKey)
 			})
 
 			It("should handle service errors", func() {
@@ -193,77 +204,109 @@ var _ = Describe("UserHandler", func() {
 			IsActive: true,
 		}
 
-		BeforeEach(func() {
-			setupRoute("PUT", "/users/:id", entities.UserRoleAdmin, handler.Update)
-		})
+		Context("when authorized as ADMIN", func() {
+			BeforeEach(func() {
+				setupRoute("PUT", "/users/:id", entities.UserRoleAdmin, handler.Update)
+			})
 
-		It("should update user successfully", func() {
-			updatedUser := *sampleUser
-			updatedUser.Name = updateReq.Name
-			updatedUser.Role = updateReq.Role
+			It("should update user successfully", func() {
+				updatedUser := *sampleUser
+				updatedUser.Name = updateReq.Name
+				updatedUser.Role = updateReq.Role
 
-			mockService.EXPECT().Update(mock.Anything, userID, mock.MatchedBy(func(cmd *services.UserUpdateCommand) bool {
-				return cmd.Name == updateReq.Name && cmd.Role == updateReq.Role
-			})).Return(nil).Once()
+				mockService.EXPECT().Update(mock.Anything, userID, mock.MatchedBy(func(cmd *services.UserUpdateCommand) bool {
+					return cmd.Name == updateReq.Name && cmd.Role == updateReq.Role
+				})).Return(nil).Once()
 
-			SendRequest(r, http.MethodPut, "/users/"+userID.String(), w, updateReq)
-			Expect(w.Code).To(Equal(http.StatusNoContent))
-		})
+				SendRequest(r, http.MethodPut, "/users/"+userID.String(), w, updateReq)
+				Expect(w.Code).To(Equal(http.StatusNoContent))
+			})
 
-		DescribeTable("should handle error scenarios",
-			func(setupMock func(), url string, reqBody interface{}, expectedStatus int, expectedError string) {
-				if setupMock != nil {
-					setupMock()
-				}
-				SendRequest(r, http.MethodPut, url, w, reqBody)
-				ExpectErrorCode(w, expectedStatus, expectedError)
-			},
-			Entry("invalid UUID",
-				nil,
-				"/users/invalid-uuid", updateReq, http.StatusBadRequest, apperrors.ErrorCodeInvalidUUID),
-			Entry("invalid JSON",
-				nil,
-				"/users/"+userID.String(), "invalid json", http.StatusBadRequest, apperrors.ErrorCodeInvalidJsonRequest),
-			Entry("user not found",
-				func() {
-					mockService.EXPECT().Update(mock.Anything, userID, mock.Anything).
-						Return(apperrors.NewUserNotFound()).Once()
+			DescribeTable("should handle error scenarios",
+				func(setupMock func(), url string, reqBody interface{}, expectedStatus int, expectedError string) {
+					if setupMock != nil {
+						setupMock()
+					}
+					SendRequest(r, http.MethodPut, url, w, reqBody)
+					ExpectErrorCode(w, expectedStatus, expectedError)
 				},
-				"/users/"+userID.String(), updateReq, http.StatusNotFound, apperrors.ErrorCodeUserNotFound),
-		)
+				Entry("invalid UUID",
+					nil,
+					"/users/invalid-uuid", updateReq, http.StatusBadRequest, apperrors.ErrorCodeInvalidUUID),
+				Entry("invalid JSON",
+					nil,
+					"/users/"+userID.String(), "invalid json", http.StatusBadRequest, apperrors.ErrorCodeInvalidJsonRequest),
+				Entry("validation error from service",
+					func() {
+						mockService.EXPECT().Update(mock.Anything, userID, mock.Anything).
+							Return(apperrors.NewInvalidUserInput()).Once()
+					},
+					"/users/"+userID.String(), updateReq, http.StatusBadRequest, apperrors.ErrorCodeInvalidUserInput),
+				Entry("user not found",
+					func() {
+						mockService.EXPECT().Update(mock.Anything, userID, mock.Anything).
+							Return(apperrors.NewUserNotFound()).Once()
+					},
+					"/users/"+userID.String(), updateReq, http.StatusNotFound, apperrors.ErrorCodeUserNotFound),
+			)
+		})
+
+		Context("when not authorized", func() {
+			It("should deny access for non-admin users", func() {
+				setupRoute("PUT", "/users/:id", entities.UserRoleScStaff, handler.Update)
+				SendRequest(r, http.MethodPut, "/users/"+userID.String(), w, updateReq)
+				ExpectErrorCode(w, http.StatusForbidden, apperrors.ErrorCodeUnauthorizedRole)
+			})
+		})
 	})
 
 	Describe("Delete", func() {
 		userID := uuid.New()
 
-		BeforeEach(func() {
-			setupRoute("DELETE", "/users/:id", entities.UserRoleAdmin, handler.Delete)
-		})
+		Context("when performed by ADMIN", func() {
+			BeforeEach(func() {
+				setupRoute("DELETE", "/users/:id", entities.UserRoleAdmin, handler.Delete)
+			})
 
-		It("should delete user successfully", func() {
-			mockService.EXPECT().Delete(mock.Anything, userID).Return(nil).Once()
-			SendRequest(r, http.MethodDelete, "/users/"+userID.String(), w, nil)
-			Expect(w.Code).To(Equal(http.StatusNoContent))
-		})
+			It("should delete user successfully", func() {
+				mockService.EXPECT().Delete(mock.Anything, userID).Return(nil).Once()
+				SendRequest(r, http.MethodDelete, "/users/"+userID.String(), w, nil)
+				Expect(w.Code).To(Equal(http.StatusNoContent))
+			})
 
-		DescribeTable("should handle error scenarios",
-			func(setupMock func(), url string, expectedStatus int, expectedError string) {
-				if setupMock != nil {
-					setupMock()
-				}
-				SendRequest(r, http.MethodDelete, url, w, nil)
-				ExpectErrorCode(w, expectedStatus, expectedError)
-			},
-			Entry("invalid UUID",
-				nil,
-				"/users/invalid-uuid", http.StatusBadRequest, apperrors.ErrorCodeInvalidUUID),
-			Entry("user not found",
-				func() {
-					mockService.EXPECT().Delete(mock.Anything, userID).
-						Return(apperrors.NewUserNotFound()).Once()
+			DescribeTable("should handle error scenarios",
+				func(setupMock func(), url string, expectedStatus int, expectedError string) {
+					if setupMock != nil {
+						setupMock()
+					}
+					SendRequest(r, http.MethodDelete, url, w, nil)
+					ExpectErrorCode(w, expectedStatus, expectedError)
 				},
-				"/users/"+userID.String(), http.StatusNotFound, apperrors.ErrorCodeUserNotFound),
-		)
+				Entry("invalid UUID",
+					nil,
+					"/users/invalid-uuid", http.StatusBadRequest, apperrors.ErrorCodeInvalidUUID),
+				Entry("service error",
+					func() {
+						mockService.EXPECT().Delete(mock.Anything, userID).
+							Return(apperrors.NewDBOperationError(errors.New("database error"))).Once()
+					},
+					"/users/"+userID.String(), http.StatusInternalServerError, apperrors.ErrorCodeDBOperation),
+				Entry("user not found",
+					func() {
+						mockService.EXPECT().Delete(mock.Anything, userID).
+							Return(apperrors.NewUserNotFound()).Once()
+					},
+					"/users/"+userID.String(), http.StatusNotFound, apperrors.ErrorCodeUserNotFound),
+			)
+		})
+
+		Context("when not authorized", func() {
+			It("should deny access for non-admin users", func() {
+				setupRoute("DELETE", "/users/:id", entities.UserRoleScStaff, handler.Delete)
+				SendRequest(r, http.MethodDelete, "/users/"+userID.String(), w, nil)
+				ExpectErrorCode(w, http.StatusForbidden, apperrors.ErrorCodeUnauthorizedRole)
+			})
+		})
 	})
 })
 
