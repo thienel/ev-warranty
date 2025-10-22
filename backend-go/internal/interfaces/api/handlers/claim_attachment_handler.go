@@ -107,8 +107,9 @@ func (h *claimAttachmentHandler) Create(c *gin.Context) {
 			if err != nil {
 				return err
 			}
-			err = file.Close()
-			h.log.Error("Failed to close file", "error", err)
+			if err = file.Close(); err != nil {
+				h.log.Error("Failed to close file", "error", err)
+			}
 			attachments = append(attachments, attachment)
 		}
 		return nil
