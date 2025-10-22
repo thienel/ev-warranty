@@ -35,7 +35,7 @@ func (c *claimItemRepository) Update(tx application.Tx, item *entities.ClaimItem
 	db := tx.GetTx().(*gorm.DB)
 	if err := db.Model(item).
 		Select("part_category_id", "faulty_part_id", "replacement_part_id",
-			"issue_description", "line_status", "type", "cost").
+			"issue_description", "status", "type", "cost").
 		Updates(item).Error; err != nil {
 		return apperrors.NewDBOperationError(err)
 	}
@@ -61,7 +61,7 @@ func (c *claimItemRepository) SoftDeleteByClaimID(tx application.Tx, claimID uui
 func (c *claimItemRepository) UpdateStatus(tx application.Tx, id uuid.UUID, status string) error {
 	db := tx.GetTx().(*gorm.DB)
 	if err := db.Model(&entities.ClaimItem{}).Where("id = ?", id).
-		Update("line_status", status).Error; err != nil {
+		Update("status", status).Error; err != nil {
 
 		return apperrors.NewDBOperationError(err)
 	}
@@ -115,7 +115,7 @@ func (c *claimItemRepository) CountByClaimID(ctx context.Context, claimID uuid.U
 func (c *claimItemRepository) FindByStatus(ctx context.Context, claimID uuid.UUID, status string) ([]*entities.ClaimItem, error) {
 	var items []*entities.ClaimItem
 	if err := c.db.WithContext(ctx).
-		Where("claim_id = ? AND line_status = ?", claimID, status).
+		Where("claim_id = ? AND status = ?", claimID, status).
 		Order("created_at ASC").
 		Find(&items).Error; err != nil {
 		return nil, apperrors.NewDBOperationError(err)

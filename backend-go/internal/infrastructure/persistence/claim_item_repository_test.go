@@ -268,7 +268,7 @@ var _ = Describe("ClaimItemRepository", func() {
 				mockTx := mocks.NewTx(GinkgoT())
 				mockTx.EXPECT().GetTx().Return(db)
 				mock.ExpectBegin()
-				mock.ExpectExec(regexp.QuoteMeta(`UPDATE "claim_items" SET "line_status"=$1,"updated_at"=$2 WHERE id = $3 AND "claim_items"."deleted_at" IS NULL`)).
+				mock.ExpectExec(regexp.QuoteMeta(`UPDATE "claim_items" SET "status"=$1,"updated_at"=$2 WHERE id = $3 AND "claim_items"."deleted_at" IS NULL`)).
 					WithArgs(status, sqlmock.AnyArg(), itemID).
 					WillReturnResult(sqlmock.NewResult(1, 1))
 				mock.ExpectCommit()
@@ -284,7 +284,7 @@ var _ = Describe("ClaimItemRepository", func() {
 				mockTx := mocks.NewTx(GinkgoT())
 				mockTx.EXPECT().GetTx().Return(db)
 				mock.ExpectBegin()
-				mock.ExpectExec(regexp.QuoteMeta(`UPDATE "claim_items" SET "line_status"=$1,"updated_at"=$2 WHERE id = $3 AND "claim_items"."deleted_at" IS NULL`)).
+				mock.ExpectExec(regexp.QuoteMeta(`UPDATE "claim_items" SET "status"=$1,"updated_at"=$2 WHERE id = $3 AND "claim_items"."deleted_at" IS NULL`)).
 					WithArgs(status, sqlmock.AnyArg(), itemID).
 					WillReturnError(errors.New("database connection failed"))
 				mock.ExpectRollback()
@@ -307,7 +307,7 @@ var _ = Describe("ClaimItemRepository", func() {
 					mockTx := mocks.NewTx(GinkgoT())
 					mockTx.EXPECT().GetTx().Return(db)
 					mock.ExpectBegin()
-					mock.ExpectExec(regexp.QuoteMeta(`UPDATE "claim_items" SET "line_status"=$1,"updated_at"=$2 WHERE id = $3 AND "claim_items"."deleted_at" IS NULL`)).
+					mock.ExpectExec(regexp.QuoteMeta(`UPDATE "claim_items" SET "status"=$1,"updated_at"=$2 WHERE id = $3 AND "claim_items"."deleted_at" IS NULL`)).
 						WithArgs(s, sqlmock.AnyArg(), itemID).
 						WillReturnResult(sqlmock.NewResult(1, 1))
 					mock.ExpectCommit()
@@ -626,7 +626,7 @@ var _ = Describe("ClaimItemRepository", func() {
 					2000.0, time.Now(), time.Now(), nil,
 				)
 
-				mock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "claim_items" WHERE (claim_id = $1 AND line_status = $2) AND "claim_items"."deleted_at" IS NULL ORDER BY created_at ASC`)).
+				mock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "claim_items" WHERE (claim_id = $1 AND status = $2) AND "claim_items"."deleted_at" IS NULL ORDER BY created_at ASC`)).
 					WithArgs(claimID, status).
 					WillReturnRows(rows)
 
@@ -646,7 +646,7 @@ var _ = Describe("ClaimItemRepository", func() {
 					"issue_description", "status", "type", "cost", "created_at", "updated_at", "deleted_at",
 				})
 
-				mock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "claim_items" WHERE (claim_id = $1 AND line_status = $2) AND "claim_items"."deleted_at" IS NULL ORDER BY created_at ASC`)).
+				mock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "claim_items" WHERE (claim_id = $1 AND status = $2) AND "claim_items"."deleted_at" IS NULL ORDER BY created_at ASC`)).
 					WithArgs(claimID, status).
 					WillReturnRows(rows)
 
@@ -659,7 +659,7 @@ var _ = Describe("ClaimItemRepository", func() {
 
 		Context("when there is a database error", func() {
 			It("should return DBOperationError", func() {
-				mock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "claim_items" WHERE (claim_id = $1 AND line_status = $2) AND "claim_items"."deleted_at" IS NULL ORDER BY created_at ASC`)).
+				mock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "claim_items" WHERE (claim_id = $1 AND status = $2) AND "claim_items"."deleted_at" IS NULL ORDER BY created_at ASC`)).
 					WithArgs(claimID, status).
 					WillReturnError(errors.New("database connection failed"))
 
@@ -684,7 +684,7 @@ var _ = Describe("ClaimItemRepository", func() {
 					500.0, time.Now(), time.Now(), nil,
 				)
 
-				mock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "claim_items" WHERE (claim_id = $1 AND line_status = $2) AND "claim_items"."deleted_at" IS NULL ORDER BY created_at ASC`)).
+				mock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "claim_items" WHERE (claim_id = $1 AND status = $2) AND "claim_items"."deleted_at" IS NULL ORDER BY created_at ASC`)).
 					WithArgs(claimID, entities.ClaimItemStatusPending).
 					WillReturnRows(rows)
 
@@ -708,7 +708,7 @@ var _ = Describe("ClaimItemRepository", func() {
 					500.0, time.Now(), time.Now(), nil,
 				)
 
-				mock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "claim_items" WHERE (claim_id = $1 AND line_status = $2) AND "claim_items"."deleted_at" IS NULL ORDER BY created_at ASC`)).
+				mock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "claim_items" WHERE (claim_id = $1 AND status = $2) AND "claim_items"."deleted_at" IS NULL ORDER BY created_at ASC`)).
 					WithArgs(claimID, entities.ClaimItemStatusRejected).
 					WillReturnRows(rows)
 
