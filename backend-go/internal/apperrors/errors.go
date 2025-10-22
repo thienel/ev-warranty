@@ -221,6 +221,6 @@ func NewEmptyCloudinaryParameter(param string) *AppError {
 		fmt.Errorf("empty cloudinary parameter: %s", param))
 }
 
-func NewUnauthorizedRoleError() *AppError {
+func NewUnauthorizedRole() *AppError {
 	return New(http.StatusForbidden, ErrorCodeUnauthorizedRole, errors.New("user does not have permission to perform this action"))
 }

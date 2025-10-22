@@ -137,5 +137,5 @@ func allowedRoles(c *gin.Context, allowedRoles ...string) error {
 			return nil
 		}
 	}
-	return apperrors.NewUnauthorizedRoleError()
+	return apperrors.NewUnauthorizedRole()
 }
