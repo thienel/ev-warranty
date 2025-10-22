@@ -121,8 +121,8 @@ var _ = Describe("AuthHandler", func() {
 				req.Header.Set("Content-Type", "application/json")
 				r.ServeHTTP(w, req)
 
-				Expect(w.Code).To(Equal(http.StatusBadRequest))
-				ExpectErrorCode(w, http.StatusBadRequest, apperrors.ErrorCodeInvalidCredentials)
+				Expect(w.Code).To(Equal(http.StatusUnauthorized))
+				ExpectErrorCode(w, http.StatusUnauthorized, apperrors.ErrorCodeInvalidCredentials)
 			})
 		})
 
