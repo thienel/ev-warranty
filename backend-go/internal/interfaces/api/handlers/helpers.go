@@ -123,19 +123,25 @@ func getUserIDFromHeader(c *gin.Context) (uuid.UUID, error) {
 }
 
 func getUserRoleFromHeader(c *gin.Context) (string, error) {
-	userRole := c.GetHeader(headerUserRole)
-	if userRole == "" {
+	role := c.GetHeader(headerUserRole)
+	if role == "" {
 		return "", apperrors.NewMissingUserRole()
 	}
-	return userRole, nil
+
+	return role, nil
 }
 
 func allowedRoles(c *gin.Context, allowedRoles ...string) error {
-	userRole := c.GetHeader(headerUserRole)
+	userRole, err := getUserRoleFromHeader(c)
+	if err != nil {
+		return err
+	}
+
 	for _, role := range allowedRoles {
 		if userRole == role {
 			return nil
 		}
 	}
+
 	return apperrors.NewUnauthorizedRole()
 }

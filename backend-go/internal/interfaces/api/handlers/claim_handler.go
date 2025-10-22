@@ -356,11 +356,11 @@ func (h *claimHandler) History(c *gin.Context) {
 		return
 	}
 
-	histories, err := h.service.GetHistory(ctx, id)
+	history, err := h.service.GetHistory(ctx, id)
 	if err != nil {
 		handleError(h.log, c, err)
 		return
 	}
 
-	writeSuccessResponse(c, http.StatusOK, histories)
+	writeSuccessResponse(c, http.StatusOK, history)
 }
