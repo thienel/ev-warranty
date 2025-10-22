@@ -93,11 +93,8 @@ var _ = Describe("OfficeService", func() {
 			It("should return InvalidOfficeType error", func() {
 				office, err := service.Create(ctx, cmd)
 
-				Expect(err).To(HaveOccurred())
 				Expect(office).To(BeNil())
-				var appErr *apperrors.AppError
-				Expect(errors.As(err, &appErr)).To(BeTrue())
-				Expect(appErr.ErrorCode).To(Equal(apperrors.ErrorCodeInvalidOfficeType))
+				ExpectAppError(err, apperrors.ErrorCodeInvalidOfficeType)
 			})
 		})
 
@@ -162,11 +159,8 @@ var _ = Describe("OfficeService", func() {
 
 				office, err := service.GetByID(ctx, officeID)
 
-				Expect(err).To(HaveOccurred())
 				Expect(office).To(BeNil())
-				var appErr *apperrors.AppError
-				Expect(errors.As(err, &appErr)).To(BeTrue())
-				Expect(appErr.ErrorCode).To(Equal(apperrors.ErrorCodeOfficeNotFound))
+				ExpectAppError(err, apperrors.ErrorCodeOfficeNotFound)
 			})
 		})
 
@@ -298,10 +292,7 @@ var _ = Describe("OfficeService", func() {
 
 				err := service.Update(ctx, officeID, cmd)
 
-				Expect(err).To(HaveOccurred())
-				var appErr *apperrors.AppError
-				Expect(errors.As(err, &appErr)).To(BeTrue())
-				Expect(appErr.ErrorCode).To(Equal(apperrors.ErrorCodeOfficeNotFound))
+				ExpectAppError(err, apperrors.ErrorCodeOfficeNotFound)
 			})
 		})
 
@@ -320,10 +311,7 @@ var _ = Describe("OfficeService", func() {
 
 				err := service.Update(ctx, officeID, cmd)
 
-				Expect(err).To(HaveOccurred())
-				var appErr *apperrors.AppError
-				Expect(errors.As(err, &appErr)).To(BeTrue())
-				Expect(appErr.ErrorCode).To(Equal(apperrors.ErrorCodeInvalidOfficeType))
+				ExpectAppError(err, apperrors.ErrorCodeInvalidOfficeType)
 			})
 		})
 
@@ -386,10 +374,7 @@ var _ = Describe("OfficeService", func() {
 
 				err := service.DeleteByID(ctx, officeID)
 
-				Expect(err).To(HaveOccurred())
-				var appErr *apperrors.AppError
-				Expect(errors.As(err, &appErr)).To(BeTrue())
-				Expect(appErr.ErrorCode).To(Equal(apperrors.ErrorCodeOfficeNotFound))
+				ExpectAppError(err, apperrors.ErrorCodeOfficeNotFound)
 			})
 		})
 	})

@@ -182,5 +182,5 @@ func (h *officeHandler) Delete(c *gin.Context) {
 	}
 
 	h.log.Info("office deleted", "office_id", officeID)
-	writeSuccessResponse(c, http.StatusOK, nil)
+	writeSuccessResponse(c, http.StatusNoContent, nil)
 }

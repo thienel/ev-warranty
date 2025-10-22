@@ -72,11 +72,8 @@ var _ = Describe("ClaimAttachmentService", func() {
 
 				attachment, err := service.GetByID(ctx, attachmentID)
 
-				Expect(err).To(HaveOccurred())
 				Expect(attachment).To(BeNil())
-				var appErr *apperrors.AppError
-				Expect(errors.As(err, &appErr)).To(BeTrue())
-				Expect(appErr.ErrorCode).To(Equal(apperrors.ErrorCodeClaimAttachmentNotFound))
+				ExpectAppError(err, apperrors.ErrorCodeClaimAttachmentNotFound)
 			})
 		})
 	})
@@ -270,11 +267,8 @@ var _ = Describe("ClaimAttachmentService", func() {
 
 				attachment, err := service.Create(mockTx, claimID, file)
 
-				Expect(err).To(HaveOccurred())
 				Expect(attachment).To(BeNil())
-				var appErr *apperrors.AppError
-				Expect(errors.As(err, &appErr)).To(BeTrue())
-				Expect(appErr.ErrorCode).To(Equal(apperrors.ErrorCodeInvalidAttachmentType))
+				ExpectAppError(err, apperrors.ErrorCodeInvalidAttachmentType)
 			})
 		})
 
@@ -373,10 +367,7 @@ var _ = Describe("ClaimAttachmentService", func() {
 
 				err := service.HardDelete(mockTx, claimID, attachmentID)
 
-				Expect(err).To(HaveOccurred())
-				var appErr *apperrors.AppError
-				Expect(errors.As(err, &appErr)).To(BeTrue())
-				Expect(appErr.ErrorCode).To(Equal(apperrors.ErrorCodeClaimStatusNotAllowedDelete))
+				ExpectAppError(err, apperrors.ErrorCodeClaimStatusNotAllowedDelete)
 			})
 		})
 

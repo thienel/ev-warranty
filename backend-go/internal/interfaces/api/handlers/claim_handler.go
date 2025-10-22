@@ -158,7 +158,7 @@ func (h *claimHandler) Update(c *gin.Context) {
 		return
 	}
 
-	writeSuccessResponse(c, http.StatusOK, gin.H{"message": "Claim updated successfully"})
+	writeSuccessResponse(c, http.StatusNoContent, nil)
 }
 
 func (h *claimHandler) Delete(c *gin.Context) {
@@ -186,7 +186,7 @@ func (h *claimHandler) Delete(c *gin.Context) {
 		return
 	}
 
-	writeSuccessResponse(c, http.StatusOK, gin.H{"message": "Claim deleted successfully"})
+	writeSuccessResponse(c, http.StatusNoContent, nil)
 }
 
 func (h *claimHandler) Submit(c *gin.Context) {
@@ -216,7 +216,7 @@ func (h *claimHandler) Submit(c *gin.Context) {
 		return
 	}
 
-	writeSuccessResponse(c, http.StatusOK, gin.H{"message": "Claim submitted successfully"})
+	writeSuccessResponse(c, http.StatusNoContent, nil)
 }
 
 func (h *claimHandler) Review(c *gin.Context) {
@@ -246,7 +246,7 @@ func (h *claimHandler) Review(c *gin.Context) {
 		return
 	}
 
-	writeSuccessResponse(c, http.StatusOK, gin.H{"message": "Claim is now under review"})
+	writeSuccessResponse(c, http.StatusNoContent, nil)
 }
 
 func (h *claimHandler) RequestInfo(c *gin.Context) {
@@ -276,7 +276,7 @@ func (h *claimHandler) RequestInfo(c *gin.Context) {
 		return
 	}
 
-	writeSuccessResponse(c, http.StatusOK, gin.H{"message": "Additional information requested"})
+	writeSuccessResponse(c, http.StatusNoContent, nil)
 }
 
 func (h *claimHandler) Cancel(c *gin.Context) {
@@ -306,7 +306,7 @@ func (h *claimHandler) Cancel(c *gin.Context) {
 		return
 	}
 
-	writeSuccessResponse(c, http.StatusOK, gin.H{"message": "Claim cancelled successfully"})
+	writeSuccessResponse(c, http.StatusNoContent, nil)
 }
 
 func (h *claimHandler) Complete(c *gin.Context) {
@@ -336,7 +336,7 @@ func (h *claimHandler) Complete(c *gin.Context) {
 		return
 	}
 
-	writeSuccessResponse(c, http.StatusOK, gin.H{"message": "Claim completed successfully"})
+	writeSuccessResponse(c, http.StatusNoContent, nil)
 }
 
 func (h *claimHandler) History(c *gin.Context) {

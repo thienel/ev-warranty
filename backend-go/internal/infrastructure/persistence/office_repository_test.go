@@ -2,7 +2,6 @@ package persistence_test
 
 import (
 	"context"
-	"errors"
 	"time"
 
 	"github.com/DATA-DOG/go-sqlmock"
@@ -58,10 +57,7 @@ var _ = Describe("OfficeRepository", func() {
 
 				err := repository.Create(ctx, office)
 
-				Expect(err).To(HaveOccurred())
-				var appErr *apperrors.AppError
-				Expect(errors.As(err, &appErr)).To(BeTrue())
-				Expect(appErr.ErrorCode).To(Equal(apperrors.ErrorCodeDuplicateKey))
+				ExpectAppError(err, apperrors.ErrorCodeDuplicateKey)
 			})
 		})
 
@@ -71,10 +67,7 @@ var _ = Describe("OfficeRepository", func() {
 
 				err := repository.Create(ctx, office)
 
-				Expect(err).To(HaveOccurred())
-				var appErr *apperrors.AppError
-				Expect(errors.As(err, &appErr)).To(BeTrue())
-				Expect(appErr.ErrorCode).To(Equal(apperrors.ErrorCodeDBOperation))
+				ExpectAppError(err, apperrors.ErrorCodeDBOperation)
 			})
 		})
 	})
@@ -119,11 +112,8 @@ var _ = Describe("OfficeRepository", func() {
 
 				office, err := repository.FindByID(ctx, officeID)
 
-				Expect(err).To(HaveOccurred())
 				Expect(office).To(BeNil())
-				var appErr *apperrors.AppError
-				Expect(errors.As(err, &appErr)).To(BeTrue())
-				Expect(appErr.ErrorCode).To(Equal(apperrors.ErrorCodeOfficeNotFound))
+				ExpectAppError(err, apperrors.ErrorCodeOfficeNotFound)
 			})
 		})
 
@@ -133,11 +123,8 @@ var _ = Describe("OfficeRepository", func() {
 
 				office, err := repository.FindByID(ctx, officeID)
 
-				Expect(err).To(HaveOccurred())
 				Expect(office).To(BeNil())
-				var appErr *apperrors.AppError
-				Expect(errors.As(err, &appErr)).To(BeTrue())
-				Expect(appErr.ErrorCode).To(Equal(apperrors.ErrorCodeDBOperation))
+				ExpectAppError(err, apperrors.ErrorCodeDBOperation)
 			})
 		})
 	})
@@ -193,11 +180,8 @@ var _ = Describe("OfficeRepository", func() {
 
 				offices, err := repository.FindAll(ctx)
 
-				Expect(err).To(HaveOccurred())
 				Expect(offices).To(BeNil())
-				var appErr *apperrors.AppError
-				Expect(errors.As(err, &appErr)).To(BeTrue())
-				Expect(appErr.ErrorCode).To(Equal(apperrors.ErrorCodeDBOperation))
+				ExpectAppError(err, apperrors.ErrorCodeDBOperation)
 			})
 		})
 	})
@@ -225,10 +209,7 @@ var _ = Describe("OfficeRepository", func() {
 
 				err := repository.Update(ctx, office)
 
-				Expect(err).To(HaveOccurred())
-				var appErr *apperrors.AppError
-				Expect(errors.As(err, &appErr)).To(BeTrue())
-				Expect(appErr.ErrorCode).To(Equal(apperrors.ErrorCodeDBOperation))
+				ExpectAppError(err, apperrors.ErrorCodeDBOperation)
 			})
 		})
 	})
@@ -256,10 +237,7 @@ var _ = Describe("OfficeRepository", func() {
 
 				err := repository.SoftDelete(ctx, officeID)
 
-				Expect(err).To(HaveOccurred())
-				var appErr *apperrors.AppError
-				Expect(errors.As(err, &appErr)).To(BeTrue())
-				Expect(appErr.ErrorCode).To(Equal(apperrors.ErrorCodeDBOperation))
+				ExpectAppError(err, apperrors.ErrorCodeDBOperation)
 			})
 		})
 	})

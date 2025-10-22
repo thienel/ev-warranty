@@ -47,7 +47,7 @@ var _ = Describe("ClaimHistoryRepository", func() {
 		Context("when claim history is created successfully", func() {
 			It("should return nil error", func() {
 				mockTx := mocks.NewTx(GinkgoT())
-				mockTx.On("GetTx").Return(db)
+				mockTx.EXPECT().GetTx().Return(db)
 				MockSuccessfulInsert(mock, "claim_histories", history.ID)
 
 				err := repository.Create(mockTx, history)
@@ -59,30 +59,24 @@ var _ = Describe("ClaimHistoryRepository", func() {
 		Context("when there is a duplicate key constraint", func() {
 			It("should return DBDuplicateKeyError", func() {
 				mockTx := mocks.NewTx(GinkgoT())
-				mockTx.On("GetTx").Return(db)
+				mockTx.EXPECT().GetTx().Return(db)
 				MockDuplicateKeyError(mock, "claim_histories", "claim_histories_unique_key")
 
 				err := repository.Create(mockTx, history)
 
-				Expect(err).To(HaveOccurred())
-				var appErr *apperrors.AppError
-				Expect(errors.As(err, &appErr)).To(BeTrue())
-				Expect(appErr.ErrorCode).To(Equal(apperrors.ErrorCodeDuplicateKey))
+				ExpectAppError(err, apperrors.ErrorCodeDuplicateKey)
 			})
 		})
 
 		Context("when there is a database error", func() {
 			It("should return DBOperationError", func() {
 				mockTx := mocks.NewTx(GinkgoT())
-				mockTx.On("GetTx").Return(db)
+				mockTx.EXPECT().GetTx().Return(db)
 				MockInsertError(mock, "claim_histories")
 
 				err := repository.Create(mockTx, history)
 
-				Expect(err).To(HaveOccurred())
-				var appErr *apperrors.AppError
-				Expect(errors.As(err, &appErr)).To(BeTrue())
-				Expect(appErr.ErrorCode).To(Equal(apperrors.ErrorCodeDBOperation))
+				ExpectAppError(err, apperrors.ErrorCodeDBOperation)
 			})
 		})
 
@@ -99,7 +93,7 @@ var _ = Describe("ClaimHistoryRepository", func() {
 
 				for _, s := range statuses {
 					mockTx := mocks.NewTx(GinkgoT())
-					mockTx.On("GetTx").Return(db)
+					mockTx.EXPECT().GetTx().Return(db)
 					history.Status = s
 					MockSuccessfulInsert(mock, "claim_histories", history.ID)
 
@@ -120,7 +114,7 @@ var _ = Describe("ClaimHistoryRepository", func() {
 		Context("when claim histories are soft deleted successfully", func() {
 			It("should return nil error", func() {
 				mockTx := mocks.NewTx(GinkgoT())
-				mockTx.On("GetTx").Return(db)
+				mockTx.EXPECT().GetTx().Return(db)
 				mock.ExpectBegin()
 				mock.ExpectExec(regexp.QuoteMeta(`UPDATE "claim_histories" SET "deleted_at"=$1 WHERE claim_id = $2`)).
 					WithArgs(sqlmock.AnyArg(), claimID).
@@ -136,7 +130,7 @@ var _ = Describe("ClaimHistoryRepository", func() {
 		Context("when there is a database error", func() {
 			It("should return DBOperationError", func() {
 				mockTx := mocks.NewTx(GinkgoT())
-				mockTx.On("GetTx").Return(db)
+				mockTx.EXPECT().GetTx().Return(db)
 				mock.ExpectBegin()
 				mock.ExpectExec(regexp.QuoteMeta(`UPDATE "claim_histories" SET "deleted_at"=$1 WHERE claim_id = $2`)).
 					WithArgs(sqlmock.AnyArg(), claimID).
@@ -145,10 +139,7 @@ var _ = Describe("ClaimHistoryRepository", func() {
 
 				err := repository.SoftDeleteByClaimID(mockTx, claimID)
 
-				Expect(err).To(HaveOccurred())
-				var appErr *apperrors.AppError
-				Expect(errors.As(err, &appErr)).To(BeTrue())
-				Expect(appErr.ErrorCode).To(Equal(apperrors.ErrorCodeDBOperation))
+				ExpectAppError(err, apperrors.ErrorCodeDBOperation)
 			})
 		})
 	})
@@ -213,11 +204,8 @@ var _ = Describe("ClaimHistoryRepository", func() {
 
 				histories, err := repository.FindByClaimID(ctx, claimID)
 
-				Expect(err).To(HaveOccurred())
 				Expect(histories).To(BeNil())
-				var appErr *apperrors.AppError
-				Expect(errors.As(err, &appErr)).To(BeTrue())
-				Expect(appErr.ErrorCode).To(Equal(apperrors.ErrorCodeDBOperation))
+				ExpectAppError(err, apperrors.ErrorCodeDBOperation)
 			})
 		})
 
@@ -307,11 +295,8 @@ var _ = Describe("ClaimHistoryRepository", func() {
 
 				history, err := repository.FindLatestByClaimID(ctx, claimID)
 
-				Expect(err).To(HaveOccurred())
 				Expect(history).To(BeNil())
-				var appErr *apperrors.AppError
-				Expect(errors.As(err, &appErr)).To(BeTrue())
-				Expect(appErr.ErrorCode).To(Equal(apperrors.ErrorCodeClaimHistoryNotFound))
+				ExpectAppError(err, apperrors.ErrorCodeClaimHistoryNotFound)
 			})
 		})
 
@@ -323,11 +308,8 @@ var _ = Describe("ClaimHistoryRepository", func() {
 
 				history, err := repository.FindLatestByClaimID(ctx, claimID)
 
-				Expect(err).To(HaveOccurred())
 				Expect(history).To(BeNil())
-				var appErr *apperrors.AppError
-				Expect(errors.As(err, &appErr)).To(BeTrue())
-				Expect(appErr.ErrorCode).To(Equal(apperrors.ErrorCodeDBOperation))
+				ExpectAppError(err, apperrors.ErrorCodeDBOperation)
 			})
 		})
 	})
@@ -396,11 +378,8 @@ var _ = Describe("ClaimHistoryRepository", func() {
 
 				histories, err := repository.FindByDateRange(ctx, claimID, startDate, endDate)
 
-				Expect(err).To(HaveOccurred())
 				Expect(histories).To(BeNil())
-				var appErr *apperrors.AppError
-				Expect(errors.As(err, &appErr)).To(BeTrue())
-				Expect(appErr.ErrorCode).To(Equal(apperrors.ErrorCodeDBOperation))
+				ExpectAppError(err, apperrors.ErrorCodeDBOperation)
 			})
 		})
 

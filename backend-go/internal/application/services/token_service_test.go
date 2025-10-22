@@ -101,11 +101,8 @@ var _ = Describe("TokenService", func() {
 
 				token, err := service.GenerateRefreshToken(ctx, userID)
 
-				Expect(err).To(HaveOccurred())
 				Expect(token).To(BeEmpty())
-				var appErr *apperrors.AppError
-				Expect(errors.As(err, &appErr)).To(BeTrue())
-				Expect(appErr.ErrorCode).To(Equal(apperrors.ErrorCodeFailedGenerateRefreshToken))
+				ExpectAppError(err, apperrors.ErrorCodeFailedGenerateRefreshToken)
 			})
 		})
 	})
@@ -134,11 +131,8 @@ var _ = Describe("TokenService", func() {
 			It("should return InvalidAccessToken error", func() {
 				claims, err := service.ValidateAccessToken(ctx, "invalid.token.here")
 
-				Expect(err).To(HaveOccurred())
 				Expect(claims).To(BeNil())
-				var appErr *apperrors.AppError
-				Expect(errors.As(err, &appErr)).To(BeTrue())
-				Expect(appErr.ErrorCode).To(Equal(apperrors.ErrorCodeInvalidAccessToken))
+				ExpectAppError(err, apperrors.ErrorCodeInvalidAccessToken)
 			})
 		})
 
@@ -151,11 +145,8 @@ var _ = Describe("TokenService", func() {
 
 				claims, err := service.ValidateAccessToken(ctx, token)
 
-				Expect(err).To(HaveOccurred())
 				Expect(claims).To(BeNil())
-				var appErr *apperrors.AppError
-				Expect(errors.As(err, &appErr)).To(BeTrue())
-				Expect(appErr.ErrorCode).To(Equal(apperrors.ErrorCodeExpiredAccessToken))
+				ExpectAppError(err, apperrors.ErrorCodeExpiredAccessToken)
 			})
 		})
 
@@ -176,11 +167,8 @@ var _ = Describe("TokenService", func() {
 
 				validatedClaims, err := service.ValidateAccessToken(ctx, tokenString)
 
-				Expect(err).To(HaveOccurred())
 				Expect(validatedClaims).To(BeNil())
-				var appErr *apperrors.AppError
-				Expect(errors.As(err, &appErr)).To(BeTrue())
-				Expect(appErr.ErrorCode).To(Equal(apperrors.ErrorCodeInvalidAccessToken))
+				ExpectAppError(err, apperrors.ErrorCodeInvalidAccessToken)
 			})
 		})
 
@@ -220,11 +208,8 @@ var _ = Describe("TokenService", func() {
 
 				validatedClaims, err := service.ValidateAccessToken(ctx, tokenString)
 
-				Expect(err).To(HaveOccurred())
 				Expect(validatedClaims).To(BeNil())
-				var appErr *apperrors.AppError
-				Expect(errors.As(err, &appErr)).To(BeTrue())
-				Expect(appErr.ErrorCode).To(Equal(apperrors.ErrorCodeInvalidAccessToken))
+				ExpectAppError(err, apperrors.ErrorCodeInvalidAccessToken)
 			})
 		})
 	})
@@ -267,11 +252,8 @@ var _ = Describe("TokenService", func() {
 
 				token, err := service.ValidateRefreshToken(ctx, refreshToken)
 
-				Expect(err).To(HaveOccurred())
 				Expect(token).To(BeNil())
-				var appErr *apperrors.AppError
-				Expect(errors.As(err, &appErr)).To(BeTrue())
-				Expect(appErr.ErrorCode).To(Equal(apperrors.ErrorCodeInvalidRefreshToken))
+				ExpectAppError(err, apperrors.ErrorCodeInvalidRefreshToken)
 			})
 		})
 
@@ -289,11 +271,8 @@ var _ = Describe("TokenService", func() {
 
 				token, err := service.ValidateRefreshToken(ctx, refreshToken)
 
-				Expect(err).To(HaveOccurred())
 				Expect(token).To(BeNil())
-				var appErr *apperrors.AppError
-				Expect(errors.As(err, &appErr)).To(BeTrue())
-				Expect(appErr.ErrorCode).To(Equal(apperrors.ErrorCodeExpiredRefreshToken))
+				ExpectAppError(err, apperrors.ErrorCodeExpiredRefreshToken)
 			})
 		})
 
@@ -311,11 +290,8 @@ var _ = Describe("TokenService", func() {
 
 				token, err := service.ValidateRefreshToken(ctx, refreshToken)
 
-				Expect(err).To(HaveOccurred())
 				Expect(token).To(BeNil())
-				var appErr *apperrors.AppError
-				Expect(errors.As(err, &appErr)).To(BeTrue())
-				Expect(appErr.ErrorCode).To(Equal(apperrors.ErrorCodeRevokedRefreshToken))
+				ExpectAppError(err, apperrors.ErrorCodeRevokedRefreshToken)
 			})
 		})
 	})
@@ -392,11 +368,8 @@ var _ = Describe("TokenService", func() {
 
 				accessToken, err := service.RefreshAccessToken(ctx, refreshToken)
 
-				Expect(err).To(HaveOccurred())
 				Expect(accessToken).To(BeEmpty())
-				var appErr *apperrors.AppError
-				Expect(errors.As(err, &appErr)).To(BeTrue())
-				Expect(appErr.ErrorCode).To(Equal(apperrors.ErrorCodeInvalidRefreshToken))
+				ExpectAppError(err, apperrors.ErrorCodeInvalidRefreshToken)
 			})
 		})
 
@@ -414,11 +387,8 @@ var _ = Describe("TokenService", func() {
 
 				accessToken, err := service.RefreshAccessToken(ctx, refreshToken)
 
-				Expect(err).To(HaveOccurred())
 				Expect(accessToken).To(BeEmpty())
-				var appErr *apperrors.AppError
-				Expect(errors.As(err, &appErr)).To(BeTrue())
-				Expect(appErr.ErrorCode).To(Equal(apperrors.ErrorCodeExpiredRefreshToken))
+				ExpectAppError(err, apperrors.ErrorCodeExpiredRefreshToken)
 			})
 		})
 	})

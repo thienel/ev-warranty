@@ -95,17 +95,15 @@ var _ = Describe("AuthService", func() {
 		})
 
 		Context("when user is not found", func() {
-			It("should return InvalidCredentials error", func() {
-				mockUserRepo.EXPECT().FindByEmail(ctx, email).Return(nil, nil).Once()
+			It("should return UserNotFound error", func() {
+				notFoundErr := apperrors.NewUserNotFound()
+				mockUserRepo.EXPECT().FindByEmail(ctx, email).Return(nil, notFoundErr).Once()
 
 				at, rt, err := service.Login(ctx, email, password)
 
-				Expect(err).To(HaveOccurred())
 				Expect(at).To(BeEmpty())
 				Expect(rt).To(BeEmpty())
-				var appErr *apperrors.AppError
-				Expect(errors.As(err, &appErr)).To(BeTrue())
-				Expect(appErr.ErrorCode).To(Equal(apperrors.ErrorCodeInvalidCredentials))
+				Expect(err).To(Equal(notFoundErr))
 			})
 		})
 
@@ -123,12 +121,9 @@ var _ = Describe("AuthService", func() {
 
 				at, rt, err := service.Login(ctx, email, password)
 
-				Expect(err).To(HaveOccurred())
 				Expect(at).To(BeEmpty())
 				Expect(rt).To(BeEmpty())
-				var appErr *apperrors.AppError
-				Expect(errors.As(err, &appErr)).To(BeTrue())
-				Expect(appErr.ErrorCode).To(Equal(apperrors.ErrorCodeUserInactive))
+				ExpectAppError(err, apperrors.ErrorCodeUserInactive)
 			})
 		})
 
@@ -146,12 +141,9 @@ var _ = Describe("AuthService", func() {
 
 				at, rt, err := service.Login(ctx, email, password)
 
-				Expect(err).To(HaveOccurred())
 				Expect(at).To(BeEmpty())
 				Expect(rt).To(BeEmpty())
-				var appErr *apperrors.AppError
-				Expect(errors.As(err, &appErr)).To(BeTrue())
-				Expect(appErr.ErrorCode).To(Equal(apperrors.ErrorCodeUserPasswordInvalid))
+				ExpectAppError(err, apperrors.ErrorCodeUserPasswordInvalid)
 			})
 		})
 
@@ -286,6 +278,21 @@ var _ = Describe("AuthService", func() {
 			})
 		})
 
+		Context("when DB operation error", func() {
+			It("should return DBOperationError", func() {
+				dbErr := apperrors.NewDBOperationError(errors.New("database error"))
+
+				mockUserRepo.EXPECT().FindByOAuth(ctx, userInfo.Provider, userInfo.ProviderID).Return(nil, dbErr).Once()
+
+				at, rt, err := service.HandleOAuthUser(ctx, userInfo)
+
+				Expect(at).To(BeEmpty())
+				Expect(rt).To(BeEmpty())
+				Expect(err).To(HaveOccurred())
+				Expect(err).To(Equal(dbErr))
+			})
+		})
+
 		Context("when OAuth user not found but email exists", func() {
 			It("should link OAuth and return tokens", func() {
 				user := &entities.User{
@@ -298,7 +305,7 @@ var _ = Describe("AuthService", func() {
 				refreshToken := "refresh_token_string"
 
 				mockUserRepo.EXPECT().FindByOAuth(ctx, userInfo.Provider, userInfo.ProviderID).
-					Return(nil, errors.New("user not found")).Once()
+					Return(nil, apperrors.NewUserNotFound()).Once()
 				mockUserRepo.EXPECT().FindByEmail(ctx, userInfo.Email).Return(user, nil).Once()
 				mockUserRepo.EXPECT().Update(ctx, mock.MatchedBy(func(u *entities.User) bool {
 					return u.ID == user.ID &&
@@ -322,8 +329,8 @@ var _ = Describe("AuthService", func() {
 			It("should return the error", func() {
 				dbErr := apperrors.New(500, apperrors.ErrorCodeDBOperation, errors.New("database error"))
 
-				mockUserRepo.EXPECT().FindByOAuth(ctx, userInfo.Provider, userInfo.ProviderID).
-					Return(nil, errors.New("user not found")).Once()
+				mockUserRepo.EXPECT().FindByOAuth(mock.Anything, userInfo.Provider, userInfo.ProviderID).
+					Return(nil, apperrors.NewUserNotFound()).Once()
 				mockUserRepo.EXPECT().FindByEmail(ctx, userInfo.Email).Return(nil, dbErr).Once()
 
 				at, rt, err := service.HandleOAuthUser(ctx, userInfo)
@@ -346,7 +353,7 @@ var _ = Describe("AuthService", func() {
 				updateErr := apperrors.New(500, apperrors.ErrorCodeDBOperation, errors.New("update error"))
 
 				mockUserRepo.EXPECT().FindByOAuth(ctx, userInfo.Provider, userInfo.ProviderID).
-					Return(nil, errors.New("user not found")).Once()
+					Return(nil, apperrors.NewUserNotFound()).Once()
 				mockUserRepo.EXPECT().FindByEmail(ctx, userInfo.Email).Return(user, nil).Once()
 				mockUserRepo.EXPECT().Update(ctx, mock.AnythingOfType("*entities.User")).Return(updateErr).Once()
 

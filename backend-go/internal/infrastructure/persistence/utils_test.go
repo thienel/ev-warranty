@@ -2,10 +2,12 @@ package persistence_test
 
 import (
 	"errors"
+	"ev-warranty-go/internal/apperrors"
 	"regexp"
 
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/jackc/pgx/v5/pgconn"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -106,4 +108,12 @@ func MockSoftDelete(mock sqlmock.Sqlmock, tableName string, id any) {
 		WithArgs(sqlmock.AnyArg(), id).
 		WillReturnResult(sqlmock.NewResult(1, 1))
 	mock.ExpectCommit()
+}
+
+func ExpectAppError(err error, expectedCode string) {
+	GinkgoHelper()
+	Expect(err).To(HaveOccurred())
+	var appErr *apperrors.AppError
+	Expect(errors.As(err, &appErr)).To(BeTrue(), "error should be an AppError")
+	Expect(appErr.ErrorCode).To(Equal(expectedCode), "error code should match")
 }

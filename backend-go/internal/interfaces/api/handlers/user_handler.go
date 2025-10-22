@@ -113,7 +113,7 @@ func (h userHandler) Update(c *gin.Context) {
 	}
 
 	h.log.Info("user updated", "user_id", id)
-	writeSuccessResponse(c, http.StatusOK, nil)
+	writeSuccessResponse(c, http.StatusNoContent, nil)
 }
 
 func (h userHandler) GetByID(c *gin.Context) {

@@ -148,7 +148,7 @@ func (h *claimItemHandler) Delete(c *gin.Context) {
 		return
 	}
 
-	writeSuccessResponse(c, http.StatusOK, gin.H{"message": "Claim item deleted successfully"})
+	writeSuccessResponse(c, http.StatusNoContent, nil)
 }
 
 func (h *claimItemHandler) Approve(c *gin.Context) {
@@ -177,7 +177,7 @@ func (h *claimItemHandler) Approve(c *gin.Context) {
 		return
 	}
 
-	writeSuccessResponse(c, http.StatusOK, gin.H{"message": "Claim item approved successfully"})
+	writeSuccessResponse(c, http.StatusNoContent, nil)
 }
 
 func (h *claimItemHandler) Reject(c *gin.Context) {
@@ -206,7 +206,7 @@ func (h *claimItemHandler) Reject(c *gin.Context) {
 		return
 	}
 
-	writeSuccessResponse(c, http.StatusOK, gin.H{"message": "Claim item rejected successfully"})
+	writeSuccessResponse(c, http.StatusNoContent, nil)
 }
 
 func parseItemIDParam(c *gin.Context) (uuid.UUID, error) {

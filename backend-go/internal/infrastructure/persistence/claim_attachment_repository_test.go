@@ -47,7 +47,7 @@ var _ = Describe("ClaimAttachmentRepository", func() {
 		Context("when attachment is created successfully", func() {
 			It("should return nil error", func() {
 				mockTx := mocks.NewTx(GinkgoT())
-				mockTx.On("GetTx").Return(db)
+				mockTx.EXPECT().GetTx().Return(db)
 				MockSuccessfulInsert(mock, "claim_attachments", attachment.ID)
 
 				err := repository.Create(mockTx, attachment)
@@ -59,37 +59,31 @@ var _ = Describe("ClaimAttachmentRepository", func() {
 		Context("when there is a duplicate key constraint", func() {
 			It("should return DBDuplicateKeyError", func() {
 				mockTx := mocks.NewTx(GinkgoT())
-				mockTx.On("GetTx").Return(db)
+				mockTx.EXPECT().GetTx().Return(db)
 				MockDuplicateKeyError(mock, "claim_attachments", "claim_attachments_unique_key")
 
 				err := repository.Create(mockTx, attachment)
 
-				Expect(err).To(HaveOccurred())
-				var appErr *apperrors.AppError
-				Expect(errors.As(err, &appErr)).To(BeTrue())
-				Expect(appErr.ErrorCode).To(Equal(apperrors.ErrorCodeDuplicateKey))
+				ExpectAppError(err, apperrors.ErrorCodeDuplicateKey)
 			})
 		})
 
 		Context("when there is a database error", func() {
 			It("should return DBOperationError", func() {
 				mockTx := mocks.NewTx(GinkgoT())
-				mockTx.On("GetTx").Return(db)
+				mockTx.EXPECT().GetTx().Return(db)
 				MockInsertError(mock, "claim_attachments")
 
 				err := repository.Create(mockTx, attachment)
 
-				Expect(err).To(HaveOccurred())
-				var appErr *apperrors.AppError
-				Expect(errors.As(err, &appErr)).To(BeTrue())
-				Expect(appErr.ErrorCode).To(Equal(apperrors.ErrorCodeDBOperation))
+				ExpectAppError(err, apperrors.ErrorCodeDBOperation)
 			})
 		})
 
 		Context("boundary cases for attachment types", func() {
 			It("should handle image type", func() {
 				mockTx := mocks.NewTx(GinkgoT())
-				mockTx.On("GetTx").Return(db)
+				mockTx.EXPECT().GetTx().Return(db)
 				attachment.Type = entities.AttachmentTypeImage
 				MockSuccessfulInsert(mock, "claim_attachments", attachment.ID)
 
@@ -100,7 +94,7 @@ var _ = Describe("ClaimAttachmentRepository", func() {
 
 			It("should handle video type", func() {
 				mockTx := mocks.NewTx(GinkgoT())
-				mockTx.On("GetTx").Return(db)
+				mockTx.EXPECT().GetTx().Return(db)
 				attachment.Type = entities.AttachmentTypeVideo
 				MockSuccessfulInsert(mock, "claim_attachments", attachment.ID)
 
@@ -113,7 +107,7 @@ var _ = Describe("ClaimAttachmentRepository", func() {
 		Context("boundary cases for URL", func() {
 			It("should handle empty URL", func() {
 				mockTx := mocks.NewTx(GinkgoT())
-				mockTx.On("GetTx").Return(db)
+				mockTx.EXPECT().GetTx().Return(db)
 				attachment.URL = ""
 				MockSuccessfulInsert(mock, "claim_attachments", attachment.ID)
 
@@ -124,7 +118,7 @@ var _ = Describe("ClaimAttachmentRepository", func() {
 
 			It("should handle very long URL", func() {
 				mockTx := mocks.NewTx(GinkgoT())
-				mockTx.On("GetTx").Return(db)
+				mockTx.EXPECT().GetTx().Return(db)
 				attachment.URL = "https://example.com/" + string(make([]byte, 1000))
 				MockSuccessfulInsert(mock, "claim_attachments", attachment.ID)
 
@@ -145,7 +139,7 @@ var _ = Describe("ClaimAttachmentRepository", func() {
 		Context("when attachment is hard deleted successfully", func() {
 			It("should return nil error", func() {
 				mockTx := mocks.NewTx(GinkgoT())
-				mockTx.On("GetTx").Return(db)
+				mockTx.EXPECT().GetTx().Return(db)
 				mock.ExpectBegin()
 				mock.ExpectExec(regexp.QuoteMeta(`DELETE FROM "claim_attachments" WHERE id = $1`)).
 					WithArgs(attachmentID).
@@ -161,7 +155,7 @@ var _ = Describe("ClaimAttachmentRepository", func() {
 		Context("when there is a database error", func() {
 			It("should return DBOperationError", func() {
 				mockTx := mocks.NewTx(GinkgoT())
-				mockTx.On("GetTx").Return(db)
+				mockTx.EXPECT().GetTx().Return(db)
 				mock.ExpectBegin()
 				mock.ExpectExec(regexp.QuoteMeta(`DELETE FROM "claim_attachments" WHERE id = $1`)).
 					WithArgs(attachmentID).
@@ -170,10 +164,7 @@ var _ = Describe("ClaimAttachmentRepository", func() {
 
 				err := repository.HardDelete(mockTx, attachmentID)
 
-				Expect(err).To(HaveOccurred())
-				var appErr *apperrors.AppError
-				Expect(errors.As(err, &appErr)).To(BeTrue())
-				Expect(appErr.ErrorCode).To(Equal(apperrors.ErrorCodeDBOperation))
+				ExpectAppError(err, apperrors.ErrorCodeDBOperation)
 			})
 		})
 	})
@@ -188,7 +179,7 @@ var _ = Describe("ClaimAttachmentRepository", func() {
 		Context("when attachments are soft deleted successfully", func() {
 			It("should return nil error", func() {
 				mockTx := mocks.NewTx(GinkgoT())
-				mockTx.On("GetTx").Return(db)
+				mockTx.EXPECT().GetTx().Return(db)
 				mock.ExpectBegin()
 				mock.ExpectExec(regexp.QuoteMeta(`UPDATE "claim_attachments" SET "deleted_at"=$1 WHERE claim_id = $2`)).
 					WithArgs(sqlmock.AnyArg(), claimID).
@@ -204,7 +195,7 @@ var _ = Describe("ClaimAttachmentRepository", func() {
 		Context("when there is a database error", func() {
 			It("should return DBOperationError", func() {
 				mockTx := mocks.NewTx(GinkgoT())
-				mockTx.On("GetTx").Return(db)
+				mockTx.EXPECT().GetTx().Return(db)
 				mock.ExpectBegin()
 				mock.ExpectExec(regexp.QuoteMeta(`UPDATE "claim_attachments" SET "deleted_at"=$1 WHERE claim_id = $2`)).
 					WithArgs(sqlmock.AnyArg(), claimID).
@@ -213,10 +204,7 @@ var _ = Describe("ClaimAttachmentRepository", func() {
 
 				err := repository.SoftDeleteByClaimID(mockTx, claimID)
 
-				Expect(err).To(HaveOccurred())
-				var appErr *apperrors.AppError
-				Expect(errors.As(err, &appErr)).To(BeTrue())
-				Expect(appErr.ErrorCode).To(Equal(apperrors.ErrorCodeDBOperation))
+				ExpectAppError(err, apperrors.ErrorCodeDBOperation)
 			})
 		})
 	})
@@ -258,11 +246,8 @@ var _ = Describe("ClaimAttachmentRepository", func() {
 
 				attachment, err := repository.FindByID(ctx, attachmentID)
 
-				Expect(err).To(HaveOccurred())
 				Expect(attachment).To(BeNil())
-				var appErr *apperrors.AppError
-				Expect(errors.As(err, &appErr)).To(BeTrue())
-				Expect(appErr.ErrorCode).To(Equal(apperrors.ErrorCodeClaimAttachmentNotFound))
+				ExpectAppError(err, apperrors.ErrorCodeClaimAttachmentNotFound)
 			})
 		})
 
@@ -272,11 +257,8 @@ var _ = Describe("ClaimAttachmentRepository", func() {
 
 				attachment, err := repository.FindByID(ctx, attachmentID)
 
-				Expect(err).To(HaveOccurred())
 				Expect(attachment).To(BeNil())
-				var appErr *apperrors.AppError
-				Expect(errors.As(err, &appErr)).To(BeTrue())
-				Expect(appErr.ErrorCode).To(Equal(apperrors.ErrorCodeDBOperation))
+				ExpectAppError(err, apperrors.ErrorCodeDBOperation)
 			})
 		})
 	})
@@ -341,11 +323,8 @@ var _ = Describe("ClaimAttachmentRepository", func() {
 
 				attachments, err := repository.FindByClaimID(ctx, claimID)
 
-				Expect(err).To(HaveOccurred())
 				Expect(attachments).To(BeNil())
-				var appErr *apperrors.AppError
-				Expect(errors.As(err, &appErr)).To(BeTrue())
-				Expect(appErr.ErrorCode).To(Equal(apperrors.ErrorCodeDBOperation))
+				ExpectAppError(err, apperrors.ErrorCodeDBOperation)
 			})
 		})
 	})
@@ -395,11 +374,8 @@ var _ = Describe("ClaimAttachmentRepository", func() {
 
 				count, err := repository.CountByClaimID(ctx, claimID)
 
-				Expect(err).To(HaveOccurred())
 				Expect(count).To(Equal(int64(0)))
-				var appErr *apperrors.AppError
-				Expect(errors.As(err, &appErr)).To(BeTrue())
-				Expect(appErr.ErrorCode).To(Equal(apperrors.ErrorCodeDBOperation))
+				ExpectAppError(err, apperrors.ErrorCodeDBOperation)
 			})
 		})
 
@@ -481,11 +457,8 @@ var _ = Describe("ClaimAttachmentRepository", func() {
 
 				attachments, err := repository.FindByType(ctx, claimID, attachmentType)
 
-				Expect(err).To(HaveOccurred())
 				Expect(attachments).To(BeNil())
-				var appErr *apperrors.AppError
-				Expect(errors.As(err, &appErr)).To(BeTrue())
-				Expect(appErr.ErrorCode).To(Equal(apperrors.ErrorCodeDBOperation))
+				ExpectAppError(err, apperrors.ErrorCodeDBOperation)
 			})
 		})
 
