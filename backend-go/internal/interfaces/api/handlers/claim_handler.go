@@ -317,6 +317,7 @@ func (h *claimHandler) Cancel(c *gin.Context) {
 func (h *claimHandler) Complete(c *gin.Context) {
 	if err := allowedRoles(c, entities.UserRoleEvmStaff); err != nil {
 		handleError(h.log, c, err)
+		return
 	}
 
 	idParam := c.Param("id")
