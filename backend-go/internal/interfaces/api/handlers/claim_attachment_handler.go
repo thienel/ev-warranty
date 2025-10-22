@@ -147,7 +147,7 @@ func (h *claimAttachmentHandler) Delete(c *gin.Context) {
 		return
 	}
 
-	writeSuccessResponse(c, http.StatusNoContent, gin.H{"message": "Claim attachment deleted successfully"})
+	writeSuccessResponse(c, http.StatusNoContent, nil)
 }
 
 func parseAttachmentIDParam(c *gin.Context) (uuid.UUID, error) {
