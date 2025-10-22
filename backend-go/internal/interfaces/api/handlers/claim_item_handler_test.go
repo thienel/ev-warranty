@@ -35,7 +35,6 @@ var _ = Describe("ClaimItemHandler", func() {
 		validReq        dtos.CreateClaimItemRequest
 	)
 
-	// Helper function to setup transaction mock
 	setupTxMock := func(serviceMockFn func()) {
 		mockTxManager.EXPECT().Do(mock.Anything, mock.AnythingOfType("func(application.Tx) error")).
 			Run(func(ctx context.Context, fn func(application.Tx) error) {
@@ -44,7 +43,6 @@ var _ = Describe("ClaimItemHandler", func() {
 			}).Return(nil).Once()
 	}
 
-	// Helper function to setup route with role
 	setupRoute := func(method, path string, role string, handlerFunc gin.HandlerFunc) {
 		r.Handle(method, path, func(c *gin.Context) {
 			if role != "" {
@@ -137,6 +135,14 @@ var _ = Describe("ClaimItemHandler", func() {
 			req, _ := http.NewRequest(http.MethodGet, "/claims/invalid-uuid/items", nil)
 			r.ServeHTTP(w, req)
 			ExpectErrorCode(w, http.StatusBadRequest, apperrors.ErrorCodeInvalidUUID)
+		})
+
+		It("should handle service error", func() {
+			dbError := apperrors.NewDBOperationError(errors.New("database error"))
+			mockService.EXPECT().GetByClaimID(mock.Anything, claimID).Return(nil, dbError).Once()
+			req, _ := http.NewRequest(http.MethodGet, "/claims/"+claimID.String()+"/items", nil)
+			r.ServeHTTP(w, req)
+			ExpectErrorCode(w, http.StatusInternalServerError, apperrors.ErrorCodeDBOperation)
 		})
 
 		It("should handle empty results", func() {
@@ -238,6 +244,35 @@ var _ = Describe("ClaimItemHandler", func() {
 					nil,
 					"/claims/"+claimID.String()+"/items/invalid-uuid", http.StatusBadRequest, apperrors.ErrorCodeInvalidUUID),
 			)
+
+			It("should handle service error during deletion", func() {
+				setupTxMock(func() {
+					mockService.EXPECT().HardDelete(mockTx, claimID, itemID).
+						Return(apperrors.NewClaimItemNotFound()).Once()
+				})
+				mockTxManager.ExpectedCalls[0].ReturnArguments = []interface{}{apperrors.NewClaimItemNotFound()}
+
+				req, _ := http.NewRequest(http.MethodDelete, "/claims/"+claimID.String()+"/items/"+itemID.String(), nil)
+				r.ServeHTTP(w, req)
+				ExpectErrorCode(w, http.StatusNotFound, apperrors.ErrorCodeClaimItemNotFound)
+			})
+
+			It("should handle transaction manager error", func() {
+				mockTxManager.EXPECT().Do(mock.Anything, mock.AnythingOfType("func(application.Tx) error")).
+					Return(apperrors.NewDBOperationError(errors.New("transaction failed"))).Once()
+
+				req, _ := http.NewRequest(http.MethodDelete, "/claims/"+claimID.String()+"/items/"+itemID.String(), nil)
+				r.ServeHTTP(w, req)
+				ExpectErrorCode(w, http.StatusInternalServerError, apperrors.ErrorCodeDBOperation)
+			})
+
+		})
+
+		It("should deny access for unauthorized roles", func() {
+			setupRoute("DELETE", "/claims/:id/items/:itemID", entities.UserRoleScTechnician, handler.Delete)
+			req, _ := http.NewRequest(http.MethodDelete, "/claims/"+claimID.String()+"/items/"+itemID.String(), nil)
+			r.ServeHTTP(w, req)
+			ExpectErrorCode(w, http.StatusForbidden, apperrors.ErrorCodeUnauthorizedRole)
 		})
 	})
 
@@ -255,6 +290,44 @@ var _ = Describe("ClaimItemHandler", func() {
 				req, _ := http.NewRequest(http.MethodPost, "/claims/"+claimID.String()+"/items/"+itemID.String()+"/approve", nil)
 				r.ServeHTTP(w, req)
 				Expect(w.Code).To(Equal(http.StatusNoContent))
+			})
+
+			DescribeTable("should handle error scenarios",
+				func(setupMock func(), url string, expectedStatus int, expectedError string) {
+					if setupMock != nil {
+						setupMock()
+					}
+					req, _ := http.NewRequest(http.MethodPost, url, nil)
+					r.ServeHTTP(w, req)
+					ExpectErrorCode(w, expectedStatus, expectedError)
+				},
+				Entry("invalid claim UUID",
+					nil,
+					"/claims/invalid-uuid/items/"+itemID.String()+"/approve", http.StatusBadRequest, apperrors.ErrorCodeInvalidUUID),
+				Entry("invalid item UUID",
+					nil,
+					"/claims/"+claimID.String()+"/items/invalid-uuid/approve", http.StatusBadRequest, apperrors.ErrorCodeInvalidUUID),
+			)
+
+			It("should handle service error during approval", func() {
+				setupTxMock(func() {
+					mockService.EXPECT().Approve(mockTx, claimID, itemID).
+						Return(apperrors.NewClaimItemNotFound()).Once()
+				})
+				mockTxManager.ExpectedCalls[0].ReturnArguments = []interface{}{apperrors.NewClaimItemNotFound()}
+
+				req, _ := http.NewRequest(http.MethodPost, "/claims/"+claimID.String()+"/items/"+itemID.String()+"/approve", nil)
+				r.ServeHTTP(w, req)
+				ExpectErrorCode(w, http.StatusNotFound, apperrors.ErrorCodeClaimItemNotFound)
+			})
+
+			It("should handle transaction manager error", func() {
+				mockTxManager.EXPECT().Do(mock.Anything, mock.AnythingOfType("func(application.Tx) error")).
+					Return(apperrors.NewDBOperationError(errors.New("transaction failed"))).Once()
+
+				req, _ := http.NewRequest(http.MethodPost, "/claims/"+claimID.String()+"/items/"+itemID.String()+"/approve", nil)
+				r.ServeHTTP(w, req)
+				ExpectErrorCode(w, http.StatusInternalServerError, apperrors.ErrorCodeDBOperation)
 			})
 		})
 
@@ -280,6 +353,44 @@ var _ = Describe("ClaimItemHandler", func() {
 				req, _ := http.NewRequest(http.MethodPost, "/claims/"+claimID.String()+"/items/"+itemID.String()+"/reject", nil)
 				r.ServeHTTP(w, req)
 				Expect(w.Code).To(Equal(http.StatusNoContent))
+			})
+
+			DescribeTable("should handle error scenarios",
+				func(setupMock func(), url string, expectedStatus int, expectedError string) {
+					if setupMock != nil {
+						setupMock()
+					}
+					req, _ := http.NewRequest(http.MethodPost, url, nil)
+					r.ServeHTTP(w, req)
+					ExpectErrorCode(w, expectedStatus, expectedError)
+				},
+				Entry("invalid claim UUID",
+					nil,
+					"/claims/invalid-uuid/items/"+itemID.String()+"/reject", http.StatusBadRequest, apperrors.ErrorCodeInvalidUUID),
+				Entry("invalid item UUID",
+					nil,
+					"/claims/"+claimID.String()+"/items/invalid-uuid/reject", http.StatusBadRequest, apperrors.ErrorCodeInvalidUUID),
+			)
+
+			It("should handle service error during rejection", func() {
+				setupTxMock(func() {
+					mockService.EXPECT().Reject(mockTx, claimID, itemID).
+						Return(apperrors.NewClaimItemNotFound()).Once()
+				})
+				mockTxManager.ExpectedCalls[0].ReturnArguments = []interface{}{apperrors.NewClaimItemNotFound()}
+
+				req, _ := http.NewRequest(http.MethodPost, "/claims/"+claimID.String()+"/items/"+itemID.String()+"/reject", nil)
+				r.ServeHTTP(w, req)
+				ExpectErrorCode(w, http.StatusNotFound, apperrors.ErrorCodeClaimItemNotFound)
+			})
+
+			It("should handle transaction manager error", func() {
+				mockTxManager.EXPECT().Do(mock.Anything, mock.AnythingOfType("func(application.Tx) error")).
+					Return(apperrors.NewDBOperationError(errors.New("transaction failed"))).Once()
+
+				req, _ := http.NewRequest(http.MethodPost, "/claims/"+claimID.String()+"/items/"+itemID.String()+"/reject", nil)
+				r.ServeHTTP(w, req)
+				ExpectErrorCode(w, http.StatusInternalServerError, apperrors.ErrorCodeDBOperation)
 			})
 		})
 
