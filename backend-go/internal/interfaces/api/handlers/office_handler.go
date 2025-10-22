@@ -16,7 +16,7 @@ import (
 
 type OfficeHandler interface {
 	Create(c *gin.Context)
-	GetById(c *gin.Context)
+	GetByID(c *gin.Context)
 	GetAll(c *gin.Context)
 	Update(c *gin.Context)
 	Delete(c *gin.Context)
@@ -75,7 +75,7 @@ func (h *officeHandler) Create(c *gin.Context) {
 	writeSuccessResponse(c, http.StatusCreated, office)
 }
 
-func (h *officeHandler) GetById(c *gin.Context) {
+func (h *officeHandler) GetByID(c *gin.Context) {
 	ctx, cancel := context.WithTimeout(c.Request.Context(), requestTimeout)
 	defer cancel()
 

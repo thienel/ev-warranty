@@ -48,7 +48,7 @@ func NewRouter(db *database.Database, authHandler handlers.AuthHandler,
 	{
 		office.POST("", officeHandler.Create)
 		office.GET("", officeHandler.GetAll)
-		office.GET("/:id", officeHandler.GetById)
+		office.GET("/:id", officeHandler.GetByID)
 		office.PUT("/:id", officeHandler.Update)
 		office.DELETE("/:id", officeHandler.Delete)
 	}
