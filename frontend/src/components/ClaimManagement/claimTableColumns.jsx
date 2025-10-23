@@ -24,7 +24,7 @@ const GenerateColumns = (sortedInfo, filteredInfo, onOpenModal, onDelete, additi
       title: <span style={{ padding: '0 14px', display: 'inline-block' }}>Vehicle</span>,
       dataIndex: 'vehicle_info',
       key: 'vehicle_info',
-      width: '30%',
+      width: '25%',
       render: (text, record) => (
         <Space style={{ padding: '0 14px', whiteSpace: 'normal', wordBreak: 'break-word' }}>
           <CarOutlined style={{ color: '#697565' }} />
@@ -64,7 +64,7 @@ const GenerateColumns = (sortedInfo, filteredInfo, onOpenModal, onDelete, additi
       sortOrder: sortedInfo.columnKey === 'total_cost' ? sortedInfo.order : null,
       render: (cost) => (
         <Space style={{ padding: '0 14px' }}>
-          <span>{cost ? `${cost.toLocaleString('vi-VN')} VND` : '0 VND'}</span>
+          <span>{`${cost.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })} `}</span>
         </Space>
       ),
     },
@@ -72,14 +72,14 @@ const GenerateColumns = (sortedInfo, filteredInfo, onOpenModal, onDelete, additi
       title: <span style={{ padding: '0 14px', display: 'inline-block' }}>Created Date</span>,
       dataIndex: 'created_at',
       key: 'created_at',
-      width: '10%',
+      width: '15%',
       align: 'center',
       sorter: (a, b) => new Date(a.created_at || 0) - new Date(b.created_at || 0),
       sortOrder: sortedInfo.columnKey === 'created_at' ? sortedInfo.order : null,
       render: (date) => (
         <Space style={{ padding: '0 14px' }}>
           <CalendarOutlined style={{ color: '#697565' }} />
-          <span>{date ? new Date(date).toLocaleDateString() : 'N/A'}</span>
+          <span>{date ? new Date(date).toLocaleDateString('vi-VN') : 'N/A'}</span>
         </Space>
       ),
     },
