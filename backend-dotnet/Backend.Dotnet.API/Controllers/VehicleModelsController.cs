@@ -18,11 +18,48 @@ namespace Backend.Dotnet.API.Controllers
         }
 
         [HttpGet]
-        [ProducesResponseType(typeof(BaseResponseDto<VehicleModelResponse>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(BaseResponseDto<IEnumerable<VehicleModelResponse>>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BaseResponseDto), StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetAll(
+        [FromQuery] string brand = null,
+        [FromQuery] string modelName = null,
+        [FromQuery] int? year = null,
+        [FromQuery] string search = null)
         {
-            var result = await _vehicleModelService.GetAllAsync();
+            // Filter by brand + model + year (returns single or not found)
+            if (!string.IsNullOrWhiteSpace(brand) &&
+                !string.IsNullOrWhiteSpace(modelName) &&
+                year.HasValue)
+            {
+                var result = await _vehicleModelService.GetByBrandModelYearAsync(brand, modelName, year.Value);
+                return result.IsSuccess ? Ok(result) : NotFound(result);
+            }
+
+            // Filter by brand only (returns list)
+            if (!string.IsNullOrWhiteSpace(brand))
+            {
+                var result = await _vehicleModelService.GetByBrandAsync(brand);
+                return result.IsSuccess ? Ok(result) : BadRequest(result);
+            }
+
+            // Search/filter by term (returns list)
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                var result = await _vehicleModelService.SearchAsync(search);
+                return result.IsSuccess ? Ok(result) : BadRequest(result);
+            }
+
+            // No parameters = get all
+            var allResult = await _vehicleModelService.GetAllAsync();
+            return allResult.IsSuccess ? Ok(allResult) : BadRequest(allResult);
+        }
+
+        [HttpGet("brands")]
+        [ProducesResponseType(typeof(BaseResponseDto<IEnumerable<string>>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(BaseResponseDto), StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> GetAllBrands()
+        {
+            var result = await _vehicleModelService.GetAllBrandsAsync();
             if (!result.IsSuccess)
                 return BadRequest(result);
 
@@ -37,71 +74,6 @@ namespace Backend.Dotnet.API.Controllers
             var result = await _vehicleModelService.GetByIdAsync(id);
             if (!result.IsSuccess)
                 return NotFound(result);
-
-            return Ok(result);
-        }
-        /*
-        [HttpGet("{id}/stats")]
-        public async Task<IActionResult> GetWithStats(Guid id)
-        {
-            var result = await _vehicleModelService.GetWithStatsAsync(id);
-            if (!result.IsSuccess)
-                return NotFound(result);
-
-            return Ok(result);
-        }
-        */
-        [HttpGet("by-details")]
-        [ProducesResponseType(typeof(BaseResponseDto<VehicleModelResponse>), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(BaseResponseDto), StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(typeof(BaseResponseDto), StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> GetByBrandModelYear([FromQuery] string brand, [FromQuery] string modelName, [FromQuery] int year)
-        {
-            if (string.IsNullOrWhiteSpace(brand) || string.IsNullOrWhiteSpace(modelName) || year <= 0)
-                return BadRequest(new { message = "Brand, model name, and year are required" });
-
-            var result = await _vehicleModelService.GetByBrandModelYearAsync(brand, modelName, year);
-            if (!result.IsSuccess)
-                return NotFound(result);
-
-            return Ok(result);
-        }
-
-        [HttpGet("brand/{brand}")]
-        [ProducesResponseType(typeof(BaseResponseDto<VehicleModelResponse>), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(BaseResponseDto), StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> GetByBrand(string brand)
-        {
-            if (string.IsNullOrWhiteSpace(brand))
-                return BadRequest(new { message = "Brand is required" });
-
-            var result = await _vehicleModelService.GetByBrandAsync(brand);
-            if (!result.IsSuccess)
-                return BadRequest(result);
-
-            return Ok(result);
-        }
-
-        [HttpGet("brands")]
-        [ProducesResponseType(typeof(BaseResponseDto<VehicleModelResponse>), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(BaseResponseDto), StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> GetAllBrands()
-        {
-            var result = await _vehicleModelService.GetAllBrandsAsync();
-            if (!result.IsSuccess)
-                return BadRequest(result);
-
-            return Ok(result);
-        }
-
-        [HttpGet("search")]
-        [ProducesResponseType(typeof(BaseResponseDto<VehicleModelResponse>), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(BaseResponseDto), StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> Search([FromQuery] string searchTerm)
-        {
-            var result = await _vehicleModelService.SearchAsync(searchTerm);
-            if (!result.IsSuccess)
-                return BadRequest(result);
 
             return Ok(result);
         }
@@ -136,7 +108,6 @@ namespace Backend.Dotnet.API.Controllers
             return Ok(result);
         }
 
-        // Hard delete Endpoints
         [HttpDelete("{id}")]
         [ProducesResponseType(typeof(BaseResponseDto<VehicleModelResponse>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BaseResponseDto), StatusCodes.Status400BadRequest)]

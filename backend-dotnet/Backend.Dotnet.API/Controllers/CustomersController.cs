@@ -20,13 +20,27 @@ namespace Backend.Dotnet.API.Controllers
         [HttpGet]
         [ProducesResponseType(typeof(BaseResponseDto<IEnumerable<CustomerResponse>>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BaseResponseDto), StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetAll(
+        [FromQuery] string email = null,
+        [FromQuery] string search = null)
         {
-            var result = await _customerService.GetAllAsync();
-            if (!result.IsSuccess)
-                return BadRequest(result);
+            // Filter by email (returns single or not found)
+            if (!string.IsNullOrWhiteSpace(email))
+            {
+                var result = await _customerService.GetByEmailAsync(email);
+                return result.IsSuccess ? Ok(result) : NotFound(result);
+            }
 
-            return Ok(result);
+            // Search/filter by term (returns list)
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                var result = await _customerService.SearchAsync(search);
+                return result.IsSuccess ? Ok(result) : BadRequest(result);
+            }
+
+            // No parameters = get all
+            var allResult = await _customerService.GetAllAsync();
+            return allResult.IsSuccess ? Ok(allResult) : BadRequest(allResult);
         }
 
         [HttpGet("{id}")]
@@ -35,33 +49,6 @@ namespace Backend.Dotnet.API.Controllers
         public async Task<IActionResult> GetById(Guid id)
         {
             var result = await _customerService.GetByIdAsync(id);
-            if (!result.IsSuccess)
-                return NotFound(result);
-
-            return Ok(result);
-        }
-
-        /*
-        [HttpGet("{id}/vehicles")]
-        public async Task<IActionResult> GetWithVehicles(Guid id)
-        {
-            var result = await _customerService.GetWithVehiclesAsync(id);
-            if (!result.IsSuccess)
-                return NotFound(result);
-
-            return Ok(result);
-        }
-        */
-        [HttpGet("by-email")]
-        [ProducesResponseType(typeof(BaseResponseDto<CustomerResponse>), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(BaseResponseDto), StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(typeof(BaseResponseDto), StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> GetByEmail([FromQuery] string email)
-        {
-            if (string.IsNullOrWhiteSpace(email))
-                return BadRequest(new { message = "Email is required" });
-
-            var result = await _customerService.GetByEmailAsync(email);
             if (!result.IsSuccess)
                 return NotFound(result);
 
@@ -111,43 +98,6 @@ namespace Backend.Dotnet.API.Controllers
             return Ok(result);
         }
 
-        //[HttpPut("{id}/email")]
-        //public async Task<IActionResult> UpdateEmail(Guid id, [FromBody] string email)
-        //{
-        //    if (string.IsNullOrWhiteSpace(email))
-        //        return BadRequest(new { message = "Email is required" });
-
-        //    var result = await _customerService.UpdateEmailAsync(id, email);
-        //    if (!result.IsSuccess)
-        //        return BadRequest(result);
-
-        //    return Ok(result);
-        //}
-
-        //[HttpPatch("{id}/phone")]
-        //public async Task<IActionResult> UpdatePhoneNumber(Guid id, [FromBody] string phoneNumber)
-        //{
-        //    if (string.IsNullOrWhiteSpace(phoneNumber))
-        //        return BadRequest(new { message = "Phone number is required" });
-
-        //    var result = await _customerService.UpdatePhoneNumberAsync(id, phoneNumber);
-        //    if (!result.IsSuccess)
-        //        return BadRequest(result);
-
-        //    return Ok(result);
-        //}
-
-        //[HttpPatch("{id}/address")]
-        //public async Task<IActionResult> UpdateAddress(Guid id, [FromBody] string address)
-        //{
-        //    var result = await _customerService.UpdateAddressAsync(id, address);
-        //    if (!result.IsSuccess)
-        //        return BadRequest(result);
-
-        //    return Ok(result);
-        //}
-
-        // Soft delete Endpoints
         [HttpDelete("{id}")]
         [ProducesResponseType(typeof(BaseResponseDto<CustomerResponse>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BaseResponseDto), StatusCodes.Status400BadRequest)]
