@@ -13,6 +13,7 @@ import { USER_ROLES } from '@constants/common-constants.js'
 import EVMStaffClaims from '@pages/evm-staff/Claims.jsx'
 import SCStaffClaims from '@pages/sc-staff/Claims.jsx'
 import SCTechnicianClaims from '@pages/sc-technician/Claims.jsx'
+import ClaimDetail from '@pages/claims/ClaimDetail.jsx'
 
 export const ProtectedRoute = () => {
   const { isAuthenticated } = useSelector((state) => state.auth)
@@ -76,7 +77,10 @@ const App = () => {
           children: [
             {
               path: 'claims',
-              element: <EVMStaffClaims />,
+              children: [
+                { path: '', element: <EVMStaffClaims /> },
+                { path: ':id', element: <ClaimDetail /> },
+              ],
             },
           ],
         },
@@ -86,7 +90,10 @@ const App = () => {
           children: [
             {
               path: 'claims',
-              element: <SCStaffClaims />,
+              children: [
+                { path: '', element: <SCStaffClaims /> },
+                { path: ':id', element: <ClaimDetail /> },
+              ],
             },
           ],
         },
@@ -96,7 +103,10 @@ const App = () => {
           children: [
             {
               path: 'claims',
-              element: <SCTechnicianClaims />,
+              children: [
+                { path: '', element: <SCTechnicianClaims /> },
+                { path: ':id', element: <ClaimDetail /> },
+              ],
             },
           ],
         },
