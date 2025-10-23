@@ -54,19 +54,24 @@ func SendRequest(router *gin.Engine, method, url string, w *httptest.ResponseRec
 func ExpectResponseNotNil(w *httptest.ResponseRecorder, httpStatus int) {
 	GinkgoHelper()
 	Expect(w.Code).To(Equal(httpStatus))
+
+	if httpStatus == http.StatusNoContent {
+		return
+	}
+
 	var response dtos.APIResponse
 	err := json.Unmarshal(w.Body.Bytes(), &response)
 	Expect(err).NotTo(HaveOccurred())
 	Expect(response.Data).NotTo(BeNil())
 }
 
-func ExpectErrorCode(w *httptest.ResponseRecorder, httpStatus int, error string) {
+func ExpectErrorCode(w *httptest.ResponseRecorder, httpStatus int, errorCode string) {
 	GinkgoHelper()
 	Expect(w.Code).To(Equal(httpStatus))
 	var response dtos.APIResponse
 	err := json.Unmarshal(w.Body.Bytes(), &response)
 	Expect(err).NotTo(HaveOccurred())
-	Expect(response.Error).To(Equal(error))
+	Expect(response.Error).To(Equal(errorCode))
 }
 
 func ExpectCookieRefreshToken(w *httptest.ResponseRecorder, token string) {
@@ -77,8 +82,4 @@ func ExpectCookieRefreshToken(w *httptest.ResponseRecorder, token string) {
 	Expect(cookies[0].Value).To(Equal(token))
 	Expect(cookies[0].HttpOnly).To(BeTrue())
 	Expect(cookies[0].MaxAge).To(Equal(60 * 60 * 24 * 7))
-}
-
-func decodeResponse(w *httptest.ResponseRecorder, response *dtos.APIResponse) error {
-	return json.Unmarshal(w.Body.Bytes(), response)
 }

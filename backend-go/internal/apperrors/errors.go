@@ -64,7 +64,7 @@ func NewInvalidAuthHeader() *AppError {
 }
 
 func NewInvalidCredentials() *AppError {
-	return New(http.StatusBadRequest, ErrorCodeInvalidCredentials, errors.New("invalid credentials"))
+	return New(http.StatusUnauthorized, ErrorCodeInvalidCredentials, errors.New("invalid credentials"))
 }
 
 func NewFailedSignAccessToken(err error) *AppError {
@@ -155,7 +155,7 @@ func NewNotAllowDeleteClaim() *AppError {
 }
 
 func NewMissingInformationClaim() *AppError {
-	return New(http.StatusConflict, ErrorCodeClaimMissingInformation,
+	return New(http.StatusBadRequest, ErrorCodeClaimMissingInformation,
 		errors.New("claim does not have enough information to submit"))
 }
 
@@ -165,11 +165,11 @@ func NewInvalidQueryParameter(param string) *AppError {
 }
 
 func NewMissingUserID() *AppError {
-	return New(http.StatusUnauthorized, ErrorCodeMissingUserID, errors.New("missing X-User-ID header"))
+	return New(http.StatusBadRequest, ErrorCodeMissingUserID, errors.New("missing X-User-ID header"))
 }
 
 func NewMissingUserRole() *AppError {
-	return New(http.StatusUnauthorized, ErrorCodeMissingUserRole, errors.New("missing X-User-Role header"))
+	return New(http.StatusBadRequest, ErrorCodeMissingUserRole, errors.New("missing X-User-Role header"))
 }
 
 func NewInvalidUserID() *AppError {
@@ -221,6 +221,6 @@ func NewEmptyCloudinaryParameter(param string) *AppError {
 		fmt.Errorf("empty cloudinary parameter: %s", param))
 }
 
-func NewUnauthorizedRoleError() *AppError {
+func NewUnauthorizedRole() *AppError {
 	return New(http.StatusForbidden, ErrorCodeUnauthorizedRole, errors.New("user does not have permission to perform this action"))
 }

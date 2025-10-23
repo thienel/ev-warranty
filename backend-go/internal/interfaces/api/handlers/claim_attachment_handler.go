@@ -75,6 +75,7 @@ func (h *claimAttachmentHandler) GetByClaimID(c *gin.Context) {
 func (h *claimAttachmentHandler) Create(c *gin.Context) {
 	if err := allowedRoles(c, entities.UserRoleScTechnician); err != nil {
 		handleError(h.log, c, err)
+		return
 	}
 
 	claimID, err := parseClaimIDParam(c)
@@ -106,8 +107,9 @@ func (h *claimAttachmentHandler) Create(c *gin.Context) {
 			if err != nil {
 				return err
 			}
-			err = file.Close()
-			h.log.Error("Failed to close file", "error", err)
+			if err = file.Close(); err != nil {
+				h.log.Error("Failed to close file", "error", err)
+			}
 			attachments = append(attachments, attachment)
 		}
 		return nil
@@ -124,6 +126,7 @@ func (h *claimAttachmentHandler) Create(c *gin.Context) {
 func (h *claimAttachmentHandler) Delete(c *gin.Context) {
 	if err := allowedRoles(c, entities.UserRoleScTechnician); err != nil {
 		handleError(h.log, c, err)
+		return
 	}
 
 	claimID, err := parseClaimIDParam(c)
@@ -147,7 +150,7 @@ func (h *claimAttachmentHandler) Delete(c *gin.Context) {
 		return
 	}
 
-	writeSuccessResponse(c, http.StatusNoContent, gin.H{"message": "Claim attachment deleted successfully"})
+	writeSuccessResponse(c, http.StatusNoContent, nil)
 }
 
 func parseAttachmentIDParam(c *gin.Context) (uuid.UUID, error) {

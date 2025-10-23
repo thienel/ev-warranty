@@ -20,525 +20,260 @@ import (
 
 var _ = Describe("OfficeHandler", func() {
 	var (
-		mockLogger  *mocks.Logger
-		mockService *mocks.OfficeService
-		handler     handlers.OfficeHandler
-		r           *gin.Engine
-		w           *httptest.ResponseRecorder
+		mockLogger   *mocks.Logger
+		mockService  *mocks.OfficeService
+		handler      handlers.OfficeHandler
+		r            *gin.Engine
+		w            *httptest.ResponseRecorder
+		validReq     dtos.CreateOfficeRequest
+		sampleOffice *entities.Office
 	)
+
+	setupRoute := func(method, path string, role string, handlerFunc gin.HandlerFunc) {
+		r.Handle(method, path, func(c *gin.Context) {
+			if role != "" {
+				SetHeaderRole(c, role)
+			}
+			SetContentTypeJSON(c)
+			handlerFunc(c)
+		})
+	}
 
 	BeforeEach(func() {
 		mockLogger, r, w = SetupMock(GinkgoT())
 		mockService = mocks.NewOfficeService(GinkgoT())
 		handler = handlers.NewOfficeHandler(mockLogger, mockService)
+
+		validReq = dtos.CreateOfficeRequest{
+			OfficeName: "Test Office",
+			OfficeType: entities.OfficeTypeEVM,
+			Address:    "123 Test Street",
+			IsActive:   true,
+		}
+		sampleOffice = CreateOfficeFromRequest(validReq)
 	})
 
 	Describe("Create", func() {
-		var (
-			validReq dtos.CreateOfficeRequest
-		)
+		Context("when authorized as ADMIN", func() {
+			BeforeEach(func() {
+				setupRoute("POST", "/offices", entities.UserRoleAdmin, handler.Create)
+			})
 
-		BeforeEach(func() {
-			validReq = dtos.CreateOfficeRequest{
-				OfficeName: "Test Office",
-				OfficeType: entities.OfficeTypeEVM,
-				Address:    "123 Test Street",
-				IsActive:   true,
-			}
-		})
-
-		Context("when office is created successfully", func() {
-			It("should return 201 with created office", func() {
-				office := CreateOfficeFromRequest(validReq)
-
+			It("should create office successfully", func() {
 				mockService.EXPECT().Create(mock.Anything, mock.MatchedBy(func(cmd *services.CreateOfficeCommand) bool {
-					return cmd.OfficeName == validReq.OfficeName &&
-						cmd.OfficeType == validReq.OfficeType &&
-						cmd.Address == validReq.Address &&
-						cmd.IsActive == validReq.IsActive
-				})).Return(office, nil).Once()
-
-				r.POST("/offices", func(c *gin.Context) {
-					SetHeaderRole(c, entities.UserRoleAdmin)
-					SetContentTypeJSON(c)
-					handler.Create(c)
-				})
+					return cmd.OfficeName == validReq.OfficeName && cmd.OfficeType == validReq.OfficeType
+				})).Return(sampleOffice, nil).Once()
 
 				SendRequest(r, http.MethodPost, "/offices", w, validReq)
 				ExpectResponseNotNil(w, http.StatusCreated)
 			})
-		})
 
-		Context("when user is not admin", func() {
-			It("should return 403 forbidden role error", func() {
-				r.POST("/offices", func(c *gin.Context) {
-					SetHeaderRole(c, entities.UserRoleScStaff)
-					SetContentTypeJSON(c)
-					handler.Create(c)
-				})
+			DescribeTable("should handle validation errors",
+				func(modifyReq func(*dtos.CreateOfficeRequest), expectedError string) {
+					req := validReq
+					if modifyReq != nil {
+						modifyReq(&req)
+					}
+					SendRequest(r, http.MethodPost, "/offices", w, req)
+					ExpectErrorCode(w, http.StatusBadRequest, expectedError)
+				},
+				Entry("invalid office type",
+					func(req *dtos.CreateOfficeRequest) {
+						req.OfficeType = "INVALID_TYPE"
+					},
+					apperrors.ErrorCodeInvalidOfficeType),
+			)
 
-				SendRequest(r, http.MethodPost, "/offices", w, validReq)
-				ExpectErrorCode(w, http.StatusForbidden, apperrors.ErrorCodeUnauthorizedRole)
-			})
-		})
-
-		Context("when request body is invalid JSON", func() {
-			It("should return 400 bad request", func() {
-				r.POST("/offices", func(c *gin.Context) {
-					SetHeaderRole(c, entities.UserRoleAdmin)
-					SetContentTypeJSON(c)
-					handler.Create(c)
-				})
-
+			It("should handle invalid JSON", func() {
 				SendRequest(r, http.MethodPost, "/offices", w, "invalid json")
 				ExpectErrorCode(w, http.StatusBadRequest, apperrors.ErrorCodeInvalidJsonRequest)
 			})
-		})
 
-		Context("when office type is invalid", func() {
-			It("should return 400 bad request", func() {
-				invalidReq := validReq
-				invalidReq.OfficeType = "INVALID_TYPE"
-
-				r.POST("/offices", func(c *gin.Context) {
-					SetHeaderRole(c, entities.UserRoleAdmin)
-					SetContentTypeJSON(c)
-					handler.Create(c)
-				})
-
-				SendRequest(r, http.MethodPost, "/offices", w, invalidReq)
-				ExpectErrorCode(w, http.StatusBadRequest, apperrors.ErrorCodeInvalidOfficeType)
-			})
-		})
-
-		Context("when service returns error", func() {
-			It("should return error from service", func() {
-				dbErr := apperrors.NewDBOperationError(errors.New("database error"))
-				mockService.EXPECT().Create(mock.Anything, mock.Anything).Return(nil, dbErr).Once()
-
-				r.POST("/offices", func(c *gin.Context) {
-					SetHeaderRole(c, entities.UserRoleAdmin)
-					SetContentTypeJSON(c)
-					handler.Create(c)
-				})
+			It("should handle service errors", func() {
+				mockService.EXPECT().Create(mock.Anything, mock.Anything).
+					Return(nil, apperrors.NewDBOperationError(errors.New("database error"))).Once()
 
 				SendRequest(r, http.MethodPost, "/offices", w, validReq)
 				ExpectErrorCode(w, http.StatusInternalServerError, apperrors.ErrorCodeDBOperation)
 			})
 		})
 
-		Context("when required fields are missing", func() {
-			It("should return 400 bad request for missing office_name", func() {
-				invalidReq := validReq
-				invalidReq.OfficeName = ""
-
-				r.POST("/offices", func(c *gin.Context) {
-					SetHeaderRole(c, entities.UserRoleAdmin)
-					SetContentTypeJSON(c)
-					handler.Create(c)
-				})
-
-				SendRequest(r, http.MethodPost, "/offices", w, invalidReq)
-				Expect(w.Code).To(Equal(http.StatusBadRequest))
-			})
-		})
-
-		Context("when office type is SC", func() {
-			It("should create office with SC type successfully", func() {
-				scReq := validReq
-				scReq.OfficeType = entities.OfficeTypeSC
-				office := CreateOfficeFromRequest(scReq)
-
-				mockService.EXPECT().Create(mock.Anything, mock.MatchedBy(func(cmd *services.CreateOfficeCommand) bool {
-					return cmd.OfficeType == entities.OfficeTypeSC
-				})).Return(office, nil).Once()
-
-				r.POST("/offices", func(c *gin.Context) {
-					SetHeaderRole(c, entities.UserRoleAdmin)
-					SetContentTypeJSON(c)
-					handler.Create(c)
-				})
-
-				SendRequest(r, http.MethodPost, "/offices", w, scReq)
-				Expect(w.Code).To(Equal(http.StatusCreated))
-			})
-		})
-
-		Context("when office is created as inactive", func() {
-			It("should create inactive office successfully", func() {
-				inactiveReq := validReq
-				inactiveReq.IsActive = false
-				office := CreateOfficeFromRequest(inactiveReq)
-
-				mockService.EXPECT().Create(mock.Anything, mock.MatchedBy(func(cmd *services.CreateOfficeCommand) bool {
-					return cmd.IsActive == false
-				})).Return(office, nil).Once()
-
-				r.POST("/offices", func(c *gin.Context) {
-					SetHeaderRole(c, entities.UserRoleAdmin)
-					SetContentTypeJSON(c)
-					handler.Create(c)
-				})
-
-				SendRequest(r, http.MethodPost, "/offices", w, inactiveReq)
-				Expect(w.Code).To(Equal(http.StatusCreated))
-			})
-		})
-	})
-
-	Describe("GetById", func() {
-		var officeID uuid.UUID
-
-		BeforeEach(func() {
-			officeID = uuid.New()
-		})
-
-		Context("when office is found", func() {
-			It("should return 200 with office data", func() {
-				office := &entities.Office{
-					ID:         officeID,
-					OfficeName: "Test Office",
-					OfficeType: entities.OfficeTypeEVM,
-					Address:    "123 Test Street",
-					IsActive:   true,
-				}
-				mockService.EXPECT().GetByID(mock.Anything, officeID).Return(office, nil).Once()
-
-				r.GET("/offices/:id", handler.GetById)
-
-				SendRequest(r, http.MethodGet, "/offices/"+officeID.String(), w, nil)
-				ExpectResponseNotNil(w, http.StatusOK)
-			})
-		})
-
-		Context("when office ID is invalid UUID", func() {
-			It("should return 400 bad request", func() {
-				r.GET("/offices/:id", handler.GetById)
-
-				SendRequest(r, http.MethodGet, "/offices/invalid-uuid", w, nil)
-				ExpectErrorCode(w, http.StatusBadRequest, apperrors.ErrorCodeInvalidUUID)
-			})
-		})
-
-		Context("when office is not found", func() {
-			It("should return 404 not found", func() {
-				notFoundErr := apperrors.NewOfficeNotFound()
-				mockService.EXPECT().GetByID(mock.Anything, officeID).Return(nil, notFoundErr).Once()
-
-				r.GET("/offices/:id", handler.GetById)
-
-				SendRequest(r, http.MethodGet, "/offices/"+officeID.String(), w, nil)
-				ExpectErrorCode(w, http.StatusNotFound, apperrors.ErrorCodeOfficeNotFound)
-			})
-		})
-
-		Context("when service returns database error", func() {
-			It("should return 500 internal server error", func() {
-				dbErr := apperrors.NewDBOperationError(errors.New("database error"))
-				mockService.EXPECT().GetByID(mock.Anything, officeID).Return(nil, dbErr).Once()
-
-				r.GET("/offices/:id", handler.GetById)
-
-				SendRequest(r, http.MethodGet, "/offices/"+officeID.String(), w, nil)
-				Expect(w.Code).To(Equal(http.StatusInternalServerError))
-			})
+		It("should deny access for non-admin users", func() {
+			setupRoute("POST", "/offices", entities.UserRoleScStaff, handler.Create)
+			SendRequest(r, http.MethodPost, "/offices", w, validReq)
+			ExpectErrorCode(w, http.StatusForbidden, apperrors.ErrorCodeUnauthorizedRole)
 		})
 	})
 
 	Describe("GetAll", func() {
-		Context("when offices are found", func() {
-			It("should return 200 with all offices", func() {
-				offices := []*entities.Office{
-					{
-						ID:         uuid.New(),
-						OfficeName: "Office 1",
-						OfficeType: entities.OfficeTypeEVM,
-						Address:    "Address 1",
-						IsActive:   true,
-					},
-					{
-						ID:         uuid.New(),
-						OfficeName: "Office 2",
-						OfficeType: entities.OfficeTypeSC,
-						Address:    "Address 2",
-						IsActive:   false,
-					},
+		BeforeEach(func() {
+			setupRoute("GET", "/offices", "", handler.GetAll)
+		})
+
+		DescribeTable("should handle different scenarios",
+			func(setupMock func(), expectedStatus int, expectedError string) {
+				setupMock()
+				SendRequest(r, http.MethodGet, "/offices", w, nil)
+
+				if expectedError != "" {
+					ExpectErrorCode(w, expectedStatus, expectedError)
+				} else {
+					ExpectResponseNotNil(w, expectedStatus)
 				}
+			},
+			Entry("successful retrieval",
+				func() {
+					offices := []*entities.Office{sampleOffice}
+					mockService.EXPECT().GetAll(mock.Anything).Return(offices, nil).Once()
+				},
+				http.StatusOK, ""),
+			Entry("empty results",
+				func() {
+					mockService.EXPECT().GetAll(mock.Anything).Return([]*entities.Office{}, nil).Once()
+				},
+				http.StatusOK, ""),
+			Entry("service error",
+				func() {
+					mockService.EXPECT().GetAll(mock.Anything).
+						Return(nil, errors.New("database error")).Once()
+				},
+				http.StatusInternalServerError, apperrors.ErrorCodeInternalServerError),
+		)
+	})
 
-				mockService.EXPECT().GetAll(mock.Anything).Return(offices, nil).Once()
+	Describe("GetByID", func() {
+		officeID := uuid.New()
 
-				r.GET("/offices", handler.GetAll)
-
-				SendRequest(r, http.MethodGet, "/offices", w, nil)
-				ExpectResponseNotNil(w, http.StatusOK)
-			})
+		BeforeEach(func() {
+			setupRoute("GET", "/offices/:id", "", handler.GetByID)
 		})
 
-		Context("when no offices exist", func() {
-			It("should return 200 with empty array", func() {
-				mockService.EXPECT().GetAll(mock.Anything).Return([]*entities.Office{}, nil).Once()
+		DescribeTable("should handle different scenarios",
+			func(setupMock func(), url string, expectedStatus int, expectedError string) {
+				if setupMock != nil {
+					setupMock()
+				}
+				SendRequest(r, http.MethodGet, url, w, nil)
 
-				r.GET("/offices", handler.GetAll)
-
-				SendRequest(r, http.MethodGet, "/offices", w, nil)
-				Expect(w.Code).To(Equal(http.StatusOK))
-			})
-		})
-
-		Context("when service returns error", func() {
-			It("should return 500 internal server error", func() {
-				dbErr := apperrors.NewDBOperationError(errors.New("database error"))
-				mockService.EXPECT().GetAll(mock.Anything).Return(nil, dbErr).Once()
-
-				r.GET("/offices", handler.GetAll)
-
-				SendRequest(r, http.MethodGet, "/offices", w, nil)
-				Expect(w.Code).To(Equal(http.StatusInternalServerError))
-			})
-		})
+				if expectedError != "" {
+					ExpectErrorCode(w, expectedStatus, expectedError)
+				} else {
+					ExpectResponseNotNil(w, expectedStatus)
+				}
+			},
+			Entry("successful retrieval",
+				func() {
+					mockService.EXPECT().GetByID(mock.Anything, officeID).Return(sampleOffice, nil).Once()
+				},
+				"/offices/"+officeID.String(), http.StatusOK, ""),
+			Entry("invalid UUID",
+				nil,
+				"/offices/invalid-uuid", http.StatusBadRequest, apperrors.ErrorCodeInvalidUUID),
+			Entry("office not found",
+				func() {
+					mockService.EXPECT().GetByID(mock.Anything, officeID).
+						Return(nil, apperrors.NewOfficeNotFound()).Once()
+				},
+				"/offices/"+officeID.String(), http.StatusNotFound, apperrors.ErrorCodeOfficeNotFound),
+		)
 	})
 
 	Describe("Update", func() {
-		var (
-			officeID uuid.UUID
-			validReq dtos.UpdateOfficeRequest
-		)
+		officeID := uuid.New()
+		updateReq := dtos.UpdateOfficeRequest{
+			OfficeName: "Updated Office",
+			Address:    "456 Updated Street",
+			IsActive:   false,
+		}
 
-		BeforeEach(func() {
-			officeID = uuid.New()
-			validReq = dtos.UpdateOfficeRequest{
-				OfficeName: "Updated Office",
-				OfficeType: entities.OfficeTypeEVM,
-				Address:    "Updated Address",
-				IsActive:   true,
-			}
-		})
-
-		Context("when office is updated successfully", func() {
-			It("should return 204 no content", func() {
-				mockService.EXPECT().Update(mock.Anything, officeID, mock.MatchedBy(func(cmd *services.UpdateOfficeCommand) bool {
-					return cmd.OfficeName == validReq.OfficeName &&
-						cmd.OfficeType == validReq.OfficeType &&
-						cmd.Address == validReq.Address &&
-						cmd.IsActive == validReq.IsActive
-				})).Return(nil).Once()
-
-				r.PUT("/offices/:id", func(c *gin.Context) {
-					SetHeaderRole(c, entities.UserRoleAdmin)
-					SetContentTypeJSON(c)
-					handler.Update(c)
-				})
-
-				SendRequest(r, http.MethodPut, "/offices/"+officeID.String(), w, validReq)
-				Expect(w.Code).To(Equal(http.StatusNoContent))
+		Context("when authorized as ADMIN", func() {
+			BeforeEach(func() {
+				setupRoute("PUT", "/offices/:id", entities.UserRoleAdmin, handler.Update)
 			})
-		})
 
-		Context("when user is not admin", func() {
-			It("should return 403 unauthorized role error", func() {
-				r.PUT("/offices/:id", func(c *gin.Context) {
-					SetHeaderRole(c, entities.UserRoleEvmStaff)
-					SetContentTypeJSON(c)
-					handler.Update(c)
-				})
-
-				SendRequest(r, http.MethodPut, "/offices/"+officeID.String(), w, validReq)
-				Expect(w.Code).To(Equal(http.StatusForbidden))
-			})
-		})
-
-		Context("when office ID is invalid UUID", func() {
-			It("should return 400 bad request", func() {
-				r.PUT("/offices/:id", func(c *gin.Context) {
-					SetHeaderRole(c, entities.UserRoleAdmin)
-					SetContentTypeJSON(c)
-					handler.Update(c)
-				})
-
-				SendRequest(r, http.MethodPut, "/offices/invalid-uuid", w, validReq)
-				ExpectErrorCode(w, http.StatusBadRequest, apperrors.ErrorCodeInvalidUUID)
-			})
-		})
-
-		Context("when request body is invalid JSON", func() {
-			It("should return 400 bad request", func() {
-				r.PUT("/offices/:id", func(c *gin.Context) {
-					SetHeaderRole(c, entities.UserRoleAdmin)
-					SetContentTypeJSON(c)
-					handler.Update(c)
-				})
-
-				SendRequest(r, http.MethodPut, "/offices/"+officeID.String(), w, "invalid json")
-				ExpectErrorCode(w, http.StatusBadRequest, apperrors.ErrorCodeInvalidJsonRequest)
-			})
-		})
-
-		Context("when office is not found", func() {
-			It("should return 404 not found", func() {
-				notFoundErr := apperrors.NewOfficeNotFound()
-				mockService.EXPECT().Update(mock.Anything, officeID, mock.Anything).Return(notFoundErr).Once()
-
-				r.PUT("/offices/:id", func(c *gin.Context) {
-					SetHeaderRole(c, entities.UserRoleAdmin)
-					SetContentTypeJSON(c)
-					handler.Update(c)
-				})
-
-				SendRequest(r, http.MethodPut, "/offices/"+officeID.String(), w, validReq)
-				Expect(w.Code).To(Equal(http.StatusNotFound))
-			})
-		})
-
-		Context("when service returns invalid office type error", func() {
-			It("should return 400 bad request", func() {
-				invalidTypeErr := apperrors.NewInvalidOfficeType()
-				mockService.EXPECT().Update(mock.Anything, officeID, mock.Anything).Return(invalidTypeErr).Once()
-
-				r.PUT("/offices/:id", func(c *gin.Context) {
-					SetHeaderRole(c, entities.UserRoleAdmin)
-					SetContentTypeJSON(c)
-					handler.Update(c)
-				})
-
-				SendRequest(r, http.MethodPut, "/offices/"+officeID.String(), w, validReq)
-				Expect(w.Code).To(Equal(http.StatusBadRequest))
-			})
-		})
-
-		Context("when updating to SC office type", func() {
-			It("should update successfully", func() {
-				scReq := validReq
-				scReq.OfficeType = entities.OfficeTypeSC
+			It("should update office successfully", func() {
+				updatedOffice := *sampleOffice
+				updatedOffice.OfficeName = updateReq.OfficeName
 
 				mockService.EXPECT().Update(mock.Anything, officeID, mock.MatchedBy(func(cmd *services.UpdateOfficeCommand) bool {
-					return cmd.OfficeType == entities.OfficeTypeSC
+					return cmd.OfficeName == updateReq.OfficeName && cmd.Address == updateReq.Address
 				})).Return(nil).Once()
 
-				r.PUT("/offices/:id", func(c *gin.Context) {
-					SetHeaderRole(c, entities.UserRoleAdmin)
-					SetContentTypeJSON(c)
-					handler.Update(c)
-				})
-
-				SendRequest(r, http.MethodPut, "/offices/"+officeID.String(), w, scReq)
+				SendRequest(r, http.MethodPut, "/offices/"+officeID.String(), w, updateReq)
 				Expect(w.Code).To(Equal(http.StatusNoContent))
 			})
+
+			DescribeTable("should handle error scenarios",
+				func(setupMock func(), url string, reqBody interface{}, expectedStatus int, expectedError string) {
+					if setupMock != nil {
+						setupMock()
+					}
+					SendRequest(r, http.MethodPut, url, w, reqBody)
+					ExpectErrorCode(w, expectedStatus, expectedError)
+				},
+				Entry("invalid UUID",
+					nil,
+					"/offices/invalid-uuid", updateReq, http.StatusBadRequest, apperrors.ErrorCodeInvalidUUID),
+				Entry("invalid JSON",
+					nil,
+					"/offices/"+officeID.String(), "invalid json", http.StatusBadRequest, apperrors.ErrorCodeInvalidJsonRequest),
+				Entry("office not found",
+					func() {
+						mockService.EXPECT().Update(mock.Anything, officeID, mock.Anything).
+							Return(apperrors.NewOfficeNotFound()).Once()
+					},
+					"/offices/"+officeID.String(), updateReq, http.StatusNotFound, apperrors.ErrorCodeOfficeNotFound),
+			)
 		})
 
-		Context("when updating to inactive status", func() {
-			It("should update successfully", func() {
-				inactiveReq := validReq
-				inactiveReq.IsActive = false
-
-				mockService.EXPECT().Update(mock.Anything, officeID, mock.MatchedBy(func(cmd *services.UpdateOfficeCommand) bool {
-					return cmd.IsActive == false
-				})).Return(nil).Once()
-
-				r.PUT("/offices/:id", func(c *gin.Context) {
-					SetHeaderRole(c, entities.UserRoleAdmin)
-					SetContentTypeJSON(c)
-					handler.Update(c)
-				})
-
-				SendRequest(r, http.MethodPut, "/offices/"+officeID.String(), w, inactiveReq)
-				Expect(w.Code).To(Equal(http.StatusNoContent))
-			})
-		})
-
-		Context("when service returns database error", func() {
-			It("should return 500 internal server error", func() {
-				dbErr := apperrors.NewDBOperationError(errors.New("database error"))
-				mockService.EXPECT().Update(mock.Anything, officeID, mock.Anything).Return(dbErr).Once()
-
-				r.PUT("/offices/:id", func(c *gin.Context) {
-					SetHeaderRole(c, entities.UserRoleAdmin)
-					SetContentTypeJSON(c)
-					handler.Update(c)
-				})
-
-				SendRequest(r, http.MethodPut, "/offices/"+officeID.String(), w, validReq)
-				Expect(w.Code).To(Equal(http.StatusInternalServerError))
+		Context("when not authorized as ADMIN", func() {
+			It("should deny access", func() {
+				setupRoute("PUT", "/offices/:id", entities.UserRoleScStaff, handler.Update)
+				SendRequest(r, http.MethodPut, "/offices/"+officeID.String(), w, updateReq)
+				ExpectErrorCode(w, http.StatusForbidden, apperrors.ErrorCodeUnauthorizedRole)
 			})
 		})
 	})
 
 	Describe("Delete", func() {
-		var officeID uuid.UUID
+		officeID := uuid.New()
 
-		BeforeEach(func() {
-			officeID = uuid.New()
-		})
+		Context("when authorized as ADMIN", func() {
+			BeforeEach(func() {
+				setupRoute("DELETE", "/offices/:id", entities.UserRoleAdmin, handler.Delete)
+			})
 
-		Context("when office is deleted successfully", func() {
-			It("should return 204 no content", func() {
+			It("should delete office successfully", func() {
 				mockService.EXPECT().DeleteByID(mock.Anything, officeID).Return(nil).Once()
-
-				r.DELETE("/offices/:id", func(c *gin.Context) {
-					SetHeaderRole(c, entities.UserRoleAdmin)
-					SetContentTypeJSON(c)
-					handler.Delete(c)
-				})
-
 				SendRequest(r, http.MethodDelete, "/offices/"+officeID.String(), w, nil)
 				Expect(w.Code).To(Equal(http.StatusNoContent))
 			})
+
+			DescribeTable("should handle error scenarios",
+				func(setupMock func(), url string, expectedStatus int, expectedError string) {
+					if setupMock != nil {
+						setupMock()
+					}
+					SendRequest(r, http.MethodDelete, url, w, nil)
+					ExpectErrorCode(w, expectedStatus, expectedError)
+				},
+				Entry("invalid UUID",
+					nil,
+					"/offices/invalid-uuid", http.StatusBadRequest, apperrors.ErrorCodeInvalidUUID),
+				Entry("office not found",
+					func() {
+						mockService.EXPECT().DeleteByID(mock.Anything, officeID).
+							Return(apperrors.NewOfficeNotFound()).Once()
+					},
+					"/offices/"+officeID.String(), http.StatusNotFound, apperrors.ErrorCodeOfficeNotFound),
+			)
 		})
 
-		Context("when user is not admin", func() {
-			It("should return 403 unauthorized role error", func() {
-				r.DELETE("/offices/:id", func(c *gin.Context) {
-					SetHeaderRole(c, entities.UserRoleScTechnician)
-					SetContentTypeJSON(c)
-					handler.Delete(c)
-				})
-
+		Context("when not authorized as ADMIN", func() {
+			It("should deny access", func() {
+				setupRoute("DELETE", "/offices/:id", entities.UserRoleScStaff, handler.Delete)
 				SendRequest(r, http.MethodDelete, "/offices/"+officeID.String(), w, nil)
 				ExpectErrorCode(w, http.StatusForbidden, apperrors.ErrorCodeUnauthorizedRole)
-			})
-		})
-
-		Context("when office ID is invalid UUID", func() {
-			It("should return 400 bad request", func() {
-				r.DELETE("/offices/:id", func(c *gin.Context) {
-					SetHeaderRole(c, entities.UserRoleAdmin)
-					SetContentTypeJSON(c)
-					handler.Delete(c)
-				})
-
-				SendRequest(r, http.MethodDelete, "/offices/invalid-uuid", w, nil)
-				ExpectErrorCode(w, http.StatusBadRequest, apperrors.ErrorCodeInvalidUUID)
-			})
-		})
-
-		Context("when office is not found", func() {
-			It("should return 404 not found", func() {
-				notFoundErr := apperrors.NewOfficeNotFound()
-				mockService.EXPECT().DeleteByID(mock.Anything, officeID).Return(notFoundErr).Once()
-
-				r.DELETE("/offices/:id", func(c *gin.Context) {
-					SetHeaderRole(c, entities.UserRoleAdmin)
-					SetContentTypeJSON(c)
-					handler.Delete(c)
-				})
-
-				SendRequest(r, http.MethodDelete, "/offices/"+officeID.String(), w, nil)
-				Expect(w.Code).To(Equal(http.StatusNotFound))
-			})
-		})
-
-		Context("when service returns database error", func() {
-			It("should return 500 internal server error", func() {
-				dbErr := apperrors.NewDBOperationError(errors.New("database error"))
-				mockService.EXPECT().DeleteByID(mock.Anything, officeID).Return(dbErr).Once()
-
-				r.DELETE("/offices/:id", func(c *gin.Context) {
-					SetHeaderRole(c, entities.UserRoleAdmin)
-					SetContentTypeJSON(c)
-					handler.Delete(c)
-				})
-
-				SendRequest(r, http.MethodDelete, "/offices/"+officeID.String(), w, nil)
-				Expect(w.Code).To(Equal(http.StatusInternalServerError))
 			})
 		})
 	})

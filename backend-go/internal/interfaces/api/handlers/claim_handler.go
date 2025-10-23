@@ -164,6 +164,7 @@ func (h *claimHandler) Update(c *gin.Context) {
 func (h *claimHandler) Delete(c *gin.Context) {
 	if err := allowedRoles(c, entities.UserRoleScStaff, entities.UserRoleEvmStaff); err != nil {
 		handleError(h.log, c, err)
+		return
 	}
 
 	idParam := c.Param("id")
@@ -192,6 +193,7 @@ func (h *claimHandler) Delete(c *gin.Context) {
 func (h *claimHandler) Submit(c *gin.Context) {
 	if err := allowedRoles(c, entities.UserRoleScStaff); err != nil {
 		handleError(h.log, c, err)
+		return
 	}
 
 	idParam := c.Param("id")
@@ -222,6 +224,7 @@ func (h *claimHandler) Submit(c *gin.Context) {
 func (h *claimHandler) Review(c *gin.Context) {
 	if err := allowedRoles(c, entities.UserRoleEvmStaff); err != nil {
 		handleError(h.log, c, err)
+		return
 	}
 
 	idParam := c.Param("id")
@@ -252,6 +255,7 @@ func (h *claimHandler) Review(c *gin.Context) {
 func (h *claimHandler) RequestInfo(c *gin.Context) {
 	if err := allowedRoles(c, entities.UserRoleEvmStaff); err != nil {
 		handleError(h.log, c, err)
+		return
 	}
 
 	idParam := c.Param("id")
@@ -282,6 +286,7 @@ func (h *claimHandler) RequestInfo(c *gin.Context) {
 func (h *claimHandler) Cancel(c *gin.Context) {
 	if err := allowedRoles(c, entities.UserRoleScStaff); err != nil {
 		handleError(h.log, c, err)
+		return
 	}
 
 	idParam := c.Param("id")
@@ -312,6 +317,7 @@ func (h *claimHandler) Cancel(c *gin.Context) {
 func (h *claimHandler) Complete(c *gin.Context) {
 	if err := allowedRoles(c, entities.UserRoleEvmStaff); err != nil {
 		handleError(h.log, c, err)
+		return
 	}
 
 	idParam := c.Param("id")
@@ -350,11 +356,11 @@ func (h *claimHandler) History(c *gin.Context) {
 		return
 	}
 
-	histories, err := h.service.GetHistory(ctx, id)
+	history, err := h.service.GetHistory(ctx, id)
 	if err != nil {
 		handleError(h.log, c, err)
 		return
 	}
 
-	writeSuccessResponse(c, http.StatusOK, histories)
+	writeSuccessResponse(c, http.StatusOK, history)
 }

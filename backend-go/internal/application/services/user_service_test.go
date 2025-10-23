@@ -46,10 +46,8 @@ var _ = Describe("UserService", func() {
 			})
 
 			It("should return created user", func() {
-				office := &entities.Office{
-					ID:         cmd.OfficeID,
-					OfficeType: entities.OfficeTypeEVM,
-				}
+				office := entities.NewOffice("Test Office", entities.OfficeTypeEVM, "123 Test St", true)
+				office.ID = cmd.OfficeID
 				mockOfficeRepo.EXPECT().FindByID(ctx, cmd.OfficeID).Return(office, nil).Once()
 				mockUserRepo.EXPECT().Create(ctx, mock.MatchedBy(func(u *entities.User) bool {
 					return u.Name == cmd.Name &&

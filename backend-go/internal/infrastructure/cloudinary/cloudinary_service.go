@@ -94,11 +94,6 @@ func parseCloudinaryURL(fileURL string) (publicID, resourceType string, err erro
 		return "", "", apperrors.NewInvalidCloudinaryURL()
 	}
 
-	// parts[0] = cloud-name
-	// parts[1] = resource_type (image/video/raw)
-	// parts[2] = upload
-	// parts[3+] = version and path to file
-
 	resourceType = parts[1]
 
 	pathWithVersion := strings.Join(parts[3:], "/")

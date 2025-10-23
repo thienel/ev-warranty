@@ -23,155 +23,98 @@ var _ = Describe("OAuthHandler", func() {
 		handler         handlers.OAuthHandler
 		r               *gin.Engine
 		w               *httptest.ResponseRecorder
-		frontendBaseURL string
+		frontendBaseURL = "http://localhost:3000"
+		errorMsg        = "Error while login with Google, please try again!"
 	)
 
 	BeforeEach(func() {
 		mockLogger, r, w = SetupMock(GinkgoT())
 		mockOAuthSvc = mocks.NewOAuthService(GinkgoT())
 		mockAuthSvc = mocks.NewAuthService(GinkgoT())
-		frontendBaseURL = "http://localhost:3000"
 		handler = handlers.NewOAuthHandler(mockLogger, frontendBaseURL, mockOAuthSvc, mockAuthSvc)
 	})
 
 	Describe("InitiateOAuth", func() {
-		Context("when auth URL is generated successfully", func() {
-			It("should redirect to the OAuth provider", func() {
-				authURL := "https://accounts.google.com/o/oauth2/auth?client_id=test"
-				mockOAuthSvc.EXPECT().GenerateAuthURL().Return(authURL, nil).Once()
-
-				r.GET("/oauth/login", handler.InitiateOAuth)
-				req, _ := http.NewRequest(http.MethodGet, "/oauth/login", nil)
-				r.ServeHTTP(w, req)
-
-				Expect(w.Code).To(Equal(http.StatusFound))
-				Expect(w.Header().Get("Location")).To(Equal(authURL))
-			})
+		BeforeEach(func() {
+			r.GET("/oauth/login", handler.InitiateOAuth)
 		})
 
-		Context("when auth URL generation fails", func() {
-			It("should redirect to frontend login with error", func() {
-				mockOAuthSvc.EXPECT().GenerateAuthURL().Return("", errors.New("state generation failed")).Once()
+		It("should redirect to OAuth provider on success", func() {
+			authURL := "https://accounts.google.com/o/oauth2/auth?client_id=test"
+			mockOAuthSvc.EXPECT().GenerateAuthURL().Return(authURL, nil).Once()
 
-				r.GET("/oauth/login", handler.InitiateOAuth)
-				req, _ := http.NewRequest(http.MethodGet, "/oauth/login", nil)
-				r.ServeHTTP(w, req)
+			req, _ := http.NewRequest(http.MethodGet, "/oauth/login", nil)
+			r.ServeHTTP(w, req)
 
-				Expect(w.Code).To(Equal(http.StatusFound))
-				expectedLocation := fmt.Sprintf("%s/login?error=%s", frontendBaseURL, "Error while login with Google, please try again!")
-				Expect(w.Header().Get("Location")).To(Equal(expectedLocation))
-			})
+			Expect(w.Code).To(Equal(http.StatusFound))
+			Expect(w.Header().Get("Location")).To(Equal(authURL))
+		})
+
+		It("should redirect to frontend on error", func() {
+			mockOAuthSvc.EXPECT().GenerateAuthURL().Return("", errors.New("failed")).Once()
+
+			req, _ := http.NewRequest(http.MethodGet, "/oauth/login", nil)
+			r.ServeHTTP(w, req)
+
+			Expect(w.Code).To(Equal(http.StatusFound))
+			Expect(w.Header().Get("Location")).To(Equal(fmt.Sprintf("%s/login?error=%s", frontendBaseURL, errorMsg)))
 		})
 	})
 
 	Describe("HandleCallback", func() {
 		var (
-			validCode  string
-			validState string
+			validCode    = "test-auth-code"
+			validState   = "test-state-token"
+			userInfo     *providers.UserInfo
+			accessToken  = "access-token-123"
+			refreshToken = "refresh-token-456"
 		)
 
 		BeforeEach(func() {
-			validCode = "test-auth-code"
-			validState = "test-state-token"
+			r.GET("/oauth/callback", handler.HandleCallback)
+			userInfo = &providers.UserInfo{
+				Provider:   "google",
+				ProviderID: "123456789",
+				Email:      "test@example.com",
+				Name:       "Test User",
+			}
 		})
 
-		Context("when OAuth callback is successful", func() {
-			It("should set refresh token cookie and redirect with access token", func() {
-				userInfo := &providers.UserInfo{
-					Provider:   "google",
-					ProviderID: "123456789",
-					Email:      "test@example.com",
-					Name:       "Test User",
+		It("should handle successful OAuth callback", func() {
+			mockOAuthSvc.EXPECT().HandleCallback(mock.Anything, validCode, validState).Return(userInfo, nil).Once()
+			mockAuthSvc.EXPECT().HandleOAuthUser(mock.Anything, userInfo).Return(accessToken, refreshToken, nil).Once()
+
+			req, _ := http.NewRequest(http.MethodGet, fmt.Sprintf("/oauth/callback?code=%s&state=%s", validCode, validState), nil)
+			r.ServeHTTP(w, req)
+
+			Expect(w.Code).To(Equal(http.StatusFound))
+			Expect(w.Header().Get("Location")).To(Equal(fmt.Sprintf("%s/auth/callback?token=%s", frontendBaseURL, accessToken)))
+			ExpectCookieRefreshToken(w, refreshToken)
+		})
+
+		DescribeTable("should redirect to frontend with error",
+			func(url string, setupMocks func()) {
+				if setupMocks != nil {
+					setupMocks()
 				}
-				accessToken := "access-token-123"
-				refreshToken := "refresh-token-456"
-
-				mockOAuthSvc.EXPECT().HandleCallback(mock.Anything, validCode, validState).Return(userInfo, nil).Once()
-				mockAuthSvc.EXPECT().HandleOAuthUser(mock.Anything, userInfo).Return(accessToken, refreshToken, nil).Once()
-
-				r.GET("/oauth/callback", handler.HandleCallback)
-				req, _ := http.NewRequest(http.MethodGet, fmt.Sprintf("/oauth/callback?code=%s&state=%s", validCode, validState), nil)
+				req, _ := http.NewRequest(http.MethodGet, url, nil)
 				r.ServeHTTP(w, req)
 
 				Expect(w.Code).To(Equal(http.StatusFound))
-				expectedLocation := fmt.Sprintf("%s/auth/callback?token=%s", frontendBaseURL, accessToken)
-				Expect(w.Header().Get("Location")).To(Equal(expectedLocation))
-				ExpectCookieRefreshToken(w, refreshToken)
-			})
-		})
-
-		Context("when state is missing", func() {
-			It("should redirect to frontend login with error", func() {
-				r.GET("/oauth/callback", handler.HandleCallback)
-				req, _ := http.NewRequest(http.MethodGet, fmt.Sprintf("/oauth/callback?code=%s", validCode), nil)
-				r.ServeHTTP(w, req)
-
-				Expect(w.Code).To(Equal(http.StatusFound))
-				expectedLocation := fmt.Sprintf("%s/login?error=%s", frontendBaseURL, "Error while login with Google, please try again!")
-				Expect(w.Header().Get("Location")).To(Equal(expectedLocation))
-			})
-		})
-
-		Context("when code is missing", func() {
-			It("should redirect to frontend login with error", func() {
-				r.GET("/oauth/callback", handler.HandleCallback)
-				req, _ := http.NewRequest(http.MethodGet, fmt.Sprintf("/oauth/callback?state=%s", validState), nil)
-				r.ServeHTTP(w, req)
-
-				Expect(w.Code).To(Equal(http.StatusFound))
-				expectedLocation := fmt.Sprintf("%s/login?error=%s", frontendBaseURL, "Error while login with Google, please try again!")
-				Expect(w.Header().Get("Location")).To(Equal(expectedLocation))
-			})
-		})
-
-		Context("when OAuth provider returns error", func() {
-			It("should redirect to frontend login with error", func() {
-				r.GET("/oauth/callback", handler.HandleCallback)
-				req, _ := http.NewRequest(http.MethodGet, "/oauth/callback?error=access_denied&state=test-state", nil)
-				r.ServeHTTP(w, req)
-
-				Expect(w.Code).To(Equal(http.StatusFound))
-				expectedLocation := fmt.Sprintf("%s/login?error=%s", frontendBaseURL, "Error while login with Google, please try again!")
-				Expect(w.Header().Get("Location")).To(Equal(expectedLocation))
-			})
-		})
-
-		Context("when OAuth service HandleCallback fails", func() {
-			It("should redirect to frontend login with error", func() {
+				Expect(w.Header().Get("Location")).To(Equal(fmt.Sprintf("%s/login?error=%s", frontendBaseURL, errorMsg)))
+			},
+			Entry("when state is missing", fmt.Sprintf("/oauth/callback?code=%s", validCode), nil),
+			Entry("when code is missing", fmt.Sprintf("/oauth/callback?state=%s", validState), nil),
+			Entry("when OAuth provider returns error", "/oauth/callback?error=access_denied&state=test-state", nil),
+			Entry("when OAuth service fails", fmt.Sprintf("/oauth/callback?code=%s&state=%s", validCode, validState), func() {
 				mockOAuthSvc.EXPECT().HandleCallback(mock.Anything, validCode, validState).
 					Return(nil, errors.New("invalid state")).Once()
-
-				r.GET("/oauth/callback", handler.HandleCallback)
-				req, _ := http.NewRequest(http.MethodGet, fmt.Sprintf("/oauth/callback?code=%s&state=%s", validCode, validState), nil)
-				r.ServeHTTP(w, req)
-
-				Expect(w.Code).To(Equal(http.StatusFound))
-				expectedLocation := fmt.Sprintf("%s/login?error=%s", frontendBaseURL, "Error while login with Google, please try again!")
-				Expect(w.Header().Get("Location")).To(Equal(expectedLocation))
-			})
-		})
-
-		Context("when auth service HandleOAuthUser fails", func() {
-			It("should redirect to frontend login with error", func() {
-				userInfo := &providers.UserInfo{
-					Provider:   "google",
-					ProviderID: "123456789",
-					Email:      "test@example.com",
-					Name:       "Test User",
-				}
-
+			}),
+			Entry("when auth service fails", fmt.Sprintf("/oauth/callback?code=%s&state=%s", validCode, validState), func() {
 				mockOAuthSvc.EXPECT().HandleCallback(mock.Anything, validCode, validState).Return(userInfo, nil).Once()
 				mockAuthSvc.EXPECT().HandleOAuthUser(mock.Anything, userInfo).
 					Return("", "", errors.New("user creation failed")).Once()
-
-				r.GET("/oauth/callback", handler.HandleCallback)
-				req, _ := http.NewRequest(http.MethodGet, fmt.Sprintf("/oauth/callback?code=%s&state=%s", validCode, validState), nil)
-				r.ServeHTTP(w, req)
-
-				Expect(w.Code).To(Equal(http.StatusFound))
-				expectedLocation := fmt.Sprintf("%s/login?error=%s", frontendBaseURL, "Error while login with Google, please try again!")
-				Expect(w.Header().Get("Location")).To(Equal(expectedLocation))
-			})
-		})
+			}),
+		)
 	})
 })
