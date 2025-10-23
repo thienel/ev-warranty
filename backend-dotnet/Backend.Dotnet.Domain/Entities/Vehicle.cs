@@ -46,7 +46,11 @@ namespace Backend.Dotnet.Domain.Entities
             SetPurchaseDate(purchaseDate);
             SetUpdatedAt();
         }
-
+        public void ChangeVin(string Vin)
+        {
+            SetVin(Vin);
+            SetUpdatedAt();
+        }
         public void ChangeLicensePlate(string licensePlate)
         {
             SetLicensePlate(licensePlate);
@@ -56,6 +60,16 @@ namespace Backend.Dotnet.Domain.Entities
         public void ChangePurchaseDate(DateTime? purchaseDate)
         {
             SetPurchaseDate(purchaseDate);
+            SetUpdatedAt();
+        }
+
+
+        public void ChangeModel(Guid newModelId)
+        {
+            if (newModelId == Guid.Empty)
+                throw new BusinessRuleViolationException("New model ID is invalid");
+
+            ModelId = newModelId;
             SetUpdatedAt();
         }
 

@@ -44,6 +44,7 @@ namespace Backend.Dotnet.Domain.Entities
             SetUpdatedAt();
         }
 
+        // change method lack of vadidation, use for mapper in purpose of reducing null-coalescing
         public void ChangePhoneNumber(string phoneNumber)
         {
             SetPhoneNumber(phoneNumber);
@@ -59,6 +60,34 @@ namespace Backend.Dotnet.Domain.Entities
         public void ChangeAddress(string address)
         {
             SetAddress(address);
+            SetUpdatedAt();
+        }
+
+        public void ChangeFirstName(string? firstName)
+        {
+            if (string.IsNullOrWhiteSpace(firstName))
+                throw new BusinessRuleViolationException("First name cannot be empty");
+
+            if(firstName.Length > 100)
+            {
+                throw new BusinessRuleViolationException("Name cannot exceed 100 characters");
+            }
+
+            SetFirstName(firstName.Trim());
+            SetUpdatedAt();
+        }
+
+        public void ChangeLastName(string? lastName)
+        {
+            if (string.IsNullOrWhiteSpace(lastName))
+                throw new BusinessRuleViolationException("Last name cannot be empty");
+
+            if(lastName.Length > 100)
+            {
+                throw new BusinessRuleViolationException("Name cannot exceed 100 characters");
+            }
+
+            SetLastName(lastName?.Trim());
             SetUpdatedAt();
         }
 

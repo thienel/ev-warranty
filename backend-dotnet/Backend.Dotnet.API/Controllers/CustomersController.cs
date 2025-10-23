@@ -1,4 +1,5 @@
-﻿using Backend.Dotnet.Application.Interfaces;
+﻿using Backend.Dotnet.Application.DTOs;
+using Backend.Dotnet.Application.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using static Backend.Dotnet.Application.DTOs.CustomerDto;
 
@@ -17,6 +18,8 @@ namespace Backend.Dotnet.API.Controllers
         }
 
         [HttpGet]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> GetAll()
         {
             var result = await _customerService.GetAllAsync();
@@ -27,6 +30,8 @@ namespace Backend.Dotnet.API.Controllers
         }
 
         [HttpGet("{id}")]
+        [ProducesResponseType(typeof(BaseResponseDto<CustomerResponse>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(BaseResponseDto<CustomerResponse>), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetById(Guid id)
         {
             var result = await _customerService.GetByIdAsync(id);
@@ -48,6 +53,9 @@ namespace Backend.Dotnet.API.Controllers
         }
         */
         [HttpGet("by-email")]
+        [ProducesResponseType(typeof(BaseResponseDto<CustomerResponse>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(BaseResponseDto<CustomerResponse>), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(BaseResponseDto<CustomerResponse>), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetByEmail([FromQuery] string email)
         {
             if (string.IsNullOrWhiteSpace(email))
@@ -61,6 +69,8 @@ namespace Backend.Dotnet.API.Controllers
         }
 
         [HttpGet("search")]
+        [ProducesResponseType(typeof(BaseResponseDto<IEnumerable<CustomerResponse>>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(BaseResponseDto<IEnumerable<CustomerResponse>>), StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> Search([FromQuery] string searchTerm)
         {
             var result = await _customerService.SearchAsync(searchTerm);
@@ -71,6 +81,8 @@ namespace Backend.Dotnet.API.Controllers
         }
 
         [HttpPost]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> Create([FromBody] CreateCustomerRequest request)
         {
             if (!ModelState.IsValid)
@@ -84,6 +96,9 @@ namespace Backend.Dotnet.API.Controllers
         }
 
         [HttpPut("{id}")]
+        [ProducesResponseType(typeof(BaseResponseDto<CustomerResponse>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(BaseResponseDto<CustomerResponse>), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(BaseResponseDto<CustomerResponse>), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Update(Guid id, [FromBody] UpdateCustomerRequest request)
         {
             if (!ModelState.IsValid)
@@ -96,44 +111,46 @@ namespace Backend.Dotnet.API.Controllers
             return Ok(result);
         }
 
-        [HttpPatch("{id}/email")]
-        public async Task<IActionResult> UpdateEmail(Guid id, [FromBody] string email)
-        {
-            if (string.IsNullOrWhiteSpace(email))
-                return BadRequest(new { message = "Email is required" });
+        //[HttpPut("{id}/email")]
+        //public async Task<IActionResult> UpdateEmail(Guid id, [FromBody] string email)
+        //{
+        //    if (string.IsNullOrWhiteSpace(email))
+        //        return BadRequest(new { message = "Email is required" });
 
-            var result = await _customerService.UpdateEmailAsync(id, email);
-            if (!result.IsSuccess)
-                return BadRequest(result);
+        //    var result = await _customerService.UpdateEmailAsync(id, email);
+        //    if (!result.IsSuccess)
+        //        return BadRequest(result);
 
-            return Ok(result);
-        }
+        //    return Ok(result);
+        //}
 
-        [HttpPatch("{id}/phone")]
-        public async Task<IActionResult> UpdatePhoneNumber(Guid id, [FromBody] string phoneNumber)
-        {
-            if (string.IsNullOrWhiteSpace(phoneNumber))
-                return BadRequest(new { message = "Phone number is required" });
+        //[HttpPatch("{id}/phone")]
+        //public async Task<IActionResult> UpdatePhoneNumber(Guid id, [FromBody] string phoneNumber)
+        //{
+        //    if (string.IsNullOrWhiteSpace(phoneNumber))
+        //        return BadRequest(new { message = "Phone number is required" });
 
-            var result = await _customerService.UpdatePhoneNumberAsync(id, phoneNumber);
-            if (!result.IsSuccess)
-                return BadRequest(result);
+        //    var result = await _customerService.UpdatePhoneNumberAsync(id, phoneNumber);
+        //    if (!result.IsSuccess)
+        //        return BadRequest(result);
 
-            return Ok(result);
-        }
+        //    return Ok(result);
+        //}
 
-        [HttpPatch("{id}/address")]
-        public async Task<IActionResult> UpdateAddress(Guid id, [FromBody] string address)
-        {
-            var result = await _customerService.UpdateAddressAsync(id, address);
-            if (!result.IsSuccess)
-                return BadRequest(result);
+        //[HttpPatch("{id}/address")]
+        //public async Task<IActionResult> UpdateAddress(Guid id, [FromBody] string address)
+        //{
+        //    var result = await _customerService.UpdateAddressAsync(id, address);
+        //    if (!result.IsSuccess)
+        //        return BadRequest(result);
 
-            return Ok(result);
-        }
+        //    return Ok(result);
+        //}
 
         // Soft delete Endpoints
         [HttpDelete("{id}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> SoftDelete(Guid id)
         {
             var result = await _customerService.SoftDeleteAsync(id);
@@ -144,6 +161,8 @@ namespace Backend.Dotnet.API.Controllers
         }
 
         [HttpPost("{id}/restore")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> Restore(Guid id)
         {
             var result = await _customerService.RestoreAsync(id);

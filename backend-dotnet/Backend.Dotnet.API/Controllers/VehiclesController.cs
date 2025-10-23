@@ -1,4 +1,5 @@
-﻿using Backend.Dotnet.Application.Interfaces;
+﻿using Backend.Dotnet.Application.DTOs;
+using Backend.Dotnet.Application.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using static Backend.Dotnet.Application.DTOs.VehicleDto;
 
@@ -117,6 +118,9 @@ namespace Backend.Dotnet.API.Controllers
         }
 
         [HttpPut("{id}")]
+        [ProducesResponseType(typeof(BaseResponseDto<VehicleResponse>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(BaseResponseDto<VehicleResponse>), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(BaseResponseDto<VehicleResponse>), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Update(Guid id, [FromBody] UpdateVehicleRequest request)
         {
             if (!ModelState.IsValid)
@@ -129,34 +133,36 @@ namespace Backend.Dotnet.API.Controllers
             return Ok(result);
         }
 
-        [HttpPatch("{id}/license-plate")]
-        public async Task<IActionResult> UpdateLicensePlate(Guid id, [FromBody] UpdateLicensePlateCommand command)
-        {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
+        //[HttpPatch("{id}/license-plate")]
+        //public async Task<IActionResult> UpdateLicensePlate(Guid id, [FromBody] UpdateLicensePlateCommand command)
+        //{
+        //    if (!ModelState.IsValid)
+        //        return BadRequest(ModelState);
 
-            var result = await _vehicleService.UpdateLicensePlateAsync(id, command);
-            if (!result.IsSuccess)
-                return BadRequest(result);
+        //    var result = await _vehicleService.UpdateLicensePlateAsync(id, command);
+        //    if (!result.IsSuccess)
+        //        return BadRequest(result);
 
-            return Ok(result);
-        }
+        //    return Ok(result);
+        //}
 
-        [HttpPatch("{id}/transfer")]
-        public async Task<IActionResult> TransferOwnership(Guid id, [FromBody] TransferVehicleCommand command)
-        {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
+        //[HttpPatch("{id}/transfer")]
+        //public async Task<IActionResult> TransferOwnership(Guid id, [FromBody] TransferVehicleCommand command)
+        //{
+        //    if (!ModelState.IsValid)
+        //        return BadRequest(ModelState);
 
-            var result = await _vehicleService.TransferOwnershipAsync(id, command);
-            if (!result.IsSuccess)
-                return BadRequest(result);
+        //    var result = await _vehicleService.TransferOwnershipAsync(id, command);
+        //    if (!result.IsSuccess)
+        //        return BadRequest(result);
 
-            return Ok(result);
-        }
+        //    return Ok(result);
+        //}
 
         // Soft delete Endpoints
         [HttpDelete("{id}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> SoftDelete(Guid id)
         {
             var result = await _vehicleService.SoftDeleteAsync(id);
@@ -167,6 +173,8 @@ namespace Backend.Dotnet.API.Controllers
         }
 
         [HttpPost("{id}/restore")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> Restore(Guid id)
         {
             var result = await _vehicleService.RestoreAsync(id);
