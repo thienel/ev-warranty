@@ -17,7 +17,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	. "github.com/onsi/ginkgo/v2"
-	. "github.com/onsi/gomega"
 	"github.com/stretchr/testify/mock"
 )
 
@@ -37,7 +36,6 @@ var _ = Describe("ClaimHandler", func() {
 		validUpdateReq dtos.UpdateClaimRequest
 	)
 
-	// Helper function to setup route with role and user ID
 	setupRoute := func(method, path string, role string, handlerFunc gin.HandlerFunc) {
 		r.Handle(method, path, func(c *gin.Context) {
 			if role != "" {
@@ -49,13 +47,20 @@ var _ = Describe("ClaimHandler", func() {
 		})
 	}
 
-	// Helper function to setup transaction mock
 	setupTxMock := func(serviceMockFn func()) {
 		mockTxManager.EXPECT().Do(mock.Anything, mock.AnythingOfType("func(application.Tx) error")).
 			Run(func(ctx context.Context, fn func(application.Tx) error) {
 				serviceMockFn()
 				_ = fn(mockTx)
 			}).Return(nil).Once()
+	}
+
+	setupTxMockWithError := func(serviceMockFn func(), expectedError error) {
+		mockTxManager.EXPECT().Do(mock.Anything, mock.AnythingOfType("func(application.Tx) error")).
+			Run(func(ctx context.Context, fn func(application.Tx) error) {
+				serviceMockFn()
+				_ = fn(mockTx)
+			}).Return(expectedError).Once()
 	}
 
 	BeforeEach(func() {
@@ -95,42 +100,41 @@ var _ = Describe("ClaimHandler", func() {
 			r.GET("/claims/:id", handler.GetByID)
 		})
 
-		DescribeTable("should handle different scenarios",
-			func(setupMock func(), claimIDParam string, expectedStatus int, expectedError string) {
-				if setupMock != nil {
-					setupMock()
-				}
-				req, _ := http.NewRequest(http.MethodGet, "/claims/"+claimIDParam, nil)
-				r.ServeHTTP(w, req)
+		It("should retrieve claim successfully", func() {
+			mockService.EXPECT().GetByID(mock.Anything, claimID).Return(sampleClaim, nil).Once()
 
-				Expect(w.Code).To(Equal(expectedStatus))
-				if expectedError != "" {
-					ExpectErrorCode(w, expectedStatus, expectedError)
-				} else {
-					ExpectResponseNotNil(w, expectedStatus)
-				}
-			},
-			Entry("successful retrieval",
-				func() {
-					mockService.EXPECT().GetByID(mock.Anything, claimID).Return(sampleClaim, nil).Once()
-				},
-				claimID.String(), http.StatusOK, ""),
-			Entry("invalid UUID",
-				nil,
-				"invalid-uuid", http.StatusBadRequest, apperrors.ErrorCodeInvalidUUID),
-			Entry("claim not found",
-				func() {
-					mockService.EXPECT().GetByID(mock.Anything, claimID).
-						Return(nil, apperrors.NewClaimNotFound()).Once()
-				},
-				claimID.String(), http.StatusNotFound, apperrors.ErrorCodeClaimNotFound),
-			Entry("service error",
-				func() {
-					mockService.EXPECT().GetByID(mock.Anything, claimID).
-						Return(nil, errors.New("database error")).Once()
-				},
-				claimID.String(), http.StatusInternalServerError, apperrors.ErrorCodeInternalServerError),
-		)
+			req, _ := http.NewRequest(http.MethodGet, "/claims/"+claimID.String(), nil)
+			r.ServeHTTP(w, req)
+
+			ExpectResponseNotNil(w, http.StatusOK)
+		})
+
+		It("should handle invalid UUID", func() {
+			req, _ := http.NewRequest(http.MethodGet, "/claims/invalid-uuid", nil)
+			r.ServeHTTP(w, req)
+
+			ExpectErrorCode(w, http.StatusBadRequest, apperrors.ErrorCodeInvalidUUID)
+		})
+
+		It("should handle claim not found", func() {
+			mockService.EXPECT().GetByID(mock.Anything, claimID).
+				Return(nil, apperrors.NewClaimNotFound()).Once()
+
+			req, _ := http.NewRequest(http.MethodGet, "/claims/"+claimID.String(), nil)
+			r.ServeHTTP(w, req)
+
+			ExpectErrorCode(w, http.StatusNotFound, apperrors.ErrorCodeClaimNotFound)
+		})
+
+		It("should handle service errors", func() {
+			mockService.EXPECT().GetByID(mock.Anything, claimID).
+				Return(nil, errors.New("database error")).Once()
+
+			req, _ := http.NewRequest(http.MethodGet, "/claims/"+claimID.String(), nil)
+			r.ServeHTTP(w, req)
+
+			ExpectErrorCode(w, http.StatusInternalServerError, apperrors.ErrorCodeInternalServerError)
+		})
 	})
 
 	Describe("GetAll", func() {
@@ -241,27 +245,23 @@ var _ = Describe("ClaimHandler", func() {
 					req := validCreateReq
 					modifyReq(&req)
 
-					setupTxMock(func() {
-						mockService.EXPECT().Create(mockTx, mock.Anything).
-							Return(nil, apperrors.NewInvalidUserInput()).Once()
-					})
-
 					SendRequest(r, http.MethodPost, "/claims", w, req)
 					ExpectErrorCode(w, http.StatusBadRequest, expectedError)
 				},
 				Entry("empty description", func(req *dtos.CreateClaimRequest) {
 					req.Description = ""
-				}, apperrors.ErrorCodeInvalidUserInput),
+				}, apperrors.ErrorCodeInvalidJsonRequest),
 				Entry("description too short", func(req *dtos.CreateClaimRequest) {
 					req.Description = "short"
-				}, apperrors.ErrorCodeInvalidUserInput),
+				}, apperrors.ErrorCodeInvalidJsonRequest),
 			)
 
 			It("should handle service errors", func() {
-				setupTxMock(func() {
+				dbError := errors.New("database error")
+				setupTxMockWithError(func() {
 					mockService.EXPECT().Create(mockTx, mock.Anything).
-						Return(nil, errors.New("database error")).Once()
-				})
+						Return(nil, dbError).Once()
+				}, dbError)
 
 				SendRequest(r, http.MethodPost, "/claims", w, validCreateReq)
 				ExpectErrorCode(w, http.StatusInternalServerError, apperrors.ErrorCodeInternalServerError)
@@ -326,10 +326,11 @@ var _ = Describe("ClaimHandler", func() {
 			})
 
 			It("should handle service errors", func() {
-				setupTxMock(func() {
+				notFoundError := apperrors.NewClaimNotFound()
+				setupTxMockWithError(func() {
 					mockService.EXPECT().Update(mockTx, claimID, mock.Anything).
-						Return(apperrors.NewClaimNotFound()).Once()
-				})
+						Return(notFoundError).Once()
+				}, notFoundError)
 
 				SendRequest(r, http.MethodPut, "/claims/"+claimID.String(), w, validUpdateReq)
 				ExpectErrorCode(w, http.StatusNotFound, apperrors.ErrorCodeClaimNotFound)
@@ -364,10 +365,11 @@ var _ = Describe("ClaimHandler", func() {
 			})
 
 			It("should handle service errors", func() {
-				setupTxMock(func() {
+				notFoundError := apperrors.NewClaimNotFound()
+				setupTxMockWithError(func() {
 					mockService.EXPECT().HardDelete(mockTx, claimID).
-						Return(apperrors.NewClaimNotFound()).Once()
-				})
+						Return(notFoundError).Once()
+				}, notFoundError)
 
 				SendRequest(r, http.MethodDelete, "/claims/"+claimID.String(), w, nil)
 				ExpectErrorCode(w, http.StatusNotFound, apperrors.ErrorCodeClaimNotFound)
@@ -417,10 +419,11 @@ var _ = Describe("ClaimHandler", func() {
 			})
 
 			It("should handle service errors", func() {
-				setupTxMock(func() {
+				invalidActionError := apperrors.NewInvalidClaimAction()
+				setupTxMockWithError(func() {
 					mockService.EXPECT().Submit(mockTx, claimID, userID).
-						Return(apperrors.NewInvalidClaimAction()).Once()
-				})
+						Return(invalidActionError).Once()
+				}, invalidActionError)
 
 				SendRequest(r, http.MethodPost, "/claims/"+claimID.String()+"/submit", w, nil)
 				ExpectErrorCode(w, http.StatusConflict, apperrors.ErrorCodeInvalidClaimAction)
@@ -455,10 +458,11 @@ var _ = Describe("ClaimHandler", func() {
 			})
 
 			It("should handle service errors", func() {
-				setupTxMock(func() {
+				invalidActionError := apperrors.NewInvalidClaimAction()
+				setupTxMockWithError(func() {
 					mockService.EXPECT().UpdateStatus(mockTx, claimID, entities.ClaimStatusReviewing, userID).
-						Return(apperrors.NewInvalidClaimAction()).Once()
-				})
+						Return(invalidActionError).Once()
+				}, invalidActionError)
 
 				SendRequest(r, http.MethodPost, "/claims/"+claimID.String()+"/review", w, nil)
 				ExpectErrorCode(w, http.StatusConflict, apperrors.ErrorCodeInvalidClaimAction)
@@ -493,10 +497,11 @@ var _ = Describe("ClaimHandler", func() {
 			})
 
 			It("should handle service errors", func() {
-				setupTxMock(func() {
+				invalidActionError := apperrors.NewInvalidClaimAction()
+				setupTxMockWithError(func() {
 					mockService.EXPECT().UpdateStatus(mockTx, claimID, entities.ClaimStatusRequestInfo, userID).
-						Return(apperrors.NewInvalidClaimAction()).Once()
-				})
+						Return(invalidActionError).Once()
+				}, invalidActionError)
 
 				SendRequest(r, http.MethodPost, "/claims/"+claimID.String()+"/request-info", w, nil)
 				ExpectErrorCode(w, http.StatusConflict, apperrors.ErrorCodeInvalidClaimAction)
@@ -531,10 +536,11 @@ var _ = Describe("ClaimHandler", func() {
 			})
 
 			It("should handle service errors", func() {
-				setupTxMock(func() {
+				invalidActionError := apperrors.NewInvalidClaimAction()
+				setupTxMockWithError(func() {
 					mockService.EXPECT().UpdateStatus(mockTx, claimID, entities.ClaimStatusCancelled, userID).
-						Return(apperrors.NewInvalidClaimAction()).Once()
-				})
+						Return(invalidActionError).Once()
+				}, invalidActionError)
 
 				SendRequest(r, http.MethodPost, "/claims/"+claimID.String()+"/cancel", w, nil)
 				ExpectErrorCode(w, http.StatusConflict, apperrors.ErrorCodeInvalidClaimAction)
@@ -556,7 +562,7 @@ var _ = Describe("ClaimHandler", func() {
 
 			It("should complete claim successfully", func() {
 				setupTxMock(func() {
-					mockService.EXPECT().UpdateStatus(mockTx, claimID, entities.ClaimStatusApproved, userID).Return(nil).Once()
+					mockService.EXPECT().Complete(mockTx, claimID, userID).Return(nil).Once()
 				})
 
 				SendRequest(r, http.MethodPost, "/claims/"+claimID.String()+"/complete", w, nil)
@@ -569,10 +575,11 @@ var _ = Describe("ClaimHandler", func() {
 			})
 
 			It("should handle service errors", func() {
-				setupTxMock(func() {
-					mockService.EXPECT().UpdateStatus(mockTx, claimID, entities.ClaimStatusApproved, userID).
-						Return(apperrors.NewInvalidClaimAction()).Once()
-				})
+				invalidActionError := apperrors.NewInvalidClaimAction()
+				setupTxMockWithError(func() {
+					mockService.EXPECT().Complete(mockTx, claimID, userID).
+						Return(invalidActionError).Once()
+				}, invalidActionError)
 
 				SendRequest(r, http.MethodPost, "/claims/"+claimID.String()+"/complete", w, nil)
 				ExpectErrorCode(w, http.StatusConflict, apperrors.ErrorCodeInvalidClaimAction)
@@ -593,7 +600,7 @@ var _ = Describe("ClaimHandler", func() {
 
 		It("should get claim history successfully", func() {
 			sampleHistory := []*entities.ClaimHistory{
-				CreateSampleClaimHistory(claimID),
+				entities.NewClaimHistory(claimID, entities.ClaimStatusSubmitted, uuid.New()),
 			}
 			mockService.EXPECT().GetHistory(mock.Anything, claimID).Return(sampleHistory, nil).Once()
 
