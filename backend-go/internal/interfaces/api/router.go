@@ -70,7 +70,7 @@ func NewRouter(db *database.Database, authHandler handlers.AuthHandler,
 
 		claim.POST("/:id/submit", claimHandler.Submit)
 		claim.POST("/:id/review", claimHandler.Review)
-		claim.POST("/:id/request-info", claimHandler.RequestInfo)
+		claim.POST("/:id/request-information", claimHandler.RequestInformation)
 		claim.POST("/:id/cancel", claimHandler.Cancel)
 		claim.POST("/:id/complete", claimHandler.Complete)
 		claim.GET("/:id/history", claimHandler.History)

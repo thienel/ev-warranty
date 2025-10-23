@@ -24,7 +24,7 @@ type ClaimHandler interface {
 
 	Submit(c *gin.Context)
 	Review(c *gin.Context)
-	RequestInfo(c *gin.Context)
+	RequestInformation(c *gin.Context)
 	Cancel(c *gin.Context)
 	Complete(c *gin.Context)
 
@@ -355,7 +355,7 @@ func (h *claimHandler) Review(c *gin.Context) {
 	c.Status(http.StatusNoContent)
 }
 
-// RequestInfo godoc
+// RequestInformation godoc
 // @Summary Request additional information for a claim
 // @Description Request additional information from SC for a claim (EVM Staff only)
 // @Tags claims
@@ -369,8 +369,8 @@ func (h *claimHandler) Review(c *gin.Context) {
 // @Failure 403 {object} dtos.ErrorResponse "Forbidden"
 // @Failure 404 {object} dtos.ErrorResponse "Claim not found"
 // @Failure 500 {object} dtos.ErrorResponse "Internal server error"
-// @Router /claims/{id}/request-info [post]
-func (h *claimHandler) RequestInfo(c *gin.Context) {
+// @Router /claims/{id}/request-information [post]
+func (h *claimHandler) RequestInformation(c *gin.Context) {
 	if err := allowedRoles(c, entities.UserRoleEvmStaff); err != nil {
 		handleError(h.log, c, err)
 		return
