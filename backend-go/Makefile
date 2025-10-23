@@ -72,3 +72,7 @@ test/cover/html:
 test/cover/func:
 	ginkgo -cover ./...
 	go tool cover -func=coverprofile.out
+
+.PHONY: swagger/gen
+swagger/gen:
+	swag init -g cmd/server/main.go --output docs
