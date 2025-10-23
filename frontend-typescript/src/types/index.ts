@@ -6,7 +6,7 @@ export interface BaseEntity {
 }
 
 // User types
-export interface User {
+export interface User extends Record<string, unknown> {
   id: string
   email: string
   name: string
@@ -43,7 +43,7 @@ export interface LoginPayload {
 }
 
 // Office types
-export interface Office {
+export interface Office extends Record<string, unknown> {
   id: string
   office_name: string
   office_type: 'evm' | 'sc'
@@ -61,7 +61,7 @@ export interface OfficeFormData {
 }
 
 // Claim types
-export interface Claim {
+export interface Claim extends Record<string, unknown> {
   id: string
   status: 'SUBMITTED' | 'APPROVED' | 'REJECTED' | 'PROCESSING' | 'COMPLETED'
   customer_id: string

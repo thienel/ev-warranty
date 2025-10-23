@@ -11,7 +11,10 @@ import {
 } from "@ant-design/icons";
 import { type User } from "@/types/index.js";
 
-type OnOpenModal = (item?: (Record<string, unknown> & { id: string | number }) | null, isUpdate?: boolean) => void;
+type OnOpenModal = (
+  item?: (Record<string, unknown> & { id: string | number }) | null,
+  isUpdate?: boolean
+) => void;
 type OnDelete = (itemId: string | number) => Promise<void>;
 
 const GenerateColumns = (
@@ -33,7 +36,11 @@ const GenerateColumns = (
       dataIndex: "name",
       key: "name",
       width: "20%",
-      sorter: (a: User, b: User) => (a.name || "").localeCompare(b.name || ""),
+      sorter: (a: Record<string, unknown>, b: Record<string, unknown>) => {
+        const aUser = a as User;
+        const bUser = b as User;
+        return (aUser.name || "").localeCompare(bUser.name || "");
+      },
       sortOrder:
         sortedInfo.columnKey === "name"
           ? (sortedInfo.order as "ascend" | "descend" | null)
@@ -60,8 +67,11 @@ const GenerateColumns = (
       dataIndex: "email",
       key: "email",
       width: "22%",
-      sorter: (a: User, b: User) =>
-        (a.email || "").localeCompare(b.email || ""),
+      sorter: (a: Record<string, unknown>, b: Record<string, unknown>) => {
+        const aUser = a as User;
+        const bUser = b as User;
+        return (aUser.email || "").localeCompare(bUser.email || "");
+      },
       sortOrder:
         sortedInfo.columnKey === "email"
           ? (sortedInfo.order as "ascend" | "descend" | null)
@@ -85,8 +95,13 @@ const GenerateColumns = (
         value: role,
       })),
       filteredValue: (filteredInfo.role as React.Key[] | null) || null,
-      onFilter: (value: string | number | boolean, record: User) =>
-        record.role === value,
+      onFilter: (
+        value: boolean | React.Key,
+        record: Record<string, unknown>
+      ) => {
+        const user = record as User;
+        return user.role === value;
+      },
       render: (role: string) => {
         return (
           <Space>{ROLE_LABELS[role as keyof typeof ROLE_LABELS] || role}</Space>
@@ -117,8 +132,13 @@ const GenerateColumns = (
         { text: "Inactive", value: false },
       ],
       filteredValue: (filteredInfo.is_active as React.Key[] | null) || null,
-      onFilter: (value: string | number | boolean, record: User) =>
-        record.is_active === value,
+      onFilter: (
+        value: boolean | React.Key,
+        record: Record<string, unknown>
+      ) => {
+        const user = record as User;
+        return user.is_active === value;
+      },
       render: (isActive: boolean) => (
         <Tag
           icon={isActive ? <CheckCircleOutlined /> : <CloseCircleOutlined />}
@@ -134,25 +154,28 @@ const GenerateColumns = (
       fixed: "right" as const,
       align: "center" as const,
       width: "10%",
-      render: (_: unknown, record: User) => (
-        <Space size="small">
-          <Button
-            type="text"
-            icon={<EditOutlined />}
-            onClick={() => onOpenModal(record as unknown as Record<string, unknown> & { id: string | number }, true)}
-          />
-          <Popconfirm
-            title="Delete user"
-            description="Are you sure you want to delete this user?"
-            onConfirm={() => onDelete(record.id)}
-            okText="Delete"
-            cancelText="Cancel"
-            okButtonProps={{ danger: true }}
-          >
-            <Button type="text" danger icon={<DeleteOutlined />} />
-          </Popconfirm>
-        </Space>
-      ),
+      render: (_: unknown, record: Record<string, unknown>) => {
+        const user = record as User;
+        return (
+          <Space size="small">
+            <Button
+              type="text"
+              icon={<EditOutlined />}
+              onClick={() => onOpenModal(user, true)}
+            />
+            <Popconfirm
+              title="Delete user"
+              description="Are you sure you want to delete this user?"
+              onConfirm={() => onDelete(user.id)}
+              okText="Delete"
+              cancelText="Cancel"
+              okButtonProps={{ danger: true }}
+            >
+              <Button type="text" danger icon={<DeleteOutlined />} />
+            </Popconfirm>
+          </Space>
+        );
+      },
     },
   ];
 };
