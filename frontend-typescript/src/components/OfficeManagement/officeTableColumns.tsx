@@ -9,7 +9,10 @@ import {
 } from "@ant-design/icons";
 import { type Office } from "@/types/index.js";
 
-type OnOpenModal = (item?: (Record<string, unknown> & { id: string | number }) | null, isUpdate?: boolean) => void;
+type OnOpenModal = (
+  item?: (Record<string, unknown> & { id: string | number }) | null,
+  isUpdate?: boolean
+) => void;
 type OnDelete = (itemId: string | number) => Promise<void>;
 
 const OFFICE_TYPE_LABELS = {
@@ -33,8 +36,13 @@ const GenerateColumns = (
       dataIndex: "office_name",
       key: "office_name",
       width: "25%",
-      sorter: (a: Office, b: Office) =>
-        (a.office_name || "").localeCompare(b.office_name || ""),
+      sorter: (a: Record<string, unknown>, b: Record<string, unknown>) => {
+        const aOffice = a as Office;
+        const bOffice = b as Office;
+        return (aOffice.office_name || "").localeCompare(
+          bOffice.office_name || ""
+        );
+      },
       sortOrder:
         sortedInfo.columnKey === "office_name"
           ? (sortedInfo.order as "ascend" | "descend" | null)
@@ -63,8 +71,13 @@ const GenerateColumns = (
         { text: "Service Center", value: "sc" },
       ],
       filteredValue: (filteredInfo.office_type as React.Key[] | null) || null,
-      onFilter: (value: string | number | boolean, record: Office) =>
-        record.office_type === value,
+      onFilter: (
+        value: boolean | React.Key,
+        record: Record<string, unknown>
+      ) => {
+        const office = record as Office;
+        return office.office_type === value;
+      },
       render: (office_type: "evm" | "sc") => {
         const label = OFFICE_TYPE_LABELS[office_type] || office_type;
         return <span>{label}</span>;
@@ -79,8 +92,11 @@ const GenerateColumns = (
       dataIndex: "address",
       key: "address",
       width: "30%",
-      sorter: (a: Office, b: Office) =>
-        (a.address || "").localeCompare(b.address || ""),
+      sorter: (a: Record<string, unknown>, b: Record<string, unknown>) => {
+        const aOffice = a as Office;
+        const bOffice = b as Office;
+        return (aOffice.address || "").localeCompare(bOffice.address || "");
+      },
       sortOrder:
         sortedInfo.columnKey === "address"
           ? (sortedInfo.order as "ascend" | "descend" | null)
@@ -104,8 +120,13 @@ const GenerateColumns = (
         { text: "Inactive", value: false },
       ],
       filteredValue: (filteredInfo.is_active as React.Key[] | null) || null,
-      onFilter: (value: string | number | boolean, record: Office) =>
-        record.is_active === value,
+      onFilter: (
+        value: boolean | React.Key,
+        record: Record<string, unknown>
+      ) => {
+        const office = record as Office;
+        return office.is_active === value;
+      },
       render: (is_active: boolean) => {
         const color = is_active ? "green" : "red";
         const icon = is_active ? (
@@ -126,31 +147,34 @@ const GenerateColumns = (
       key: "actions",
       align: "center" as const,
       width: "18%",
-      render: (_: unknown, record: Office) => (
-        <Space size="small">
-          <Button
-            type="text"
-            size="small"
-            icon={<EditOutlined />}
-            onClick={() => onOpenModal(record as unknown as Record<string, unknown> & { id: string | number }, true)}
-            style={{ color: "#1890ff" }}
-          >
-            Edit
-          </Button>
-          <Popconfirm
-            title="Delete Office"
-            description="Are you sure you want to delete this office?"
-            onConfirm={() => onDelete(record.id)}
-            okText="Yes"
-            cancelText="No"
-            placement="topRight"
-          >
-            <Button type="text" size="small" icon={<DeleteOutlined />} danger>
-              Delete
+      render: (_: unknown, record: Record<string, unknown>) => {
+        const office = record as Office;
+        return (
+          <Space size="small">
+            <Button
+              type="text"
+              size="small"
+              icon={<EditOutlined />}
+              onClick={() => onOpenModal(office, true)}
+              style={{ color: "#1890ff" }}
+            >
+              Edit
             </Button>
-          </Popconfirm>
-        </Space>
-      ),
+            <Popconfirm
+              title="Delete Office"
+              description="Are you sure you want to delete this office?"
+              onConfirm={() => onDelete(office.id)}
+              okText="Yes"
+              cancelText="No"
+              placement="topRight"
+            >
+              <Button type="text" size="small" icon={<DeleteOutlined />} danger>
+                Delete
+              </Button>
+            </Popconfirm>
+          </Space>
+        );
+      },
     },
   ];
 };
