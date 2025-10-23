@@ -10,6 +10,10 @@ import Error from '@pages/Error/Error.jsx'
 import useCheckRole from '@/hooks/useCheckRole.js'
 import { USER_ROLES } from '@constants/common-constants.js'
 
+import EVMStaffClaims from '@pages/evm-staff/Claims.jsx'
+import SCStaffClaims from '@pages/sc-staff/Claims.jsx'
+import SCTechnicianClaims from '@pages/sc-technician/Claims.jsx'
+
 export const ProtectedRoute = () => {
   const { isAuthenticated } = useSelector((state) => state.auth)
 
@@ -24,6 +28,24 @@ export const PublicRoute = () => {
 
 export const AdminRoute = () => {
   const isRightRole = useCheckRole(USER_ROLES.ADMIN)
+
+  return isRightRole ? <Outlet /> : <Navigate to="/unauthorized" replace />
+}
+
+export const EVMStaffRoute = () => {
+  const isRightRole = useCheckRole(USER_ROLES.EVM_STAFF)
+
+  return isRightRole ? <Outlet /> : <Navigate to="/unauthorized" replace />
+}
+
+export const SCStaffRoute = () => {
+  const isRightRole = useCheckRole(USER_ROLES.SC_STAFF)
+
+  return isRightRole ? <Outlet /> : <Navigate to="/unauthorized" replace />
+}
+
+export const SCTechnicianRoute = () => {
+  const isRightRole = useCheckRole(USER_ROLES.SC_TECHNICIAN)
 
   return isRightRole ? <Outlet /> : <Navigate to="/unauthorized" replace />
 }
@@ -45,6 +67,36 @@ const App = () => {
             {
               path: 'offices',
               element: <Offices />,
+            },
+          ],
+        },
+        {
+          path: '/evm-staff',
+          element: <EVMStaffRoute />,
+          children: [
+            {
+              path: 'claims',
+              element: <EVMStaffClaims />,
+            },
+          ],
+        },
+        {
+          path: '/sc-staff',
+          element: <SCStaffRoute />,
+          children: [
+            {
+              path: 'claims',
+              element: <SCStaffClaims />,
+            },
+          ],
+        },
+        {
+          path: '/sc-technician',
+          element: <SCTechnicianRoute />,
+          children: [
+            {
+              path: 'claims',
+              element: <SCTechnicianClaims />,
             },
           ],
         },
