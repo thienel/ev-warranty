@@ -290,6 +290,29 @@ var _ = Describe("ClaimHandler", func() {
 			SendRequest(r, http.MethodPost, "/claims", w, validCreateReq)
 			ExpectErrorCode(w, http.StatusForbidden, apperrors.ErrorCodeUnauthorizedRole)
 		})
+
+		It("should handle missing user ID header", func() {
+			r.POST("/claims", func(c *gin.Context) {
+				SetHeaderRole(c, entities.UserRoleScTechnician)
+				SetContentTypeJSON(c)
+				handler.Create(c)
+			})
+
+			SendRequest(r, http.MethodPost, "/claims", w, validCreateReq)
+			ExpectErrorCode(w, http.StatusBadRequest, apperrors.ErrorCodeMissingUserID)
+		})
+
+		It("should handle invalid user ID header", func() {
+			r.POST("/claims", func(c *gin.Context) {
+				SetHeaderRole(c, entities.UserRoleScTechnician)
+				c.Request.Header.Set("X-User-ID", "invalid-uuid")
+				SetContentTypeJSON(c)
+				handler.Create(c)
+			})
+
+			SendRequest(r, http.MethodPost, "/claims", w, validCreateReq)
+			ExpectErrorCode(w, http.StatusBadRequest, apperrors.ErrorCodeInvalidUserID)
+		})
 	})
 
 	Describe("Update", func() {
@@ -429,6 +452,29 @@ var _ = Describe("ClaimHandler", func() {
 			SendRequest(r, http.MethodPost, "/claims/"+claimID.String()+"/submit", w, nil)
 			ExpectErrorCode(w, http.StatusForbidden, apperrors.ErrorCodeUnauthorizedRole)
 		})
+
+		It("should handle missing user ID header", func() {
+			r.POST("/claims/:id/submit", func(c *gin.Context) {
+				SetHeaderRole(c, entities.UserRoleScStaff)
+				SetContentTypeJSON(c)
+				handler.Submit(c)
+			})
+
+			SendRequest(r, http.MethodPost, "/claims/"+claimID.String()+"/submit", w, nil)
+			ExpectErrorCode(w, http.StatusBadRequest, apperrors.ErrorCodeMissingUserID)
+		})
+
+		It("should handle invalid user ID header", func() {
+			r.POST("/claims/:id/submit", func(c *gin.Context) {
+				SetHeaderRole(c, entities.UserRoleScStaff)
+				c.Request.Header.Set("X-User-ID", "invalid-uuid")
+				SetContentTypeJSON(c)
+				handler.Submit(c)
+			})
+
+			SendRequest(r, http.MethodPost, "/claims/"+claimID.String()+"/submit", w, nil)
+			ExpectErrorCode(w, http.StatusBadRequest, apperrors.ErrorCodeInvalidUserID)
+		})
 	})
 
 	Describe("Review", func() {
@@ -467,6 +513,29 @@ var _ = Describe("ClaimHandler", func() {
 			setupRoute("POST", "/claims/:id/review", entities.UserRoleScStaff, handler.Review)
 			SendRequest(r, http.MethodPost, "/claims/"+claimID.String()+"/review", w, nil)
 			ExpectErrorCode(w, http.StatusForbidden, apperrors.ErrorCodeUnauthorizedRole)
+		})
+
+		It("should handle missing user ID header", func() {
+			r.POST("/claims/:id/review", func(c *gin.Context) {
+				SetHeaderRole(c, entities.UserRoleEvmStaff)
+				SetContentTypeJSON(c)
+				handler.Review(c)
+			})
+
+			SendRequest(r, http.MethodPost, "/claims/"+claimID.String()+"/review", w, nil)
+			ExpectErrorCode(w, http.StatusBadRequest, apperrors.ErrorCodeMissingUserID)
+		})
+
+		It("should handle invalid user ID header", func() {
+			r.POST("/claims/:id/review", func(c *gin.Context) {
+				SetHeaderRole(c, entities.UserRoleEvmStaff)
+				c.Request.Header.Set("X-User-ID", "invalid-uuid")
+				SetContentTypeJSON(c)
+				handler.Review(c)
+			})
+
+			SendRequest(r, http.MethodPost, "/claims/"+claimID.String()+"/review", w, nil)
+			ExpectErrorCode(w, http.StatusBadRequest, apperrors.ErrorCodeInvalidUserID)
 		})
 	})
 
@@ -507,6 +576,29 @@ var _ = Describe("ClaimHandler", func() {
 			SendRequest(r, http.MethodPost, "/claims/"+claimID.String()+"/request-info", w, nil)
 			ExpectErrorCode(w, http.StatusForbidden, apperrors.ErrorCodeUnauthorizedRole)
 		})
+
+		It("should handle missing user ID header", func() {
+			r.POST("/claims/:id/request-info", func(c *gin.Context) {
+				SetHeaderRole(c, entities.UserRoleEvmStaff)
+				SetContentTypeJSON(c)
+				handler.RequestInfo(c)
+			})
+
+			SendRequest(r, http.MethodPost, "/claims/"+claimID.String()+"/request-info", w, nil)
+			ExpectErrorCode(w, http.StatusBadRequest, apperrors.ErrorCodeMissingUserID)
+		})
+
+		It("should handle invalid user ID header", func() {
+			r.POST("/claims/:id/request-info", func(c *gin.Context) {
+				SetHeaderRole(c, entities.UserRoleEvmStaff)
+				c.Request.Header.Set("X-User-ID", "invalid-uuid")
+				SetContentTypeJSON(c)
+				handler.RequestInfo(c)
+			})
+
+			SendRequest(r, http.MethodPost, "/claims/"+claimID.String()+"/request-info", w, nil)
+			ExpectErrorCode(w, http.StatusBadRequest, apperrors.ErrorCodeInvalidUserID)
+		})
 	})
 
 	Describe("Cancel", func() {
@@ -546,6 +638,29 @@ var _ = Describe("ClaimHandler", func() {
 			SendRequest(r, http.MethodPost, "/claims/"+claimID.String()+"/cancel", w, nil)
 			ExpectErrorCode(w, http.StatusForbidden, apperrors.ErrorCodeUnauthorizedRole)
 		})
+
+		It("should handle missing user ID header", func() {
+			r.POST("/claims/:id/cancel", func(c *gin.Context) {
+				SetHeaderRole(c, entities.UserRoleScStaff)
+				SetContentTypeJSON(c)
+				handler.Cancel(c)
+			})
+
+			SendRequest(r, http.MethodPost, "/claims/"+claimID.String()+"/cancel", w, nil)
+			ExpectErrorCode(w, http.StatusBadRequest, apperrors.ErrorCodeMissingUserID)
+		})
+
+		It("should handle invalid user ID header", func() {
+			r.POST("/claims/:id/cancel", func(c *gin.Context) {
+				SetHeaderRole(c, entities.UserRoleScStaff)
+				c.Request.Header.Set("X-User-ID", "invalid-uuid")
+				SetContentTypeJSON(c)
+				handler.Cancel(c)
+			})
+
+			SendRequest(r, http.MethodPost, "/claims/"+claimID.String()+"/cancel", w, nil)
+			ExpectErrorCode(w, http.StatusBadRequest, apperrors.ErrorCodeInvalidUserID)
+		})
 	})
 
 	Describe("Complete", func() {
@@ -584,6 +699,29 @@ var _ = Describe("ClaimHandler", func() {
 			setupRoute("POST", "/claims/:id/complete", entities.UserRoleScStaff, handler.Complete)
 			SendRequest(r, http.MethodPost, "/claims/"+claimID.String()+"/complete", w, nil)
 			ExpectErrorCode(w, http.StatusForbidden, apperrors.ErrorCodeUnauthorizedRole)
+		})
+
+		It("should handle missing user ID header", func() {
+			r.POST("/claims/:id/complete", func(c *gin.Context) {
+				SetHeaderRole(c, entities.UserRoleEvmStaff)
+				SetContentTypeJSON(c)
+				handler.Complete(c)
+			})
+
+			SendRequest(r, http.MethodPost, "/claims/"+claimID.String()+"/complete", w, nil)
+			ExpectErrorCode(w, http.StatusBadRequest, apperrors.ErrorCodeMissingUserID)
+		})
+
+		It("should handle invalid user ID header", func() {
+			r.POST("/claims/:id/complete", func(c *gin.Context) {
+				SetHeaderRole(c, entities.UserRoleEvmStaff)
+				c.Request.Header.Set("X-User-ID", "invalid-uuid")
+				SetContentTypeJSON(c)
+				handler.Complete(c)
+			})
+
+			SendRequest(r, http.MethodPost, "/claims/"+claimID.String()+"/complete", w, nil)
+			ExpectErrorCode(w, http.StatusBadRequest, apperrors.ErrorCodeInvalidUserID)
 		})
 	})
 
