@@ -7,7 +7,7 @@ namespace Backend.Dotnet.API.Controllers
 {
 
     [ApiController]
-    [Route("[controller]")]
+    [Route("vehicles")]
     [Produces("application/json")]
     public class VehiclesController : ControllerBase
     {
@@ -19,6 +19,8 @@ namespace Backend.Dotnet.API.Controllers
         }
 
         [HttpGet]
+        [ProducesResponseType(typeof(BaseResponseDto<VehicleResponse>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(BaseResponseDto), StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> GetAll()
         {
             var result = await _vehicleService.GetAllAsync();
@@ -29,6 +31,8 @@ namespace Backend.Dotnet.API.Controllers
         }
 
         [HttpGet("{id}")]
+        [ProducesResponseType(typeof(BaseResponseDto<VehicleResponse>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(BaseResponseDto), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetById(Guid id)
         {
             var result = await _vehicleService.GetByIdAsync(id);
@@ -49,6 +53,9 @@ namespace Backend.Dotnet.API.Controllers
         }
         */
         [HttpGet("by-vin/{vin}")]
+        [ProducesResponseType(typeof(BaseResponseDto<VehicleResponse>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(BaseResponseDto), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(BaseResponseDto), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetByVin(string vin)
         {
             if (string.IsNullOrWhiteSpace(vin))
@@ -62,6 +69,9 @@ namespace Backend.Dotnet.API.Controllers
         }
 
         [HttpGet("by-plate/{licensePlate}")]
+        [ProducesResponseType(typeof(BaseResponseDto<VehicleResponse>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(BaseResponseDto), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(BaseResponseDto), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetByLicensePlate(string licensePlate)
         {
             if (string.IsNullOrWhiteSpace(licensePlate))
@@ -75,6 +85,8 @@ namespace Backend.Dotnet.API.Controllers
         }
 
         [HttpGet("customer/{customerId}")]
+        [ProducesResponseType(typeof(BaseResponseDto<VehicleResponse>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(BaseResponseDto), StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> GetByCustomerId(Guid customerId)
         {
             var result = await _vehicleService.GetByCustomerIdAsync(customerId);
@@ -85,6 +97,8 @@ namespace Backend.Dotnet.API.Controllers
         }
 
         [HttpGet("model/{modelId}")]
+        [ProducesResponseType(typeof(BaseResponseDto<VehicleResponse>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(BaseResponseDto), StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> GetByModelId(Guid modelId)
         {
             var result = await _vehicleService.GetByModelIdAsync(modelId);
@@ -95,6 +109,8 @@ namespace Backend.Dotnet.API.Controllers
         }
 
         [HttpGet("search")]
+        [ProducesResponseType(typeof(BaseResponseDto<VehicleResponse>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(BaseResponseDto), StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> Search([FromQuery] string searchTerm)
         {
             var result = await _vehicleService.SearchAsync(searchTerm);
@@ -105,6 +121,8 @@ namespace Backend.Dotnet.API.Controllers
         }
 
         [HttpPost]
+        [ProducesResponseType(typeof(BaseResponseDto<VehicleResponse>), StatusCodes.Status201Created)]
+        [ProducesResponseType(typeof(BaseResponseDto), StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> Create([FromBody] CreateVehicleRequest request)
         {
             if (!ModelState.IsValid)
@@ -119,8 +137,7 @@ namespace Backend.Dotnet.API.Controllers
 
         [HttpPut("{id}")]
         [ProducesResponseType(typeof(BaseResponseDto<VehicleResponse>), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(BaseResponseDto<VehicleResponse>), StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(typeof(BaseResponseDto<VehicleResponse>), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(BaseResponseDto), StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> Update(Guid id, [FromBody] UpdateVehicleRequest request)
         {
             if (!ModelState.IsValid)
@@ -161,8 +178,8 @@ namespace Backend.Dotnet.API.Controllers
 
         // Soft delete Endpoints
         [HttpDelete("{id}")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(BaseResponseDto<VehicleResponse>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(BaseResponseDto), StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> SoftDelete(Guid id)
         {
             var result = await _vehicleService.SoftDeleteAsync(id);
@@ -173,8 +190,8 @@ namespace Backend.Dotnet.API.Controllers
         }
 
         [HttpPost("{id}/restore")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(BaseResponseDto<VehicleResponse>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(BaseResponseDto), StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> Restore(Guid id)
         {
             var result = await _vehicleService.RestoreAsync(id);

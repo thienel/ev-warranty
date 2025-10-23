@@ -1,13 +1,12 @@
 ﻿using Backend.Dotnet.Application.DTOs;
 using Backend.Dotnet.Application.Interfaces;
 using Microsoft.AspNetCore.Mvc;
-using static Backend.Dotnet.Application.DTOs.CustomerDto;
 using static Backend.Dotnet.Application.DTOs.VehicleModelDto;
 
 namespace Backend.Dotnet.API.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("vehicle-models")]
     [Produces("application/json")]
     public class VehicleModelsController : ControllerBase
     {
@@ -19,6 +18,8 @@ namespace Backend.Dotnet.API.Controllers
         }
 
         [HttpGet]
+        [ProducesResponseType(typeof(BaseResponseDto<VehicleModelResponse>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(BaseResponseDto), StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> GetAll()
         {
             var result = await _vehicleModelService.GetAllAsync();
@@ -29,6 +30,8 @@ namespace Backend.Dotnet.API.Controllers
         }
 
         [HttpGet("{id}")]
+        [ProducesResponseType(typeof(BaseResponseDto<VehicleModelResponse>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(BaseResponseDto), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetById(Guid id)
         {
             var result = await _vehicleModelService.GetByIdAsync(id);
@@ -49,6 +52,9 @@ namespace Backend.Dotnet.API.Controllers
         }
         */
         [HttpGet("by-details")]
+        [ProducesResponseType(typeof(BaseResponseDto<VehicleModelResponse>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(BaseResponseDto), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(BaseResponseDto), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetByBrandModelYear([FromQuery] string brand, [FromQuery] string modelName, [FromQuery] int year)
         {
             if (string.IsNullOrWhiteSpace(brand) || string.IsNullOrWhiteSpace(modelName) || year <= 0)
@@ -62,6 +68,8 @@ namespace Backend.Dotnet.API.Controllers
         }
 
         [HttpGet("brand/{brand}")]
+        [ProducesResponseType(typeof(BaseResponseDto<VehicleModelResponse>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(BaseResponseDto), StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> GetByBrand(string brand)
         {
             if (string.IsNullOrWhiteSpace(brand))
@@ -75,6 +83,8 @@ namespace Backend.Dotnet.API.Controllers
         }
 
         [HttpGet("brands")]
+        [ProducesResponseType(typeof(BaseResponseDto<VehicleModelResponse>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(BaseResponseDto), StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> GetAllBrands()
         {
             var result = await _vehicleModelService.GetAllBrandsAsync();
@@ -85,6 +95,8 @@ namespace Backend.Dotnet.API.Controllers
         }
 
         [HttpGet("search")]
+        [ProducesResponseType(typeof(BaseResponseDto<VehicleModelResponse>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(BaseResponseDto), StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> Search([FromQuery] string searchTerm)
         {
             var result = await _vehicleModelService.SearchAsync(searchTerm);
@@ -95,6 +107,8 @@ namespace Backend.Dotnet.API.Controllers
         }
 
         [HttpPost]
+        [ProducesResponseType(typeof(BaseResponseDto<VehicleModelResponse>), StatusCodes.Status201Created)]
+        [ProducesResponseType(typeof(BaseResponseDto), StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> Create([FromBody] CreateVehicleModelRequest request)
         {
             if (!ModelState.IsValid)
@@ -109,8 +123,7 @@ namespace Backend.Dotnet.API.Controllers
 
         [HttpPut("{id}")]
         [ProducesResponseType(typeof(BaseResponseDto<VehicleModelResponse>), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(BaseResponseDto<VehicleModelResponse>), StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(typeof(BaseResponseDto<VehicleModelResponse>), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(BaseResponseDto), StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> Update(Guid id, [FromBody] UpdateVehicleModelRequest request)
         {
             if (!ModelState.IsValid)
@@ -125,8 +138,8 @@ namespace Backend.Dotnet.API.Controllers
 
         // Hard delete Endpoints
         [HttpDelete("{id}")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(BaseResponseDto<VehicleModelResponse>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(BaseResponseDto), StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> Delete(Guid id)
         {
             var result = await _vehicleModelService.DeleteAsync(id);
