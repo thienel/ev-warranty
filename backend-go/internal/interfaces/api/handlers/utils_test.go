@@ -59,7 +59,7 @@ func ExpectResponseNotNil(w *httptest.ResponseRecorder, httpStatus int) {
 		return
 	}
 
-	var response dtos.APIResponse
+	var response dtos.SuccessResponse
 	err := json.Unmarshal(w.Body.Bytes(), &response)
 	Expect(err).NotTo(HaveOccurred())
 	Expect(response.Data).NotTo(BeNil())
@@ -68,7 +68,7 @@ func ExpectResponseNotNil(w *httptest.ResponseRecorder, httpStatus int) {
 func ExpectErrorCode(w *httptest.ResponseRecorder, httpStatus int, errorCode string) {
 	GinkgoHelper()
 	Expect(w.Code).To(Equal(httpStatus))
-	var response dtos.APIResponse
+	var response dtos.ErrorResponse
 	err := json.Unmarshal(w.Body.Bytes(), &response)
 	Expect(err).NotTo(HaveOccurred())
 	Expect(response.Error).To(Equal(errorCode))
