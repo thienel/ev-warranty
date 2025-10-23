@@ -42,11 +42,11 @@ func NewOfficeHandler(log logger.Logger, service services.OfficeService) OfficeH
 // @Produce json
 // @Security Bearer
 // @Param createOfficeRequest body dtos.CreateOfficeRequest true "Office creation data"
-// @Success 201 {object} dtos.APIResponse{data=entities.Office} "Office created successfully"
-// @Failure 400 {object} dtos.APIResponse "Bad request"
-// @Failure 401 {object} dtos.APIResponse "Unauthorized"
-// @Failure 403 {object} dtos.APIResponse "Forbidden"
-// @Failure 500 {object} dtos.APIResponse "Internal server error"
+// @Success 201 {object} dtos.SuccessResponse{data=entities.Office} "Office created successfully"
+// @Failure 400 {object} dtos.ErrorResponse "Bad request"
+// @Failure 401 {object} dtos.ErrorResponse "Unauthorized"
+// @Failure 403 {object} dtos.ErrorResponse "Forbidden"
+// @Failure 500 {object} dtos.ErrorResponse "Internal server error"
 // @Router /offices [post]
 func (h *officeHandler) Create(c *gin.Context) {
 	if err := allowedRoles(c, entities.UserRoleAdmin); err != nil {
@@ -97,11 +97,11 @@ func (h *officeHandler) Create(c *gin.Context) {
 // @Produce json
 // @Security Bearer
 // @Param id path string true "Office ID"
-// @Success 200 {object} dtos.APIResponse{data=entities.Office} "Office retrieved successfully"
-// @Failure 400 {object} dtos.APIResponse "Bad request"
-// @Failure 401 {object} dtos.APIResponse "Unauthorized"
-// @Failure 404 {object} dtos.APIResponse "Office not found"
-// @Failure 500 {object} dtos.APIResponse "Internal server error"
+// @Success 200 {object} dtos.SuccessResponse{data=entities.Office} "Office retrieved successfully"
+// @Failure 400 {object} dtos.ErrorResponse "Bad request"
+// @Failure 401 {object} dtos.ErrorResponse "Unauthorized"
+// @Failure 404 {object} dtos.ErrorResponse "Office not found"
+// @Failure 500 {object} dtos.ErrorResponse "Internal server error"
 // @Router /offices/{id} [get]
 func (h *officeHandler) GetByID(c *gin.Context) {
 	ctx, cancel := context.WithTimeout(c.Request.Context(), requestTimeout)
@@ -133,9 +133,9 @@ func (h *officeHandler) GetByID(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Security Bearer
-// @Success 200 {object} dtos.APIResponse{data=[]entities.Office} "Offices retrieved successfully"
-// @Failure 401 {object} dtos.APIResponse "Unauthorized"
-// @Failure 500 {object} dtos.APIResponse "Internal server error"
+// @Success 200 {object} dtos.SuccessResponse{data=[]entities.Office} "Offices retrieved successfully"
+// @Failure 401 {object} dtos.ErrorResponse "Unauthorized"
+// @Failure 500 {object} dtos.ErrorResponse "Internal server error"
 // @Router /offices [get]
 func (h *officeHandler) GetAll(c *gin.Context) {
 	ctx, cancel := context.WithTimeout(c.Request.Context(), requestTimeout)
@@ -162,12 +162,12 @@ func (h *officeHandler) GetAll(c *gin.Context) {
 // @Security Bearer
 // @Param id path string true "Office ID"
 // @Param updateOfficeRequest body dtos.UpdateOfficeRequest true "Office update data"
-// @Success 204 {object} dtos.APIResponse "Office updated successfully"
-// @Failure 400 {object} dtos.APIResponse "Bad request"
-// @Failure 401 {object} dtos.APIResponse "Unauthorized"
-// @Failure 403 {object} dtos.APIResponse "Forbidden"
-// @Failure 404 {object} dtos.APIResponse "Office not found"
-// @Failure 500 {object} dtos.APIResponse "Internal server error"
+// @Success 204 "Office updated successfully"
+// @Failure 400 {object} dtos.ErrorResponse "Bad request"
+// @Failure 401 {object} dtos.ErrorResponse "Unauthorized"
+// @Failure 403 {object} dtos.ErrorResponse "Forbidden"
+// @Failure 404 {object} dtos.ErrorResponse "Office not found"
+// @Failure 500 {object} dtos.ErrorResponse "Internal server error"
 // @Router /offices/{id} [put]
 func (h *officeHandler) Update(c *gin.Context) {
 	if err := allowedRoles(c, entities.UserRoleAdmin); err != nil {
@@ -209,7 +209,7 @@ func (h *officeHandler) Update(c *gin.Context) {
 	}
 
 	h.log.Info("office updated", "office_id", id)
-	writeSuccessResponse(c, http.StatusNoContent, nil)
+	c.Status(http.StatusNoContent)
 }
 
 // Delete godoc
@@ -220,12 +220,12 @@ func (h *officeHandler) Update(c *gin.Context) {
 // @Produce json
 // @Security Bearer
 // @Param id path string true "Office ID"
-// @Success 204 {object} dtos.APIResponse "Office deleted successfully"
-// @Failure 400 {object} dtos.APIResponse "Bad request"
-// @Failure 401 {object} dtos.APIResponse "Unauthorized"
-// @Failure 403 {object} dtos.APIResponse "Forbidden"
-// @Failure 404 {object} dtos.APIResponse "Office not found"
-// @Failure 500 {object} dtos.APIResponse "Internal server error"
+// @Success 204 "Office deleted successfully"
+// @Failure 400 {object} dtos.ErrorResponse "Bad request"
+// @Failure 401 {object} dtos.ErrorResponse "Unauthorized"
+// @Failure 403 {object} dtos.ErrorResponse "Forbidden"
+// @Failure 404 {object} dtos.ErrorResponse "Office not found"
+// @Failure 500 {object} dtos.ErrorResponse "Internal server error"
 // @Router /offices/{id} [delete]
 func (h *officeHandler) Delete(c *gin.Context) {
 	if err := allowedRoles(c, entities.UserRoleAdmin); err != nil {
@@ -252,5 +252,5 @@ func (h *officeHandler) Delete(c *gin.Context) {
 	}
 
 	h.log.Info("office deleted", "office_id", officeID)
-	writeSuccessResponse(c, http.StatusNoContent, nil)
+	c.Status(http.StatusNoContent)
 }
