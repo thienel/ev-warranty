@@ -46,12 +46,7 @@ var _ = Describe("AuthService", func() {
 		Context("when login is successful", func() {
 			It("should return access and refresh tokens", func() {
 				passwordHash, _ := security.HashPassword(password)
-				user := &entities.User{
-					ID:           uuid.New(),
-					Email:        email,
-					PasswordHash: passwordHash,
-					IsActive:     true,
-				}
+				user := entities.NewUser("Test User", email, entities.UserRoleAdmin, passwordHash, true, uuid.New())
 
 				accessToken := "access.token.jwt"
 				refreshToken := "refresh_token_string"
@@ -72,12 +67,7 @@ var _ = Describe("AuthService", func() {
 			It("should trim spaces and login successfully", func() {
 				emailWithSpaces := "  user@example.com  "
 				passwordHash, _ := security.HashPassword(password)
-				user := &entities.User{
-					ID:           uuid.New(),
-					Email:        email,
-					PasswordHash: passwordHash,
-					IsActive:     true,
-				}
+				user := entities.NewUser("Test User", email, entities.UserRoleAdmin, passwordHash, true, uuid.New())
 
 				accessToken := "access.token.jwt"
 				refreshToken := "refresh_token_string"
@@ -110,12 +100,7 @@ var _ = Describe("AuthService", func() {
 		Context("when user is inactive", func() {
 			It("should return UserInactive error", func() {
 				passwordHash, _ := security.HashPassword(password)
-				user := &entities.User{
-					ID:           uuid.New(),
-					Email:        email,
-					PasswordHash: passwordHash,
-					IsActive:     false,
-				}
+				user := entities.NewUser("Test User", email, entities.UserRoleAdmin, passwordHash, false, uuid.New())
 
 				mockUserRepo.EXPECT().FindByEmail(ctx, email).Return(user, nil).Once()
 
@@ -130,12 +115,7 @@ var _ = Describe("AuthService", func() {
 		Context("when password is incorrect", func() {
 			It("should return UserPasswordInvalid error", func() {
 				passwordHash, _ := security.HashPassword("DifferentPassword123!")
-				user := &entities.User{
-					ID:           uuid.New(),
-					Email:        email,
-					PasswordHash: passwordHash,
-					IsActive:     true,
-				}
+				user := entities.NewUser("Test User", email, entities.UserRoleAdmin, passwordHash, true, uuid.New())
 
 				mockUserRepo.EXPECT().FindByEmail(ctx, email).Return(user, nil).Once()
 

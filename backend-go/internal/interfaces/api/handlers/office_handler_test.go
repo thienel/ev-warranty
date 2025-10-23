@@ -107,7 +107,7 @@ var _ = Describe("OfficeHandler", func() {
 
 	Describe("GetAll", func() {
 		BeforeEach(func() {
-			setupRoute("GET", "/offices", "", handler.GetAll) // No role restriction
+			setupRoute("GET", "/offices", "", handler.GetAll)
 		})
 
 		DescribeTable("should handle different scenarios",
@@ -145,7 +145,7 @@ var _ = Describe("OfficeHandler", func() {
 		officeID := uuid.New()
 
 		BeforeEach(func() {
-			setupRoute("GET", "/offices/:id", "", handler.GetByID) // No role restriction
+			setupRoute("GET", "/offices/:id", "", handler.GetByID)
 		})
 
 		DescribeTable("should handle different scenarios",

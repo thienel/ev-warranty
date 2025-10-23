@@ -35,7 +35,6 @@ var _ = Describe("ClaimAttachmentHandler", func() {
 		sampleAttachment *entities.ClaimAttachment
 	)
 
-	// Helper function to create multipart form
 	createMultipartForm := func(filenames ...string) (*bytes.Buffer, string) {
 		body := &bytes.Buffer{}
 		writer := multipart.NewWriter(body)
@@ -267,7 +266,7 @@ var _ = Describe("ClaimAttachmentHandler", func() {
 
 		It("should deny access for unauthorized roles", func() {
 			r.POST("/claims/:id/attachments", func(c *gin.Context) {
-				SetHeaderRole(c, entities.UserRoleEvmStaff) // Wrong role
+				SetHeaderRole(c, entities.UserRoleEvmStaff)
 				handler.Create(c)
 			})
 
@@ -347,7 +346,7 @@ var _ = Describe("ClaimAttachmentHandler", func() {
 
 		It("should deny access for unauthorized roles", func() {
 			r.DELETE("/claims/:id/attachments/:attachmentID", func(c *gin.Context) {
-				SetHeaderRole(c, entities.UserRoleEvmStaff) // Wrong role
+				SetHeaderRole(c, entities.UserRoleEvmStaff)
 				handler.Delete(c)
 			})
 

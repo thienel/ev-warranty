@@ -48,10 +48,8 @@ var _ = Describe("AuthHandler", func() {
 
 		BeforeEach(func() {
 			r.POST("/auth/login", handler.Login)
-			user = &entities.User{
-				ID: userID, Name: "Test User", Email: "test@example.com",
-				Role: entities.UserRoleAdmin, IsActive: true, OfficeID: uuid.New(),
-			}
+			user = entities.NewUser("Test User", "test@example.com", entities.UserRoleAdmin, "password_hash", true, uuid.New())
+			user.ID = userID
 		})
 
 		It("should return access token and user info with refresh token cookie", func() {

@@ -153,7 +153,6 @@ var _ = Describe("ClaimAttachmentService", func() {
 
 		Context("when attachment is created successfully with image", func() {
 			It("should upload and create attachment", func() {
-				// Create a mock JPEG file
 				jpegHeader := []byte{0xFF, 0xD8, 0xFF}
 				fileContent := append(jpegHeader, make([]byte, 509)...)
 				file = &mockFile{Reader: bytes.NewReader(fileContent)}
@@ -182,7 +181,6 @@ var _ = Describe("ClaimAttachmentService", func() {
 
 		Context("when attachment is created successfully with PNG image", func() {
 			It("should upload and create PNG attachment", func() {
-				// Create a mock PNG file
 				pngHeader := []byte{0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A}
 				fileContent := append(pngHeader, make([]byte, 504)...)
 				file = &mockFile{Reader: bytes.NewReader(fileContent)}
@@ -253,7 +251,6 @@ var _ = Describe("ClaimAttachmentService", func() {
 
 		Context("when attachment type is invalid", func() {
 			It("should return InvalidAttachmentType error", func() {
-				// Create a mock text file
 				textContent := []byte("plain text file")
 				fileContent := append(textContent, make([]byte, 497)...)
 				file = &mockFile{Reader: bytes.NewReader(fileContent)}
@@ -453,7 +450,6 @@ var _ = Describe("ClaimAttachmentService", func() {
 	})
 })
 
-// Mock file implementation for testing
 type mockFile struct {
 	io.Reader
 	seekError bool
@@ -481,7 +477,6 @@ func (m *mockFile) ReadAt(p []byte, off int64) (n int, err error) {
 	return 0, nil
 }
 
-// errorReader always returns an error
 type errorReader struct{}
 
 func (e *errorReader) Read(p []byte) (n int, err error) {

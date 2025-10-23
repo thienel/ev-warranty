@@ -34,7 +34,6 @@ var _ = Describe("TokenService", func() {
 		mockRefreshTokenRepo = mocks.NewRefreshTokenRepository(GinkgoT())
 		ctx = context.Background()
 
-		// Generate RSA keys for testing
 		var err error
 		privateKey, err = rsa.GenerateKey(rand.Reader, 2048)
 		Expect(err).NotTo(HaveOccurred())
@@ -60,7 +59,6 @@ var _ = Describe("TokenService", func() {
 				Expect(err).NotTo(HaveOccurred())
 				Expect(token).NotTo(BeEmpty())
 
-				// Verify token can be parsed
 				parsedToken, parseErr := jwt.ParseWithClaims(token, &services.CustomClaims{}, func(t *jwt.Token) (interface{}, error) {
 					return publicKey, nil
 				})
@@ -138,7 +136,6 @@ var _ = Describe("TokenService", func() {
 
 		Context("when token is expired", func() {
 			It("should return ExpiredAccessToken error", func() {
-				// Create a service with very short TTL
 				shortService := services.NewTokenService(mockRefreshTokenRepo, -1*time.Hour, refreshTTL, privateKey, publicKey)
 				token, err := shortService.GenerateAccessToken(userID)
 				Expect(err).NotTo(HaveOccurred())
@@ -152,7 +149,6 @@ var _ = Describe("TokenService", func() {
 
 		Context("when token is not yet valid", func() {
 			It("should return InvalidAccessToken error", func() {
-				// Create a token with future NotBefore time
 				claims := services.CustomClaims{
 					UserID: userID.String(),
 					RegisteredClaims: jwt.RegisteredClaims{
@@ -174,7 +170,6 @@ var _ = Describe("TokenService", func() {
 
 		Context("when token has wrong signing method", func() {
 			It("should return InvalidAccessToken error", func() {
-				// Create a token with HMAC instead of RSA
 				claims := services.CustomClaims{
 					UserID: userID.String(),
 					RegisteredClaims: jwt.RegisteredClaims{
@@ -354,7 +349,6 @@ var _ = Describe("TokenService", func() {
 				Expect(err).NotTo(HaveOccurred())
 				Expect(accessToken).NotTo(BeEmpty())
 
-				// Verify the new access token
 				claims, err := service.ValidateAccessToken(ctx, accessToken)
 				Expect(err).NotTo(HaveOccurred())
 				Expect(claims.UserID).To(Equal(userID.String()))
@@ -394,7 +388,6 @@ var _ = Describe("TokenService", func() {
 	})
 })
 
-// Helper matcher functions
 func MatchRefreshToken(userID uuid.UUID) interface{} {
 	return mock.MatchedBy(func(rt *entities.RefreshToken) bool {
 		return rt.UserID == userID

@@ -29,7 +29,6 @@ var _ = Describe("UserHandler", func() {
 		sampleUser  *entities.User
 	)
 
-	// Helper function to setup route with role
 	setupRoute := func(method, path string, role string, handlerFunc gin.HandlerFunc) {
 		r.Handle(method, path, func(c *gin.Context) {
 			if role != "" {

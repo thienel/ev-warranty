@@ -85,14 +85,8 @@ var _ = Describe("ClaimHandler", func() {
 			Description: "Updated claim description for warranty issue",
 		}
 
-		sampleClaim = &entities.Claim{
-			ID:          claimID,
-			VehicleID:   vehicleID,
-			CustomerID:  customerID,
-			Description: validCreateReq.Description,
-			Status:      entities.ClaimStatusDraft,
-			TotalCost:   0.0,
-		}
+		sampleClaim = entities.NewClaim(vehicleID, customerID, validCreateReq.Description, entities.ClaimStatusDraft, nil)
+		sampleClaim.ID = claimID
 	})
 
 	Describe("GetByID", func() {
