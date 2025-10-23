@@ -35,6 +35,15 @@ func NewOAuthHandler(log logger.Logger, frontendBaseURL string, oauthService oau
 	}
 }
 
+// InitiateOAuth godoc
+// @Summary Initiate Google OAuth login
+// @Description Redirect to Google OAuth authorization URL
+// @Tags auth
+// @Accept json
+// @Produce json
+// @Success 302 {string} string "Redirect to Google OAuth"
+// @Failure 500 {string} string "Redirect to frontend with error"
+// @Router /auth/google [get]
 func (h *oauthHandler) InitiateOAuth(c *gin.Context) {
 	h.log.Info("OAuth initiate", "remote_addr", c.ClientIP())
 
@@ -49,6 +58,18 @@ func (h *oauthHandler) InitiateOAuth(c *gin.Context) {
 	c.Redirect(http.StatusFound, authURL)
 }
 
+// HandleCallback godoc
+// @Summary Handle Google OAuth callback
+// @Description Process Google OAuth callback and authenticate user
+// @Tags auth
+// @Accept json
+// @Produce json
+// @Param state query string true "OAuth state parameter"
+// @Param code query string true "OAuth authorization code"
+// @Param error query string false "OAuth error parameter"
+// @Success 302 {string} string "Redirect to frontend with token"
+// @Failure 302 {string} string "Redirect to frontend with error"
+// @Router /auth/google/callback [get]
 func (h *oauthHandler) HandleCallback(c *gin.Context) {
 	h.log.Info("OAuth callback", "remote_addr", c.ClientIP())
 

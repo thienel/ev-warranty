@@ -34,6 +34,20 @@ func NewUserHandler(log logger.Logger, userService services.UserService) UserHan
 	}
 }
 
+// Create godoc
+// @Summary Create a new user
+// @Description Create a new user (Admin only)
+// @Tags users
+// @Accept json
+// @Produce json
+// @Security Bearer
+// @Param createUserRequest body dtos.CreateUserRequest true "User creation data"
+// @Success 201 {object} dtos.APIResponse{data=dtos.UserDTO} "User created successfully"
+// @Failure 400 {object} dtos.APIResponse "Bad request"
+// @Failure 401 {object} dtos.APIResponse "Unauthorized"
+// @Failure 403 {object} dtos.APIResponse "Forbidden"
+// @Failure 500 {object} dtos.APIResponse "Internal server error"
+// @Router /users [post]
 func (h userHandler) Create(c *gin.Context) {
 	if err := allowedRoles(c, entities.UserRoleAdmin); err != nil {
 		handleError(h.log, c, err)
@@ -73,6 +87,22 @@ func (h userHandler) Create(c *gin.Context) {
 	writeSuccessResponse(c, http.StatusCreated, response)
 }
 
+// Update godoc
+// @Summary Update a user
+// @Description Update an existing user by ID (Admin only)
+// @Tags users
+// @Accept json
+// @Produce json
+// @Security Bearer
+// @Param id path string true "User ID"
+// @Param updateUserRequest body dtos.UpdateUserRequest true "User update data"
+// @Success 200 {object} dtos.APIResponse{data=dtos.UserDTO} "User updated successfully"
+// @Failure 400 {object} dtos.APIResponse "Bad request"
+// @Failure 401 {object} dtos.APIResponse "Unauthorized"
+// @Failure 403 {object} dtos.APIResponse "Forbidden"
+// @Failure 404 {object} dtos.APIResponse "User not found"
+// @Failure 500 {object} dtos.APIResponse "Internal server error"
+// @Router /users/{id} [put]
 func (h userHandler) Update(c *gin.Context) {
 	if err := allowedRoles(c, entities.UserRoleAdmin); err != nil {
 		handleError(h.log, c, err)
@@ -116,6 +146,20 @@ func (h userHandler) Update(c *gin.Context) {
 	writeSuccessResponse(c, http.StatusNoContent, nil)
 }
 
+// GetByID godoc
+// @Summary Get user by ID
+// @Description Retrieve a specific user by their ID
+// @Tags users
+// @Accept json
+// @Produce json
+// @Security Bearer
+// @Param id path string true "User ID"
+// @Success 200 {object} dtos.APIResponse{data=dtos.UserDTO} "User retrieved successfully"
+// @Failure 400 {object} dtos.APIResponse "Bad request"
+// @Failure 401 {object} dtos.APIResponse "Unauthorized"
+// @Failure 404 {object} dtos.APIResponse "User not found"
+// @Failure 500 {object} dtos.APIResponse "Internal server error"
+// @Router /users/{id} [get]
 func (h userHandler) GetByID(c *gin.Context) {
 	ctx, cancel := context.WithTimeout(c.Request.Context(), requestTimeout)
 	defer cancel()
@@ -139,6 +183,17 @@ func (h userHandler) GetByID(c *gin.Context) {
 	writeSuccessResponse(c, http.StatusOK, user)
 }
 
+// GetAll godoc
+// @Summary Get all users
+// @Description Retrieve a list of all users
+// @Tags users
+// @Accept json
+// @Produce json
+// @Security Bearer
+// @Success 200 {object} dtos.APIResponse{data=[]dtos.UserDTO} "Users retrieved successfully"
+// @Failure 401 {object} dtos.APIResponse "Unauthorized"
+// @Failure 500 {object} dtos.APIResponse "Internal server error"
+// @Router /users [get]
 func (h userHandler) GetAll(c *gin.Context) {
 	ctx, cancel := context.WithTimeout(c.Request.Context(), requestTimeout)
 	defer cancel()
@@ -156,6 +211,21 @@ func (h userHandler) GetAll(c *gin.Context) {
 	writeSuccessResponse(c, http.StatusOK, usersDto)
 }
 
+// Delete godoc
+// @Summary Delete a user
+// @Description Delete a user by ID (Admin only)
+// @Tags users
+// @Accept json
+// @Produce json
+// @Security Bearer
+// @Param id path string true "User ID"
+// @Success 204 {object} dtos.APIResponse "User deleted successfully"
+// @Failure 400 {object} dtos.APIResponse "Bad request"
+// @Failure 401 {object} dtos.APIResponse "Unauthorized"
+// @Failure 403 {object} dtos.APIResponse "Forbidden"
+// @Failure 404 {object} dtos.APIResponse "User not found"
+// @Failure 500 {object} dtos.APIResponse "Internal server error"
+// @Router /users/{id} [delete]
 func (h userHandler) Delete(c *gin.Context) {
 	if err := allowedRoles(c, entities.UserRoleAdmin); err != nil {
 		handleError(h.log, c, err)

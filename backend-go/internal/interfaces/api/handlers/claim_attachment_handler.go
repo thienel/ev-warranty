@@ -34,6 +34,21 @@ func NewClaimAttachmentHandler(log logger.Logger, txManager application.TxManage
 	}
 }
 
+// GetByID godoc
+// @Summary Get claim attachment by ID
+// @Description Retrieve a specific claim attachment by its ID
+// @Tags claim-attachments
+// @Accept json
+// @Produce json
+// @Security Bearer
+// @Param id path string true "Claim ID"
+// @Param attachmentID path string true "Attachment ID"
+// @Success 200 {object} dtos.APIResponse{data=entities.ClaimAttachment} "Claim attachment retrieved successfully"
+// @Failure 400 {object} dtos.APIResponse "Bad request"
+// @Failure 401 {object} dtos.APIResponse "Unauthorized"
+// @Failure 404 {object} dtos.APIResponse "Claim attachment not found"
+// @Failure 500 {object} dtos.APIResponse "Internal server error"
+// @Router /claims/{id}/attachments/{attachmentID} [get]
 func (h *claimAttachmentHandler) GetByID(c *gin.Context) {
 	ctx, cancel := context.WithTimeout(c.Request.Context(), requestTimeout)
 	defer cancel()
@@ -53,6 +68,20 @@ func (h *claimAttachmentHandler) GetByID(c *gin.Context) {
 	writeSuccessResponse(c, http.StatusOK, attachment)
 }
 
+// GetByClaimID godoc
+// @Summary Get claim attachments by claim ID
+// @Description Retrieve all attachments for a specific claim
+// @Tags claim-attachments
+// @Accept json
+// @Produce json
+// @Security Bearer
+// @Param id path string true "Claim ID"
+// @Success 200 {object} dtos.APIResponse{data=dtos.ClaimAttachmentListResponse} "Claim attachments retrieved successfully"
+// @Failure 400 {object} dtos.APIResponse "Bad request"
+// @Failure 401 {object} dtos.APIResponse "Unauthorized"
+// @Failure 404 {object} dtos.APIResponse "Claim not found"
+// @Failure 500 {object} dtos.APIResponse "Internal server error"
+// @Router /claims/{id}/attachments [get]
 func (h *claimAttachmentHandler) GetByClaimID(c *gin.Context) {
 	ctx, cancel := context.WithTimeout(c.Request.Context(), requestTimeout)
 	defer cancel()
@@ -72,6 +101,22 @@ func (h *claimAttachmentHandler) GetByClaimID(c *gin.Context) {
 	writeSuccessResponse(c, http.StatusOK, attachments)
 }
 
+// Create godoc
+// @Summary Upload claim attachments
+// @Description Upload files as attachments to a claim (SC Technician only)
+// @Tags claim-attachments
+// @Accept multipart/form-data
+// @Produce json
+// @Security Bearer
+// @Param id path string true "Claim ID"
+// @Param files formData file true "Files to upload"
+// @Success 201 {object} dtos.APIResponse{data=[]entities.ClaimAttachment} "Claim attachments uploaded successfully"
+// @Failure 400 {object} dtos.APIResponse "Bad request"
+// @Failure 401 {object} dtos.APIResponse "Unauthorized"
+// @Failure 403 {object} dtos.APIResponse "Forbidden"
+// @Failure 404 {object} dtos.APIResponse "Claim not found"
+// @Failure 500 {object} dtos.APIResponse "Internal server error"
+// @Router /claims/{id}/attachments [post]
 func (h *claimAttachmentHandler) Create(c *gin.Context) {
 	if err := allowedRoles(c, entities.UserRoleScTechnician); err != nil {
 		handleError(h.log, c, err)
@@ -123,6 +168,22 @@ func (h *claimAttachmentHandler) Create(c *gin.Context) {
 	writeSuccessResponse(c, http.StatusCreated, attachments)
 }
 
+// Delete godoc
+// @Summary Delete a claim attachment
+// @Description Remove an attachment from a claim (SC Technician only)
+// @Tags claim-attachments
+// @Accept json
+// @Produce json
+// @Security Bearer
+// @Param id path string true "Claim ID"
+// @Param attachmentID path string true "Attachment ID"
+// @Success 204 {object} dtos.APIResponse "Claim attachment deleted successfully"
+// @Failure 400 {object} dtos.APIResponse "Bad request"
+// @Failure 401 {object} dtos.APIResponse "Unauthorized"
+// @Failure 403 {object} dtos.APIResponse "Forbidden"
+// @Failure 404 {object} dtos.APIResponse "Claim attachment not found"
+// @Failure 500 {object} dtos.APIResponse "Internal server error"
+// @Router /claims/{id}/attachments/{attachmentID} [delete]
 func (h *claimAttachmentHandler) Delete(c *gin.Context) {
 	if err := allowedRoles(c, entities.UserRoleScTechnician); err != nil {
 		handleError(h.log, c, err)
