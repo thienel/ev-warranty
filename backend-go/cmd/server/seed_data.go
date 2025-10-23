@@ -37,6 +37,7 @@ func (app *App) seedDbData() {
 	email := os.Getenv("ADMIN_EMAIL")
 	if email == "" {
 		app.Log.Error("missing ADMIN_EMAIL env")
+		os.Exit(1)
 	}
 
 	admin := entities.User{}
