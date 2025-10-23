@@ -539,10 +539,10 @@ var _ = Describe("ClaimHandler", func() {
 		})
 	})
 
-	Describe("RequestInfo", func() {
+	Describe("RequestInformation", func() {
 		Context("when authorized as EVM_STAFF", func() {
 			BeforeEach(func() {
-				setupRoute("POST", "/claims/:id/request-info", entities.UserRoleEvmStaff, handler.RequestInfo)
+				setupRoute("POST", "/claims/:id/request-information", entities.UserRoleEvmStaff, handler.RequestInformation)
 			})
 
 			It("should request info successfully", func() {
@@ -550,12 +550,12 @@ var _ = Describe("ClaimHandler", func() {
 					mockService.EXPECT().UpdateStatus(mockTx, claimID, entities.ClaimStatusRequestInfo, userID).Return(nil).Once()
 				})
 
-				SendRequest(r, http.MethodPost, "/claims/"+claimID.String()+"/request-info", w, nil)
+				SendRequest(r, http.MethodPost, "/claims/"+claimID.String()+"/request-information", w, nil)
 				ExpectResponseNotNil(w, http.StatusNoContent)
 			})
 
 			It("should handle invalid UUID", func() {
-				SendRequest(r, http.MethodPost, "/claims/invalid-uuid/request-info", w, nil)
+				SendRequest(r, http.MethodPost, "/claims/invalid-uuid/request-information", w, nil)
 				ExpectErrorCode(w, http.StatusBadRequest, apperrors.ErrorCodeInvalidUUID)
 			})
 
@@ -566,37 +566,37 @@ var _ = Describe("ClaimHandler", func() {
 						Return(invalidActionError).Once()
 				}, invalidActionError)
 
-				SendRequest(r, http.MethodPost, "/claims/"+claimID.String()+"/request-info", w, nil)
+				SendRequest(r, http.MethodPost, "/claims/"+claimID.String()+"/request-information", w, nil)
 				ExpectErrorCode(w, http.StatusConflict, apperrors.ErrorCodeInvalidClaimAction)
 			})
 		})
 
 		It("should deny access for unauthorized roles", func() {
-			setupRoute("POST", "/claims/:id/request-info", entities.UserRoleScStaff, handler.RequestInfo)
-			SendRequest(r, http.MethodPost, "/claims/"+claimID.String()+"/request-info", w, nil)
+			setupRoute("POST", "/claims/:id/request-information", entities.UserRoleScStaff, handler.RequestInformation)
+			SendRequest(r, http.MethodPost, "/claims/"+claimID.String()+"/request-information", w, nil)
 			ExpectErrorCode(w, http.StatusForbidden, apperrors.ErrorCodeUnauthorizedRole)
 		})
 
 		It("should handle missing user ID header", func() {
-			r.POST("/claims/:id/request-info", func(c *gin.Context) {
+			r.POST("/claims/:id/request-information", func(c *gin.Context) {
 				SetHeaderRole(c, entities.UserRoleEvmStaff)
 				SetContentTypeJSON(c)
-				handler.RequestInfo(c)
+				handler.RequestInformation(c)
 			})
 
-			SendRequest(r, http.MethodPost, "/claims/"+claimID.String()+"/request-info", w, nil)
+			SendRequest(r, http.MethodPost, "/claims/"+claimID.String()+"/request-information", w, nil)
 			ExpectErrorCode(w, http.StatusBadRequest, apperrors.ErrorCodeMissingUserID)
 		})
 
 		It("should handle invalid user ID header", func() {
-			r.POST("/claims/:id/request-info", func(c *gin.Context) {
+			r.POST("/claims/:id/request-information", func(c *gin.Context) {
 				SetHeaderRole(c, entities.UserRoleEvmStaff)
 				c.Request.Header.Set("X-User-ID", "invalid-uuid")
 				SetContentTypeJSON(c)
-				handler.RequestInfo(c)
+				handler.RequestInformation(c)
 			})
 
-			SendRequest(r, http.MethodPost, "/claims/"+claimID.String()+"/request-info", w, nil)
+			SendRequest(r, http.MethodPost, "/claims/"+claimID.String()+"/request-information", w, nil)
 			ExpectErrorCode(w, http.StatusBadRequest, apperrors.ErrorCodeInvalidUserID)
 		})
 	})

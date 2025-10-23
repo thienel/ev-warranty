@@ -37,6 +37,21 @@ func NewClaimItemHandler(log logger.Logger, txManager application.TxManager, ser
 	}
 }
 
+// GetByID godoc
+// @Summary Get claim item by ID
+// @Description Retrieve a specific claim item by its ID
+// @Tags claim-items
+// @Accept json
+// @Produce json
+// @Security Bearer
+// @Param id path string true "Claim ID"
+// @Param itemID path string true "Claim Item ID"
+// @Success 200 {object} dtos.SuccessResponse{data=entities.ClaimItem} "Claim item retrieved successfully"
+// @Failure 400 {object} dtos.ErrorResponse "Bad request"
+// @Failure 401 {object} dtos.ErrorResponse "Unauthorized"
+// @Failure 404 {object} dtos.ErrorResponse "Claim item not found"
+// @Failure 500 {object} dtos.ErrorResponse "Internal server error"
+// @Router /claims/{id}/items/{itemID} [get]
 func (h *claimItemHandler) GetByID(c *gin.Context) {
 	ctx, cancel := context.WithTimeout(c.Request.Context(), requestTimeout)
 	defer cancel()
@@ -56,6 +71,20 @@ func (h *claimItemHandler) GetByID(c *gin.Context) {
 	writeSuccessResponse(c, http.StatusOK, item)
 }
 
+// GetByClaimID godoc
+// @Summary Get claim items by claim ID
+// @Description Retrieve all items for a specific claim
+// @Tags claim-items
+// @Accept json
+// @Produce json
+// @Security Bearer
+// @Param id path string true "Claim ID"
+// @Success 200 {object} dtos.SuccessResponse{data=dtos.ClaimItemListResponse} "Claim items retrieved successfully"
+// @Failure 400 {object} dtos.ErrorResponse "Bad request"
+// @Failure 401 {object} dtos.ErrorResponse "Unauthorized"
+// @Failure 404 {object} dtos.ErrorResponse "Claim not found"
+// @Failure 500 {object} dtos.ErrorResponse "Internal server error"
+// @Router /claims/{id}/items [get]
 func (h *claimItemHandler) GetByClaimID(c *gin.Context) {
 	ctx, cancel := context.WithTimeout(c.Request.Context(), requestTimeout)
 	defer cancel()
@@ -75,6 +104,22 @@ func (h *claimItemHandler) GetByClaimID(c *gin.Context) {
 	writeSuccessResponse(c, http.StatusOK, items)
 }
 
+// Create godoc
+// @Summary Create a new claim item
+// @Description Add a new item to a claim (SC Staff only)
+// @Tags claim-items
+// @Accept json
+// @Produce json
+// @Security Bearer
+// @Param id path string true "Claim ID"
+// @Param createClaimItemRequest body dtos.CreateClaimItemRequest true "Claim item creation data"
+// @Success 201 {object} dtos.SuccessResponse{data=entities.ClaimItem} "Claim item created successfully"
+// @Failure 400 {object} dtos.ErrorResponse "Bad request"
+// @Failure 401 {object} dtos.ErrorResponse "Unauthorized"
+// @Failure 403 {object} dtos.ErrorResponse "Forbidden"
+// @Failure 404 {object} dtos.ErrorResponse "Claim not found"
+// @Failure 500 {object} dtos.ErrorResponse "Internal server error"
+// @Router /claims/{id}/items [post]
 func (h *claimItemHandler) Create(c *gin.Context) {
 	if err := allowedRoles(c, entities.UserRoleScStaff); err != nil {
 		handleError(h.log, c, err)
@@ -123,6 +168,22 @@ func (h *claimItemHandler) Create(c *gin.Context) {
 	writeSuccessResponse(c, http.StatusCreated, item)
 }
 
+// Delete godoc
+// @Summary Delete a claim item
+// @Description Remove an item from a claim (SC Staff only)
+// @Tags claim-items
+// @Accept json
+// @Produce json
+// @Security Bearer
+// @Param id path string true "Claim ID"
+// @Param itemID path string true "Claim Item ID"
+// @Success 204 "Claim item deleted successfully"
+// @Failure 400 {object} dtos.ErrorResponse "Bad request"
+// @Failure 401 {object} dtos.ErrorResponse "Unauthorized"
+// @Failure 403 {object} dtos.ErrorResponse "Forbidden"
+// @Failure 404 {object} dtos.ErrorResponse "Claim item not found"
+// @Failure 500 {object} dtos.ErrorResponse "Internal server error"
+// @Router /claims/{id}/items/{itemID} [delete]
 func (h *claimItemHandler) Delete(c *gin.Context) {
 	if err := allowedRoles(c, entities.UserRoleScStaff); err != nil {
 		handleError(h.log, c, err)
@@ -150,9 +211,25 @@ func (h *claimItemHandler) Delete(c *gin.Context) {
 		return
 	}
 
-	writeSuccessResponse(c, http.StatusNoContent, nil)
+	c.Status(http.StatusNoContent)
 }
 
+// Approve godoc
+// @Summary Approve a claim item
+// @Description Approve a claim item for processing (EVM Staff only)
+// @Tags claim-items
+// @Accept json
+// @Produce json
+// @Security Bearer
+// @Param id path string true "Claim ID"
+// @Param itemID path string true "Claim Item ID"
+// @Success 204 "Claim item approved successfully"
+// @Failure 400 {object} dtos.ErrorResponse "Bad request"
+// @Failure 401 {object} dtos.ErrorResponse "Unauthorized"
+// @Failure 403 {object} dtos.ErrorResponse "Forbidden"
+// @Failure 404 {object} dtos.ErrorResponse "Claim item not found"
+// @Failure 500 {object} dtos.ErrorResponse "Internal server error"
+// @Router /claims/{id}/items/{itemID}/approve [post]
 func (h *claimItemHandler) Approve(c *gin.Context) {
 	if err := allowedRoles(c, entities.UserRoleEvmStaff); err != nil {
 		handleError(h.log, c, err)
@@ -180,9 +257,25 @@ func (h *claimItemHandler) Approve(c *gin.Context) {
 		return
 	}
 
-	writeSuccessResponse(c, http.StatusNoContent, nil)
+	c.Status(http.StatusNoContent)
 }
 
+// Reject godoc
+// @Summary Reject a claim item
+// @Description Reject a claim item (EVM Staff only)
+// @Tags claim-items
+// @Accept json
+// @Produce json
+// @Security Bearer
+// @Param id path string true "Claim ID"
+// @Param itemID path string true "Claim Item ID"
+// @Success 204 "Claim item rejected successfully"
+// @Failure 400 {object} dtos.ErrorResponse "Bad request"
+// @Failure 401 {object} dtos.ErrorResponse "Unauthorized"
+// @Failure 403 {object} dtos.ErrorResponse "Forbidden"
+// @Failure 404 {object} dtos.ErrorResponse "Claim item not found"
+// @Failure 500 {object} dtos.ErrorResponse "Internal server error"
+// @Router /claims/{id}/items/{itemID}/reject [post]
 func (h *claimItemHandler) Reject(c *gin.Context) {
 	if err := allowedRoles(c, entities.UserRoleEvmStaff); err != nil {
 		handleError(h.log, c, err)
@@ -210,7 +303,7 @@ func (h *claimItemHandler) Reject(c *gin.Context) {
 		return
 	}
 
-	writeSuccessResponse(c, http.StatusNoContent, nil)
+	c.Status(http.StatusNoContent)
 }
 
 func parseItemIDParam(c *gin.Context) (uuid.UUID, error) {

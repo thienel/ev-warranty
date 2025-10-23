@@ -1,6 +1,9 @@
 package dtos
 
-type APIResponse struct {
-	Data  any    `json:"data,omitempty"`
-	Error string `json:"error,omitempty"`
+type ErrorResponse struct {
+	Error string `json:"error"`
+}
+
+type SuccessResponse struct {
+	Data any `json:"data,omitempty"`
 }

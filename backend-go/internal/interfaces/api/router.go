@@ -6,6 +6,8 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
 type HealthHandler struct {
@@ -23,6 +25,11 @@ func NewRouter(db *database.Database, authHandler handlers.AuthHandler,
 	healthHandler := HealthHandler{DB: db}
 
 	router.GET("/health", healthHandler.Check)
+
+	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+	router.GET("/swagger", func(c *gin.Context) {
+		c.Redirect(302, "/swagger/index.html")
+	})
 
 	auth := router.Group("/auth")
 	{
@@ -63,7 +70,7 @@ func NewRouter(db *database.Database, authHandler handlers.AuthHandler,
 
 		claim.POST("/:id/submit", claimHandler.Submit)
 		claim.POST("/:id/review", claimHandler.Review)
-		claim.POST("/:id/requestinfo", claimHandler.RequestInfo)
+		claim.POST("/:id/request-information", claimHandler.RequestInformation)
 		claim.POST("/:id/cancel", claimHandler.Cancel)
 		claim.POST("/:id/complete", claimHandler.Complete)
 		claim.GET("/:id/history", claimHandler.History)

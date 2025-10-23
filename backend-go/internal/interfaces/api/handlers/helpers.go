@@ -28,13 +28,13 @@ func handleError(log logger.Logger, c *gin.Context, err error) {
 	}
 
 	log.Error(appErr.ErrorCode, "error", appErr.Error())
-	c.JSON(appErr.HttpCode, dtos.APIResponse{
+	c.JSON(appErr.HttpCode, dtos.ErrorResponse{
 		Error: appErr.ErrorCode,
 	})
 }
 
 func writeSuccessResponse(c *gin.Context, statusCode int, data any) {
-	c.JSON(statusCode, dtos.APIResponse{
+	c.JSON(statusCode, dtos.SuccessResponse{
 		Data: data,
 	})
 }

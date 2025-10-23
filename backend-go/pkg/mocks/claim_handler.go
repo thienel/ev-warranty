@@ -253,11 +253,11 @@ func (_c *ClaimHandler_History_Call) RunAndReturn(run func(*gin.Context)) *Claim
 }
 
 // RequestInfo provides a mock function with given fields: c
-func (_m *ClaimHandler) RequestInfo(c *gin.Context) {
+func (_m *ClaimHandler) RequestInformation(c *gin.Context) {
 	_m.Called(c)
 }
 
-// ClaimHandler_RequestInfo_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'RequestInfo'
+// ClaimHandler_RequestInfo_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'RequestInformation'
 type ClaimHandler_RequestInfo_Call struct {
 	*mock.Call
 }
@@ -265,7 +265,7 @@ type ClaimHandler_RequestInfo_Call struct {
 // RequestInfo is a helper method to define mock.On call
 //   - c *gin.Context
 func (_e *ClaimHandler_Expecter) RequestInfo(c interface{}) *ClaimHandler_RequestInfo_Call {
-	return &ClaimHandler_RequestInfo_Call{Call: _e.mock.On("RequestInfo", c)}
+	return &ClaimHandler_RequestInfo_Call{Call: _e.mock.On("RequestInformation", c)}
 }
 
 func (_c *ClaimHandler_RequestInfo_Call) Run(run func(c *gin.Context)) *ClaimHandler_RequestInfo_Call {

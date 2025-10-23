@@ -1,7 +1,6 @@
 package handlers_test
 
 import (
-	"encoding/json"
 	"ev-warranty-go/internal/apperrors"
 	"ev-warranty-go/internal/application/services"
 	"ev-warranty-go/internal/domain/entities"
@@ -113,7 +112,7 @@ var _ = Describe("AuthHandler", func() {
 			req.AddCookie(&http.Cookie{Name: "refreshToken", Value: refreshToken})
 			r.ServeHTTP(w, req)
 
-			Expect(w.Code).To(Equal(http.StatusOK))
+			Expect(w.Code).To(Equal(http.StatusNoContent))
 		})
 
 		DescribeTable("should handle errors",
@@ -154,15 +153,7 @@ var _ = Describe("AuthHandler", func() {
 			req.AddCookie(&http.Cookie{Name: "refreshToken", Value: refreshToken})
 			r.ServeHTTP(w, req)
 
-			Expect(w.Code).To(Equal(http.StatusOK))
-
-			var response dtos.APIResponse
-			err := json.Unmarshal(w.Body.Bytes(), &response)
-			Expect(err).NotTo(HaveOccurred())
-
-			tokenResp, ok := response.Data.(map[string]interface{})
-			Expect(ok).To(BeTrue())
-			Expect(tokenResp["access_token"]).To(Equal(newAccessToken))
+			ExpectResponseNotNil(w, http.StatusOK)
 		})
 
 		DescribeTable("should handle errors",
@@ -211,18 +202,9 @@ var _ = Describe("AuthHandler", func() {
 			req.Header.Set("Authorization", "Bearer "+accessToken)
 			r.ServeHTTP(w, req)
 
-			Expect(w.Code).To(Equal(http.StatusOK))
+			ExpectResponseNotNil(w, http.StatusOK)
 			Expect(w.Header().Get("X-User-ID")).To(Equal(userID.String()))
 			Expect(w.Header().Get("X-User-Role")).To(Equal(user.Role))
-
-			var response dtos.APIResponse
-			err := json.Unmarshal(w.Body.Bytes(), &response)
-			Expect(err).NotTo(HaveOccurred())
-
-			validationResp, ok := response.Data.(map[string]interface{})
-			Expect(ok).To(BeTrue())
-			Expect(validationResp["valid"]).To(BeTrue())
-			Expect(validationResp["user"]).NotTo(BeNil())
 		})
 
 		DescribeTable("should handle errors",

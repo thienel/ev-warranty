@@ -1,0 +1,1834 @@
+basePath: /
+definitions:
+  dtos.ClaimAttachmentListResponse:
+    properties:
+      attachments:
+        items:
+          $ref: '#/definitions/entities.ClaimAttachment'
+        type: array
+      total:
+        type: integer
+    type: object
+  dtos.ClaimItemListResponse:
+    properties:
+      items:
+        items:
+          $ref: '#/definitions/entities.ClaimItem'
+        type: array
+      total:
+        type: integer
+    type: object
+  dtos.CreateClaimItemRequest:
+    properties:
+      cost:
+        minimum: 0
+        type: number
+      faulty_part_id:
+        type: string
+      issue_description:
+        maxLength: 1000
+        minLength: 10
+        type: string
+      part_category_id:
+        type: integer
+      replacement_part_id:
+        type: string
+      type:
+        type: string
+    required:
+    - cost
+    - faulty_part_id
+    - issue_description
+    - part_category_id
+    - type
+    type: object
+  dtos.CreateClaimRequest:
+    properties:
+      customer_id:
+        type: string
+      description:
+        maxLength: 1000
+        minLength: 10
+        type: string
+      vehicle_id:
+        type: string
+    required:
+    - customer_id
+    - description
+    - vehicle_id
+    type: object
+  dtos.CreateOfficeRequest:
+    properties:
+      address:
+        type: string
+      is_active:
+        type: boolean
+      office_name:
+        type: string
+      office_type:
+        type: string
+    required:
+    - address
+    - office_name
+    - office_type
+    type: object
+  dtos.CreateUserRequest:
+    properties:
+      email:
+        maxLength: 100
+        type: string
+      is_active:
+        type: boolean
+      name:
+        type: string
+      office_id:
+        type: string
+      password:
+        type: string
+      role:
+        maxLength: 20
+        type: string
+    required:
+    - email
+    - name
+    - office_id
+    - password
+    - role
+    type: object
+  dtos.ErrorResponse:
+    properties:
+      error:
+        type: string
+    type: object
+  dtos.LoginRequest:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    required:
+    - email
+    - password
+    type: object
+  dtos.LoginResponse:
+    properties:
+      token:
+        type: string
+      user:
+        $ref: '#/definitions/dtos.UserDTO'
+    type: object
+  dtos.RefreshTokenResponse:
+    properties:
+      token:
+        type: string
+    type: object
+  dtos.SuccessResponse:
+    properties:
+      data: {}
+    type: object
+  dtos.UpdateClaimRequest:
+    properties:
+      description:
+        maxLength: 1000
+        minLength: 10
+        type: string
+    required:
+    - description
+    type: object
+  dtos.UpdateOfficeRequest:
+    properties:
+      address:
+        type: string
+      is_active:
+        type: boolean
+      office_name:
+        type: string
+      office_type:
+        type: string
+    type: object
+  dtos.UpdateUserRequest:
+    properties:
+      is_active:
+        type: boolean
+      name:
+        type: string
+      office_id:
+        type: string
+      role:
+        type: string
+    type: object
+  dtos.UserDTO:
+    properties:
+      email:
+        maxLength: 100
+        type: string
+      id:
+        type: string
+      is_active:
+        type: boolean
+      name:
+        type: string
+      office_id:
+        type: string
+      role:
+        maxLength: 20
+        type: string
+    required:
+    - email
+    - id
+    - name
+    - office_id
+    - role
+    type: object
+  dtos.ValidateTokenResponse:
+    properties:
+      user:
+        $ref: '#/definitions/dtos.UserDTO'
+      valid:
+        type: boolean
+    type: object
+  entities.Claim:
+    properties:
+      approved_by:
+        type: string
+      created_at:
+        type: string
+      customer_id:
+        type: string
+      description:
+        type: string
+      id:
+        type: string
+      status:
+        type: string
+      total_cost:
+        type: number
+      updated_at:
+        type: string
+      vehicle_id:
+        type: string
+    type: object
+  entities.ClaimAttachment:
+    properties:
+      claimID:
+        type: string
+      created_at:
+        type: string
+      id:
+        type: string
+      type:
+        type: string
+      url:
+        type: string
+    type: object
+  entities.ClaimHistory:
+    properties:
+      changed_by:
+        type: string
+      changedAt:
+        type: string
+      claim_id:
+        type: string
+      id:
+        type: string
+      status:
+        type: string
+    type: object
+  entities.ClaimItem:
+    properties:
+      claim_id:
+        type: string
+      cost:
+        type: number
+      created_at:
+        type: string
+      faulty_part_id:
+        type: string
+      id:
+        type: string
+      issue_description:
+        type: string
+      part_category_id:
+        type: integer
+      replacement_part_id:
+        type: string
+      status:
+        type: string
+      type:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  entities.Office:
+    properties:
+      address:
+        type: string
+      created_at:
+        type: string
+      id:
+        type: string
+      is_active:
+        type: boolean
+      office_name:
+        type: string
+      office_type:
+        type: string
+      updated_at:
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact:
+    email: support@ev-warranty.com
+    name: API Support
+  description: API for EV Warranty Management System
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+  termsOfService: http://swagger.io/terms/
+  title: EV Warranty API
+  version: "1.0"
+paths:
+  /auth/google:
+    get:
+      consumes:
+      - application/json
+      description: Redirect to Google OAuth authorization URL
+      produces:
+      - application/json
+      responses:
+        "302":
+          description: Redirect to Google OAuth
+          schema:
+            type: string
+        "500":
+          description: Redirect to frontend with error
+          schema:
+            type: string
+      summary: Initiate Google OAuth login
+      tags:
+      - auth
+  /auth/google/callback:
+    get:
+      consumes:
+      - application/json
+      description: Process Google OAuth callback and authenticate user
+      parameters:
+      - description: OAuth state parameter
+        in: query
+        name: state
+        required: true
+        type: string
+      - description: OAuth authorization code
+        in: query
+        name: code
+        required: true
+        type: string
+      - description: OAuth error parameter
+        in: query
+        name: error
+        type: string
+      produces:
+      - application/json
+      responses:
+        "302":
+          description: Redirect to frontend with error
+          schema:
+            type: string
+      summary: Handle Google OAuth callback
+      tags:
+      - auth
+  /auth/login:
+    post:
+      consumes:
+      - application/json
+      description: Authenticate user with email and password
+      parameters:
+      - description: Login credentials
+        in: body
+        name: loginRequest
+        required: true
+        schema:
+          $ref: '#/definitions/dtos.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Login successful
+          schema:
+            allOf:
+            - $ref: '#/definitions/dtos.SuccessResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/dtos.LoginResponse'
+              type: object
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+      summary: User login
+      tags:
+      - auth
+  /auth/logout:
+    post:
+      consumes:
+      - application/json
+      description: Logout user by invalidating refresh token
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: Logout successful
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+      summary: User logout
+      tags:
+      - auth
+  /auth/token:
+    get:
+      consumes:
+      - application/json
+      description: Validate the provided JWT access token
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Token is valid
+          schema:
+            allOf:
+            - $ref: '#/definitions/dtos.SuccessResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/dtos.ValidateTokenResponse'
+              type: object
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Validate access token
+      tags:
+      - auth
+    post:
+      consumes:
+      - application/json
+      description: Get a new access token using refresh token from cookie
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: New access token
+          schema:
+            allOf:
+            - $ref: '#/definitions/dtos.SuccessResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/dtos.RefreshTokenResponse'
+              type: object
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+      summary: Refresh access token
+      tags:
+      - auth
+  /claims:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a list of all claims with optional filtering and pagination
+      parameters:
+      - description: Filter by claim status
+        in: query
+        name: status
+        type: string
+      - description: Page number for pagination
+        in: query
+        name: page
+        type: integer
+      - description: Number of items per page
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Claims retrieved successfully
+          schema:
+            allOf:
+            - $ref: '#/definitions/dtos.SuccessResponse'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/entities.Claim'
+                  type: array
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Get all claims
+      tags:
+      - claims
+    post:
+      consumes:
+      - application/json
+      description: Create a new warranty claim (SC Technician/Staff only)
+      parameters:
+      - description: Claim creation data
+        in: body
+        name: createClaimRequest
+        required: true
+        schema:
+          $ref: '#/definitions/dtos.CreateClaimRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Claim created successfully
+          schema:
+            allOf:
+            - $ref: '#/definitions/dtos.SuccessResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/entities.Claim'
+              type: object
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Create a new claim
+      tags:
+      - claims
+  /claims/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: 'Delete a claim by ID (SC Staff: hard delete, EVM Staff: soft delete)'
+      parameters:
+      - description: Claim ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: Claim deleted successfully
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+        "404":
+          description: Claim not found
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Delete a claim
+      tags:
+      - claims
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a specific claim by its ID
+      parameters:
+      - description: Claim ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Claim retrieved successfully
+          schema:
+            allOf:
+            - $ref: '#/definitions/dtos.SuccessResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/entities.Claim'
+              type: object
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+        "404":
+          description: Claim not found
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Get claim by ID
+      tags:
+      - claims
+    put:
+      consumes:
+      - application/json
+      description: Update an existing claim by ID (SC Staff only)
+      parameters:
+      - description: Claim ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Claim update data
+        in: body
+        name: updateClaimRequest
+        required: true
+        schema:
+          $ref: '#/definitions/dtos.UpdateClaimRequest'
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: Claim updated successfully
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+        "404":
+          description: Claim not found
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Update a claim
+      tags:
+      - claims
+  /claims/{id}/attachments:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve all attachments for a specific claim
+      parameters:
+      - description: Claim ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Claim attachments retrieved successfully
+          schema:
+            allOf:
+            - $ref: '#/definitions/dtos.SuccessResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/dtos.ClaimAttachmentListResponse'
+              type: object
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+        "404":
+          description: Claim not found
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Get claim attachments by claim ID
+      tags:
+      - claim-attachments
+    post:
+      consumes:
+      - multipart/form-data
+      description: Upload files as attachments to a claim (SC Technician only)
+      parameters:
+      - description: Claim ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Files to upload
+        in: formData
+        name: files
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Claim attachments uploaded successfully
+          schema:
+            allOf:
+            - $ref: '#/definitions/dtos.SuccessResponse'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/entities.ClaimAttachment'
+                  type: array
+              type: object
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+        "404":
+          description: Claim not found
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Upload claim attachments
+      tags:
+      - claim-attachments
+  /claims/{id}/attachments/{attachmentID}:
+    delete:
+      consumes:
+      - application/json
+      description: Remove an attachment from a claim (SC Technician only)
+      parameters:
+      - description: Claim ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Attachment ID
+        in: path
+        name: attachmentID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: Claim attachment deleted successfully
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+        "404":
+          description: Claim attachment not found
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Delete a claim attachment
+      tags:
+      - claim-attachments
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a specific claim attachment by its ID
+      parameters:
+      - description: Claim ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Attachment ID
+        in: path
+        name: attachmentID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Claim attachment retrieved successfully
+          schema:
+            allOf:
+            - $ref: '#/definitions/dtos.SuccessResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/entities.ClaimAttachment'
+              type: object
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+        "404":
+          description: Claim attachment not found
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Get claim attachment by ID
+      tags:
+      - claim-attachments
+  /claims/{id}/cancel:
+    post:
+      consumes:
+      - application/json
+      description: Cancel a claim and update its status (SC Staff only)
+      parameters:
+      - description: Claim ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: Claim cancelled successfully
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+        "404":
+          description: Claim not found
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Cancel a claim
+      tags:
+      - claims
+  /claims/{id}/complete:
+    post:
+      consumes:
+      - application/json
+      description: Mark a claim as completed (EVM Staff only)
+      parameters:
+      - description: Claim ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: Claim completed successfully
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+        "404":
+          description: Claim not found
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Complete a claim
+      tags:
+      - claims
+  /claims/{id}/history:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve the history of status changes for a specific claim
+      parameters:
+      - description: Claim ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Claim history retrieved successfully
+          schema:
+            allOf:
+            - $ref: '#/definitions/dtos.SuccessResponse'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/entities.ClaimHistory'
+                  type: array
+              type: object
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+        "404":
+          description: Claim not found
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Get claim history
+      tags:
+      - claims
+  /claims/{id}/items:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve all items for a specific claim
+      parameters:
+      - description: Claim ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Claim items retrieved successfully
+          schema:
+            allOf:
+            - $ref: '#/definitions/dtos.SuccessResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/dtos.ClaimItemListResponse'
+              type: object
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+        "404":
+          description: Claim not found
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Get claim items by claim ID
+      tags:
+      - claim-items
+    post:
+      consumes:
+      - application/json
+      description: Add a new item to a claim (SC Staff only)
+      parameters:
+      - description: Claim ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Claim item creation data
+        in: body
+        name: createClaimItemRequest
+        required: true
+        schema:
+          $ref: '#/definitions/dtos.CreateClaimItemRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Claim item created successfully
+          schema:
+            allOf:
+            - $ref: '#/definitions/dtos.SuccessResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/entities.ClaimItem'
+              type: object
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+        "404":
+          description: Claim not found
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Create a new claim item
+      tags:
+      - claim-items
+  /claims/{id}/items/{itemID}:
+    delete:
+      consumes:
+      - application/json
+      description: Remove an item from a claim (SC Staff only)
+      parameters:
+      - description: Claim ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Claim Item ID
+        in: path
+        name: itemID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: Claim item deleted successfully
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+        "404":
+          description: Claim item not found
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Delete a claim item
+      tags:
+      - claim-items
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a specific claim item by its ID
+      parameters:
+      - description: Claim ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Claim Item ID
+        in: path
+        name: itemID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Claim item retrieved successfully
+          schema:
+            allOf:
+            - $ref: '#/definitions/dtos.SuccessResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/entities.ClaimItem'
+              type: object
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+        "404":
+          description: Claim item not found
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Get claim item by ID
+      tags:
+      - claim-items
+  /claims/{id}/items/{itemID}/approve:
+    post:
+      consumes:
+      - application/json
+      description: Approve a claim item for processing (EVM Staff only)
+      parameters:
+      - description: Claim ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Claim Item ID
+        in: path
+        name: itemID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: Claim item approved successfully
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+        "404":
+          description: Claim item not found
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Approve a claim item
+      tags:
+      - claim-items
+  /claims/{id}/items/{itemID}/reject:
+    post:
+      consumes:
+      - application/json
+      description: Reject a claim item (EVM Staff only)
+      parameters:
+      - description: Claim ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Claim Item ID
+        in: path
+        name: itemID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: Claim item rejected successfully
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+        "404":
+          description: Claim item not found
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Reject a claim item
+      tags:
+      - claim-items
+  /claims/{id}/request-information:
+    post:
+      consumes:
+      - application/json
+      description: Request additional information from SC for a claim (EVM Staff only)
+      parameters:
+      - description: Claim ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: Information request sent successfully
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+        "404":
+          description: Claim not found
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Request additional information for a claim
+      tags:
+      - claims
+  /claims/{id}/review:
+    post:
+      consumes:
+      - application/json
+      description: Review and approve/reject a submitted claim (EVM Staff only)
+      parameters:
+      - description: Claim ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: Claim reviewed successfully
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+        "404":
+          description: Claim not found
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Review a claim
+      tags:
+      - claims
+  /claims/{id}/submit:
+    post:
+      consumes:
+      - application/json
+      description: Submit a claim to EVM for review (SC Staff only)
+      parameters:
+      - description: Claim ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: Claim submitted successfully
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+        "404":
+          description: Claim not found
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Submit a claim for review
+      tags:
+      - claims
+  /offices:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a list of all offices
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Offices retrieved successfully
+          schema:
+            allOf:
+            - $ref: '#/definitions/dtos.SuccessResponse'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/entities.Office'
+                  type: array
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Get all offices
+      tags:
+      - offices
+    post:
+      consumes:
+      - application/json
+      description: Create a new office (Admin only)
+      parameters:
+      - description: Office creation data
+        in: body
+        name: createOfficeRequest
+        required: true
+        schema:
+          $ref: '#/definitions/dtos.CreateOfficeRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Office created successfully
+          schema:
+            allOf:
+            - $ref: '#/definitions/dtos.SuccessResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/entities.Office'
+              type: object
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Create a new office
+      tags:
+      - offices
+  /offices/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete an office by ID (Admin only)
+      parameters:
+      - description: Office ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: Office deleted successfully
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+        "404":
+          description: Office not found
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Delete an office
+      tags:
+      - offices
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a specific office by its ID
+      parameters:
+      - description: Office ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Office retrieved successfully
+          schema:
+            allOf:
+            - $ref: '#/definitions/dtos.SuccessResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/entities.Office'
+              type: object
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+        "404":
+          description: Office not found
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Get office by ID
+      tags:
+      - offices
+    put:
+      consumes:
+      - application/json
+      description: Update an existing office by ID (Admin only)
+      parameters:
+      - description: Office ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Office update data
+        in: body
+        name: updateOfficeRequest
+        required: true
+        schema:
+          $ref: '#/definitions/dtos.UpdateOfficeRequest'
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: Office updated successfully
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+        "404":
+          description: Office not found
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Update an office
+      tags:
+      - offices
+  /users:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a list of all users
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Users retrieved successfully
+          schema:
+            allOf:
+            - $ref: '#/definitions/dtos.SuccessResponse'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/dtos.UserDTO'
+                  type: array
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Get all users
+      tags:
+      - users
+    post:
+      consumes:
+      - application/json
+      description: Create a new user (Admin only)
+      parameters:
+      - description: User creation data
+        in: body
+        name: createUserRequest
+        required: true
+        schema:
+          $ref: '#/definitions/dtos.CreateUserRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: User created successfully
+          schema:
+            allOf:
+            - $ref: '#/definitions/dtos.SuccessResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/dtos.UserDTO'
+              type: object
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Create a new user
+      tags:
+      - users
+  /users/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a user by ID (Admin only)
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: User deleted successfully
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+        "404":
+          description: User not found
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Delete a user
+      tags:
+      - users
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a specific user by their ID
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User retrieved successfully
+          schema:
+            allOf:
+            - $ref: '#/definitions/dtos.SuccessResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/dtos.UserDTO'
+              type: object
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+        "404":
+          description: User not found
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Get user by ID
+      tags:
+      - users
+    put:
+      consumes:
+      - application/json
+      description: Update an existing user by ID (Admin only)
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: User update data
+        in: body
+        name: updateUserRequest
+        required: true
+        schema:
+          $ref: '#/definitions/dtos.UpdateUserRequest'
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: User updated successfully
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+        "404":
+          description: User not found
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Update a user
+      tags:
+      - users
+schemes:
+- http
+- https
+securityDefinitions:
+  Bearer:
+    description: Type "Bearer" followed by a space and JWT token.
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

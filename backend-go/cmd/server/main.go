@@ -20,8 +20,30 @@ import (
 	"syscall"
 	"time"
 
+	_ "ev-warranty-go/docs"
+
 	"github.com/joho/godotenv"
 )
+
+// @title EV Warranty API
+// @version 1.0
+// @description API for EV Warranty Management System
+// @termsOfService http://swagger.io/terms/
+
+// @contact.name API Support
+// @contact.email support@ev-warranty.com
+
+// @license.name MIT
+// @license.url https://opensource.org/licenses/MIT
+
+// @host localhost:8080
+// @BasePath /
+// @schemes http https
+
+// @securityDefinitions.apikey Bearer
+// @in header
+// @name Authorization
+// @description Type "Bearer" followed by a space and JWT token.
 
 type App struct {
 	Cfg *config.Config

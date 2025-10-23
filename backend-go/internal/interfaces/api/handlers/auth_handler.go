@@ -38,6 +38,18 @@ func NewAuthHandler(log logger.Logger, authService services.AuthService, tokenSe
 	}
 }
 
+// Login godoc
+// @Summary User login
+// @Description Authenticate user with email and password
+// @Tags auth
+// @Accept json
+// @Produce json
+// @Param loginRequest body dtos.LoginRequest true "Login credentials"
+// @Success 200 {object} dtos.SuccessResponse{data=dtos.LoginResponse} "Login successful"
+// @Failure 400 {object} dtos.ErrorResponse "Bad request"
+// @Failure 401 {object} dtos.ErrorResponse "Unauthorized"
+// @Failure 500 {object} dtos.ErrorResponse "Internal server error"
+// @Router /auth/login [post]
 func (h *authHandler) Login(c *gin.Context) {
 	ctx, cancel := context.WithTimeout(c.Request.Context(), requestTimeout)
 	defer cancel()
@@ -81,6 +93,16 @@ func (h *authHandler) Login(c *gin.Context) {
 	writeSuccessResponse(c, http.StatusOK, response)
 }
 
+// Logout godoc
+// @Summary User logout
+// @Description Logout user by invalidating refresh token
+// @Tags auth
+// @Accept json
+// @Produce json
+// @Success 204 "Logout successful"
+// @Failure 400 {object} dtos.ErrorResponse "Bad request"
+// @Failure 500 {object} dtos.ErrorResponse "Internal server error"
+// @Router /auth/logout [post]
 func (h *authHandler) Logout(c *gin.Context) {
 	ctx, cancel := context.WithTimeout(c.Request.Context(), requestTimeout)
 	defer cancel()
@@ -100,9 +122,20 @@ func (h *authHandler) Logout(c *gin.Context) {
 	}
 
 	h.log.Info("logout successful")
-	writeSuccessResponse(c, http.StatusOK, nil)
+	c.Status(http.StatusNoContent)
 }
 
+// RefreshToken godoc
+// @Summary Refresh access token
+// @Description Get a new access token using refresh token from cookie
+// @Tags auth
+// @Accept json
+// @Produce json
+// @Success 200 {object} dtos.SuccessResponse{data=dtos.RefreshTokenResponse} "New access token"
+// @Failure 400 {object} dtos.ErrorResponse "Bad request"
+// @Failure 401 {object} dtos.ErrorResponse "Unauthorized"
+// @Failure 500 {object} dtos.ErrorResponse "Internal server error"
+// @Router /auth/token [post]
 func (h *authHandler) RefreshToken(c *gin.Context) {
 	ctx, cancel := context.WithTimeout(c.Request.Context(), requestTimeout)
 	defer cancel()
@@ -122,12 +155,24 @@ func (h *authHandler) RefreshToken(c *gin.Context) {
 		return
 	}
 
-	response := map[string]string{"access_token": newAccessToken}
-
 	h.log.Info("token refresh successful")
-	writeSuccessResponse(c, http.StatusOK, response)
+	writeSuccessResponse(c, http.StatusOK, dtos.RefreshTokenResponse{
+		Token: newAccessToken,
+	})
 }
 
+// ValidateToken godoc
+// @Summary Validate access token
+// @Description Validate the provided JWT access token
+// @Tags auth
+// @Accept json
+// @Produce json
+// @Security Bearer
+// @Success 200 {object} dtos.SuccessResponse{data=dtos.ValidateTokenResponse} "Token is valid"
+// @Failure 400 {object} dtos.ErrorResponse "Bad request"
+// @Failure 401 {object} dtos.ErrorResponse "Unauthorized"
+// @Failure 500 {object} dtos.ErrorResponse "Internal server error"
+// @Router /auth/token [get]
 func (h *authHandler) ValidateToken(c *gin.Context) {
 	ctx, cancel := context.WithTimeout(c.Request.Context(), requestTimeout)
 	defer cancel()
@@ -158,16 +203,15 @@ func (h *authHandler) ValidateToken(c *gin.Context) {
 		return
 	}
 
-	response := map[string]any{
-		"valid": true,
-		"user":  dtos.GenerateUserDTO(user),
-	}
-
 	c.Header("X-User-ID", userID.String())
 	c.Header("X-User-Role", user.Role)
 
 	h.log.Info("token validation successful", "user_id", userID, "role", user.Role)
-	writeSuccessResponse(c, http.StatusOK, response)
+	writeSuccessResponse(c, http.StatusOK,
+		&dtos.ValidateTokenResponse{
+			Valid: true,
+			User:  *dtos.GenerateUserDTO(user),
+		})
 }
 
 func (h *authHandler) extractBearerToken(c *gin.Context) string {
