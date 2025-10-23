@@ -71,9 +71,6 @@ namespace Backend.Dotnet.Application.DTOs
             [DataType(DataType.Date)]
             public DateTime? PurchaseDate { get; set; }
             
-            [JsonPropertyName("update_mask")]
-            [Required(ErrorMessage = "updateMask is required")]
-            public List<string> UpdateMask { get; set; } = new();
         }
 
         /// <summary>
@@ -188,32 +185,13 @@ namespace Backend.Dotnet.Application.DTOs
 
         public static void ApplyToEntity(this VehicleDto.UpdateVehicleRequest request, Vehicle entity)
         {
-            if (request.UpdateMask == null || !request.UpdateMask.Any())
-            {
-                entity.UpdateVehicle(
-                    request.Vin,
-                    request.CustomerId,
-                    request.ModelId,
-                    request.LicensePlate,
-                    request.PurchaseDate);
-                return;
-            }
-
-            if (request.UpdateMask.Contains("vin", StringComparer.OrdinalIgnoreCase))
-                entity.ChangeVin(request.Vin);
-
-            if (request.UpdateMask.Contains("customer_id", StringComparer.OrdinalIgnoreCase))
-                entity.TransferToCustomer(request.CustomerId);
-
-            if (request.UpdateMask.Contains("model_id", StringComparer.OrdinalIgnoreCase))
-                entity.ChangeModel(request.ModelId);
-
-            if (request.UpdateMask.Contains("license_plate", StringComparer.OrdinalIgnoreCase))
-                entity.ChangeLicensePlate(request.LicensePlate);
-
-            if (request.UpdateMask.Contains("purchase_dare", StringComparer.OrdinalIgnoreCase))
-                entity.ChangePurchaseDate(request.PurchaseDate);
-
+            entity.UpdateVehicle(
+                request.Vin,
+                request.CustomerId,
+                request.ModelId,
+                request.LicensePlate,
+                request.PurchaseDate
+            );
         }
 
         public static void ApplyTransfer(this VehicleDto.TransferVehicleCommand request, Vehicle entity)

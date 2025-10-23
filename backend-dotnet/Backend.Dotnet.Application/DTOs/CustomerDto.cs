@@ -68,9 +68,6 @@ namespace Backend.Dotnet.Application.DTOs
             [StringLength(500, ErrorMessage = "Address cannot exceed 500 characters")]
             public string? Address { get; set; }
 
-            [JsonPropertyName("update_mask")]
-            [Required(ErrorMessage = "updateMask is required")]
-            public List<string> UpdateMask { get; set; } = new();
         }
 
         /// <summary>
@@ -174,33 +171,13 @@ namespace Backend.Dotnet.Application.DTOs
 
         public static void ApplyToEntity(this CustomerDto.UpdateCustomerRequest request, Customer customer)
         {
-            if (request.UpdateMask == null || !request.UpdateMask.Any())
-            {
-                customer.UpdateProfile(
-                    request.FirstName,
-                    request.LastName,
-                    request.Email,
-                    request.PhoneNumber,
-                    request.Address);
-                return;
-            }
-            
-            if (request.UpdateMask.Contains("first_name", StringComparer.OrdinalIgnoreCase))
-                customer.ChangeFirstName(request.FirstName ?? string.Empty);
-
-            if (request.UpdateMask.Contains("last_name", StringComparer.OrdinalIgnoreCase))
-                customer.ChangeLastName(request.LastName ?? string.Empty);
-
-            if (request.UpdateMask.Contains("email", StringComparer.OrdinalIgnoreCase))
-                customer.ChangeEmail(request.Email ?? string.Empty);
-
-            if (request.UpdateMask.Contains("phone_number", StringComparer.OrdinalIgnoreCase))
-                customer.ChangePhoneNumber(request.PhoneNumber ?? string.Empty);
-
-            if (request.UpdateMask.Contains("address", StringComparer.OrdinalIgnoreCase))
-                customer.ChangeAddress(request.Address ?? string.Empty);
-
-            //updatedAt occur during change method
+            customer.UpdateProfile(
+                request.FirstName,
+                request.LastName,
+                request.Email,
+                request.PhoneNumber,
+                request.Address
+            );
         }
 
         public static CustomerDto.CustomerResponse ToResponse(this Customer customer)
