@@ -8,7 +8,8 @@ import AppLayout from "@components/Layout/Layout";
 import Offices from "@pages/admin/Offices";
 import Error from "@pages/Error/Error";
 import useCheckRole from "@/hooks/useCheckRole";
-import { USER_ROLES } from "@constants/common-constants.js";
+import { USER_ROLES } from "@constants/common-constants";
+import { useTokenRefresh } from "@/hooks/useTokenRefresh";
 
 import EVMStaffClaims from "@pages/evm-staff/Claims";
 import SCStaffClaims from "@pages/sc-staff/Claims";
@@ -53,6 +54,9 @@ export const SCTechnicianRoute: React.FC = () => {
 };
 
 const App: React.FC = () => {
+  // Initialize token refresh management
+  useTokenRefresh();
+
   const routes = [
     {
       element: <ProtectedRoute />,

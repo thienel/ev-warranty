@@ -40,10 +40,25 @@ const useManagement = <T = Record<string, unknown>>(apiEndpoint: string): UseMan
   const fetchItems = useCallback(async () => {
     try {
       const response = await api.get(apiEndpoint)
-      const itemData = response.data.data || []
-      setItems(itemData)
+      // Handle different response structures
+      let itemData = response.data
+      
+      // If response has nested data property, use that
+      if (itemData && typeof itemData === 'object' && 'data' in itemData) {
+        itemData = itemData.data
+      }
+      
+      // Ensure we always have an array
+      if (Array.isArray(itemData)) {
+        setItems(itemData)
+      } else {
+        console.warn('API returned non-array data for', apiEndpoint, ':', itemData)
+        setItems([])
+      }
     } catch (error) {
+      console.error('Failed to fetch items from', apiEndpoint, ':', error)
       handleError(error as ErrorResponse)
+      setItems([]) // Set empty array on error
     }
   }, [apiEndpoint, handleError])
 
