@@ -97,8 +97,6 @@ namespace Backend.Dotnet.Application.Services
             }
         }
 
-        //public async Task<BaseResponseDto<VehicleModelWithStatsResponse>> GetWithStatsAsync(Guid id) => throw new NotImplementedException();
-
         public async Task<BaseResponseDto<IEnumerable<VehicleModelResponse>>> GetAllAsync()
         {
             try
@@ -162,6 +160,16 @@ namespace Backend.Dotnet.Application.Services
             try
             {
                 var models = await _unitOfWork.VehicleModels.GetByBrandAsync(brand);
+                if (!models.Any())
+                {
+                    return new BaseResponseDto<IEnumerable<VehicleModelResponse>>
+                    {
+                        IsSuccess = false,
+                        Message = $"No vehicle models found for brand '{brand}'",
+                        ErrorCode = "NOT_FOUND"
+                    };
+                }
+
                 var response = models.Select(m => m.ToResponse()).ToList();
 
                 return new BaseResponseDto<IEnumerable<VehicleModelResponse>>
@@ -182,50 +190,71 @@ namespace Backend.Dotnet.Application.Services
             }
         }
 
-        public async Task<BaseResponseDto<IEnumerable<string>>> GetAllBrandsAsync()
+        public async Task<BaseResponseDto<IEnumerable<VehicleModelResponse>>> GetByModelNameAsync(string modelName)
         {
             try
             {
-                var brands = await _unitOfWork.VehicleModels.GetAllBrandsAsync();
-
-                return new BaseResponseDto<IEnumerable<string>>
+                var models = await _unitOfWork.VehicleModels.GetByModelNameAsync(modelName);
+                if (!models.Any())
                 {
-                    IsSuccess = true,
-                    Message = "Brands retrieved successfully",
-                    Data = brands
-                };
-            }
-            catch (Exception ex)
-            {
-                return new BaseResponseDto<IEnumerable<string>>
-                {
-                    IsSuccess = false,
-                    Message = "An error occurred while retrieving brands",
-                    ErrorCode = "INTERNAL_ERROR"
-                };
-            }
-        }
+                    return new BaseResponseDto<IEnumerable<VehicleModelResponse>>
+                    {
+                        IsSuccess = false,
+                        Message = $"No vehicle models found with name '{modelName}'",
+                        ErrorCode = "NOT_FOUND"
+                    };
+                }
 
-        public async Task<BaseResponseDto<IEnumerable<VehicleModelResponse>>> SearchAsync(string searchTerm)
-        {
-            try
-            {
-                var models = await _unitOfWork.VehicleModels.SearchAsync(searchTerm);
                 var response = models.Select(m => m.ToResponse()).ToList();
 
                 return new BaseResponseDto<IEnumerable<VehicleModelResponse>>
                 {
                     IsSuccess = true,
-                    Message = "Search completed successfully",
+                    Message = "Vehicle models retrieved successfully",
                     Data = response
                 };
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return new BaseResponseDto<IEnumerable<VehicleModelResponse>>
                 {
                     IsSuccess = false,
-                    Message = "An error occurred while searching vehicle models",
+                    Message = "An error occurred while retrieving vehicle models",
+                    ErrorCode = "INTERNAL_ERROR"
+                };
+            }
+        }
+
+        public async Task<BaseResponseDto<IEnumerable<VehicleModelResponse>>> GetByYearAsync(int year)
+        {
+            try
+            {
+                var models = await _unitOfWork.VehicleModels.GetByYearAsync(year);
+                if (!models.Any())
+                {
+                    return new BaseResponseDto<IEnumerable<VehicleModelResponse>>
+                    {
+                        IsSuccess = false,
+                        Message = $"No vehicle models found for year {year}",
+                        ErrorCode = "NOT_FOUND"
+                    };
+                }
+
+                var response = models.Select(m => m.ToResponse()).ToList();
+
+                return new BaseResponseDto<IEnumerable<VehicleModelResponse>>
+                {
+                    IsSuccess = true,
+                    Message = "Vehicle models retrieved successfully",
+                    Data = response
+                };
+            }
+            catch (Exception)
+            {
+                return new BaseResponseDto<IEnumerable<VehicleModelResponse>>
+                {
+                    IsSuccess = false,
+                    Message = "An error occurred while retrieving vehicle models",
                     ErrorCode = "INTERNAL_ERROR"
                 };
             }

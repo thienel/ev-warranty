@@ -120,8 +120,6 @@ namespace Backend.Dotnet.Application.Services
             }
         }
 
-        //public async Task<BaseResponseDto<VehicleDetailResponse>> GetDetailAsync(Guid id) => throw new NotImplementedException();
-
         public async Task<BaseResponseDto<IEnumerable<VehicleResponse>>> GetAllAsync()
         {
             try
@@ -217,6 +215,17 @@ namespace Backend.Dotnet.Application.Services
         {
             try
             {
+                var customer = await _unitOfWork.Customers.GetByIdAsync(customerId);
+                if (customer == null)
+                {
+                    return new BaseResponseDto<IEnumerable<VehicleResponse>>
+                    {
+                        IsSuccess = false,
+                        Message = $"Customer with ID '{customerId}' not found",
+                        ErrorCode = "NOT_FOUND"
+                    };
+                }
+
                 var vehicles = await _unitOfWork.Vehicles.GetByCustomerIdAsync(customerId);
                 var response = vehicles.Select(v => v.ToResponse()).ToList();
 
@@ -242,6 +251,17 @@ namespace Backend.Dotnet.Application.Services
         {
             try
             {
+                var model = await _unitOfWork.VehicleModels.GetByIdAsync(modelId);
+                if (model == null)
+                {
+                    return new BaseResponseDto<IEnumerable<VehicleResponse>>
+                    {
+                        IsSuccess = false,
+                        Message = $"Vehicle model with ID '{modelId}' not found",
+                        ErrorCode = "NOT_FOUND"
+                    };
+                }
+
                 var vehicles = await _unitOfWork.Vehicles.GetByModelIdAsync(modelId);
                 var response = vehicles.Select(v => v.ToResponse()).ToList();
 
