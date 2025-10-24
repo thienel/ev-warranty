@@ -60,18 +60,35 @@ export const ERROR_MESSAGES: Record<number, string> = {
   404: 'Sorry, the page you visited does not exist.',
 }
 
-export const API_BASE_URL: string = import.meta.env.VITE_API_URL || 'http://localhost/api/v1'
+export const API_BASE_URL: string = import.meta.env.VITE_API_URL || 'http://localhost'
 
 export const API_ENDPOINTS = {
   AUTH: {
-    LOGIN: '/auth/login',
-    LOGOUT: '/auth/logout',
-    GOOGLE: '/auth/google',
-    TOKEN: '/auth/token',
+    LOGIN: '/api/v1/auth/login',
+    LOGOUT: '/api/v1/auth/logout',
+    GOOGLE: '/api/v1/auth/google',
+    GOOGLE_CALLBACK: '/api/v1/auth/google/callback',
+    TOKEN: '/api/v1/auth/token',
   },
-  USER: '/users',
-  OFFICE: '/offices',
-  CLAIM: '/claims',
+  USERS: '/api/v1/users',
+  OFFICES: '/api/v1/offices',
+  CLAIMS: '/api/v1/claims',
+  // Claim specific endpoints
+  CLAIM_ACTIONS: {
+    SUBMIT: (id: string) => `/api/v1/claims/${id}/submit`,
+    CANCEL: (id: string) => `/api/v1/claims/${id}/cancel`,
+    COMPLETE: (id: string) => `/api/v1/claims/${id}/complete`,
+    REVIEW: (id: string) => `/api/v1/claims/${id}/review`,
+    REQUEST_INFO: (id: string) => `/api/v1/claims/${id}/request-information`,
+    HISTORY: (id: string) => `/api/v1/claims/${id}/history`,
+    ITEMS: (id: string) => `/api/v1/claims/${id}/items`,
+    ATTACHMENTS: (id: string) => `/api/v1/claims/${id}/attachments`,
+  },
+  // Claim item specific endpoints
+  CLAIM_ITEM_ACTIONS: {
+    APPROVE: (claimId: string, itemId: string) => `/api/v1/claims/${claimId}/items/${itemId}/approve`,
+    REJECT: (claimId: string, itemId: string) => `/api/v1/claims/${claimId}/items/${itemId}/reject`,
+  },
 } as const
 
 export const CLAIM_STATUSES = {
@@ -83,6 +100,7 @@ export const CLAIM_STATUSES = {
   PARTIALLY_APPROVED: 'PARTIALLY_APPROVED',
   REJECTED: 'REJECTED',
   CANCELLED: 'CANCELLED',
+  COMPLETED: 'COMPLETED',
 } as const
 
 export type ClaimStatus = typeof CLAIM_STATUSES[keyof typeof CLAIM_STATUSES]
@@ -96,4 +114,65 @@ export const CLAIM_STATUS_LABELS: Record<ClaimStatus, string> = {
   [CLAIM_STATUSES.PARTIALLY_APPROVED]: 'Partially Approved',
   [CLAIM_STATUSES.REJECTED]: 'Rejected',
   [CLAIM_STATUSES.CANCELLED]: 'Cancelled',
+  [CLAIM_STATUSES.COMPLETED]: 'Completed',
 }
+
+// Claim Item Types and Statuses
+export const CLAIM_ITEM_TYPES = {
+  REPAIR: 'REPAIR',
+  REPLACEMENT: 'REPLACEMENT',
+  INSPECTION: 'INSPECTION',
+} as const
+
+export type ClaimItemType = typeof CLAIM_ITEM_TYPES[keyof typeof CLAIM_ITEM_TYPES]
+
+export const CLAIM_ITEM_STATUSES = {
+  PENDING: 'PENDING',
+  APPROVED: 'APPROVED',
+  REJECTED: 'REJECTED',
+  COMPLETED: 'COMPLETED',
+} as const
+
+export type ClaimItemStatus = typeof CLAIM_ITEM_STATUSES[keyof typeof CLAIM_ITEM_STATUSES]
+
+export const CLAIM_ITEM_STATUS_LABELS: Record<ClaimItemStatus, string> = {
+  [CLAIM_ITEM_STATUSES.PENDING]: 'Pending',
+  [CLAIM_ITEM_STATUSES.APPROVED]: 'Approved',
+  [CLAIM_ITEM_STATUSES.REJECTED]: 'Rejected',
+  [CLAIM_ITEM_STATUSES.COMPLETED]: 'Completed',
+}
+
+// Office Types
+export const OFFICE_TYPES = {
+  EVM: 'evm',
+  SC: 'sc',
+} as const
+
+export type OfficeType = typeof OFFICE_TYPES[keyof typeof OFFICE_TYPES]
+
+export const OFFICE_TYPE_LABELS: Record<OfficeType, string> = {
+  [OFFICE_TYPES.EVM]: 'EVM Office',
+  [OFFICE_TYPES.SC]: 'Service Center',
+}
+
+// File Upload Configuration
+export const FILE_UPLOAD_CONFIG = {
+  MAX_FILE_SIZE: 10 * 1024 * 1024, // 10MB
+  ALLOWED_TYPES: [
+    'image/jpeg',
+    'image/png',
+    'image/gif',
+    'application/pdf',
+    'application/msword',
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+  ],
+  MAX_FILES: 5,
+} as const
+
+// Pagination Configuration
+export const PAGINATION_CONFIG = {
+  DEFAULT_PAGE_SIZE: 10,
+  PAGE_SIZE_OPTIONS: ['10', '20', '50', '100'],
+  SHOW_SIZE_CHANGER: true,
+  SHOW_QUICK_JUMPER: true,
+} as const
