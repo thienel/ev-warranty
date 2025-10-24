@@ -1,11 +1,37 @@
 import React from "react";
+import { Button, Result } from "antd";
+import { useNavigate } from "react-router-dom";
+import "./Error.less";
+import { ERROR_MESSAGES } from "@constants/common-constants.js";
+import type { ExceptionStatusType } from "antd/es/result";
 
 interface ErrorProps {
-  code: number;
+  code: ExceptionStatusType;
 }
 
-const Error: React.FC<ErrorProps> = ({ code }) => {
-  return <div>Error {code}</div>;
+const Error: React.FC<ErrorProps> = ({ code = 404 }) => {
+  const navigate = useNavigate();
+
+  const handleGoHome = () => {
+    navigate("/");
+  };
+
+  return (
+    <div className="error-container">
+      <Result
+        status={code}
+        title={code}
+        subTitle={ERROR_MESSAGES[code]}
+        extra={
+          <div className="error-actions">
+            <Button type="primary" onClick={handleGoHome}>
+              Back Home
+            </Button>
+          </div>
+        }
+      />
+    </div>
+  );
 };
 
 export default Error;
