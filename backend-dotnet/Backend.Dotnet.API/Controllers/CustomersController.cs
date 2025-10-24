@@ -17,28 +17,39 @@ namespace Backend.Dotnet.API.Controllers
             _customerService = customerService;
         }
 
+        /// <summary>
+        /// Get customers with optional filtering
+        /// </summary>
         [HttpGet]
         [ProducesResponseType(typeof(BaseResponseDto<IEnumerable<CustomerResponse>>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BaseResponseDto), StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> GetAll(
-        [FromQuery] string email = null,
-        [FromQuery] string search = null)
+            [FromQuery] string name = null,
+            [FromQuery] string phone = null,
+            [FromQuery] string email = null)
         {
-            // Filter by email (returns single or not found)
+            // Email - absolute
             if (!string.IsNullOrWhiteSpace(email))
             {
                 var result = await _customerService.GetByEmailAsync(email);
                 return result.IsSuccess ? Ok(result) : NotFound(result);
             }
 
-            // Search/filter by term (returns list)
-            if (!string.IsNullOrWhiteSpace(search))
+            // Phone - absolute
+            if (!string.IsNullOrWhiteSpace(phone))
             {
-                var result = await _customerService.SearchAsync(search);
-                return result.IsSuccess ? Ok(result) : BadRequest(result);
+                var result = await _customerService.GetByPhoneAsync(phone);
+                return result.IsSuccess ? Ok(result) : NotFound(result);
             }
 
-            // No parameters = get all
+            // Name - absolute - first last combined
+            if (!string.IsNullOrWhiteSpace(name))
+            {
+                var result = await _customerService.GetByNameAsync(name);
+                return result.IsSuccess ? Ok(result) : NotFound(result);
+            }
+
+            // No parameters - get all
             var allResult = await _customerService.GetAllAsync();
             return allResult.IsSuccess ? Ok(allResult) : BadRequest(allResult);
         }
@@ -51,18 +62,6 @@ namespace Backend.Dotnet.API.Controllers
             var result = await _customerService.GetByIdAsync(id);
             if (!result.IsSuccess)
                 return NotFound(result);
-
-            return Ok(result);
-        }
-
-        [HttpGet("search")]
-        [ProducesResponseType(typeof(BaseResponseDto<IEnumerable<CustomerResponse>>), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(BaseResponseDto), StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> Search([FromQuery] string searchTerm)
-        {
-            var result = await _customerService.SearchAsync(searchTerm);
-            if (!result.IsSuccess)
-                return BadRequest(result);
 
             return Ok(result);
         }
@@ -93,31 +92,37 @@ namespace Backend.Dotnet.API.Controllers
 
             var result = await _customerService.UpdateAsync(id, request);
             if (!result.IsSuccess)
-                return BadRequest(result);
+                return result.ErrorCode == "NOT_FOUND" ? NotFound(result) : BadRequest(result);
 
             return Ok(result);
         }
 
+
+        /// <summary>
+        /// Soft delete a customer
+        /// </summary>
         [HttpDelete("{id}")]
         [ProducesResponseType(typeof(BaseResponseDto<CustomerResponse>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(BaseResponseDto), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(BaseResponseDto), StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> SoftDelete(Guid id)
         {
             var result = await _customerService.SoftDeleteAsync(id);
             if (!result.IsSuccess)
-                return BadRequest(result);
+                return result.ErrorCode == "NOT_FOUND" ? NotFound(result) : BadRequest(result);
 
             return Ok(result);
         }
 
         [HttpPost("{id}/restore")]
         [ProducesResponseType(typeof(BaseResponseDto<CustomerResponse>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(BaseResponseDto), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(BaseResponseDto), StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> Restore(Guid id)
         {
             var result = await _customerService.RestoreAsync(id);
             if (!result.IsSuccess)
-                return BadRequest(result);
+                return result.ErrorCode == "NOT_FOUND" ? NotFound(result) : BadRequest(result);
 
             return Ok(result);
         }
