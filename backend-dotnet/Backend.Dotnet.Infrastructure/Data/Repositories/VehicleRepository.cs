@@ -12,6 +12,8 @@ namespace Backend.Dotnet.Infrastructure.Data.Repositories
         {
             return await _dbSet
                 .Where(v => v.DeletedAt == null)
+                .Include(v => v.Customer)
+                .Include(v => v.Model)
                 .FirstOrDefaultAsync(v => v.Vin.ToLower() == vin.ToLower());
         }
 
@@ -31,15 +33,16 @@ namespace Backend.Dotnet.Infrastructure.Data.Repositories
         {
             return await _dbSet
                 .Where(v => v.DeletedAt == null)
+                .Include(v => v.Customer)
+                .Include(v => v.Model)
                 .FirstOrDefaultAsync(v => v.LicensePlate.ToLower() == licensePlate.ToLower());
         }
 
         public async Task<IEnumerable<Vehicle>> GetByCustomerIdAsync(Guid customerId)
         {
             return await _dbSet
-                .Where(v => v.DeletedAt == null)
+                .Where(v => v.DeletedAt == null && v.CustomerId == customerId)
                 .Include(v => v.Model)
-                .Where(v => v.CustomerId == customerId)
                 .OrderByDescending(v => v.CreatedAt)
                 .ToListAsync();
         }
@@ -47,9 +50,8 @@ namespace Backend.Dotnet.Infrastructure.Data.Repositories
         public async Task<IEnumerable<Vehicle>> GetByModelIdAsync(Guid modelId)
         {
             return await _dbSet
-                .Where(v => v.DeletedAt == null)
+                .Where(v => v.DeletedAt == null && v.ModelId == modelId)
                 .Include(v => v.Customer)
-                .Where(v => v.ModelId == modelId)
                 .OrderByDescending(v => v.CreatedAt)
                 .ToListAsync();
         }
@@ -66,7 +68,10 @@ namespace Backend.Dotnet.Infrastructure.Data.Repositories
         public async Task<IEnumerable<Vehicle>> SearchAsync(string searchTerm)
         {
             if (string.IsNullOrWhiteSpace(searchTerm))
-                return await _dbSet.Where(v => v.DeletedAt == null).Include(v => v.Model).ToListAsync();
+                return await _dbSet
+                    .Where(v => v.DeletedAt == null)
+                    .Include(v => v.Model)
+                    .ToListAsync();
 
             var term = searchTerm.ToLower();
             return await _dbSet
@@ -103,6 +108,8 @@ namespace Backend.Dotnet.Infrastructure.Data.Repositories
         {
             return await _dbSet
                 .Where(v => v.DeletedAt == null)
+                .Include(v => v.Customer)
+                .Include(v => v.Model)
                 .FirstOrDefaultAsync(v => v.Id == id);
         }
 
@@ -110,6 +117,9 @@ namespace Backend.Dotnet.Infrastructure.Data.Repositories
         {
             return await _dbSet
                 .Where(v => v.DeletedAt == null)
+                .Include(v => v.Customer)
+                .Include(v => v.Model)
+                .OrderByDescending(v => v.CreatedAt)
                 .ToListAsync();
         }
     }
