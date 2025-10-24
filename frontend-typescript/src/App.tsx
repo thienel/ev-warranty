@@ -18,13 +18,15 @@ import ClaimDetail from "@pages/claims/ClaimDetail";
 import type { RootState } from "@redux/store";
 
 export const ProtectedRoute: React.FC = () => {
-  const { isAuthenticated } = useSelector((state: RootState) => state.auth);
+  const authState = useSelector((state: RootState) => state.auth);
+  const isAuthenticated = authState?.isAuthenticated || false;
 
   return isAuthenticated ? <Outlet /> : <Navigate to="/login" replace />;
 };
 
 export const PublicRoute: React.FC = () => {
-  const { isAuthenticated } = useSelector((state: RootState) => state.auth);
+  const authState = useSelector((state: RootState) => state.auth);
+  const isAuthenticated = authState?.isAuthenticated || false;
 
   return !isAuthenticated ? <Outlet /> : <Navigate to="/" replace />;
 };

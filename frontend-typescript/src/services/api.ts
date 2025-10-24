@@ -38,7 +38,8 @@ const api = axios.create({
 
 api.interceptors.request.use(
   (config) => {
-    const { token } = store.getState().auth
+    const authState = store.getState().auth
+    const token = authState?.token
     if (token) {
       // Check if token is valid and not expired before making request
       if (!isTokenValid(token) || isTokenExpired(token)) {
