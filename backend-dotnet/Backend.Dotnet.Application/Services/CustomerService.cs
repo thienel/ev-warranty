@@ -1,6 +1,7 @@
 ﻿using Backend.Dotnet.Application.DTOs;
 using Backend.Dotnet.Application.Interfaces;
 using Backend.Dotnet.Application.Interfaces.Data;
+using Backend.Dotnet.Domain.Entities;
 using Backend.Dotnet.Domain.Exceptions;
 using static Backend.Dotnet.Application.DTOs.CustomerDto;
 
@@ -98,8 +99,6 @@ namespace Backend.Dotnet.Application.Services
             }
         }
 
-        //public async Task<BaseResponseDto<CustomerWithVehiclesResponse>> GetWithVehiclesAsync(Guid id) => throw new NotImplementedException();
-
         public async Task<BaseResponseDto<IEnumerable<CustomerResponse>>> GetAllAsync()
         {
             try
@@ -125,14 +124,14 @@ namespace Backend.Dotnet.Application.Services
             }
         }
 
-        public async Task<BaseResponseDto<CustomerResponse>> GetByEmailAsync(string email)
+        public async Task<BaseResponseDto<IEnumerable<CustomerResponse>>> GetByEmailAsync(string email)
         {
             try
             {
-                var customer = await _unitOfWork.Customers.GetByEmailAsync(email);
-                if (customer == null)
+                var customers = await _unitOfWork.Customers.GetByEmailAsync(email);
+                if (customers == null)
                 {
-                    return new BaseResponseDto<CustomerResponse>
+                    return new BaseResponseDto<IEnumerable<CustomerResponse>>
                     {
                         IsSuccess = false,
                         Message = $"Customer with email '{email}' not found",
@@ -140,35 +139,12 @@ namespace Backend.Dotnet.Application.Services
                     };
                 }
 
-                return new BaseResponseDto<CustomerResponse>
-                {
-                    IsSuccess = true,
-                    Message = "Customer retrieved successfully",
-                    Data = customer.ToResponse()
-                };
-            }
-            catch (Exception ex)
-            {
-                return new BaseResponseDto<CustomerResponse>
-                {
-                    IsSuccess = false,
-                    Message = "An error occurred while retrieving customer",
-                    ErrorCode = "INTERNAL_ERROR"
-                };
-            }
-        }
-
-        public async Task<BaseResponseDto<IEnumerable<CustomerResponse>>> SearchAsync(string searchTerm)
-        {
-            try
-            {
-                var customers = await _unitOfWork.Customers.SearchAsync(searchTerm);
-                var response = customers.Select(c => c.ToResponse()).ToList();
+                var response = customers.Select(m => m.ToResponse()).ToList();
 
                 return new BaseResponseDto<IEnumerable<CustomerResponse>>
                 {
                     IsSuccess = true,
-                    Message = "Search completed successfully",
+                    Message = "Customer retrieved successfully",
                     Data = response
                 };
             }
@@ -177,7 +153,78 @@ namespace Backend.Dotnet.Application.Services
                 return new BaseResponseDto<IEnumerable<CustomerResponse>>
                 {
                     IsSuccess = false,
-                    Message = "An error occurred while searching customers",
+                    Message = "An error occurred while retrieving customer",
+                    ErrorCode = "INTERNAL_ERROR"
+                };
+            }
+        }
+
+        public async Task<BaseResponseDto<IEnumerable<CustomerResponse>>> GetByPhoneAsync(string phone)
+        {
+            try
+            {
+                var customers = await _unitOfWork.Customers.GetByPhoneAsync(phone);
+                if (customers == null)
+                {
+                    return new BaseResponseDto<IEnumerable<CustomerResponse>>
+                    {
+                        IsSuccess = false,
+                        Message = $"Customer with phone '{phone}' not found",
+                        ErrorCode = "NOT_FOUND"
+                    };
+                }
+
+                var response = customers.Select(m => m.ToResponse()).ToList();
+
+                return new BaseResponseDto<IEnumerable<CustomerResponse>>
+                {
+                    IsSuccess = true,
+                    Message = "Customer retrieved successfully",
+                    Data = response
+                };
+            }
+            catch (Exception)
+            {
+                return new BaseResponseDto<IEnumerable<CustomerResponse>>
+                {
+                    IsSuccess = false,
+                    Message = "An error occurred while retrieving customer",
+                    ErrorCode = "INTERNAL_ERROR"
+                };
+            }
+        }
+
+        public async Task<BaseResponseDto<IEnumerable<CustomerResponse>>> GetByNameAsync(string name)
+        {
+            try
+            {
+                var customers = await _unitOfWork.Customers.GetByNameAsync(name);
+
+                if (customers == null)
+                {
+                    return new BaseResponseDto<IEnumerable<CustomerResponse>>
+                    {
+                        IsSuccess = false,
+                        Message = $"Customer with name '{name}' not found",
+                        ErrorCode = "NOT_FOUND"
+                    };
+                }
+
+                var response = customers.Select(m => m.ToResponse()).ToList();
+
+                return new BaseResponseDto<IEnumerable<CustomerResponse>>
+                {
+                    IsSuccess = true,
+                    Message = "Customer retrieved successfully",
+                    Data = response
+                };
+            }
+            catch (Exception)
+            {
+                return new BaseResponseDto<IEnumerable<CustomerResponse>>
+                {
+                    IsSuccess = false,
+                    Message = "An error occurred while retrieving customer",
                     ErrorCode = "INTERNAL_ERROR"
                 };
             }
@@ -239,159 +286,6 @@ namespace Backend.Dotnet.Application.Services
                 {
                     IsSuccess = false,
                     Message = "An error occurred while updating customer",
-                    ErrorCode = "INTERNAL_ERROR"
-                };
-            }
-        }
-
-        public async Task<BaseResponseDto<CustomerResponse>> UpdateEmailAsync(Guid id, string email)
-        {
-            try
-            {
-                var customer = await _unitOfWork.Customers.GetByIdAsync(id);
-                if (customer == null)
-                {
-                    return new BaseResponseDto<CustomerResponse>
-                    {
-                        IsSuccess = false,
-                        Message = $"Customer with ID '{id}' not found",
-                        ErrorCode = "NOT_FOUND"
-                    };
-                }
-
-                // Check if email already exists
-                if (!string.IsNullOrWhiteSpace(email))
-                {
-                    var emailExists = await _unitOfWork.Customers.EmailExistsAsync(email, id);
-                    if (emailExists)
-                    {
-                        return new BaseResponseDto<CustomerResponse>
-                        {
-                            IsSuccess = false,
-                            Message = "Email already exists",
-                            ErrorCode = "DUPLICATE_EMAIL"
-                        };
-                    }
-                }
-
-                customer.ChangeEmail(email);
-                _unitOfWork.Customers.Update(customer);
-                await _unitOfWork.SaveChangesAsync();
-
-                return new BaseResponseDto<CustomerResponse>
-                {
-                    IsSuccess = true,
-                    Message = "Email updated successfully",
-                    Data = customer.ToResponse()
-                };
-            }
-            catch (BusinessRuleViolationException ex)
-            {
-                return new BaseResponseDto<CustomerResponse>
-                {
-                    IsSuccess = false,
-                    Message = ex.Message,
-                    ErrorCode = ex.ErrorCode
-                };
-            }
-            catch (Exception ex)
-            {
-                return new BaseResponseDto<CustomerResponse>
-                {
-                    IsSuccess = false,
-                    Message = "An error occurred while updating email",
-                    ErrorCode = "INTERNAL_ERROR"
-                };
-            }
-        }
-
-        public async Task<BaseResponseDto<CustomerResponse>> UpdatePhoneNumberAsync(Guid id, string phoneNumber)
-        {
-            try
-            {
-                var customer = await _unitOfWork.Customers.GetByIdAsync(id);
-                if (customer == null)
-                {
-                    return new BaseResponseDto<CustomerResponse>
-                    {
-                        IsSuccess = false,
-                        Message = $"Customer with ID '{id}' not found",
-                        ErrorCode = "NOT_FOUND"
-                    };
-                }
-
-                customer.ChangePhoneNumber(phoneNumber);
-                _unitOfWork.Customers.Update(customer);
-                await _unitOfWork.SaveChangesAsync();
-
-                return new BaseResponseDto<CustomerResponse>
-                {
-                    IsSuccess = true,
-                    Message = "Phone number updated successfully",
-                    Data = customer.ToResponse()
-                };
-            }
-            catch (BusinessRuleViolationException ex)
-            {
-                return new BaseResponseDto<CustomerResponse>
-                {
-                    IsSuccess = false,
-                    Message = ex.Message,
-                    ErrorCode = ex.ErrorCode
-                };
-            }
-            catch (Exception ex)
-            {
-                return new BaseResponseDto<CustomerResponse>
-                {
-                    IsSuccess = false,
-                    Message = "An error occurred while updating phone number",
-                    ErrorCode = "INTERNAL_ERROR"
-                };
-            }
-        }
-
-        public async Task<BaseResponseDto<CustomerResponse>> UpdateAddressAsync(Guid id, string address)
-        {
-            try
-            {
-                var customer = await _unitOfWork.Customers.GetByIdAsync(id);
-                if (customer == null)
-                {
-                    return new BaseResponseDto<CustomerResponse>
-                    {
-                        IsSuccess = false,
-                        Message = $"Customer with ID '{id}' not found",
-                        ErrorCode = "NOT_FOUND"
-                    };
-                }
-
-                customer.ChangeAddress(address);
-                _unitOfWork.Customers.Update(customer);
-                await _unitOfWork.SaveChangesAsync();
-
-                return new BaseResponseDto<CustomerResponse>
-                {
-                    IsSuccess = true,
-                    Message = "Address updated successfully",
-                    Data = customer.ToResponse()
-                };
-            }
-            catch (BusinessRuleViolationException ex)
-            {
-                return new BaseResponseDto<CustomerResponse>
-                {
-                    IsSuccess = false,
-                    Message = ex.Message,
-                    ErrorCode = ex.ErrorCode
-                };
-            }
-            catch (Exception ex)
-            {
-                return new BaseResponseDto<CustomerResponse>
-                {
-                    IsSuccess = false,
-                    Message = "An error occurred while updating address",
                     ErrorCode = "INTERNAL_ERROR"
                 };
             }

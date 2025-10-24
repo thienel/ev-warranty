@@ -8,16 +8,13 @@ namespace Backend.Dotnet.Application.Interfaces
         Task<BaseResponseDto<CustomerResponse>> CreateAsync(CreateCustomerRequest request);
 
         Task<BaseResponseDto<CustomerResponse>> GetByIdAsync(Guid id);
-        //Task<BaseResponseDto<CustomerWithVehiclesResponse>> GetWithVehiclesAsync(Guid id);
         Task<BaseResponseDto<IEnumerable<CustomerResponse>>> GetAllAsync();
-        Task<BaseResponseDto<CustomerResponse>> GetByEmailAsync(string email);
-        Task<BaseResponseDto<IEnumerable<CustomerResponse>>> SearchAsync(string searchTerm);
+        Task<BaseResponseDto<IEnumerable<CustomerResponse>>> GetByEmailAsync(string email);
+        Task<BaseResponseDto<IEnumerable<CustomerResponse>>> GetByPhoneAsync(string phone);
+        Task<BaseResponseDto<IEnumerable<CustomerResponse>>> GetByNameAsync(string name);
 
         Task<BaseResponseDto<CustomerResponse>> UpdateAsync(Guid id, UpdateCustomerRequest request);
-        Task<BaseResponseDto<CustomerResponse>> UpdateEmailAsync(Guid id, string email);
-        Task<BaseResponseDto<CustomerResponse>> UpdatePhoneNumberAsync(Guid id, string phoneNumber);
-        Task<BaseResponseDto<CustomerResponse>> UpdateAddressAsync(Guid id, string address);
-
+        
         // Soft delete operations
         Task<BaseResponseDto<CustomerResponse>> SoftDeleteAsync(Guid id);
         Task<BaseResponseDto<CustomerResponse>> RestoreAsync(Guid id);

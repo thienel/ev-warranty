@@ -8,13 +8,16 @@ namespace Backend.Dotnet.Infrastructure.Data.Repositories
     {
         public VehicleModelRepository(DbContext context) : base(context) { }
 
-        public async Task<VehicleModel?> GetByBrandModelYearAsync(string brand, string modelName, int year)
+        public async Task<IEnumerable<VehicleModel>> GetByBrandModelYearAsync(string brand, string modelName, int year)
         {
             return await _dbSet
-                .FirstOrDefaultAsync(vm =>
-                    vm.Brand.ToLower() == brand.ToLower() &&
-                    vm.ModelName.ToLower() == modelName.ToLower() &&
-                    vm.Year == year);
+                .Where(vm =>
+                vm.Brand.ToLower().Contains(brand.ToLower()) &&
+                vm.ModelName.ToLower().Contains(modelName.ToLower()) &&
+                    vm.Year == year)
+                .OrderBy(vm => vm.Brand)
+                .ThenBy(vm => vm.ModelName)
+                .ToListAsync();
         }
 
         public async Task<bool> ExistsByBrandModelYearAsync(string brand, string modelName, int year, Guid? excludeModelId = null)
@@ -35,25 +38,26 @@ namespace Backend.Dotnet.Infrastructure.Data.Repositories
         public async Task<IEnumerable<VehicleModel>> GetByBrandAsync(string brand)
         {
             return await _dbSet
-                .Where(vm => vm.Brand.ToLower() == brand.ToLower())
+                .Where(vm => vm.Brand.ToLower().Contains(brand.ToLower()))
                 .OrderBy(vm => vm.Year)
                 .ThenBy(vm => vm.ModelName)
                 .ToListAsync();
         }
-
-        public async Task<IEnumerable<VehicleModel>> SearchAsync(string searchTerm)
+        public async Task<IEnumerable<VehicleModel>> GetByModelNameAsync(string modelName)
         {
-            if (string.IsNullOrWhiteSpace(searchTerm))
-                return await GetAllAsync();
-
-            var term = searchTerm.ToLower();
             return await _dbSet
-                .Where(vm =>
-                    vm.Brand.ToLower().Contains(term) ||
-                    vm.ModelName.ToLower().Contains(term)) // *u: add filter year
+                .Where(vm => vm.ModelName.ToLower().Contains(modelName.ToLower()))
+                .OrderBy(vm => vm.Brand)
+                .ThenBy(vm => vm.Year)
+                .ToListAsync();
+        }
+
+        public async Task<IEnumerable<VehicleModel>> GetByYearAsync(int year)
+        {
+            return await _dbSet
+                .Where(vm => vm.Year == year)
                 .OrderBy(vm => vm.Brand)
                 .ThenBy(vm => vm.ModelName)
-                .ThenBy(vm => vm.Year)
                 .ToListAsync();
         }
 
@@ -78,6 +82,16 @@ namespace Backend.Dotnet.Infrastructure.Data.Repositories
             return await _context.Set<Vehicle>()
                 .Where(v => v.DeletedAt == null)
                 .CountAsync(v => v.ModelId == modelId);
+        }
+
+        // Overide for filtering
+        public override async Task<IEnumerable<VehicleModel>> GetAllAsync()
+        {
+            return await _dbSet
+                .OrderBy(vm => vm.Brand)
+                .ThenBy(vm => vm.ModelName)
+                .ThenBy(vm => vm.Year)
+                .ToListAsync();
         }
     }
 }

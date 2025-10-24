@@ -8,11 +8,11 @@ namespace Backend.Dotnet.Infrastructure.Data.Repositories
     {
         public CustomerRepository(DbContext context) : base(context) { }
 
-        public async Task<Customer?> GetByEmailAsync(string email)
+        public async Task<IEnumerable<Customer>> GetByEmailAsync(string email)
         {
             return await _dbSet
-                .Where(c => c.DeletedAt == null)
-                .FirstOrDefaultAsync(c => c.Email.ToLower() == email.ToLower());
+                .Where(c => c.DeletedAt == null && c.Email.ToLower().Contains(email.ToLower()))
+                .ToListAsync();
         }
 
         public async Task<bool> EmailExistsAsync(string email, Guid? excludeCustomerId = null)
@@ -27,6 +27,22 @@ namespace Backend.Dotnet.Infrastructure.Data.Repositories
             return await query.AnyAsync();
         }
 
+        public async Task<IEnumerable<Customer>> GetByPhoneAsync(string phone)
+        {
+            return await _dbSet
+                .Where(c => c.DeletedAt == null && c.PhoneNumber.Contains(phone))
+                .ToListAsync();
+        }
+
+        public async Task<IEnumerable<Customer>> GetByNameAsync(string name)
+        {
+            return await _dbSet
+                .Where(c => c.DeletedAt == null && c.FirstName.ToLower().Contains(name.Trim().ToLower()))
+                .OrderBy(c => c.FirstName)
+                .ThenBy(c => c.LastName)
+                .ToListAsync();
+        }
+
         public async Task<Customer?> GetWithVehiclesAsync(Guid customerId)
         {
             return await _dbSet
@@ -34,21 +50,6 @@ namespace Backend.Dotnet.Infrastructure.Data.Repositories
                 .Include(c => c.Vehicles)
                     .ThenInclude(v => v.Model)
                 .FirstOrDefaultAsync(c => c.Id == customerId);
-        }
-
-        public async Task<IEnumerable<Customer>> SearchAsync(string searchTerm)
-        {
-            if (string.IsNullOrWhiteSpace(searchTerm))
-                return await _dbSet.Where(c => c.DeletedAt == null).ToListAsync();
-
-            var term = searchTerm.ToLower();
-            return await _dbSet
-                .Where(c => c.DeletedAt == null &&
-                       (c.FirstName.ToLower().Contains(term) ||
-                        c.LastName.ToLower().Contains(term) ||
-                        c.Email.ToLower().Contains(term) ||
-                        c.PhoneNumber.Contains(term)))
-                .ToListAsync();
         }
 
         // Soft Delete
@@ -67,7 +68,7 @@ namespace Backend.Dotnet.Infrastructure.Data.Repositories
                 .ToListAsync();
         }
 
-        // Override to exclude soft-deleted customers by default
+        // Override to exclude soft-deleted
         public override async Task<Customer?> GetByIdAsync(Guid id)
         {
             return await _dbSet
@@ -79,6 +80,8 @@ namespace Backend.Dotnet.Infrastructure.Data.Repositories
         {
             return await _dbSet
                 .Where(c => c.DeletedAt == null)
+                .OrderBy(c => c.LastName)
+                .ThenBy(c => c.FirstName)
                 .ToListAsync();
         }
     }
