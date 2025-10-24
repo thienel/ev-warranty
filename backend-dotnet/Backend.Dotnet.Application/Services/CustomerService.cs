@@ -1,6 +1,7 @@
 ﻿using Backend.Dotnet.Application.DTOs;
 using Backend.Dotnet.Application.Interfaces;
 using Backend.Dotnet.Application.Interfaces.Data;
+using Backend.Dotnet.Domain.Entities;
 using Backend.Dotnet.Domain.Exceptions;
 using static Backend.Dotnet.Application.DTOs.CustomerDto;
 
@@ -123,14 +124,14 @@ namespace Backend.Dotnet.Application.Services
             }
         }
 
-        public async Task<BaseResponseDto<CustomerResponse>> GetByEmailAsync(string email)
+        public async Task<BaseResponseDto<IEnumerable<CustomerResponse>>> GetByEmailAsync(string email)
         {
             try
             {
-                var customer = await _unitOfWork.Customers.GetByEmailAsync(email);
-                if (customer == null)
+                var customers = await _unitOfWork.Customers.GetByEmailAsync(email);
+                if (customers == null)
                 {
-                    return new BaseResponseDto<CustomerResponse>
+                    return new BaseResponseDto<IEnumerable<CustomerResponse>>
                     {
                         IsSuccess = false,
                         Message = $"Customer with email '{email}' not found",
@@ -138,16 +139,18 @@ namespace Backend.Dotnet.Application.Services
                     };
                 }
 
-                return new BaseResponseDto<CustomerResponse>
+                var response = customers.Select(m => m.ToResponse()).ToList();
+
+                return new BaseResponseDto<IEnumerable<CustomerResponse>>
                 {
                     IsSuccess = true,
                     Message = "Customer retrieved successfully",
-                    Data = customer.ToResponse()
+                    Data = response
                 };
             }
             catch (Exception ex)
             {
-                return new BaseResponseDto<CustomerResponse>
+                return new BaseResponseDto<IEnumerable<CustomerResponse>>
                 {
                     IsSuccess = false,
                     Message = "An error occurred while retrieving customer",
@@ -156,14 +159,14 @@ namespace Backend.Dotnet.Application.Services
             }
         }
 
-        public async Task<BaseResponseDto<CustomerResponse>> GetByPhoneAsync(string phone)
+        public async Task<BaseResponseDto<IEnumerable<CustomerResponse>>> GetByPhoneAsync(string phone)
         {
             try
             {
-                var customer = await _unitOfWork.Customers.GetByPhoneAsync(phone);
-                if (customer == null)
+                var customers = await _unitOfWork.Customers.GetByPhoneAsync(phone);
+                if (customers == null)
                 {
-                    return new BaseResponseDto<CustomerResponse>
+                    return new BaseResponseDto<IEnumerable<CustomerResponse>>
                     {
                         IsSuccess = false,
                         Message = $"Customer with phone '{phone}' not found",
@@ -171,16 +174,18 @@ namespace Backend.Dotnet.Application.Services
                     };
                 }
 
-                return new BaseResponseDto<CustomerResponse>
+                var response = customers.Select(m => m.ToResponse()).ToList();
+
+                return new BaseResponseDto<IEnumerable<CustomerResponse>>
                 {
                     IsSuccess = true,
                     Message = "Customer retrieved successfully",
-                    Data = customer.ToResponse()
+                    Data = response
                 };
             }
             catch (Exception)
             {
-                return new BaseResponseDto<CustomerResponse>
+                return new BaseResponseDto<IEnumerable<CustomerResponse>>
                 {
                     IsSuccess = false,
                     Message = "An error occurred while retrieving customer",
@@ -189,21 +194,15 @@ namespace Backend.Dotnet.Application.Services
             }
         }
 
-        public async Task<BaseResponseDto<CustomerResponse>> GetByNameAsync(string name)
+        public async Task<BaseResponseDto<IEnumerable<CustomerResponse>>> GetByNameAsync(string name)
         {
             try
             {
-                // Parse name into firstName and lastName
-                var nameParts = name.Trim().Split(' ', 2);
-                var firstName = nameParts[0];
-                var lastName = nameParts.Length > 1 ? nameParts[1] : string.Empty;
+                var customers = await _unitOfWork.Customers.GetByNameAsync(name);
 
-                var customers = await _unitOfWork.Customers.GetByNameAsync(firstName, lastName);
-                var customer = customers.FirstOrDefault();
-
-                if (customer == null)
+                if (customers == null)
                 {
-                    return new BaseResponseDto<CustomerResponse>
+                    return new BaseResponseDto<IEnumerable<CustomerResponse>>
                     {
                         IsSuccess = false,
                         Message = $"Customer with name '{name}' not found",
@@ -211,16 +210,18 @@ namespace Backend.Dotnet.Application.Services
                     };
                 }
 
-                return new BaseResponseDto<CustomerResponse>
+                var response = customers.Select(m => m.ToResponse()).ToList();
+
+                return new BaseResponseDto<IEnumerable<CustomerResponse>>
                 {
                     IsSuccess = true,
                     Message = "Customer retrieved successfully",
-                    Data = customer.ToResponse()
+                    Data = response
                 };
             }
             catch (Exception)
             {
-                return new BaseResponseDto<CustomerResponse>
+                return new BaseResponseDto<IEnumerable<CustomerResponse>>
                 {
                     IsSuccess = false,
                     Message = "An error occurred while retrieving customer",

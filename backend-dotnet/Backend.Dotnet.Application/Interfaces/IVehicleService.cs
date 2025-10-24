@@ -8,7 +8,6 @@ namespace Backend.Dotnet.Application.Interfaces
         Task<BaseResponseDto<VehicleResponse>> CreateAsync(CreateVehicleRequest request);
 
         Task<BaseResponseDto<VehicleResponse>> GetByIdAsync(Guid id);
-        //Task<BaseResponseDto<VehicleDetailResponse>> GetDetailAsync(Guid id);
         Task<BaseResponseDto<IEnumerable<VehicleResponse>>> GetAllAsync();
         Task<BaseResponseDto<VehicleResponse>> GetByVinAsync(string vin);
         Task<BaseResponseDto<VehicleResponse>> GetByLicensePlateAsync(string licensePlate);

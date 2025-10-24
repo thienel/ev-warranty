@@ -122,14 +122,14 @@ namespace Backend.Dotnet.Application.Services
             }
         }
 
-        public async Task<BaseResponseDto<VehicleModelResponse>> GetByBrandModelYearAsync(string brand, string modelName, int year)
+        public async Task<BaseResponseDto<IEnumerable<VehicleModelResponse>>> GetByBrandModelYearAsync(string brand, string modelName, int year)
         {
             try
             {
-                var model = await _unitOfWork.VehicleModels.GetByBrandModelYearAsync(brand, modelName, year);
-                if (model == null)
+                var models = await _unitOfWork.VehicleModels.GetByBrandModelYearAsync(brand, modelName, year);
+                if (models == null)
                 {
-                    return new BaseResponseDto<VehicleModelResponse>
+                    return new BaseResponseDto<IEnumerable<VehicleModelResponse>>
                     {
                         IsSuccess = false,
                         Message = $"Vehicle model '{brand} {modelName} {year}' not found",
@@ -137,16 +137,18 @@ namespace Backend.Dotnet.Application.Services
                     };
                 }
 
-                return new BaseResponseDto<VehicleModelResponse>
+                var response = models.Select(m => m.ToResponse()).ToList();
+
+                return new BaseResponseDto<IEnumerable<VehicleModelResponse>>
                 {
                     IsSuccess = true,
                     Message = "Vehicle model retrieved successfully",
-                    Data = model.ToResponse()
+                    Data = response
                 };
             }
             catch (Exception ex)
             {
-                return new BaseResponseDto<VehicleModelResponse>
+                return new BaseResponseDto<IEnumerable<VehicleModelResponse>>
                 {
                     IsSuccess = false,
                     Message = "An error occurred while retrieving vehicle model",
