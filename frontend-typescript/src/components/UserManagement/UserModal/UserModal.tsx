@@ -53,10 +53,10 @@ const UserModal: React.FC<UserModalProps> = ({
       if (isUpdate) {
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const { password, email, ...updatePayload } = payload;
-        await api.put(`${API_ENDPOINTS.USER}/${user?.id}`, updatePayload);
+        await api.put(`${API_ENDPOINTS.USERS}/${user?.id}`, updatePayload);
         message.success("User updated successfully");
       } else {
-        await api.post(API_ENDPOINTS.USER, payload);
+        await api.post(API_ENDPOINTS.USERS, payload);
         message.success("User created successfully");
       }
 
@@ -84,7 +84,7 @@ const UserModal: React.FC<UserModalProps> = ({
       style={{ margin: "auto" }}
       footer={null}
       width={500}
-      destroyOnClose
+      destroyOnHidden
     >
       <Form
         form={form}

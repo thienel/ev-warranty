@@ -1,11 +1,11 @@
 import React from "react";
-import { API_ENDPOINTS } from "@constants/common-constants.js";
-import { type Office } from "@/types/index.js";
-import OfficeModal from "@components/OfficeManagement/OfficeModal/OfficeModal.tsx";
-import useManagement from "@/hooks/useManagement.js";
-import GenericActionBar from "@components/common/GenericActionBar/GenericActionBar.tsx";
-import GenericTable from "@components/common/GenericTable/GenericTable.tsx";
-import GenerateColumns from "./officeTableColumns.tsx";
+import { API_ENDPOINTS } from "@constants/common-constants";
+import { type Office } from "@/types/index";
+import OfficeModal from "@components/OfficeManagement/OfficeModal/OfficeModal";
+import useManagement from "@/hooks/useManagement";
+import GenericActionBar from "@components/common/GenericActionBar/GenericActionBar";
+import GenericTable from "@components/common/GenericTable/GenericTable";
+import GenerateColumns from "./officeTableColumns";
 
 const OfficeManagement: React.FC = () => {
   const {
@@ -19,7 +19,7 @@ const OfficeManagement: React.FC = () => {
     isOpenModal,
     handleOpenModal,
     handleReset,
-  } = useManagement(API_ENDPOINTS.OFFICE);
+  } = useManagement(API_ENDPOINTS.OFFICES);
 
   const searchFields = ["office_name", "office_type", "address"];
 
@@ -44,7 +44,7 @@ const OfficeManagement: React.FC = () => {
         onRefresh={handleReset}
         generateColumns={GenerateColumns}
         searchFields={searchFields}
-        deleteEndpoint={API_ENDPOINTS.OFFICE}
+        deleteEndpoint={API_ENDPOINTS.OFFICES}
         deleteSuccessMessage="Office deleted successfully"
       />
 

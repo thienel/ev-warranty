@@ -1,12 +1,12 @@
 import React from "react";
 import { message } from "antd";
 import { useNavigate, useLocation } from "react-router-dom";
-import { API_ENDPOINTS } from "@constants/common-constants.js";
-import { type Claim } from "@/types/index.js";
-import useManagement from "@/hooks/useManagement.js";
-import GenericActionBar from "@components/common/GenericActionBar/GenericActionBar.tsx";
-import GenericTable from "@components/common/GenericTable/GenericTable.tsx";
-import GenerateColumns from "./claimTableColumns.tsx";
+import { API_ENDPOINTS } from "@constants/common-constants";
+import { type Claim } from "@/types/index";
+import useClaimsManagement from "@/hooks/useClaimsManagement";
+import GenericActionBar from "@components/common/GenericActionBar/GenericActionBar";
+import GenericTable from "@components/common/GenericTable/GenericTable";
+import GenerateColumns from "./claimTableColumns";
 
 const ClaimManagement: React.FC = () => {
   const navigate = useNavigate();
@@ -19,7 +19,7 @@ const ClaimManagement: React.FC = () => {
     setSearchText,
     handleOpenModal,
     handleReset,
-  } = useManagement(API_ENDPOINTS.CLAIM);
+  } = useClaimsManagement();
 
   // Mock data for demonstration since APIs are not available yet
   const mockClaims: Claim[] = [
@@ -169,11 +169,13 @@ const ClaimManagement: React.FC = () => {
             id: string | number;
           })[]
         }
-        onOpenModal={handleOpenModal}
+        onOpenModal={(record) =>
+          record && handleOpenModal(record as Claim, false)
+        }
         onRefresh={handleReset}
         generateColumns={GenerateColumns}
         searchFields={searchFields}
-        deleteEndpoint={API_ENDPOINTS.CLAIM}
+        deleteEndpoint={API_ENDPOINTS.CLAIMS}
         deleteSuccessMessage="Claim deleted successfully"
         additionalProps={{ onViewDetails: handleViewDetails }}
       />

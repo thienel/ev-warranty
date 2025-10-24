@@ -34,10 +34,10 @@ const OfficeModal: React.FC<OfficeModalProps> = ({
       const payload = { ...values };
 
       if (isUpdate) {
-        await api.put(`${API_ENDPOINTS.OFFICE}/${office?.id}`, payload);
+        await api.put(`${API_ENDPOINTS.OFFICES}/${office?.id}`, payload);
         message.success("Office updated successfully");
       } else {
-        await api.post(API_ENDPOINTS.OFFICE, payload);
+        await api.post(API_ENDPOINTS.OFFICES, payload);
         message.success("Office created successfully");
       }
 
@@ -65,7 +65,7 @@ const OfficeModal: React.FC<OfficeModalProps> = ({
       style={{ margin: "auto" }}
       footer={null}
       width={500}
-      destroyOnClose
+      destroyOnHidden
     >
       <Form
         form={form}

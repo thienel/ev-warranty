@@ -35,18 +35,18 @@ const GenerateColumns = (
           Customer Name
         </span>
       ),
-      dataIndex: "customer_name",
-      key: "customer_name",
+      dataIndex: "customer_id",
+      key: "customer_id",
       width: "25%",
       sorter: (a: Record<string, unknown>, b: Record<string, unknown>) => {
         const aClaim = a as Claim;
         const bClaim = b as Claim;
-        return (aClaim.customer_name || "").localeCompare(
-          bClaim.customer_name || ""
-        );
+        return (aClaim.customer_id || "")
+          .toString()
+          .localeCompare((bClaim.customer_id || "").toString());
       },
       sortOrder:
-        sortedInfo.columnKey === "customer_name"
+        sortedInfo.columnKey === "customer_id"
           ? (sortedInfo.order as "ascend" | "descend" | null)
           : null,
       render: (text: string, record: Record<string, unknown>) => {

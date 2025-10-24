@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from "react";
-import { API_ENDPOINTS, ROLE_LABELS } from "@constants/common-constants.js";
-import { type User, type Office } from "@/types/index.js";
-import api from "@services/api.js";
-import UserModal from "@components/UserManagement/UserModal/UserModal.tsx";
-import useManagement from "@/hooks/useManagement.js";
-import GenericActionBar from "@components/common/GenericActionBar/GenericActionBar.tsx";
-import GenericTable from "@components/common/GenericTable/GenericTable.tsx";
-import GenerateColumns from "./userTableColumns.tsx";
-import useHandleApiError from "@/hooks/useHandleApiError.js";
+import { API_ENDPOINTS, ROLE_LABELS } from "@constants/common-constants";
+import { type User, type Office } from "@/types/index";
+import { officesApi } from "@services/index";
+import UserModal from "@components/UserManagement/UserModal/UserModal";
+import useManagement from "@/hooks/useManagement";
+import GenericActionBar from "@components/common/GenericActionBar/GenericActionBar";
+import GenericTable from "@components/common/GenericTable/GenericTable";
+import GenerateColumns from "./userTableColumns";
+import useHandleApiError from "@/hooks/useHandleApiError";
 
 const UserManagement: React.FC = () => {
   const {
@@ -21,26 +21,51 @@ const UserManagement: React.FC = () => {
     isOpenModal,
     handleOpenModal,
     handleReset,
-  } = useManagement(API_ENDPOINTS.USER);
+  } = useManagement(API_ENDPOINTS.USERS);
 
   const [offices, setOffices] = useState<Office[]>([]);
   const handleError = useHandleApiError();
 
   const fetchOffices = async (): Promise<void> => {
     try {
-      const response = await api.get(API_ENDPOINTS.OFFICE);
-      setOffices(response.data.data || []);
+      const response = await officesApi.getAll();
+      // Ensure we always have an array
+      const officesData = response.data;
+      if (Array.isArray(officesData)) {
+        setOffices(officesData);
+      } else {
+        console.warn("API returned non-array data for offices:", officesData);
+        setOffices([]);
+      }
     } catch (error) {
+      console.error("Failed to fetch offices:", error);
       handleError(error as Error);
+      setOffices([]); // Set empty array on error
     }
   };
 
   useEffect(() => {
+    console.log("UserManagement: Fetching offices...");
     fetchOffices();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Debug log to track offices state changes
+  useEffect(() => {
+    console.log("UserManagement: offices state changed:", {
+      isArray: Array.isArray(offices),
+      length: Array.isArray(offices) ? offices.length : "N/A",
+      data: offices,
+    });
+  }, [offices]);
+
   const getOfficeName = (officeId: string): string => {
+    // Safety check: ensure offices is an array before calling find
+    if (!Array.isArray(offices)) {
+      console.warn("offices is not an array:", offices);
+      return "N/A";
+    }
+
     const office = offices.find((o) => o.id === officeId);
     return office ? office.office_name : "N/A";
   };
@@ -78,7 +103,7 @@ const UserManagement: React.FC = () => {
         onRefresh={handleReset}
         generateColumns={GenerateColumns}
         searchFields={searchFieldsWithRole}
-        deleteEndpoint={API_ENDPOINTS.USER}
+        deleteEndpoint={API_ENDPOINTS.USERS}
         deleteSuccessMessage="User deleted successfully"
         additionalProps={{ getOfficeName }}
       />
