@@ -1,3 +1,18 @@
+// API Response Types
+export interface ApiSuccessResponse<T = unknown> {
+  data: T
+}
+
+export interface ApiErrorResponse {
+  error: string
+}
+
+export interface PaginationParams {
+  page?: number
+  limit?: number
+  status?: string
+}
+
 // Base types
 export interface BaseEntity {
   id: string
@@ -5,16 +20,14 @@ export interface BaseEntity {
   updated_at?: string
 }
 
-// User types
+// User types (matching dtos.UserDTO from Swagger)
 export interface User extends Record<string, unknown> {
   id: string
   email: string
   name: string
   role: string
-  office_id?: string
+  office_id: string
   is_active: boolean
-  created_at?: string
-  updated_at?: string
 }
 
 export interface UserFormData {
@@ -24,6 +37,43 @@ export interface UserFormData {
   role: string
   office_id: string
   is_active: boolean
+}
+
+// User API DTOs
+export interface CreateUserRequest {
+  email: string
+  name: string
+  password: string
+  role: string
+  office_id: string
+  is_active: boolean
+}
+
+export interface UpdateUserRequest {
+  name?: string
+  role?: string
+  office_id?: string
+  is_active?: boolean
+}
+
+// Auth types
+export interface LoginRequest {
+  email: string
+  password: string
+}
+
+export interface LoginResponse {
+  token: string
+  user: User
+}
+
+export interface ValidateTokenResponse {
+  valid: boolean
+  user: User
+}
+
+export interface RefreshTokenResponse {
+  token: string
 }
 
 // Auth state types
@@ -42,11 +92,11 @@ export interface LoginPayload {
   remember: boolean
 }
 
-// Office types
+// Office types (matching entities.Office from Swagger)
 export interface Office extends Record<string, unknown> {
   id: string
   office_name: string
-  office_type: 'evm' | 'sc'
+  office_type: string
   address: string
   is_active: boolean
   created_at?: string
@@ -60,26 +110,102 @@ export interface OfficeFormData {
   is_active: boolean
 }
 
-// Claim types
+// Office API DTOs
+export interface CreateOfficeRequest {
+  office_name: string
+  office_type: string
+  address: string
+  is_active?: boolean
+}
+
+export interface UpdateOfficeRequest {
+  office_name?: string
+  office_type?: string
+  address?: string
+  is_active?: boolean
+}
+
+// Claim types (matching entities.Claim from Swagger)
 export interface Claim extends Record<string, unknown> {
   id: string
-  status: 'SUBMITTED' | 'APPROVED' | 'REJECTED' | 'PROCESSING' | 'COMPLETED'
   customer_id: string
-  customer_name: string
   vehicle_id: string
-  vehicle_info: string
   description: string
+  status: string
   total_cost: number
+  approved_by?: string
   created_at?: string
   updated_at?: string
 }
 
 export interface ClaimFormData {
-  status: string
   customer_id: string
   vehicle_id: string
   description: string
-  total_cost: number
+}
+
+// Claim API DTOs
+export interface CreateClaimRequest {
+  customer_id: string
+  vehicle_id: string
+  description: string
+}
+
+export interface UpdateClaimRequest {
+  description: string
+}
+
+// Claim Item types (matching entities.ClaimItem from Swagger)
+export interface ClaimItem extends Record<string, unknown> {
+  id: string
+  claim_id: string
+  part_category_id: number
+  faulty_part_id: string
+  replacement_part_id?: string
+  issue_description: string
+  type: string
+  cost: number
+  status: string
+  created_at?: string
+  updated_at?: string
+}
+
+// Claim Item API DTOs
+export interface CreateClaimItemRequest {
+  part_category_id: number
+  faulty_part_id: string
+  replacement_part_id?: string
+  issue_description: string
+  type: string
+  cost: number
+}
+
+export interface ClaimItemListResponse {
+  items: ClaimItem[]
+  total: number
+}
+
+// Claim Attachment types (matching entities.ClaimAttachment from Swagger)
+export interface ClaimAttachment extends Record<string, unknown> {
+  id: string
+  claimID: string
+  url: string
+  type: string
+  created_at?: string
+}
+
+export interface ClaimAttachmentListResponse {
+  attachments: ClaimAttachment[]
+  total: number
+}
+
+// Claim History types (matching entities.ClaimHistory from Swagger)
+export interface ClaimHistory extends Record<string, unknown> {
+  id: string
+  claim_id: string
+  status: string
+  changed_by: string
+  changedAt: string
 }
 
 // Table column types
