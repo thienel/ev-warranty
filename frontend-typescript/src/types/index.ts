@@ -105,7 +105,7 @@ export interface Office extends Record<string, unknown> {
 
 export interface OfficeFormData {
   office_name: string
-  office_type: 'evm' | 'sc'
+  office_type: 'EVM' | 'SC'
   address: string
   is_active: boolean
 }
@@ -236,6 +236,7 @@ export interface BaseModalProps {
 export interface UserModalProps extends BaseModalProps {
   user?: User | null
   offices: Office[]
+  officesLoading?: boolean
 }
 
 export interface OfficeModalProps extends BaseModalProps {

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
   Modal,
   Button,
@@ -34,10 +34,43 @@ const UserModal: React.FC<UserModalProps> = ({
   user = null,
   opened = false,
   offices,
+  officesLoading = false,
   isUpdate,
 }) => {
   const [form] = Form.useForm<UserFormData>();
   const handleError = useHandleApiError();
+
+  // Debug log to track offices prop changes
+  useEffect(() => {
+    console.log("UserModal: offices prop changed:", {
+      isArray: Array.isArray(offices),
+      length: Array.isArray(offices) ? offices.length : "N/A",
+      data: offices,
+      opened,
+      officesLoading,
+      isUpdate,
+    });
+  }, [offices, opened, officesLoading, isUpdate]);
+
+  // Populate form when user prop changes or modal opens
+  useEffect(() => {
+    if (opened) {
+      if (user && isUpdate) {
+        // When editing, populate form with user data
+        form.setFieldsValue(user);
+      } else {
+        // When creating new, reset to default values
+        form.setFieldsValue({ is_active: true });
+      }
+    }
+  }, [form, user, isUpdate, opened]);
+
+  // Clear form when modal closes
+  useEffect(() => {
+    if (!opened) {
+      form.resetFields();
+    }
+  }, [form, opened]);
 
   const handleSubmit = async (values: UserFormData): Promise<void> => {
     setLoading(true);
@@ -60,7 +93,6 @@ const UserModal: React.FC<UserModalProps> = ({
         message.success("User created successfully");
       }
 
-      form.resetFields();
       onClose();
     } catch (error) {
       handleError(error as Error);
@@ -77,10 +109,7 @@ const UserModal: React.FC<UserModalProps> = ({
         </Space>
       }
       open={opened}
-      onCancel={() => {
-        form.resetFields();
-        onClose();
-      }}
+      onCancel={onClose}
       style={{ margin: "auto" }}
       footer={null}
       width={500}
@@ -92,7 +121,6 @@ const UserModal: React.FC<UserModalProps> = ({
         onFinish={handleSubmit}
         autoComplete="off"
         key={user?.id || "new"}
-        initialValues={user || { is_active: true }}
       >
         <Form.Item
           label="Full Name"
@@ -170,10 +198,18 @@ const UserModal: React.FC<UserModalProps> = ({
           rules={[{ required: true, message: "Please select an office" }]}
         >
           <Select
-            placeholder="Select office"
+            placeholder={
+              officesLoading
+                ? "Loading offices..."
+                : offices.length === 0
+                  ? "No offices available"
+                  : "Select office"
+            }
             size="large"
             showSearch
             optionFilterProp="children"
+            loading={officesLoading}
+            disabled={officesLoading}
             filterOption={(input, option) =>
               option?.children
                 ?.toString()
@@ -204,13 +240,7 @@ const UserModal: React.FC<UserModalProps> = ({
           style={{ marginBottom: 0, textAlign: "right", marginTop: "24px" }}
         >
           <Space>
-            <Button
-              size="large"
-              onClick={() => {
-                form.resetFields();
-                onClose();
-              }}
-            >
+            <Button size="large" onClick={onClose}>
               Cancel
             </Button>
             <Button

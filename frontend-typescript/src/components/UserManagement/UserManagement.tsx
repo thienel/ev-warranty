@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { API_ENDPOINTS, ROLE_LABELS } from "@constants/common-constants";
 import { type User, type Office } from "@/types/index";
 import { officesApi } from "@services/index";
@@ -24,13 +24,24 @@ const UserManagement: React.FC = () => {
   } = useManagement(API_ENDPOINTS.USERS);
 
   const [offices, setOffices] = useState<Office[]>([]);
+  const [officesLoading, setOfficesLoading] = useState(false);
   const handleError = useHandleApiError();
 
-  const fetchOffices = async (): Promise<void> => {
+  const fetchOffices = useCallback(async (): Promise<void> => {
     try {
+      setOfficesLoading(true);
       const response = await officesApi.getAll();
+      // Handle different response structures - same as useManagement hook
+      let officesData = response.data;
+      // If response has nested data property, use that
+      if (
+        officesData &&
+        typeof officesData === "object" &&
+        "data" in officesData
+      ) {
+        officesData = (officesData as { data: unknown }).data as Office[];
+      }
       // Ensure we always have an array
-      const officesData = response.data;
       if (Array.isArray(officesData)) {
         setOffices(officesData);
       } else {
@@ -41,14 +52,25 @@ const UserManagement: React.FC = () => {
       console.error("Failed to fetch offices:", error);
       handleError(error as Error);
       setOffices([]); // Set empty array on error
+    } finally {
+      setOfficesLoading(false);
     }
-  };
+  }, [handleError]);
 
   useEffect(() => {
     console.log("UserManagement: Fetching offices...");
     fetchOffices();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [fetchOffices]);
+
+  // Refetch offices when modal opens if offices list is empty
+  useEffect(() => {
+    if (isOpenModal && offices.length === 0 && !officesLoading) {
+      console.log(
+        "UserManagement: Modal opened with empty offices, refetching..."
+      );
+      fetchOffices();
+    }
+  }, [isOpenModal, offices.length, officesLoading, fetchOffices]);
 
   // Debug log to track offices state changes
   useEffect(() => {
@@ -115,6 +137,7 @@ const UserManagement: React.FC = () => {
         user={updateUser ? (updateUser as unknown as User) : null}
         opened={isOpenModal}
         offices={offices}
+        officesLoading={officesLoading}
         isUpdate={isUpdate}
       />
     </>

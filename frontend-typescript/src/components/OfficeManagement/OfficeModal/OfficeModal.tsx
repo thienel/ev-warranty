@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
   Modal,
   Button,
@@ -10,7 +10,7 @@ import {
   Switch,
 } from "antd";
 import { BankOutlined } from "@ant-design/icons";
-import { API_ENDPOINTS } from "@constants/common-constants.js";
+import { API_ENDPOINTS, OFFICE_TYPES } from "@constants/common-constants.js";
 import { type OfficeModalProps, type OfficeFormData } from "@/types/index.js";
 import api from "@services/api.js";
 import useHandleApiError from "@/hooks/useHandleApiError.js";
@@ -28,8 +28,35 @@ const OfficeModal: React.FC<OfficeModalProps> = ({
   const [form] = Form.useForm<OfficeFormData>();
   const handleError = useHandleApiError();
 
+  // Populate form when office prop changes or modal opens
+  useEffect(() => {
+    if (opened) {
+      if (office && isUpdate) {
+        // When editing, populate form with office data
+        const formData: OfficeFormData = {
+          office_name: office.office_name,
+          office_type: office.office_type as "EVM" | "SC",
+          address: office.address,
+          is_active: office.is_active,
+        };
+        form.setFieldsValue(formData);
+      } else {
+        // When creating new, reset to default values
+        form.setFieldsValue({ is_active: true });
+      }
+    }
+  }, [form, office, isUpdate, opened]);
+
+  // Clear form when modal closes
+  useEffect(() => {
+    if (!opened) {
+      form.resetFields();
+    }
+  }, [form, opened]);
+
   const handleSubmit = async (values: OfficeFormData): Promise<void> => {
     setLoading(true);
+    console.log("Submitting office data:", values);
     try {
       const payload = { ...values };
 
@@ -41,7 +68,6 @@ const OfficeModal: React.FC<OfficeModalProps> = ({
         message.success("Office created successfully");
       }
 
-      form.resetFields();
       onClose();
     } catch (error) {
       handleError(error as Error);
@@ -58,10 +84,7 @@ const OfficeModal: React.FC<OfficeModalProps> = ({
         </Space>
       }
       open={opened}
-      onCancel={() => {
-        form.resetFields();
-        onClose();
-      }}
+      onCancel={onClose}
       style={{ margin: "auto" }}
       footer={null}
       width={500}
@@ -73,7 +96,6 @@ const OfficeModal: React.FC<OfficeModalProps> = ({
         onFinish={handleSubmit}
         autoComplete="off"
         key={office?.id || "new"}
-        initialValues={office || { is_active: true }}
       >
         <Form.Item
           label="Office Name"
@@ -98,13 +120,13 @@ const OfficeModal: React.FC<OfficeModalProps> = ({
           rules={[{ required: true, message: "Please select office type" }]}
         >
           <Select placeholder="Select office type" size="large">
-            <Option value="evm">
+            <Option value={OFFICE_TYPES.EVM}>
               <Space>
                 <BankOutlined />
                 EVM
               </Space>
             </Option>
-            <Option value="sc">
+            <Option value={OFFICE_TYPES.SC}>
               <Space>
                 <BankOutlined />
                 Service Center
@@ -142,13 +164,7 @@ const OfficeModal: React.FC<OfficeModalProps> = ({
           style={{ marginBottom: 0, textAlign: "right", marginTop: "24px" }}
         >
           <Space>
-            <Button
-              size="large"
-              onClick={() => {
-                form.resetFields();
-                onClose();
-              }}
-            >
+            <Button size="large" onClick={onClose}>
               Cancel
             </Button>
             <Button

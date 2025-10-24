@@ -144,8 +144,8 @@ export const CLAIM_ITEM_STATUS_LABELS: Record<ClaimItemStatus, string> = {
 
 // Office Types
 export const OFFICE_TYPES = {
-  EVM: 'evm',
-  SC: 'sc',
+  EVM: 'EVM',
+  SC: 'SC',
 } as const
 
 export type OfficeType = typeof OFFICE_TYPES[keyof typeof OFFICE_TYPES]
