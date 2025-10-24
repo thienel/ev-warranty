@@ -8,11 +8,11 @@ namespace Backend.Dotnet.Infrastructure.Data.Repositories
     {
         public CustomerRepository(DbContext context) : base(context) { }
 
-        public async Task<Customer?> GetByEmailAsync(string email)
+        public async Task<IEnumerable<Customer>> GetByEmailAsync(string email)
         {
             return await _dbSet
-                .Where(c => c.DeletedAt == null)
-                .FirstOrDefaultAsync(c => c.Email.ToLower() == email.ToLower());
+                .Where(c => c.DeletedAt == null && c.Email.ToLower().Contains(email.ToLower()))
+                .ToListAsync();
         }
 
         public async Task<bool> EmailExistsAsync(string email, Guid? excludeCustomerId = null)
@@ -27,28 +27,20 @@ namespace Backend.Dotnet.Infrastructure.Data.Repositories
             return await query.AnyAsync();
         }
 
-        public async Task<Customer?> GetByPhoneAsync(string phone)
+        public async Task<IEnumerable<Customer>> GetByPhoneAsync(string phone)
         {
             return await _dbSet
-                .Where(c => c.DeletedAt == null)
-                .FirstOrDefaultAsync(c => c.PhoneNumber == phone);
+                .Where(c => c.DeletedAt == null && c.PhoneNumber.Contains(phone))
+                .ToListAsync();
         }
 
-        public async Task<IEnumerable<Customer>> GetByNameAsync(string firstName, string lastName)
+        public async Task<IEnumerable<Customer>> GetByNameAsync(string name)
         {
-            var query = _dbSet.Where(c => c.DeletedAt == null);
-
-            if (!string.IsNullOrWhiteSpace(firstName))
-            {
-                query = query.Where(c => c.FirstName.ToLower() == firstName.ToLower());
-            }
-
-            if (!string.IsNullOrWhiteSpace(lastName))
-            {
-                query = query.Where(c => c.LastName.ToLower() == lastName.ToLower());
-            }
-
-            return await query.ToListAsync();
+            return await _dbSet
+                .Where(c => c.DeletedAt == null && c.FirstName.ToLower().Contains(name.Trim().ToLower()))
+                .OrderBy(c => c.FirstName)
+                .ThenBy(c => c.LastName)
+                .ToListAsync();
         }
 
         public async Task<Customer?> GetWithVehiclesAsync(Guid customerId)

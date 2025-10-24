@@ -8,13 +8,16 @@ namespace Backend.Dotnet.Infrastructure.Data.Repositories
     {
         public VehicleModelRepository(DbContext context) : base(context) { }
 
-        public async Task<VehicleModel?> GetByBrandModelYearAsync(string brand, string modelName, int year)
+        public async Task<IEnumerable<VehicleModel>> GetByBrandModelYearAsync(string brand, string modelName, int year)
         {
             return await _dbSet
-                .FirstOrDefaultAsync(vm =>
-                    vm.Brand.ToLower() == brand.ToLower() &&
-                    vm.ModelName.ToLower() == modelName.ToLower() &&
-                    vm.Year == year);
+                .Where(vm =>
+                vm.Brand.ToLower().Contains(brand.ToLower()) &&
+                vm.ModelName.ToLower().Contains(modelName.ToLower()) &&
+                    vm.Year == year)
+                .OrderBy(vm => vm.Brand)
+                .ThenBy(vm => vm.ModelName)
+                .ToListAsync();
         }
 
         public async Task<bool> ExistsByBrandModelYearAsync(string brand, string modelName, int year, Guid? excludeModelId = null)
@@ -35,7 +38,7 @@ namespace Backend.Dotnet.Infrastructure.Data.Repositories
         public async Task<IEnumerable<VehicleModel>> GetByBrandAsync(string brand)
         {
             return await _dbSet
-                .Where(vm => vm.Brand.ToLower() == brand.ToLower())
+                .Where(vm => vm.Brand.ToLower().Contains(brand.ToLower()))
                 .OrderBy(vm => vm.Year)
                 .ThenBy(vm => vm.ModelName)
                 .ToListAsync();
@@ -43,7 +46,7 @@ namespace Backend.Dotnet.Infrastructure.Data.Repositories
         public async Task<IEnumerable<VehicleModel>> GetByModelNameAsync(string modelName)
         {
             return await _dbSet
-                .Where(vm => vm.ModelName.ToLower() == modelName.ToLower())
+                .Where(vm => vm.ModelName.ToLower().Contains(modelName.ToLower()))
                 .OrderBy(vm => vm.Brand)
                 .ThenBy(vm => vm.Year)
                 .ToListAsync();

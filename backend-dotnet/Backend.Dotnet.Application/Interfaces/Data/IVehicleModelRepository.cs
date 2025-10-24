@@ -4,7 +4,7 @@ namespace Backend.Dotnet.Application.Interfaces.Data
 {
     public interface IVehicleModelRepository : IRepository<VehicleModel>
     {
-        Task<VehicleModel?> GetByBrandModelYearAsync(string brand, string modelName, int year);
+        Task<IEnumerable<VehicleModel>> GetByBrandModelYearAsync(string brand, string modelName, int year);
         Task<bool> ExistsByBrandModelYearAsync(string brand, string modelName, int year, Guid? excludeModelId = null);
         Task<IEnumerable<VehicleModel>> GetByBrandAsync(string brand);
         Task<IEnumerable<VehicleModel>> GetByModelNameAsync(string modelName);

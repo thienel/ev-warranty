@@ -36,10 +36,6 @@ namespace Backend.Dotnet.Application.DTOs
             [JsonPropertyName("purchase_date")]
             [DataType(DataType.Date)]
             public DateTime? PurchaseDate { get; set; }
-
-            [JsonPropertyName("updateMask")]
-            [Required(ErrorMessage = "updateMask is required")]
-            public List<string> UpdateMask { get; set; } = new();
         }
 
         /// <summary>
