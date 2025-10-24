@@ -99,6 +99,8 @@ func (h *authHandler) Logout(c *gin.Context) {
 		return
 	}
 
+	c.SetCookie("refreshToken", "", 0, "/", "localhost", false, true)
+
 	h.log.Info("logout successful")
 	writeSuccessResponse(c, http.StatusOK, nil)
 }

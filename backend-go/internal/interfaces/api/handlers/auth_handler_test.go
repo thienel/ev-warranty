@@ -113,6 +113,10 @@ var _ = Describe("AuthHandler", func() {
 			req.AddCookie(&http.Cookie{Name: "refreshToken", Value: refreshToken})
 			r.ServeHTTP(w, req)
 
+			cookies := w.Result().Cookies()
+			Expect(cookies).To(HaveLen(1))
+			Expect(cookies[0].Name).To(Equal("refreshToken"))
+			Expect(cookies[0].Value).To(Equal(""))
 			Expect(w.Code).To(Equal(http.StatusOK))
 		})
 
