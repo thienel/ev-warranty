@@ -88,7 +88,7 @@ var _ = Describe("OAuthHandler", func() {
 			r.ServeHTTP(w, req)
 
 			Expect(w.Code).To(Equal(http.StatusFound))
-			Expect(w.Header().Get("Location")).To(Equal(fmt.Sprintf("%s/auth/callback?token=%s", frontendBaseURL, accessToken)))
+			Expect(w.Header().Get("Location")).To(Equal(fmt.Sprintf("%s/callback?token=%s", frontendBaseURL, accessToken)))
 			ExpectCookieRefreshToken(w, refreshToken)
 		})
 

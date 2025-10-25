@@ -112,7 +112,7 @@ func (h *oauthHandler) HandleCallback(c *gin.Context) {
 
 	c.SetCookie("refreshToken", refreshToken, 60*60*24*7, "/", "localhost", false, true)
 
-	redirectURL := fmt.Sprintf("%s/auth/callback?token=%s", h.frontendBaseURL, accessToken)
+	redirectURL := fmt.Sprintf("%s/callback?token=%s", h.frontendBaseURL, accessToken)
 	h.log.Info("OAuth login successful", "email", userInfo.Email)
 	c.Redirect(http.StatusFound, redirectURL)
 }
