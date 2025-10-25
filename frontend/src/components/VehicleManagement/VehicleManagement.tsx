@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { API_ENDPOINTS } from "@constants/common-constants";
 import { type Vehicle, type Customer, type VehicleModel } from "@/types/index";
-import api from "@services/api";
+import { customersApi, vehicleModelsApi } from "@services/index";
 import VehicleModal from "@components/VehicleManagement/VehicleModal/VehicleModal";
 import useManagement from "@/hooks/useManagement";
 import GenericActionBar from "@components/common/GenericActionBar/GenericActionBar";
@@ -32,7 +32,7 @@ const VehicleManagement: React.FC = () => {
   const fetchCustomers = useCallback(async (): Promise<void> => {
     try {
       setCustomersLoading(true);
-      const response = await api.get(API_ENDPOINTS.CUSTOMERS);
+      const response = await customersApi.getAll();
       // Handle different response structures
       let customersData = response.data;
       if (
@@ -63,7 +63,7 @@ const VehicleManagement: React.FC = () => {
   const fetchVehicleModels = useCallback(async (): Promise<void> => {
     try {
       setVehicleModelsLoading(true);
-      const response = await api.get(API_ENDPOINTS.VEHICLE_MODELS);
+      const response = await vehicleModelsApi.getAll();
       // Handle different response structures
       let vehicleModelsData = response.data;
       if (
