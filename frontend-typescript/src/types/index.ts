@@ -242,3 +242,126 @@ export interface UserModalProps extends BaseModalProps {
 export interface OfficeModalProps extends BaseModalProps {
   office?: Office | null
 }
+
+// Customer types (matching Backend.Dotnet API)
+export interface Customer extends Record<string, unknown> {
+  id: string
+  first_name: string
+  last_name: string
+  phone_number?: string
+  email?: string
+  address?: string
+  created_at?: string
+  updated_at?: string
+  deleted_at?: string
+  is_deleted: boolean
+  full_name?: string
+}
+
+export interface CustomerFormData {
+  first_name: string
+  last_name: string
+  phone_number?: string
+  email?: string
+  address?: string
+}
+
+// Customer API DTOs
+export interface CreateCustomerRequest {
+  first_name: string
+  last_name: string
+  phone_number?: string
+  email?: string
+  address?: string
+}
+
+export interface UpdateCustomerRequest {
+  first_name: string
+  last_name: string
+  phone_number?: string
+  email?: string
+  address?: string
+}
+
+// Vehicle Model types (matching Backend.Dotnet API)
+export interface VehicleModel extends Record<string, unknown> {
+  id: string
+  brand: string
+  model_name: string
+  year: number
+  created_at?: string
+  updated_at?: string
+}
+
+export interface VehicleModelFormData {
+  brand: string
+  model_name: string
+  year: number
+}
+
+// Vehicle Model API DTOs
+export interface CreateVehicleModelRequest {
+  brand: string
+  model_name: string
+  year: number
+}
+
+export interface UpdateVehicleModelRequest {
+  brand: string
+  model_name: string
+  year: number
+}
+
+// Vehicle types (matching Backend.Dotnet API)
+export interface Vehicle extends Record<string, unknown> {
+  id: string
+  vin: string
+  license_plate?: string
+  customer_id: string
+  model_id: string
+  purchase_date?: string
+  created_at?: string
+  updated_at?: string
+}
+
+export interface VehicleFormData {
+  vin: string
+  license_plate?: string
+  customer_id: string
+  model_id: string
+  purchase_date?: unknown // Using unknown for Dayjs compatibility
+}
+
+// Vehicle API DTOs
+export interface CreateVehicleRequest {
+  vin: string
+  license_plate?: string
+  customer_id: string
+  model_id: string
+  purchase_date?: string
+}
+
+export interface UpdateVehicleRequest {
+  vin: string
+  license_plate?: string
+  customer_id: string
+  model_id: string
+  purchase_date?: string
+}
+
+// Modal props for new components
+export interface CustomerModalProps extends BaseModalProps {
+  customer?: Customer | null
+}
+
+export interface VehicleModelModalProps extends BaseModalProps {
+  vehicleModel?: VehicleModel | null
+}
+
+export interface VehicleModalProps extends BaseModalProps {
+  vehicle?: Vehicle | null
+  customers: Customer[]
+  vehicleModels: VehicleModel[]
+  customersLoading?: boolean
+  vehicleModelsLoading?: boolean
+}
