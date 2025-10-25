@@ -15,6 +15,12 @@ import EVMStaffClaims from "@pages/evm-staff/Claims";
 import SCStaffClaims from "@pages/sc-staff/Claims";
 import SCTechnicianClaims from "@pages/sc-technician/Claims";
 import ClaimDetail from "@pages/claims/ClaimDetail";
+
+// New management pages
+import Customers from "@pages/sc-staff/Customers";
+import Vehicles from "@pages/evm-staff/Vehicles";
+import VehicleModels from "@pages/evm-staff/VehicleModels";
+
 import type { RootState } from "@redux/store";
 
 export const ProtectedRoute: React.FC = () => {
@@ -89,6 +95,14 @@ const App: React.FC = () => {
                 { path: ":id", element: <ClaimDetail /> },
               ],
             },
+            {
+              path: "vehicles",
+              element: <Vehicles />,
+            },
+            {
+              path: "vehicle-models",
+              element: <VehicleModels />,
+            },
           ],
         },
         {
@@ -101,6 +115,10 @@ const App: React.FC = () => {
                 { path: "", element: <SCStaffClaims /> },
                 { path: ":id", element: <ClaimDetail /> },
               ],
+            },
+            {
+              path: "customers",
+              element: <Customers />,
             },
           ],
         },

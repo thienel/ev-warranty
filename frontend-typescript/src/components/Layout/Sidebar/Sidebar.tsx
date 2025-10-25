@@ -166,7 +166,7 @@ const MENU_ITEMS: Record<UserRole, MenuItemData[]> = {
       key: "models",
       icon: <AppstoreOutlined />,
       label: "Models",
-      path: "/evm-staff/models",
+      path: "/evm-staff/vehicle-models",
     },
     {
       key: "parts",
