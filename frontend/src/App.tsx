@@ -15,6 +15,7 @@ import EVMStaffClaims from "@pages/evm-staff/Claims";
 import SCStaffClaims from "@pages/sc-staff/Claims";
 import SCTechnicianClaims from "@pages/sc-technician/Claims";
 import ClaimDetail from "@pages/claims/ClaimDetail";
+import ClaimCreate from "@pages/sc-staff/ClaimCreate";
 
 // New management pages
 import Customers from "@pages/sc-staff/Customers";
@@ -113,6 +114,7 @@ const App: React.FC = () => {
               path: "claims",
               children: [
                 { path: "", element: <SCStaffClaims /> },
+                { path: "create", element: <ClaimCreate /> },
                 { path: ":id", element: <ClaimDetail /> },
               ],
             },
