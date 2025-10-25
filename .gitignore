@@ -92,3 +92,6 @@ shared-db/
 **/obj/
 **/.vs/
 /.vs/
+
+**/node_modules/
+**/dist/
