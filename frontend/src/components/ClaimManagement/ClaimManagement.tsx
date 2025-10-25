@@ -1,5 +1,4 @@
 import React from "react";
-import { message } from "antd";
 import { useNavigate, useLocation } from "react-router-dom";
 import { API_ENDPOINTS } from "@constants/common-constants";
 import { type Claim } from "@/types/index";
@@ -138,7 +137,15 @@ const ClaimManagement: React.FC = () => {
   };
 
   const handleCreateClaim = (): void => {
-    message.info("Create claim page will be implemented later.");
+    // Determine the base path from current location
+    const currentPath = location.pathname;
+    let basePath = "/claims";
+
+    if (currentPath.includes("/sc-staff/")) {
+      basePath = "/sc-staff/claims";
+    }
+
+    navigate(`${basePath}/create`);
   };
 
   const searchFields = [
