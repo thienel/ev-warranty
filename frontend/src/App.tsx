@@ -23,6 +23,8 @@ import Vehicles from "@pages/evm-staff/Vehicles";
 import VehicleModels from "@pages/evm-staff/VehicleModels";
 
 import type { RootState } from "@redux/store";
+import { ConfigProvider } from "antd";
+import { antdThemeConfig } from "./styles/antdThemeConfig";
 
 export const ProtectedRoute: React.FC = () => {
   const authState = useSelector((state: RootState) => state.auth);
@@ -160,7 +162,9 @@ const App: React.FC = () => {
     },
   ];
 
-  return useRoutes(routes);
+  return (
+    <ConfigProvider theme={antdThemeConfig}>{useRoutes(routes)}</ConfigProvider>
+  );
 };
 
 export default App;

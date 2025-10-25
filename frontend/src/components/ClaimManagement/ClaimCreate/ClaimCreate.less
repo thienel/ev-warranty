@@ -75,7 +75,6 @@
     }
   }
 
-  // ===== STEPS NAVIGATION =====
   .steps-card {
     margin-bottom: 32px;
     border: 1px solid @border-color;
@@ -86,7 +85,7 @@
         &-process .ant-steps-item-icon {
           background: transparent !important;
           border-color: @primary-color !important;
-          
+
           .anticon {
             color: @primary-color !important;
           }
@@ -95,7 +94,7 @@
         &-finish .ant-steps-item-icon {
           background: transparent !important;
           border-color: @success-color !important;
-          
+
           .anticon {
             color: @success-color !important;
           }
@@ -112,7 +111,6 @@
     }
   }
 
-  // ===== FORM CONTAINER =====
   .form-container {
     .ant-form {
       .ant-row {
@@ -121,35 +119,38 @@
     }
   }
 
-  // ===== STEP CARDS =====
   .step-card {
     height: 100%;
     border: 2px solid @border-color;
     border-radius: @border-radius-lg;
     transition: all @motion-duration-mid ease;
     overflow: hidden;
-    
+
     &:hover {
       box-shadow: @box-shadow-medium;
       transform: translateY(-2px);
     }
-    
+
     &.disabled {
       opacity: 0.6;
       pointer-events: none;
       background: @fill-color;
-      
+
       .ant-card-head {
         background: @fill-secondary;
       }
     }
-    
+
     &.active {
       border-color: @primary-color;
       box-shadow: 0 4px 16px fade(@primary-color, 20%);
-      
+
       .ant-card-head {
-        background: linear-gradient(135deg, @primary-bg 0%, @primary-bg-hover 100%);
+        background: linear-gradient(
+          135deg,
+          @primary-bg 0%,
+          @primary-bg-hover 100%
+        );
         border-bottom-color: @primary-border;
       }
 
@@ -160,9 +161,13 @@
 
     &.completed {
       border-color: @success-color;
-      
+
       .ant-card-head {
-        background: linear-gradient(135deg, @success-bg 0%, lighten(@success-bg, 2%) 100%);
+        background: linear-gradient(
+          135deg,
+          @success-bg 0%,
+          lighten(@success-bg, 2%) 100%
+        );
         border-bottom-color: @success-border;
       }
 
@@ -213,7 +218,43 @@
         }
       }
     }
+  }
 
+  .vehicle-list {
+    .vehicle-options {
+      max-height: 400px;
+      overflow-y: auto;
+      padding: 4px;
+
+      .vehicle-option {
+        transition: all @motion-duration-mid ease;
+
+        &:hover:not(.disabled) {
+          border-color: @primary-border-hover !important;
+          background-color: @primary-bg-hover !important;
+          transform: translateY(-1px);
+          box-shadow: 0 2px 8px fade(@primary-color, 15%);
+        }
+
+        &.selected {
+          border-color: @primary-color !important;
+          background-color: @primary-bg !important;
+          box-shadow: 0 2px 12px fade(@primary-color, 20%);
+        }
+
+        &.disabled {
+          background-color: @fill-color !important;
+          border-color: @border-secondary !important;
+
+          .ant-typography {
+            color: @text-disabled !important;
+          }
+        }
+
+        &:last-child {
+          margin-bottom: 0;
+        }
+      }
+    }
   }
 }
-

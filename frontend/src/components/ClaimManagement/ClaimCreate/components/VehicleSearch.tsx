@@ -4,7 +4,6 @@ import { CarOutlined } from "@ant-design/icons";
 import { vehiclesApi, vehicleModelsApi } from "@services/index";
 import type { Vehicle, Customer, VehicleModel } from "@/types";
 import useHandleApiError from "@/hooks/useHandleApiError";
-import "./VehicleSearch.less";
 
 const { Text } = Typography;
 
