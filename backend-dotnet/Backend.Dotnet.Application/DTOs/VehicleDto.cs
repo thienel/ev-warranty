@@ -113,7 +113,7 @@ namespace Backend.Dotnet.Application.DTOs
             [JsonPropertyName("model_id")]
             public Guid ModelId { get; set; }
 
-            [JsonPropertyName("purchase_id")]
+            [JsonPropertyName("purchase_date")]
             public DateTime? PurchaseDate { get; set; }
 
             [JsonPropertyName("created_at")]
@@ -138,7 +138,7 @@ namespace Backend.Dotnet.Application.DTOs
             [JsonPropertyName("license_plate")]
             public string? LicensePlate { get; set; }
 
-            [JsonPropertyName("purchase_id")]
+            [JsonPropertyName("purchase_date")]
             public DateTime? PurchaseDate { get; set; }
 
             [JsonPropertyName("created_at")]
