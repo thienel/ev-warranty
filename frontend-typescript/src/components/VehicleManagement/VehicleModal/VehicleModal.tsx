@@ -40,7 +40,7 @@ const VehicleModal: React.FC<VehicleModalProps> = ({
         // When editing, populate form with vehicle data
         form.setFieldsValue({
           vin: vehicle.vin,
-          license_plate: vehicle.license_plate || "",
+          license_plate: vehicle.license_plate,
           customer_id: vehicle.customer_id,
           model_id: vehicle.model_id,
           purchase_date: vehicle.purchase_date
@@ -140,13 +140,20 @@ const VehicleModal: React.FC<VehicleModalProps> = ({
           label="License Plate"
           name="license_plate"
           rules={[
-            { max: 20, message: "License plate cannot exceed 20 characters" },
+            { required: true, message: "Please enter license plate" },
+            {
+              pattern: /^[0-9]{2}[A-Z]{1,2}-[0-9]{4,5}$/,
+              message:
+                "Invalid license plate format (e.g., 29A-12345 or 51B-1234)",
+            },
           ]}
         >
           <Input
-            placeholder="Enter license plate (optional)"
+            placeholder="e.g., 29A-12345"
             prefix={<CarOutlined />}
             size="large"
+            maxLength={10}
+            style={{ textTransform: "uppercase" }}
           />
         </Form.Item>
 

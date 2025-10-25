@@ -110,6 +110,7 @@ const GenerateColumns = (
       title: "Created Date",
       dataIndex: "created_at",
       key: "created_at",
+      align: "center" as const,
       width: "20%",
       sorter: (a: Record<string, unknown>, b: Record<string, unknown>) => {
         const aModel = a as VehicleModel;

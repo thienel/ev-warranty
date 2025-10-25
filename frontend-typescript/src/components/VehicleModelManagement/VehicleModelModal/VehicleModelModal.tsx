@@ -143,19 +143,19 @@ const VehicleModelModal: React.FC<VehicleModelModalProps> = ({
             { required: true, message: "Please enter manufacturing year" },
             {
               type: "number",
-              min: 1900,
-              max: currentYear + 1,
-              message: `Year must be between 1900 and ${currentYear + 1}`,
+              min: 2000,
+              max: currentYear,
+              message: `Year must be between 2000 and ${currentYear}`,
             },
           ]}
         >
           <InputNumber
-            placeholder={`Enter year (1900-${currentYear + 1})`}
+            placeholder={`Enter year (2000-${currentYear})`}
             prefix={<CalendarOutlined />}
             size="large"
             style={{ width: "100%" }}
-            min={1900}
-            max={currentYear + 1}
+            min={2000}
+            max={currentYear}
             precision={0}
           />
         </Form.Item>

@@ -133,12 +133,13 @@ const CustomerModal: React.FC<CustomerModalProps> = ({
           label="Email"
           name="email"
           rules={[
+            { required: true, message: "Please enter email" },
             { type: "email", message: "Invalid email format" },
             { max: 100, message: "Email cannot exceed 100 characters" },
           ]}
         >
           <Input
-            placeholder="Enter email (optional)"
+            placeholder="Enter email"
             prefix={<MailOutlined />}
             size="large"
           />
@@ -148,15 +149,16 @@ const CustomerModal: React.FC<CustomerModalProps> = ({
           label="Phone Number"
           name="phone_number"
           rules={[
-            { max: 20, message: "Phone number cannot exceed 20 characters" },
+            { required: true, message: "Please enter phone number" },
             {
-              pattern: /^[+]?[\d\s\-()]+$/,
+              pattern:
+                /^(0|\+84)(3[2-9]|5[6|8|9]|7[0|6-9]|8[1-9]|9[0-9])[0-9]{7}$/,
               message: "Invalid phone number format",
             },
           ]}
         >
           <Input
-            placeholder="Enter phone number (optional)"
+            placeholder="Enter phone number"
             prefix={<PhoneOutlined />}
             size="large"
           />
@@ -166,14 +168,11 @@ const CustomerModal: React.FC<CustomerModalProps> = ({
           label="Address"
           name="address"
           rules={[
+            { required: true, message: "Please enter address" },
             { max: 255, message: "Address cannot exceed 255 characters" },
           ]}
         >
-          <Input.TextArea
-            placeholder="Enter address (optional)"
-            rows={3}
-            size="large"
-          />
+          <Input.TextArea placeholder="Enter address" rows={3} size="large" />
         </Form.Item>
 
         <Form.Item

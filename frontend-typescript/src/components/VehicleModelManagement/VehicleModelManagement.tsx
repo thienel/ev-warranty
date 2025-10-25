@@ -39,7 +39,7 @@ const VehicleModelManagement: React.FC = () => {
         onOpenModal={handleOpenModal}
         loading={loading}
         searchPlaceholder="Search by brand, model or year..."
-        addButtonText="Add Vehicle Model"
+        addButtonText="Add Model"
       />
 
       <GenericTable
