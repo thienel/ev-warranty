@@ -1,3 +1,24 @@
+/**
+ * =====================================================
+ * ANT DESIGN THEME OVERRIDES - EV WARRANTY SYSTEM
+ * =====================================================
+ * 
+ * Custom theme implementation for EV Warranty Management System
+ * Based on green color palette for sustainability theme
+ * 
+ * Note: !important is required for proper Ant Design override behavior
+ * 
+ * Structure:
+ * - Global Overrides (body, links, typography)
+ * - Layout Components (header, sidebar, content)
+ * - Form Controls (buttons, inputs, selects)
+ * - Data Display (tables, cards, lists)
+ * - Navigation (menus, breadcrumbs, tabs)
+ * - Feedback (modals, notifications, messages)
+ * - Modern Components (segmented, float button, etc.)
+ */
+
+// ===== GLOBAL BASE STYLES =====
 html, body {
   overscroll-behavior: none !important;
 }
@@ -26,7 +47,7 @@ a {
   }
 }
 
-// Global hover effects for interactive elements
+// ===== GLOBAL HOVER & TRANSITION EFFECTS =====
 .ant-btn,
 .ant-input,
 .ant-select-selector,
@@ -39,7 +60,9 @@ a {
 .ant-mentions,
 .ant-cascader-picker,
 .ant-time-picker,
-.ant-picker {
+.ant-picker,
+.ant-segmented-item,
+.ant-color-picker-trigger {
   transition: @transition-base !important;
 }
 
@@ -161,7 +184,7 @@ p {
   &-primary {
     background: @primary-color !important;
     border-color: @primary-color !important;
-    color: #ffffff !important;
+    color: @bg-container !important;
 
     &:hover {
       background: @primary-hover !important;
@@ -363,7 +386,7 @@ p {
   &:not(.ant-select-customize-input) .ant-select-selector {
     border-radius: @border-radius-base !important;
     border-color: @border-color !important;
-    //height: @control-height-base !important;
+    height: @control-height-base !important;
 
     &:hover {
       border-color: @primary-border-hover !important;
@@ -501,31 +524,20 @@ p {
   border: none !important;
   color: rgba(255, 255, 255, 0.85) !important;
 
-  &-item {
+  // Common item styles for dark theme
+  &-item,
+  &-submenu-title {
     margin: 4px 8px !important;
     border-radius: @border-radius-base !important;
     transition: @transition-base !important;
 
     &:hover {
       background: rgba(255, 255, 255, 0.1) !important;
-      color: #ffffff !important;
+      color: @bg-container !important;
     }
 
     &:active {
       background: rgba(255, 255, 255, 0.15) !important;
-    }
-
-    &.ant-menu-item-selected {
-      background: @primary-color !important;
-      color: #ffffff !important;
-
-      &::after {
-        display: none !important;
-      }
-
-      &:hover {
-        background: @primary-hover !important;
-      }
     }
 
     a {
@@ -538,22 +550,22 @@ p {
     }
   }
 
-  &-submenu {
-    &-title {
-      margin: 4px 8px !important;
-      border-radius: @border-radius-base !important;
-      transition: @transition-base !important;
+  &-item {
+    &.ant-menu-item-selected {
+      background: @primary-color !important;
+      color: @bg-container !important;
+
+      &::after {
+        display: none !important;
+      }
 
       &:hover {
-        background: rgba(255, 255, 255, 0.1) !important;
-        color: #ffffff !important;
-      }
-
-      &:active {
-        background: rgba(255, 255, 255, 0.15) !important;
+        background: @primary-hover !important;
       }
     }
+  }
 
+  &-submenu {
     &-arrow {
       color: rgba(255, 255, 255, 0.65) !important;
     }
@@ -794,7 +806,7 @@ p {
       border-color: @primary-color !important;
 
       a {
-        color: #ffffff !important;
+        color: @bg-container !important;
       }
     }
   }
@@ -849,7 +861,7 @@ p {
       border-color: @primary-color !important;
 
       &:after {
-        border-color: #ffffff !important;
+        border-color: @bg-container !important;
       }
     }
 
@@ -862,9 +874,7 @@ p {
       background-color: @primary-active !important;
       border-color: @primary-active !important;
     }
-  }
-
-  &-input:focus + .ant-checkbox-inner {
+  }  &-input:focus + .ant-checkbox-inner {
     border-color: @primary-color !important;
     box-shadow: 0 0 0 3px fade(@primary-color, 12%) !important;
   }
@@ -875,7 +885,7 @@ p {
       border-color: @primary-color !important;
 
       &:after {
-        background-color: #ffffff !important;
+        background-color: @bg-container !important;
       }
     }
 
@@ -964,7 +974,7 @@ p {
   &-inner {
     background: @text-heading !important;
     border-radius: @border-radius-base !important;
-    color: #ffffff !important;
+    color: @bg-container !important;
   }
 
   &-arrow-content {
@@ -1175,7 +1185,7 @@ p {
   .ant-picker-calendar-date-selected {
     .ant-picker-calendar-date-value {
       background: @primary-color !important;
-      color: #ffffff !important;
+      color: @bg-container !important;
     }
   }
 }
@@ -1265,7 +1275,7 @@ p {
 .ant-back-top {
   &-content {
     background: @primary-color !important;
-    color: #ffffff !important;
+    color: @bg-container !important;
     border-radius: @border-radius-base !important;
     transition: @transition-base !important;
 
@@ -1306,7 +1316,7 @@ p {
     &-selected {
       .ant-picker-cell-inner {
         background: @primary-color !important;
-        color: #ffffff !important;
+        color: @bg-container !important;
       }
     }
 
@@ -1880,4 +1890,210 @@ p {
   &-content-prefix {
     color: @text-color !important;
   }
+}
+
+// ===== SEGMENTED OVERRIDES =====
+.ant-segmented {
+  background: @fill-color !important;
+  border-radius: @border-radius-base !important;
+  padding: @padding-xxs !important;
+
+  &-item {
+    color: @text-color !important;
+    transition: @transition-base !important;
+
+    &:hover {
+      color: @primary-text-hover !important;
+    }
+
+    &-selected {
+      background: @bg-container !important;
+      color: @primary-color !important;
+      border-radius: @border-radius-sm !important;
+      box-shadow: @box-shadow-light !important;
+    }
+  }
+}
+
+// ===== FLOAT BUTTON OVERRIDES =====
+.ant-float-btn {
+  background: @primary-color !important;
+  color: @bg-container !important;
+  box-shadow: @box-shadow-medium !important;
+
+  &:hover {
+    background: @primary-hover !important;
+  }
+
+  &-group {
+    .ant-float-btn {
+      background: @bg-container !important;
+      color: @text-color !important;
+      border: 1px solid @border-color !important;
+
+      &:hover {
+        background: @primary-bg-hover !important;
+        color: @primary-text-hover !important;
+      }
+    }
+  }
+}
+
+// ===== TOUR OVERRIDES =====
+.ant-tour {
+  &-content {
+    border-radius: @border-radius-lg !important;
+    box-shadow: @box-shadow-heavy !important;
+  }
+
+  &-title {
+    color: @text-heading !important;
+    font-weight: @font-weight-semibold !important;
+  }
+
+  &-description {
+    color: @text-color !important;
+  }
+
+  &-arrow {
+    &-content {
+      background: @bg-container !important;
+    }
+  }
+}
+
+// ===== QR CODE OVERRIDES =====
+.ant-qrcode {
+  background: @bg-container !important;
+  border: 1px solid @border-color !important;
+  border-radius: @border-radius-base !important;
+  padding: @padding-base !important;
+
+  canvas {
+    border-radius: @border-radius-sm !important;
+  }
+}
+
+// ===== WATERMARK OVERRIDES =====
+.ant-watermark {
+  pointer-events: none !important;
+  
+  &-text {
+    color: fade(@text-quaternary, 50%) !important;
+  }
+}
+
+// ===== COLOR PICKER OVERRIDES =====
+.ant-color-picker {
+  &-trigger {
+    border-radius: @border-radius-base !important;
+    border-color: @border-color !important;
+
+    &:hover {
+      border-color: @primary-border-hover !important;
+    }
+  }
+
+  &-panel {
+    background: @bg-container !important;
+    border-radius: @border-radius-lg !important;
+    box-shadow: @box-shadow-medium !important;
+  }
+}
+
+// ===== FLEX OVERRIDES =====
+.ant-flex {
+  &-vertical {
+    gap: @padding-base !important;
+  }
+
+  &-horizontal {
+    gap: @padding-base !important;
+  }
+}
+
+// ===== RESPONSIVE UTILITIES =====
+@media (max-width: 768px) {
+  .ant-layout-sider {
+    position: fixed !important;
+    height: 100vh !important;
+    z-index: 999 !important;
+    box-shadow: @box-shadow-heavy !important;
+  }
+
+  .ant-table-wrapper {
+    overflow-x: auto !important;
+  }
+
+  .ant-modal {
+    margin: @padding-base !important;
+    max-width: calc(100vw - 32px) !important;
+  }
+
+  .ant-drawer {
+    &-content-wrapper {
+      width: 85vw !important;
+      max-width: 378px !important;
+    }
+  }
+}
+
+// ===== UTILITY CLASSES =====
+.text-ellipsis {
+  overflow: hidden !important;
+  white-space: nowrap !important;
+  text-overflow: ellipsis !important;
+}
+
+.border-dashed {
+  border-style: dashed !important;
+}
+
+.bg-gradient-primary {
+  background: linear-gradient(135deg, @primary-color 0%, @primary-hover 100%) !important;
+}
+
+.shadow-card {
+  box-shadow: @box-shadow-light !important;
+}
+
+.shadow-elevated {
+  box-shadow: @box-shadow-medium !important;
+}
+
+.rounded-lg {
+  border-radius: @border-radius-lg !important;
+}
+
+.rounded-base {
+  border-radius: @border-radius-base !important;
+}
+
+// ===== ANIMATION ENHANCEMENTS =====
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.3s ease-out !important;
+}
+
+.animate-pulse {
+  animation: pulse 2s infinite !important;
 }
