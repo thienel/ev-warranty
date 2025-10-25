@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useEffect, useRef } from "react";
-import { AutoComplete, Input, Space, Typography, Spin } from "antd";
+import { AutoComplete, Input, Typography, Spin } from "antd";
 import { UserOutlined, SearchOutlined } from "@ant-design/icons";
 import { customersApi } from "@services/index";
 import type { Customer } from "@/types";
@@ -25,7 +25,7 @@ interface CustomerSearchProps {
 const CustomerSearch: React.FC<CustomerSearchProps> = ({
   onSelect,
   selectedCustomer,
-  placeholder = "Search customers by name, email, or phone...",
+  placeholder = "Search customers by name or email...",
   allowClear = true,
   disabled = false,
   className,
@@ -58,20 +58,15 @@ const CustomerSearch: React.FC<CustomerSearchProps> = ({
       try {
         setLoading(true);
 
-        // Try different search approaches
+        // Search by name and email only
         const searchPromises = [];
 
-        // Search by name (most common)
+        // Search by name (first name, last name, or full name)
         searchPromises.push(customersApi.getAll({ name: searchText }));
 
         // If it looks like an email, search by email
-        if (searchText.includes("@")) {
+        if (searchText.includes("@") || searchText.includes(".")) {
           searchPromises.push(customersApi.getAll({ email: searchText }));
-        }
-
-        // If it looks like a phone number, search by phone
-        if (/^\d+/.test(searchText)) {
-          searchPromises.push(customersApi.getAll({ phone: searchText }));
         }
 
         const results = await Promise.allSettled(searchPromises);
@@ -105,43 +100,44 @@ const CustomerSearch: React.FC<CustomerSearchProps> = ({
           }
         });
 
+        // Filter results to match search text more precisely
+        const filteredCustomers = allCustomers.filter((customer) => {
+          const fullName =
+            customer.full_name ||
+            `${customer.first_name} ${customer.last_name}`;
+          const searchLower = searchText.toLowerCase();
+
+          return (
+            fullName.toLowerCase().includes(searchLower) ||
+            customer.first_name?.toLowerCase().includes(searchLower) ||
+            customer.last_name?.toLowerCase().includes(searchLower) ||
+            customer.email?.toLowerCase().includes(searchLower)
+          );
+        });
+
         // Convert to AutoComplete options
-        const customerOptions: CustomerOption[] = allCustomers.map(
+        const customerOptions: CustomerOption[] = filteredCustomers.map(
           (customer) => {
             const displayName =
               customer.full_name ||
               `${customer.first_name} ${customer.last_name}`;
-            const displayInfo = [
-              customer.email,
-              customer.phone_number,
-              customer.address,
-            ]
-              .filter(Boolean)
-              .join(" • ");
 
             return {
               value: customer.id,
               customer,
               label: (
-                <div style={{ padding: "8px 0" }}>
-                  <Space
-                    direction="vertical"
-                    size={2}
-                    style={{ width: "100%" }}
-                  >
-                    <Space>
-                      <UserOutlined style={{ color: "#697565" }} />
-                      <Text strong>{displayName}</Text>
-                    </Space>
-                    {displayInfo && (
-                      <Text
-                        type="secondary"
-                        style={{ fontSize: "12px", marginLeft: "20px" }}
-                      >
-                        {displayInfo}
-                      </Text>
-                    )}
-                  </Space>
+                <div className="search-option">
+                  <div className="option-main">
+                    <UserOutlined
+                      style={{ color: "#697565", marginRight: 8 }}
+                    />
+                    <Text strong>{displayName}</Text>
+                  </div>
+                  {customer.email && (
+                    <div className="option-details">
+                      <Text type="secondary">{customer.email}</Text>
+                    </div>
+                  )}
                 </div>
               ),
             };
@@ -207,14 +203,14 @@ const CustomerSearch: React.FC<CustomerSearchProps> = ({
       onSearch={handleSearch}
       onSelect={handleSelect}
       value={searchValue}
-      placeholder={placeholder}
       allowClear={allowClear}
       disabled={disabled}
       notFoundContent={loading ? <Spin size="small" /> : "No customers found"}
       popupMatchSelectWidth={false}
-      style={{ width: "100%" }}
+      style={{ width: "100%", height: 46 }}
     >
       <Input
+        placeholder={placeholder}
         prefix={<SearchOutlined />}
         suffix={loading ? <Spin size="small" /> : null}
       />
