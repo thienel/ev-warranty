@@ -12,6 +12,8 @@ import {
   message,
   Steps,
   Alert,
+  Tag,
+  Progress,
 } from "antd";
 import {
   UserOutlined,
@@ -19,6 +21,8 @@ import {
   FileTextOutlined,
   SaveOutlined,
   ArrowLeftOutlined,
+  CheckCircleOutlined,
+  ExclamationCircleOutlined,
 } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import CustomerSearch from "@components/common/CustomerSearch/CustomerSearch";
@@ -163,228 +167,321 @@ const ClaimCreate: React.FC = () => {
   };
 
   return (
-    <div
-      className="claim-create"
-      style={{ padding: "24px", maxWidth: "1200px", margin: "0 auto" }}
-    >
-      {/* Header */}
-      <div style={{ marginBottom: "24px" }}>
-        <Space size="middle" style={{ marginBottom: "16px" }}>
-          <Button icon={<ArrowLeftOutlined />} onClick={handleBack} type="text">
+    <div className="claim-create">
+      {/* Header Section */}
+      <div className="claim-create-header">
+        <div className="header-nav">
+          <Button
+            icon={<ArrowLeftOutlined />}
+            onClick={handleBack}
+            type="text"
+            size="large"
+            className="back-button"
+          >
             Back to Claims
           </Button>
-        </Space>
-        <Title level={2} style={{ margin: 0 }}>
-          Create New Warranty Claim
-        </Title>
-        <Text type="secondary">
-          Create a new warranty claim for a customer's vehicle. Only SC Staff
-          can create claims.
-        </Text>
+        </div>
+
+        <div className="header-content">
+          <div className="header-text">
+            <Title level={1} className="page-title">
+              Create New Warranty Claim
+            </Title>
+            <Text className="page-description">
+              Create a new warranty claim for a customer's vehicle. Follow the
+              steps below to complete the process.
+            </Text>
+          </div>
+
+          <div className="header-progress">
+            <Progress
+              type="circle"
+              percent={Math.round(((currentStep + 1) / 3) * 100)}
+              size={80}
+              strokeColor={{
+                "0%": "#697565",
+                "100%": "#5a6358",
+              }}
+              format={() => (
+                <div className="progress-content">
+                  <div className="step-number">{currentStep + 1}</div>
+                  <div className="step-total">of 3</div>
+                </div>
+              )}
+            />
+          </div>
+        </div>
       </div>
 
-      {/* Steps */}
-      <Card style={{ marginBottom: "24px" }}>
+      {/* Steps Navigation */}
+      <Card className="steps-card">
         <Steps
           current={currentStep}
-          items={steps}
+          items={steps.map((step, index) => ({
+            ...step,
+            status:
+              currentStep > index
+                ? "finish"
+                : currentStep === index
+                  ? "process"
+                  : "wait",
+            icon: currentStep > index ? <CheckCircleOutlined /> : step.icon,
+          }))}
           onChange={handleStepChange}
+          className="claim-steps"
         />
       </Card>
 
       {/* Form Content */}
-      <Form
-        form={form}
-        layout="vertical"
-        onFinish={handleSubmit}
-        disabled={loading}
-      >
-        <Row gutter={[24, 24]}>
-          {/* Customer Selection */}
-          <Col xs={24} lg={12}>
-            <Card
-              title={
-                <Space>
-                  <UserOutlined />
-                  <span>Customer Selection</span>
-                </Space>
-              }
-              className={`step-card ${currentStep === 0 ? "active" : ""}`}
-            >
-              <Space
-                direction="vertical"
-                size="middle"
-                style={{ width: "100%" }}
+      <div className="form-container">
+        <Form
+          form={form}
+          layout="vertical"
+          onFinish={handleSubmit}
+          disabled={loading}
+        >
+          <Row gutter={[24, 24]}>
+            {/* Customer Selection */}
+            <Col xs={24} lg={12}>
+              <Card
+                title={
+                  <div className="card-header">
+                    <div className="card-title">
+                      <UserOutlined className="card-icon" />
+                      <span>Customer Selection</span>
+                    </div>
+                    <div className="card-status">
+                      {selectedCustomer ? (
+                        <Tag color="success" icon={<CheckCircleOutlined />}>
+                          Selected
+                        </Tag>
+                      ) : (
+                        <Tag
+                          color="warning"
+                          icon={<ExclamationCircleOutlined />}
+                        >
+                          Required
+                        </Tag>
+                      )}
+                    </div>
+                  </div>
+                }
+                className={`step-card ${currentStep === 0 ? "active" : ""} ${selectedCustomer ? "completed" : ""}`}
+                hoverable
               >
-                <CustomerSearch
-                  onSelect={handleCustomerSelect}
-                  selectedCustomer={selectedCustomer}
-                  placeholder="Search by customer name, email, or phone..."
-                  className="customer-search"
-                />
-
-                {selectedCustomer && (
-                  <Alert
-                    message="Customer Selected"
-                    description={
-                      <div className="customer-info">
-                        <Text strong>
-                          {selectedCustomer.full_name ||
-                            `${selectedCustomer.first_name} ${selectedCustomer.last_name}`}
-                        </Text>
-                        <br />
-                        {selectedCustomer.email && (
-                          <Text type="secondary">
-                            Email: {selectedCustomer.email}
-                          </Text>
-                        )}
-                        {selectedCustomer.email &&
-                          selectedCustomer.phone_number && <br />}
-                        {selectedCustomer.phone_number && (
-                          <Text type="secondary">
-                            Phone: {selectedCustomer.phone_number}
-                          </Text>
-                        )}
-                        {(selectedCustomer.email ||
-                          selectedCustomer.phone_number) &&
-                          selectedCustomer.address && <br />}
-                        {selectedCustomer.address && (
-                          <Text type="secondary">
-                            Address: {selectedCustomer.address}
-                          </Text>
-                        )}
-                      </div>
-                    }
-                    type="success"
-                    showIcon
-                    style={{ marginTop: "8px" }}
+                <div className="card-content">
+                  <CustomerSearch
+                    onSelect={handleCustomerSelect}
+                    selectedCustomer={selectedCustomer}
+                    placeholder="Search by customer name or email..."
                   />
-                )}
-              </Space>
-            </Card>
-          </Col>
 
-          {/* Vehicle Selection */}
-          <Col xs={24} lg={12}>
-            <Card
-              title={
-                <Space>
-                  <CarOutlined />
-                  <span>Vehicle Selection</span>
-                </Space>
-              }
-              className={`step-card ${currentStep === 1 ? "active" : ""} ${!selectedCustomer ? "disabled" : ""}`}
-            >
-              <Space
-                direction="vertical"
-                size="middle"
-                style={{ width: "100%" }}
-              >
-                <VehicleSearch
-                  onSelect={handleVehicleSelect}
-                  selectedVehicle={selectedVehicle}
-                  selectedCustomer={selectedCustomer}
-                  disabled={!selectedCustomer}
-                  className="vehicle-search"
-                />
-
-                {selectedVehicle && (
-                  <Alert
-                    message="Vehicle Selected"
-                    description={
-                      <div className="vehicle-info">
-                        <Text strong>VIN: {selectedVehicle.vin}</Text>
-                        <br />
-                        {selectedVehicle.license_plate && (
-                          <>
-                            <Text type="secondary">
-                              License Plate: {selectedVehicle.license_plate}
-                            </Text>
-                            <br />
-                          </>
-                        )}
-                        {selectedVehicle.purchase_date && (
-                          <Text type="secondary">
-                            Purchase Date:{" "}
-                            {new Date(
-                              selectedVehicle.purchase_date
-                            ).toLocaleDateString()}
+                  {selectedCustomer && (
+                    <Alert
+                      style={{ marginTop: 18 }}
+                      description={
+                        <div className="customer-info">
+                          <Text strong className="customer-name">
+                            {selectedCustomer.full_name ||
+                              `${selectedCustomer.first_name} ${selectedCustomer.last_name}`}
                           </Text>
-                        )}
-                      </div>
-                    }
-                    type="success"
-                    showIcon
-                    style={{ marginTop: "8px" }}
-                  />
-                )}
-              </Space>
-            </Card>
-          </Col>
+                          <div className="customer-details">
+                            {selectedCustomer.email && (
+                              <div className="detail-item">
+                                <Text type="secondary">
+                                  Email: {selectedCustomer.email}
+                                </Text>
+                              </div>
+                            )}
+                            {selectedCustomer.phone_number && (
+                              <div className="detail-item">
+                                <Text type="secondary">
+                                  Phone: {selectedCustomer.phone_number}
+                                </Text>
+                              </div>
+                            )}
+                            {selectedCustomer.address && (
+                              <div className="detail-item">
+                                <Text type="secondary">
+                                  Address: {selectedCustomer.address}
+                                </Text>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      }
+                      type="success"
+                      showIcon
+                      className="selection-alert"
+                    />
+                  )}
+                </div>
+              </Card>
+            </Col>
 
-          {/* Claim Description */}
-          <Col xs={24}>
-            <Card
-              title={
-                <Space>
-                  <FileTextOutlined />
-                  <span>Claim Description</span>
-                </Space>
-              }
-              className={`step-card ${currentStep === 2 ? "active" : ""} ${!selectedCustomer || !selectedVehicle ? "disabled" : ""}`}
-            >
-              <Form.Item
-                name="description"
-                label="Claim Description"
-                rules={[
-                  {
-                    required: true,
-                    message: "Please provide a description of the issue",
-                  },
-                  {
-                    min: 10,
-                    message: "Description must be at least 10 characters long",
-                  },
-                  {
-                    max: 1000,
-                    message: "Description cannot exceed 1000 characters",
-                  },
-                ]}
-                extra="Describe the issue or problem that requires warranty coverage. Be as detailed as possible."
+            {/* Vehicle Selection */}
+            <Col xs={24} lg={12}>
+              <Card
+                title={
+                  <div className="card-header">
+                    <div className="card-title">
+                      <CarOutlined className="card-icon" />
+                      <span>Vehicle Selection</span>
+                    </div>
+                    <div className="card-status">
+                      {selectedVehicle ? (
+                        <Tag color="success" icon={<CheckCircleOutlined />}>
+                          Selected
+                        </Tag>
+                      ) : selectedCustomer ? (
+                        <Tag
+                          color="warning"
+                          icon={<ExclamationCircleOutlined />}
+                        >
+                          Required
+                        </Tag>
+                      ) : (
+                        <Tag color="default">Waiting</Tag>
+                      )}
+                    </div>
+                  </div>
+                }
+                className={`step-card ${currentStep === 1 ? "active" : ""} ${!selectedCustomer ? "disabled" : ""} ${selectedVehicle ? "completed" : ""}`}
+                hoverable={!!selectedCustomer}
               >
-                <TextArea
-                  rows={6}
-                  placeholder="Describe the issue, symptoms, and any relevant details about the warranty claim..."
-                  disabled={!selectedCustomer || !selectedVehicle}
-                  showCount
-                  maxLength={1000}
-                />
-              </Form.Item>
-            </Card>
-          </Col>
-        </Row>
+                <div className="card-content">
+                  <VehicleSearch
+                    onSelect={handleVehicleSelect}
+                    selectedVehicle={selectedVehicle}
+                    selectedCustomer={selectedCustomer}
+                    disabled={!selectedCustomer}
+                  />
 
-        <Divider />
+                  {selectedVehicle && (
+                    <Alert
+                      description={
+                        <div className="vehicle-info">
+                          <Text strong className="vehicle-vin">
+                            VIN: {selectedVehicle.vin}
+                          </Text>
+                          <div className="vehicle-details">
+                            {selectedVehicle.license_plate && (
+                              <div className="detail-item">
+                                <Text type="secondary">
+                                  License Plate: {selectedVehicle.license_plate}
+                                </Text>
+                              </div>
+                            )}
+                            {selectedVehicle.purchase_date && (
+                              <div className="detail-item">
+                                <Text type="secondary">
+                                  Purchase Date:{" "}
+                                  {new Date(
+                                    selectedVehicle.purchase_date
+                                  ).toLocaleDateString()}
+                                </Text>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      }
+                      type="success"
+                      showIcon
+                      className="selection-alert"
+                    />
+                  )}
+                </div>
+              </Card>
+            </Col>
 
-        {/* Action Buttons */}
-        <div className="form-actions">
-          <Space size="middle">
-            <Button onClick={handleBack} disabled={loading}>
-              Cancel
-            </Button>
-            <Button
-              type="primary"
-              htmlType="submit"
-              icon={<SaveOutlined />}
-              loading={loading}
-              disabled={!isStepValid(2)}
-              size="large"
-            >
-              Create Claim
-            </Button>
-          </Space>
-        </div>
-      </Form>
+            {/* Claim Description */}
+            <Col xs={24}>
+              <Card
+                title={
+                  <div className="card-header">
+                    <div className="card-title">
+                      <FileTextOutlined className="card-icon" />
+                      <span>Claim Description</span>
+                    </div>
+                    <div className="card-status">
+                      {!selectedCustomer || !selectedVehicle ? (
+                        <Tag color="default">Waiting</Tag>
+                      ) : (
+                        <Tag
+                          color="warning"
+                          icon={<ExclamationCircleOutlined />}
+                        >
+                          Required
+                        </Tag>
+                      )}
+                    </div>
+                  </div>
+                }
+                className={`step-card ${currentStep === 2 ? "active" : ""} ${!selectedCustomer || !selectedVehicle ? "disabled" : ""}`}
+                hoverable={!!(selectedCustomer && selectedVehicle)}
+              >
+                <Form.Item
+                  name="description"
+                  label={
+                    <div className="form-label">
+                      <span>Claim Description</span>
+                      <Text type="secondary" className="label-helper">
+                        Provide detailed information about the issue
+                      </Text>
+                    </div>
+                  }
+                  rules={[
+                    {
+                      required: true,
+                      message: "Please provide a description of the issue",
+                    },
+                    {
+                      min: 10,
+                      message:
+                        "Description must be at least 10 characters long",
+                    },
+                    {
+                      max: 1000,
+                      message: "Description cannot exceed 1000 characters",
+                    },
+                  ]}
+                >
+                  <TextArea
+                    style={{ marginTop: 12 }}
+                    rows={8}
+                    placeholder="Describe the issue, symptoms, and any relevant details about the warranty claim..."
+                    disabled={!selectedCustomer || !selectedVehicle}
+                    showCount
+                    maxLength={1000}
+                  />
+                </Form.Item>
+              </Card>
+            </Col>
+          </Row>
+
+          <Divider />
+
+          {/* Action Buttons */}
+          <div style={{ textAlign: "center" }}>
+            <Space size="large">
+              <Button onClick={handleBack} disabled={loading} size="large">
+                Cancel
+              </Button>
+              <Button
+                type="primary"
+                htmlType="submit"
+                icon={<SaveOutlined />}
+                loading={loading}
+                disabled={!isStepValid(2)}
+                size="large"
+                className="submit-button"
+              >
+                Create Claim
+              </Button>
+            </Space>
+          </div>
+        </Form>
+      </div>
     </div>
   );
 };

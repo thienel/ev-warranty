@@ -1,55 +1,219 @@
 .claim-create {
-  .active-step .ant-card-head {
-    background-color: #f0f9ff;
-    border-color: #1890ff;
+  padding: 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+  min-height: 100vh;
+
+  &-header {
+    background: @bg-container;
+    border-radius: @border-radius-lg;
+    padding: 32px;
+    margin-bottom: 24px;
+    box-shadow: @box-shadow-light;
+    border: 1px solid @border-color;
+
+    .header-nav {
+      margin-bottom: 24px;
+
+      .back-button {
+        color: @text-secondary !important;
+        font-weight: @font-weight-medium;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        transition: @transition-base;
+
+        &:hover {
+          color: @primary-text-hover !important;
+          background: @primary-bg-hover !important;
+        }
+      }
+    }
+
+    .header-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 32px;
+
+      .header-text {
+        flex: 1;
+
+        .page-title {
+          color: @text-heading !important;
+          margin-bottom: 8px !important;
+          font-weight: @font-weight-semibold !important;
+          font-size: 28px !important;
+        }
+
+        .page-description {
+          color: @text-secondary !important;
+          font-size: @font-size-lg;
+          line-height: 1.6;
+        }
+      }
+
+      .header-progress {
+        flex-shrink: 0;
+
+        .progress-content {
+          text-align: center;
+
+          .step-number {
+            font-size: 18px;
+            font-weight: @font-weight-semibold;
+            color: @primary-color;
+          }
+
+          .step-total {
+            font-size: 12px;
+            color: @text-tertiary;
+            margin-top: -2px;
+          }
+        }
+      }
+    }
   }
-  
+
+  // ===== STEPS NAVIGATION =====
+  .steps-card {
+    margin-bottom: 32px;
+    border: 1px solid @border-color;
+    box-shadow: @box-shadow-light;
+
+    .claim-steps {
+      .ant-steps-item {
+        &-process .ant-steps-item-icon {
+          background: transparent !important;
+          border-color: @primary-color !important;
+          
+          .anticon {
+            color: @primary-color !important;
+          }
+        }
+
+        &-finish .ant-steps-item-icon {
+          background: transparent !important;
+          border-color: @success-color !important;
+          
+          .anticon {
+            color: @success-color !important;
+          }
+        }
+
+        &-title {
+          font-weight: @font-weight-medium !important;
+        }
+
+        &-description {
+          color: @text-secondary !important;
+        }
+      }
+    }
+  }
+
+  // ===== FORM CONTAINER =====
+  .form-container {
+    .ant-form {
+      .ant-row {
+        margin-bottom: 24px;
+      }
+    }
+  }
+
+  // ===== STEP CARDS =====
   .step-card {
-    transition: all 0.3s ease;
+    height: 100%;
+    border: 2px solid @border-color;
+    border-radius: @border-radius-lg;
+    transition: all @motion-duration-mid ease;
+    overflow: hidden;
+    
+    &:hover {
+      box-shadow: @box-shadow-medium;
+      transform: translateY(-2px);
+    }
     
     &.disabled {
       opacity: 0.6;
       pointer-events: none;
+      background: @fill-color;
+      
+      .ant-card-head {
+        background: @fill-secondary;
+      }
     }
     
     &.active {
-      border: 2px solid #1890ff;
-      box-shadow: 0 4px 12px rgba(24, 144, 255, 0.15);
+      border-color: @primary-color;
+      box-shadow: 0 4px 16px fade(@primary-color, 20%);
+      
+      .ant-card-head {
+        background: linear-gradient(135deg, @primary-bg 0%, @primary-bg-hover 100%);
+        border-bottom-color: @primary-border;
+      }
+
+      .card-icon {
+        color: @primary-color;
+      }
     }
-  }
-  
-  .customer-info,
-  .vehicle-info {
-    .ant-alert-description {
-      margin-top: 8px;
+
+    &.completed {
+      border-color: @success-color;
+      
+      .ant-card-head {
+        background: linear-gradient(135deg, @success-bg 0%, lighten(@success-bg, 2%) 100%);
+        border-bottom-color: @success-border;
+      }
+
+      .card-icon {
+        color: @success-color;
+      }
     }
-  }
-  
-  .form-actions {
-    text-align: center;
-    padding: 24px 0;
+
+    // Card Header
+    .ant-card-head {
+      background: @bg-container;
+      border-bottom: 1px solid @border-color;
+      transition: @transition-base;
+      padding: 20px 24px;
+
+      .ant-card-head-title {
+        padding: 0;
+      }
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+
+      .card-title {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-weight: @font-weight-semibold;
+        color: @text-heading;
+
+        .card-icon {
+          font-size: 18px;
+          transition: @transition-base;
+        }
+      }
+
+      .card-status {
+        .ant-tag {
+          border-radius: @border-radius-base;
+          font-weight: @font-weight-medium;
+          padding: 4px 12px;
+          display: flex;
+          align-items: center;
+          gap: 6px;
+        }
+      }
+    }
+
   }
 }
 
-.customer-search,
-.vehicle-search {
-  .ant-select-dropdown {
-    max-width: 400px;
-  }
-  
-  .search-option {
-    padding: 8px 0;
-    
-    .option-main {
-      display: flex;
-      align-items: center;
-      margin-bottom: 4px;
-    }
-    
-    .option-details {
-      font-size: 12px;
-      color: #666;
-      margin-left: 20px;
-    }
-  }
-}
