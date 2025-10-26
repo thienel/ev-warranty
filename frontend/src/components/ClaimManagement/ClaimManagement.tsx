@@ -1,16 +1,16 @@
-import React from "react";
-import { useNavigate, useLocation } from "react-router-dom";
-import { API_ENDPOINTS, USER_ROLES } from "@constants/common-constants";
-import { type Claim } from "@/types/index";
-import useClaimsManagement from "@/components/ClaimManagement/useClaimsManagement";
-import GenericActionBar from "@components/common/GenericActionBar/GenericActionBar";
-import GenericTable from "@components/common/GenericTable/GenericTable";
-import GenerateColumns from "./claimTableColumns";
-import { allowRoles, getClaimsBasePath } from "@/utils/navigationHelpers";
+import React from 'react'
+import { useNavigate, useLocation } from 'react-router-dom'
+import { API_ENDPOINTS, USER_ROLES } from '@constants/common-constants'
+import { type Claim } from '@/types/index'
+import useClaimsManagement from '@/components/ClaimManagement/useClaimsManagement'
+import GenericActionBar from '@components/common/GenericActionBar/GenericActionBar'
+import GenericTable from '@components/common/GenericTable/GenericTable'
+import GenerateColumns from './claimTableColumns'
+import { allowRoles, getClaimsBasePath } from '@/utils/navigationHelpers'
 
 const ClaimManagement: React.FC = () => {
-  const navigate = useNavigate();
-  const location = useLocation();
+  const navigate = useNavigate()
+  const location = useLocation()
 
   const {
     claims,
@@ -21,7 +21,7 @@ const ClaimManagement: React.FC = () => {
     handleOpenModal,
     handleReset,
     allowCreate,
-  } = useClaimsManagement();
+  } = useClaimsManagement()
 
   const handleViewDetails = (claim: Claim): void => {
     if (
@@ -32,24 +32,19 @@ const ClaimManagement: React.FC = () => {
         USER_ROLES.SC_TECHNICIAN,
       ])
     ) {
-      const basePath = getClaimsBasePath(location.pathname);
-      navigate(`${basePath}/${claim.id}`);
+      const basePath = getClaimsBasePath(location.pathname)
+      navigate(`${basePath}/${claim.id}`)
     }
-  };
+  }
 
   const handleCreateClaim = (): void => {
     if (allowRoles(location.pathname, [USER_ROLES.SC_STAFF])) {
-      const basePath = getClaimsBasePath(location.pathname);
-      navigate(`${basePath}/create`);
+      const basePath = getClaimsBasePath(location.pathname)
+      navigate(`${basePath}/create`)
     }
-  };
+  }
 
-  const searchFields = [
-    "customer_name",
-    "vehicle_info",
-    "description",
-    "status",
-  ];
+  const searchFields = ['customer_name', 'vehicle_info', 'description', 'status']
 
   return (
     <>
@@ -69,16 +64,11 @@ const ClaimManagement: React.FC = () => {
         setLoading={setLoading}
         searchText={searchText}
         data={
-          (Array.isArray(claims) ? claims : []) as unknown as (Record<
-            string,
-            unknown
-          > & {
-            id: string | number;
+          (Array.isArray(claims) ? claims : []) as unknown as (Record<string, unknown> & {
+            id: string | number
           })[]
         }
-        onOpenModal={(record) =>
-          record && handleOpenModal(record as Claim, false)
-        }
+        onOpenModal={(record) => record && handleOpenModal(record as unknown as Claim, false)}
         onRefresh={handleReset}
         generateColumns={GenerateColumns}
         searchFields={searchFields}
@@ -87,7 +77,7 @@ const ClaimManagement: React.FC = () => {
         additionalProps={{ onViewDetails: handleViewDetails }}
       />
     </>
-  );
-};
+  )
+}
 
-export default ClaimManagement;
+export default ClaimManagement

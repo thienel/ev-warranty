@@ -304,7 +304,7 @@ export interface Vehicle {
   license_plate?: string
   customer_id: string
   model_id: string
-  purchase_id?: string
+  purchase_date?: string
   created_at: string
   updated_at?: string
 }
