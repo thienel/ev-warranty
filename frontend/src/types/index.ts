@@ -1,4 +1,3 @@
-// API Response Types
 export interface ApiSuccessResponse<T = unknown> {
   data: T
 }
@@ -13,21 +12,19 @@ export interface PaginationParams {
   status?: string
 }
 
-// Base types
 export interface BaseEntity {
   id: string
   created_at?: string
   updated_at?: string
 }
 
-// User types (matching dtos.UserDTO from Swagger)
-export interface User extends Record<string, unknown> {
+export interface User {
   id: string
   email: string
   name: string
   role: string
   office_id: string
-  is_active: boolean
+  is_active?: boolean
 }
 
 export interface UserFormData {
@@ -39,14 +36,13 @@ export interface UserFormData {
   is_active: boolean
 }
 
-// User API DTOs
 export interface CreateUserRequest {
   email: string
   name: string
   password: string
   role: string
   office_id: string
-  is_active: boolean
+  is_active?: boolean
 }
 
 export interface UpdateUserRequest {
@@ -56,7 +52,6 @@ export interface UpdateUserRequest {
   is_active?: boolean
 }
 
-// Auth types
 export interface LoginRequest {
   email: string
   password: string
@@ -76,7 +71,6 @@ export interface RefreshTokenResponse {
   token: string
 }
 
-// Auth state types
 export interface AuthState {
   user: User | null
   token: string | null
@@ -85,20 +79,18 @@ export interface AuthState {
   isLoading?: boolean
 }
 
-// Login payload type
 export interface LoginPayload {
   user: User
   token: string
   remember: boolean
 }
 
-// Office types (matching entities.Office from Swagger)
-export interface Office extends Record<string, unknown> {
+export interface Office {
   id: string
   office_name: string
   office_type: string
   address: string
-  is_active: boolean
+  is_active?: boolean
   created_at?: string
   updated_at?: string
 }
@@ -110,7 +102,6 @@ export interface OfficeFormData {
   is_active: boolean
 }
 
-// Office API DTOs
 export interface CreateOfficeRequest {
   office_name: string
   office_type: string
@@ -125,8 +116,7 @@ export interface UpdateOfficeRequest {
   is_active?: boolean
 }
 
-// Claim types (matching entities.Claim from Swagger)
-export interface Claim extends Record<string, unknown> {
+export interface Claim {
   id: string
   customer_id: string
   vehicle_id: string
@@ -144,7 +134,6 @@ export interface ClaimFormData {
   description: string
 }
 
-// Claim API DTOs
 export interface CreateClaimRequest {
   customer_id: string
   vehicle_id: string
@@ -157,14 +146,13 @@ export interface UpdateClaimRequest {
 
 export interface ClaimListResponse {
   claims: Claim[]
-  total: number,
-  page: number,
-  page_size: number,
+  total: number
+  page: number
+  page_size: number
   total_pages: number
 }
 
-// Claim Item types (matching entities.ClaimItem from Swagger)
-export interface ClaimItem extends Record<string, unknown> {
+export interface ClaimItem {
   id: string
   claim_id: string
   part_category_id: number
@@ -178,7 +166,6 @@ export interface ClaimItem extends Record<string, unknown> {
   updated_at?: string
 }
 
-// Claim Item API DTOs
 export interface CreateClaimItemRequest {
   part_category_id: number
   faulty_part_id: string
@@ -193,8 +180,7 @@ export interface ClaimItemListResponse {
   total: number
 }
 
-// Claim Attachment types (matching entities.ClaimAttachment from Swagger)
-export interface ClaimAttachment extends Record<string, unknown> {
+export interface ClaimAttachment {
   id: string
   claimID: string
   url: string
@@ -207,8 +193,7 @@ export interface ClaimAttachmentListResponse {
   total: number
 }
 
-// Claim History types (matching entities.ClaimHistory from Swagger)
-export interface ClaimHistory extends Record<string, unknown> {
+export interface ClaimHistory {
   id: string
   claim_id: string
   status: string
@@ -216,7 +201,6 @@ export interface ClaimHistory extends Record<string, unknown> {
   changedAt: string
 }
 
-// Table column types
 export interface SortInfo {
   columnKey?: string
   order?: 'ascend' | 'descend' | null
@@ -226,13 +210,11 @@ export interface FilterInfo {
   [key: string]: React.Key[] | null
 }
 
-// Additional props for table columns
 export interface TableAdditionalProps {
   getOfficeName?: (officeId: string) => string
   [key: string]: unknown
 }
 
-// Modal component props
 export interface BaseModalProps {
   loading: boolean
   setLoading: (loading: boolean) => void
@@ -251,15 +233,14 @@ export interface OfficeModalProps extends BaseModalProps {
   office?: Office | null
 }
 
-// Customer types (matching Backend.Dotnet API)
-export interface Customer extends Record<string, unknown> {
+export interface Customer {
   id: string
   first_name: string
   last_name: string
   phone_number?: string
   email?: string
   address?: string
-  created_at?: string
+  created_at: string
   updated_at?: string
   deleted_at?: string
   is_deleted: boolean
@@ -274,30 +255,28 @@ export interface CustomerFormData {
   address?: string
 }
 
-// Customer API DTOs
 export interface CreateCustomerRequest {
   first_name: string
   last_name: string
-  phone_number?: string
   email?: string
+  phone_number?: string
   address?: string
 }
 
 export interface UpdateCustomerRequest {
   first_name: string
   last_name: string
-  phone_number?: string
   email?: string
+  phone_number?: string
   address?: string
 }
 
-// Vehicle Model types (matching Backend.Dotnet API)
-export interface VehicleModel extends Record<string, unknown> {
+export interface VehicleModel {
   id: string
   brand: string
   model_name: string
   year: number
-  created_at?: string
+  created_at: string
   updated_at?: string
 }
 
@@ -307,7 +286,6 @@ export interface VehicleModelFormData {
   year: number
 }
 
-// Vehicle Model API DTOs
 export interface CreateVehicleModelRequest {
   brand: string
   model_name: string
@@ -320,15 +298,14 @@ export interface UpdateVehicleModelRequest {
   year: number
 }
 
-// Vehicle types (matching Backend.Dotnet API)
-export interface Vehicle extends Record<string, unknown> {
+export interface Vehicle {
   id: string
   vin: string
   license_plate?: string
   customer_id: string
   model_id: string
-  purchase_date?: string
-  created_at?: string
+  purchase_id?: string
+  created_at: string
   updated_at?: string
 }
 
@@ -337,10 +314,9 @@ export interface VehicleFormData {
   license_plate?: string
   customer_id: string
   model_id: string
-  purchase_date?: unknown // Using unknown for Dayjs compatibility
+  purchase_date?: unknown
 }
 
-// Vehicle API DTOs
 export interface CreateVehicleRequest {
   vin: string
   license_plate?: string
@@ -357,7 +333,13 @@ export interface UpdateVehicleRequest {
   purchase_date?: string
 }
 
-// Modal props for new components
+export interface DotNetApiResponse<T = unknown> {
+  is_success: boolean
+  message?: string
+  error?: string
+  data?: T
+}
+
 export interface CustomerModalProps extends BaseModalProps {
   customer?: Customer | null
 }

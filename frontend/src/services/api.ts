@@ -23,7 +23,7 @@ const processQueue = (error: unknown, token: string | null = null) => {
       resolve(token)
     }
   })
-  
+
   failedQueue = []
 }
 
@@ -47,13 +47,13 @@ api.interceptors.request.use(
         store.dispatch(logout())
         return Promise.reject(new Error('Invalid or expired token'))
       }
-      
+
       config.headers = config.headers || {}
       config.headers.Authorization = `Bearer ${token}`
     }
     return config
   },
-  (error: AxiosError) => Promise.reject(error)
+  (error: AxiosError) => Promise.reject(error),
 )
 
 api.interceptors.response.use(
@@ -67,14 +67,16 @@ api.interceptors.response.use(
         // If token is being refreshed, queue this request
         return new Promise((resolve, reject) => {
           failedQueue.push({ resolve, reject })
-        }).then(token => {
-          if (originalRequest?.headers) {
-            originalRequest.headers.Authorization = `Bearer ${token}`
-          }
-          return api(originalRequest as AxiosRequestConfig)
-        }).catch(err => {
-          return Promise.reject(err)
         })
+          .then((token) => {
+            if (originalRequest?.headers) {
+              originalRequest.headers.Authorization = `Bearer ${token}`
+            }
+            return api(originalRequest as AxiosRequestConfig)
+          })
+          .catch((err) => {
+            return Promise.reject(err)
+          })
       }
 
       if (originalRequest) {
@@ -87,7 +89,7 @@ api.interceptors.response.use(
         const res = await axios.post(
           `${API_BASE_URL}${API_ENDPOINTS.AUTH.TOKEN}`,
           {},
-          { withCredentials: true }
+          { withCredentials: true },
         )
         const newToken = res.data.data.access_token
 
@@ -97,18 +99,18 @@ api.interceptors.response.use(
         if (originalRequest?.headers) {
           originalRequest.headers.Authorization = `Bearer ${newToken}`
         }
-        
+
         return api(originalRequest as AxiosRequestConfig)
       } catch (refreshError) {
         processQueue(refreshError, null)
         store.dispatch(logout())
         await persistor.purge()
-        
+
         // Redirect to login page
         if (window.location.pathname !== '/login') {
           window.location.replace('/login')
         }
-        
+
         return Promise.reject(refreshError)
       } finally {
         isRefreshing = false
@@ -116,7 +118,7 @@ api.interceptors.response.use(
     }
 
     return Promise.reject(error)
-  }
+  },
 )
 
 export default api
