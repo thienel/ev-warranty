@@ -4,6 +4,8 @@ import useDelay from '@/hooks/useDelay'
 import useHandleApiError from '@/hooks/useHandleApiError'
 import type { ErrorResponse } from '@/constants/error-messages'
 import type { Claim, PaginationParams } from '@/types'
+import { allowRoles } from '@/utils/navigationHelpers'
+import { USER_ROLES } from '@/constants/common-constants'
 
 interface UseClaimsManagementReturn {
   claims: Claim[]
@@ -28,6 +30,7 @@ interface UseClaimsManagementReturn {
   handleComplete: (claimId: string) => Promise<void>
   handleReview: (claimId: string) => Promise<void>
   handleRequestInfo: (claimId: string) => Promise<void>
+  allowCreate: boolean
 }
 
 const useClaimsManagement = (): UseClaimsManagementReturn => {
@@ -41,6 +44,7 @@ const useClaimsManagement = (): UseClaimsManagementReturn => {
     page: 1,
     limit: 10,
   })
+  const [allowCreate, setAllowCreate] = useState(false)
   const handleError = useHandleApiError()
   const delay = useDelay(300)
 
@@ -136,6 +140,10 @@ const useClaimsManagement = (): UseClaimsManagementReturn => {
   }
 
   useEffect(() => {
+    if (allowRoles(location.pathname, [USER_ROLES.SC_STAFF])) {
+      setAllowCreate(true) 
+    }
+
     fetchClaims()
   }, [fetchClaims])
 
@@ -162,6 +170,7 @@ const useClaimsManagement = (): UseClaimsManagementReturn => {
     handleComplete,
     handleReview,
     handleRequestInfo,
+    allowCreate,
   }
 }
 

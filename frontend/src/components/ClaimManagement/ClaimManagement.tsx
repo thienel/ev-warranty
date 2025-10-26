@@ -1,12 +1,12 @@
 import React from "react";
-import { message } from "antd";
 import { useNavigate, useLocation } from "react-router-dom";
-import { API_ENDPOINTS } from "@constants/common-constants";
+import { API_ENDPOINTS, USER_ROLES } from "@constants/common-constants";
 import { type Claim } from "@/types/index";
-import useClaimsManagement from "@/hooks/useClaimsManagement";
+import useClaimsManagement from "@/components/ClaimManagement/useClaimsManagement";
 import GenericActionBar from "@components/common/GenericActionBar/GenericActionBar";
 import GenericTable from "@components/common/GenericTable/GenericTable";
 import GenerateColumns from "./claimTableColumns";
+import { allowRoles, getClaimsBasePath } from "@/utils/navigationHelpers";
 
 const ClaimManagement: React.FC = () => {
   const navigate = useNavigate();
@@ -19,6 +19,7 @@ const ClaimManagement: React.FC = () => {
     setSearchText,
     handleOpenModal,
     handleReset,
+    allowCreate,
   } = useClaimsManagement();
 
   // Mock data for demonstration since APIs are not available yet
@@ -122,23 +123,24 @@ const ClaimManagement: React.FC = () => {
   ];
 
   const handleViewDetails = (claim: Claim): void => {
-    // Determine the base path from current location
-    const currentPath = location.pathname;
-    let basePath = "/claims";
-
-    if (currentPath.includes("/evm-staff/")) {
-      basePath = "/evm-staff/claims";
-    } else if (currentPath.includes("/sc-staff/")) {
-      basePath = "/sc-staff/claims";
-    } else if (currentPath.includes("/sc-technician/")) {
-      basePath = "/sc-technician/claims";
+    if (
+      allowRoles(location.pathname, [
+        USER_ROLES.ADMIN,
+        USER_ROLES.EVM_STAFF,
+        USER_ROLES.SC_STAFF,
+        USER_ROLES.SC_TECHNICIAN,
+      ])
+    ) {
+      const basePath = getClaimsBasePath(location.pathname);
+      navigate(`${basePath}/${claim.id}`);
     }
-
-    navigate(`${basePath}/${claim.id}`);
   };
 
   const handleCreateClaim = (): void => {
-    message.info("Create claim page will be implemented later.");
+    if (allowRoles(location.pathname, [USER_ROLES.SC_STAFF])) {
+      const basePath = getClaimsBasePath(location.pathname);
+      navigate(`${basePath}/create`);
+    }
   };
 
   const searchFields = [
@@ -158,6 +160,7 @@ const ClaimManagement: React.FC = () => {
         loading={loading}
         searchPlaceholder="Search by customer name, vehicle, description, or status..."
         addButtonText="Create Claim"
+        allowCreate={allowCreate}
       />
 
       <GenericTable

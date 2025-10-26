@@ -40,6 +40,7 @@ const VehicleModelManagement: React.FC = () => {
         loading={loading}
         searchPlaceholder="Search by brand, model or year..."
         addButtonText="Add Model"
+        allowCreate={true}
       />
 
       <GenericTable

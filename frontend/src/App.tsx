@@ -15,6 +15,7 @@ import EVMStaffClaims from "@pages/evm-staff/Claims";
 import SCStaffClaims from "@pages/sc-staff/Claims";
 import SCTechnicianClaims from "@pages/sc-technician/Claims";
 import ClaimDetail from "@pages/claims/ClaimDetail";
+import ClaimCreate from "@pages/sc-staff/ClaimCreate";
 
 // New management pages
 import Customers from "@pages/sc-staff/Customers";
@@ -22,6 +23,8 @@ import Vehicles from "@pages/evm-staff/Vehicles";
 import VehicleModels from "@pages/evm-staff/VehicleModels";
 
 import type { RootState } from "@redux/store";
+import { ConfigProvider } from "antd";
+import { antdThemeConfig } from "./styles/antdThemeConfig";
 
 export const ProtectedRoute: React.FC = () => {
   const authState = useSelector((state: RootState) => state.auth);
@@ -113,6 +116,7 @@ const App: React.FC = () => {
               path: "claims",
               children: [
                 { path: "", element: <SCStaffClaims /> },
+                { path: "create", element: <ClaimCreate /> },
                 { path: ":id", element: <ClaimDetail /> },
               ],
             },
@@ -158,7 +162,9 @@ const App: React.FC = () => {
     },
   ];
 
-  return useRoutes(routes);
+  return (
+    <ConfigProvider theme={antdThemeConfig}>{useRoutes(routes)}</ConfigProvider>
+  );
 };
 
 export default App;

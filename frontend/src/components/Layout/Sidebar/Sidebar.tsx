@@ -60,7 +60,9 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed }) => {
       const menuData = MENU_ITEMS[user.role as UserRole] || [];
       if (menuData.length > 0) {
         const currentItem = menuData.find(
-          (item) => item.path === location.pathname
+          (item) =>
+            location.pathname === item.path ||
+            location.pathname.startsWith(item.path + "/")
         );
 
         if (!currentItem) {
@@ -77,8 +79,11 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed }) => {
   const selectedKey = (() => {
     const menuData = getMenuData();
     return (
-      menuData.find((item) => item.path === location.pathname)?.key ||
-      menuData[0]?.key
+      menuData.find(
+        (item) =>
+          location.pathname === item.path ||
+          location.pathname.startsWith(item.path + "/")
+      )?.key || menuData[0]?.key
     );
   })();
 

@@ -16,6 +16,7 @@ interface GenericActionBarProps {
   searchPlaceholder?: string;
   addButtonText?: string;
   className?: string;
+  allowCreate: boolean;
 }
 
 const GenericActionBar: React.FC<GenericActionBarProps> = ({
@@ -27,10 +28,11 @@ const GenericActionBar: React.FC<GenericActionBarProps> = ({
   searchPlaceholder = "Search...",
   addButtonText = "Add Item",
   className = "generic-action-bar",
+  allowCreate = true,
 }) => {
   return (
     <Row gutter={[16, 16]} className={className}>
-      <Col lg={18}>
+      <Col lg={allowCreate ? 18 : 20}>
         <Input
           placeholder={searchPlaceholder}
           prefix={<SearchOutlined />}
@@ -39,9 +41,9 @@ const GenericActionBar: React.FC<GenericActionBarProps> = ({
           allowClear
         />
       </Col>
-      <Col lg={6} className="action-group">
+      <Col lg={allowCreate ? 6 : 4} className="action-group">
         <Row>
-          <Col lg={12}>
+          <Col lg={allowCreate ? 12 : 24}>
             <Button
               icon={<ReloadOutlined />}
               onClick={onReset}
@@ -50,15 +52,17 @@ const GenericActionBar: React.FC<GenericActionBarProps> = ({
               Refresh
             </Button>
           </Col>
-          <Col lg={12}>
-            <Button
-              type="primary"
-              icon={<PlusOutlined />}
-              onClick={onOpenModal}
-            >
-              {addButtonText}
-            </Button>
-          </Col>
+          {allowCreate && (
+            <Col lg={12}>
+              <Button
+                type="primary"
+                icon={<PlusOutlined />}
+                onClick={onOpenModal}
+              >
+                {addButtonText}
+              </Button>
+            </Col>
+          )}
         </Row>
       </Col>
     </Row>

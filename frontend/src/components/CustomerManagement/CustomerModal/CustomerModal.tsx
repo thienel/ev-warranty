@@ -1,9 +1,8 @@
 import React, { useEffect } from "react";
 import { Modal, Button, Form, Input, message, Space } from "antd";
 import { UserOutlined, MailOutlined, PhoneOutlined } from "@ant-design/icons";
-import { API_ENDPOINTS } from "@constants/common-constants";
 import { type CustomerModalProps, type CustomerFormData } from "@/types/index";
-import api from "@services/api";
+import { customersApi } from "@services/index";
 import useHandleApiError from "@/hooks/useHandleApiError";
 
 const CustomerModal: React.FC<CustomerModalProps> = ({
@@ -49,10 +48,10 @@ const CustomerModal: React.FC<CustomerModalProps> = ({
       const payload = { ...values };
 
       if (isUpdate) {
-        await api.put(`${API_ENDPOINTS.CUSTOMERS}/${customer?.id}`, payload);
+        await customersApi.update(customer?.id || '', payload);
         message.success("Customer updated successfully");
       } else {
-        await api.post(API_ENDPOINTS.CUSTOMERS, payload);
+        await customersApi.create(payload);
         message.success("Customer created successfully");
       }
 

@@ -1,12 +1,11 @@
 import React, { useEffect } from "react";
 import { Modal, Button, Form, Input, message, Space, InputNumber } from "antd";
 import { CarOutlined, TagOutlined, CalendarOutlined } from "@ant-design/icons";
-import { API_ENDPOINTS } from "@constants/common-constants";
 import {
   type VehicleModelModalProps,
   type VehicleModelFormData,
 } from "@/types/index";
-import api from "@services/api";
+import { vehicleModelsApi } from "@services/index";
 import useHandleApiError from "@/hooks/useHandleApiError";
 
 const VehicleModelModal: React.FC<VehicleModelModalProps> = ({
@@ -50,13 +49,10 @@ const VehicleModelModal: React.FC<VehicleModelModalProps> = ({
       const payload = { ...values };
 
       if (isUpdate) {
-        await api.put(
-          `${API_ENDPOINTS.VEHICLE_MODELS}/${vehicleModel?.id}`,
-          payload
-        );
+        await vehicleModelsApi.update(vehicleModel?.id || "", payload);
         message.success("Vehicle model updated successfully");
       } else {
-        await api.post(API_ENDPOINTS.VEHICLE_MODELS, payload);
+        await vehicleModelsApi.create(payload);
         message.success("Vehicle model created successfully");
       }
 

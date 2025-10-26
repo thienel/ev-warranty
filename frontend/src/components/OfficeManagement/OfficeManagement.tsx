@@ -33,6 +33,7 @@ const OfficeManagement: React.FC = () => {
         loading={loading}
         searchPlaceholder="Search by office name, type or address..."
         addButtonText="Add Office"
+        allowCreate={true}
       />
 
       <GenericTable

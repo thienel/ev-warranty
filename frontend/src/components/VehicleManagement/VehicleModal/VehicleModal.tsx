@@ -10,9 +10,8 @@ import {
   DatePicker,
 } from "antd";
 import { CarOutlined, UserOutlined, FileTextOutlined } from "@ant-design/icons";
-import { API_ENDPOINTS } from "@constants/common-constants";
 import { type VehicleModalProps, type VehicleFormData } from "@/types/index";
-import api from "@services/api";
+import { vehiclesApi } from "@services/index";
 import useHandleApiError from "@/hooks/useHandleApiError";
 import dayjs from "dayjs";
 
@@ -74,10 +73,10 @@ const VehicleModal: React.FC<VehicleModalProps> = ({
       };
 
       if (isUpdate) {
-        await api.put(`${API_ENDPOINTS.VEHICLES}/${vehicle?.id}`, payload);
+        await vehiclesApi.update(vehicle?.id || '', payload);
         message.success("Vehicle updated successfully");
       } else {
-        await api.post(API_ENDPOINTS.VEHICLES, payload);
+        await vehiclesApi.create(payload);
         message.success("Vehicle created successfully");
       }
 

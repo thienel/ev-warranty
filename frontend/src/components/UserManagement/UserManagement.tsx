@@ -114,6 +114,7 @@ const UserManagement: React.FC = () => {
         loading={loading}
         searchPlaceholder="Search by name, email or role..."
         addButtonText="Add User"
+        allowCreate={true}
       />
 
       <GenericTable
