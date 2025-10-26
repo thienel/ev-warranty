@@ -223,9 +223,9 @@ definitions:
     type: object
   entities.ClaimHistory:
     properties:
-      changed_by:
+      changed_at:
         type: string
-      changedAt:
+      changed_by:
         type: string
       claim_id:
         type: string
