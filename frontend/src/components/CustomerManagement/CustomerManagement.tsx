@@ -40,6 +40,7 @@ const CustomerManagement: React.FC = () => {
         loading={loading}
         searchPlaceholder="Search by name, email or phone..."
         addButtonText="Add Customer"
+        allowCreate={true}
       />
 
       <GenericTable

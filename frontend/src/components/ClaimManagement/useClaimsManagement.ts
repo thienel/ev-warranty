@@ -28,6 +28,7 @@ interface UseClaimsManagementReturn {
   handleComplete: (claimId: string) => Promise<void>
   handleReview: (claimId: string) => Promise<void>
   handleRequestInfo: (claimId: string) => Promise<void>
+  allowCreate: boolean
 }
 
 const useClaimsManagement = (): UseClaimsManagementReturn => {
@@ -41,6 +42,7 @@ const useClaimsManagement = (): UseClaimsManagementReturn => {
     page: 1,
     limit: 10,
   })
+  const [allowCreate, setAllowCreate] = useState(false)
   const handleError = useHandleApiError()
   const delay = useDelay(300)
 
@@ -136,6 +138,11 @@ const useClaimsManagement = (): UseClaimsManagementReturn => {
   }
 
   useEffect(() => {
+    const currentPath = location.pathname;
+    if (currentPath.includes("/sc-staff/")) {
+     setAllowCreate(true) 
+    }
+
     fetchClaims()
   }, [fetchClaims])
 
@@ -162,6 +169,7 @@ const useClaimsManagement = (): UseClaimsManagementReturn => {
     handleComplete,
     handleReview,
     handleRequestInfo,
+    allowCreate,
   }
 }
 

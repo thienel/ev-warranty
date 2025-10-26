@@ -156,6 +156,7 @@ const VehicleManagement: React.FC = () => {
         loading={loading}
         searchPlaceholder="Search by VIN or license plate..."
         addButtonText="Add Vehicle"
+        allowCreate={true}
       />
 
       <GenericTable

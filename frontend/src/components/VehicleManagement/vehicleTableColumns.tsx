@@ -34,7 +34,7 @@ const GenerateColumns = (
       ),
       dataIndex: "vin",
       key: "vin",
-      width: "20%",
+      width: "21%",
       sorter: (a: Record<string, unknown>, b: Record<string, unknown>) => {
         const aVehicle = a as Vehicle;
         const bVehicle = b as Vehicle;
@@ -65,7 +65,7 @@ const GenerateColumns = (
       ),
       dataIndex: "license_plate",
       key: "license_plate",
-      width: "15%",
+      width: "14%",
       sorter: (a: Record<string, unknown>, b: Record<string, unknown>) => {
         const aVehicle = a as Vehicle;
         const bVehicle = b as Vehicle;
@@ -113,6 +113,7 @@ const GenerateColumns = (
       dataIndex: "purchase_date",
       key: "purchase_date",
       width: "15%",
+      align: "center" as const,
       sorter: (a: Record<string, unknown>, b: Record<string, unknown>) => {
         const aVehicle = a as Vehicle;
         const bVehicle = b as Vehicle;

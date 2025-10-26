@@ -18,6 +18,7 @@ const ClaimManagement: React.FC = () => {
     setSearchText,
     handleOpenModal,
     handleReset,
+    allowCreate,
   } = useClaimsManagement();
 
   // Mock data for demonstration since APIs are not available yet
@@ -165,6 +166,7 @@ const ClaimManagement: React.FC = () => {
         loading={loading}
         searchPlaceholder="Search by customer name, vehicle, description, or status..."
         addButtonText="Create Claim"
+        allowCreate={allowCreate}
       />
 
       <GenericTable
