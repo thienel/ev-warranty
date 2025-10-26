@@ -2813,7 +2813,7 @@ const docTemplate = `{
         "entities.ClaimHistory": {
             "type": "object",
             "properties": {
-                "changedAt": {
+                "changed_at": {
                     "type": "string"
                 },
                 "changed_by": {
