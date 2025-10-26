@@ -90,7 +90,7 @@ const GenerateColumns = (
           : null,
       ellipsis: true,
       render: (text: string) => (
-        <Space style={{ padding: '0 14px' }}>
+        <Space style={{ padding: '0 14px', whiteSpace: 'normal', wordBreak: 'break-word' }}>
           <EnvironmentOutlined style={{ color: '#697565' }} />
           <span>{text || 'N/A'}</span>
         </Space>
