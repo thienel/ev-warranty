@@ -56,7 +56,6 @@ func IsValidClaimStatusTransition(currentStatus, newStatus string) bool {
 	validTransitions := map[string][]string{
 		ClaimStatusDraft: {
 			ClaimStatusSubmitted,
-			ClaimStatusCancelled,
 		},
 		ClaimStatusSubmitted: {
 			ClaimStatusReviewing,
