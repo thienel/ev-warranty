@@ -89,7 +89,7 @@ func (h *officeHandler) Create(c *gin.Context) {
 	writeSuccessResponse(c, http.StatusCreated, office)
 }
 
-// GetById godoc
+// GetByID godoc
 // @Summary Get office by ID
 // @Description Retrieve a specific office by its ID
 // @Tags offices

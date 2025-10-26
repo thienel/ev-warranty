@@ -276,6 +276,21 @@ definitions:
       updated_at:
         type: string
     type: object
+  services.ClaimListResult:
+    properties:
+      claims:
+        items:
+          $ref: '#/definitions/entities.Claim'
+        type: array
+      page:
+        type: integer
+      page_size:
+        type: integer
+      total:
+        type: integer
+      total_pages:
+        type: integer
+    type: object
 host: localhost:8080
 info:
   contact:
@@ -492,7 +507,7 @@ paths:
             - properties:
                 data:
                   items:
-                    $ref: '#/definitions/entities.Claim'
+                    $ref: '#/definitions/services.ClaimListResult'
                   type: array
               type: object
         "401":
