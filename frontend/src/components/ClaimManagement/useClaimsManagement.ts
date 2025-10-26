@@ -4,6 +4,8 @@ import useDelay from '@/hooks/useDelay'
 import useHandleApiError from '@/hooks/useHandleApiError'
 import type { ErrorResponse } from '@/constants/error-messages'
 import type { Claim, PaginationParams } from '@/types'
+import { allowRoles } from '@/utils/navigationHelpers'
+import { USER_ROLES } from '@/constants/common-constants'
 
 interface UseClaimsManagementReturn {
   claims: Claim[]
@@ -138,9 +140,8 @@ const useClaimsManagement = (): UseClaimsManagementReturn => {
   }
 
   useEffect(() => {
-    const currentPath = location.pathname;
-    if (currentPath.includes("/sc-staff/")) {
-     setAllowCreate(true) 
+    if (allowRoles(location.pathname, [USER_ROLES.SC_STAFF])) {
+      setAllowCreate(true) 
     }
 
     fetchClaims()

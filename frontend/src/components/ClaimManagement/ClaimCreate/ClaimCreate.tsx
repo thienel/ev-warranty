@@ -18,7 +18,7 @@ import {
   CarOutlined,
   FileTextOutlined,
 } from "@ant-design/icons";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import CustomerSearch from "./components/CustomerSearch";
 import VehicleSearch from "./components/VehicleSearch";
 import ClaimFormHeader from "./components/ClaimFormHeader";
@@ -26,6 +26,7 @@ import StepCard from "./components/StepCard";
 import SelectionAlert from "./components/SelectionAlert";
 import { useClaimFormState } from "./hooks/useClaimFormState";
 import { useClaimSubmission } from "./hooks/useClaimSubmission";
+import { getClaimsBasePath } from "@/utils/navigationHelpers";
 import { getClaimSteps, isStepValid, getStepStatus } from "./utils/claimSteps";
 import "./ClaimCreate.less";
 
@@ -39,6 +40,7 @@ interface ClaimFormValues {
 const ClaimCreate: React.FC = () => {
   const [form] = Form.useForm<ClaimFormValues>();
   const navigate = useNavigate();
+  const location = useLocation();
 
   // Custom hooks for state management
   const {
@@ -65,7 +67,8 @@ const ClaimCreate: React.FC = () => {
 
   // Handle going back
   const handleBack = () => {
-    navigate("/sc-staff/claims");
+    const basePath = getClaimsBasePath(location.pathname);
+    navigate(basePath);
   };
 
   return (
