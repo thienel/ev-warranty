@@ -125,10 +125,10 @@ const ClaimManagement: React.FC = () => {
   const handleViewDetails = (claim: Claim): void => {
     if (
       allowRoles(location.pathname, [
-        "ADMIN",
-        "EVM_STAFF",
-        "SC_STAFF",
-        "SC_TECHNICIAN",
+        USER_ROLES.ADMIN,
+        USER_ROLES.EVM_STAFF,
+        USER_ROLES.SC_STAFF,
+        USER_ROLES.SC_TECHNICIAN,
       ])
     ) {
       const basePath = getClaimsBasePath(location.pathname);

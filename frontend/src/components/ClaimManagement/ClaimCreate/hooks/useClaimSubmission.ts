@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { message } from "antd";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { claimsApi } from "@services/claimsApi";
 import type { Customer, Vehicle, CreateClaimRequest } from "@/types";
 import useHandleApiError from "@/hooks/useHandleApiError";
+import { getClaimsBasePath } from "@/utils/navigationHelpers";
 
 interface ClaimFormValues {
   description: string;
@@ -13,6 +14,7 @@ export const useClaimSubmission = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const handleError = useHandleApiError();
+  const location = useLocation()
 
   const submitClaim = async (
     values: ClaimFormValues,
@@ -46,7 +48,7 @@ export const useClaimSubmission = () => {
       await claimsApi.create(claimData);
 
       message.success("Claim created successfully!");
-      navigate("/sc-staff/claims");
+      navigate(getClaimsBasePath(location.pathname));
       return { success: true };
     } catch (error) {
       console.error("Failed to create claim:", error);
