@@ -2,7 +2,7 @@ import React from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { API_ENDPOINTS } from "@constants/common-constants";
 import { type Claim } from "@/types/index";
-import useClaimsManagement from "@/hooks/useClaimsManagement";
+import useClaimsManagement from "@/components/ClaimManagement/useClaimsManagement";
 import GenericActionBar from "@components/common/GenericActionBar/GenericActionBar";
 import GenericTable from "@components/common/GenericTable/GenericTable";
 import GenerateColumns from "./claimTableColumns";
