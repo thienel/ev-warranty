@@ -155,6 +155,14 @@ export interface UpdateClaimRequest {
   description: string
 }
 
+export interface ClaimListResponse {
+  claims: Claim[]
+  total: number,
+  page: number,
+  page_size: number,
+  total_pages: number
+}
+
 // Claim Item types (matching entities.ClaimItem from Swagger)
 export interface ClaimItem extends Record<string, unknown> {
   id: string

@@ -54,18 +54,23 @@ const useClaimsManagement = (): UseClaimsManagementReturn => {
     setIsOpenModal(true)
   }
 
-  const fetchClaims = useCallback(async (params?: PaginationParams) => {
-    try {
-      setLoading(true)
-      const response = await claimsApi.getAll(params || pagination)
-      const claimsData = response.data || []
-      setClaims(claimsData)
-    } catch (error) {
-      handleError(error as ErrorResponse)
-    } finally {
-      setLoading(false)
-    }
-  }, [pagination, handleError])
+  const fetchClaims = useCallback(
+    async (params?: PaginationParams) => {
+      try {
+        setLoading(true)
+        const response = await claimsApi.getAll(params || pagination)
+        const claimsData = Array.isArray(response.data?.claims) ? response.data.claims : []
+        console.log('Fetched claims:', response)
+        setClaims(claimsData)
+      } catch (error) {
+        handleError(error as ErrorResponse)
+        setClaims([])
+      } finally {
+        setLoading(false)
+      }
+    },
+    [pagination, handleError],
+  )
 
   const handleReset = async () => {
     setLoading(true)
@@ -141,7 +146,7 @@ const useClaimsManagement = (): UseClaimsManagementReturn => {
 
   useEffect(() => {
     if (allowRoles(location.pathname, [USER_ROLES.SC_STAFF])) {
-      setAllowCreate(true) 
+      setAllowCreate(true)
     }
 
     fetchClaims()

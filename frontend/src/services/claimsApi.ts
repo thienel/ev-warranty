@@ -12,19 +12,20 @@ import type {
   ClaimItemListResponse,
   ClaimAttachmentListResponse,
   PaginationParams,
+  ClaimListResponse,
 } from '@/types'
 
 // Claims API
 export const claimsApi = {
   // Get all claims with optional filtering and pagination
-  getAll: (params?: PaginationParams): Promise<ApiSuccessResponse<Claim[]>> => {
+  getAll: (params?: PaginationParams): Promise<ApiSuccessResponse<ClaimListResponse>> => {
     const searchParams = new URLSearchParams()
     if (params?.page) searchParams.append('page', params.page.toString())
     if (params?.limit) searchParams.append('limit', params.limit.toString())
     if (params?.status) searchParams.append('status', params.status)
     
     const query = searchParams.toString()
-    return api.get(`${API_ENDPOINTS.CLAIMS}${query ? `?${query}` : ''}`)
+    return api.get(`${API_ENDPOINTS.CLAIMS}${query ? `?${query}` : ''}`).then(response => response.data)
   },
 
   // Get claim by ID

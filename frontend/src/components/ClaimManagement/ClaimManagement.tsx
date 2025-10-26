@@ -69,7 +69,10 @@ const ClaimManagement: React.FC = () => {
         setLoading={setLoading}
         searchText={searchText}
         data={
-          claims as unknown as (Record<string, unknown> & {
+          (Array.isArray(claims) ? claims : []) as unknown as (Record<
+            string,
+            unknown
+          > & {
             id: string | number;
           })[]
         }
