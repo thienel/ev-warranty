@@ -33,7 +33,7 @@ services:
       - REFRESH_TOKEN_TTL=168h
       - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
       - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
-      - GOOGLE_REDIRECT_URL=http://localhost/api/v1/auth/google/callback
+      - GOOGLE_REDIRECT_URL=https://localhost/api/v1/auth/google/callback
       - PRIVATE_PEM=${PRIVATE_PEM}
       - PUBLIC_PEM=${PUBLIC_PEM}
       - ADMIN_EMAIL=${ADMIN_EMAIL}
@@ -110,18 +110,14 @@ services:
       - "80:80"
       - "443:443"
     volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf:ro
-      - ./ssl:/etc/nginx/ssl:ro
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - /etc/ssl/certs/selfsigned.crt:/etc/ssl/certs/selfsigned.crt:ro
+      - /etc/ssl/private/selfsigned.key:/etc/ssl/private/selfsigned.key:ro
     depends_on:
       backend-go:
         condition: service_healthy
       backend-dotnet:
         condition: service_healthy
-    healthcheck:
-      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
     networks:
       - backend-network
 

@@ -83,3 +83,45 @@ jobs:
             lethiendev/ev-warranty-dotnet:${{ steps.version.outputs.VERSION }}
           cache-from: type=registry,ref=lethiendev/ev-warranty-dotnet:buildcache
           cache-to: type=registry,ref=lethiendev/ev-warranty-dotnet:buildcache,mode=max
+
+  deploy:
+    needs: [build-backend-go, build-backend-dotnet]
+    if: |
+      always() &&
+      (needs.build-backend-go.result == 'success' || 
+       needs.build-backend-dotnet.result == 'success' ||
+       (needs.build-backend-go.result == 'skipped' && 
+        needs.build-backend-dotnet.result == 'skipped'))
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Deploy to EC2
+        uses: appleboy/ssh-action@v1.0.3
+        env:
+          ENV_FILE: ${{ secrets.ENV_FILE }}
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          envs: ENV_FILE
+          script: |
+            cd ~/ev-warranty
+            
+            if [ -d ".git" ]; then
+              git pull origin main
+            else
+              git clone https://github.com/${{ github.repository }} .
+            fi
+            
+            echo "$ENV_FILE" > .env
+            chmod 600 .env
+            
+            docker compose pull
+            docker compose up -d --remove-orphans
+            sleep 5
+            docker compose logs --tail=100
+            docker compose ps
+            docker image prune -af
