@@ -1,3 +1,4 @@
+using Backend.Dotnet.API.Middleware;
 using Backend.Dotnet.Infrastructure;
 using Backend.Dotnet.Infrastructure.Data.Context;
 using Microsoft.EntityFrameworkCore;
