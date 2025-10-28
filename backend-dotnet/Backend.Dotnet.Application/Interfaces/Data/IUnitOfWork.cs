@@ -5,6 +5,10 @@
         ICustomerRepository Customers { get; }
         IVehicleRepository Vehicles { get; }
         IVehicleModelRepository VehicleModels { get; }
+        IWarrantyPolicyRepository WarrantyPolicies { get; }
+        IPartCategoryRepository PartCategories { get; }
+        IPartRepository Parts { get; }
+        IPolicyCoveragePartRepository PolicyCoverageParts { get; }
 
         Task<int> SaveChangesAsync();
         int SaveChanges();

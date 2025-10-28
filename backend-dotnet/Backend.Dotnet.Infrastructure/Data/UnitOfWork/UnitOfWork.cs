@@ -1,4 +1,5 @@
 ﻿using Backend.Dotnet.Application.Interfaces.Data;
+using Backend.Dotnet.Domain.Entities;
 using Backend.Dotnet.Infrastructure.Data.Context;
 using Backend.Dotnet.Infrastructure.Data.Repositories;
 using Microsoft.EntityFrameworkCore;
@@ -18,6 +19,10 @@ namespace Backend.Dotnet.Infrastructure.Data.UnitOfWork
         private ICustomerRepository? _customers;
         private IVehicleRepository? _vehicles;
         private IVehicleModelRepository? _vehicleModels;
+        private IWarrantyPolicyRepository? _warrantyPolicies;
+        private IPartCategoryRepository? _partCategories;
+        private IPartRepository? _parts;
+        private IPolicyCoveragePartRepository? _policyCoverageParts;
 
         public UnitOfWork(
             AppDbContext context,
@@ -51,6 +56,42 @@ namespace Backend.Dotnet.Infrastructure.Data.UnitOfWork
             {
                 _vehicleModels ??= new VehicleModelRepository(_context);
                 return _vehicleModels;
+            }
+        }
+
+        public IWarrantyPolicyRepository WarrantyPolicies
+        {
+            get
+            {
+                _warrantyPolicies ??= new WarrantyPolicyRepository(_context);
+                return _warrantyPolicies;
+            }
+        }
+
+        public IPartCategoryRepository PartCategories
+        {
+            get
+            {
+                _partCategories ??= new PartCategoryRepository(_context);
+                return _partCategories;
+            }
+        }
+
+        public IPartRepository Parts
+        {
+            get
+            {
+                _parts ??= new PartRepository(_context);
+                return _parts;
+            }
+        }
+
+        public IPolicyCoveragePartRepository PolicyCoverageParts
+        {
+            get
+            {
+                _policyCoverageParts ??= new PolicyCoveragePartRepository(_context);
+                return _policyCoverageParts;
             }
         }
 
