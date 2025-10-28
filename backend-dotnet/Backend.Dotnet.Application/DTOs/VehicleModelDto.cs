@@ -26,6 +26,9 @@ namespace Backend.Dotnet.Application.DTOs
             [Required(ErrorMessage = "Year is required")]
             [Range(2000, 2100, ErrorMessage = "Year must be between 2000 and 2100")]
             public int Year { get; set; }
+
+            [JsonPropertyName("policy_id")]
+            public Guid? PolicyId { get; set; }
         }
 
         /// <summary>
@@ -51,6 +54,13 @@ namespace Backend.Dotnet.Application.DTOs
 
         }
 
+        public class AssignPolicyRequest
+        {
+            [JsonPropertyName("policy_id")]
+            [Required(ErrorMessage = "Policy ID is required")]
+            public Guid PolicyId { get; set; }
+        }
+
         /// <summary>
         /// Response DTO for vehicle model basic information
         /// Used in dropdowns, lists, and vehicle registration forms
@@ -68,6 +78,12 @@ namespace Backend.Dotnet.Application.DTOs
 
             [JsonPropertyName("year")]
             public int Year { get; set; }
+
+            [JsonPropertyName("policy_id")]
+            public Guid? PolicyId { get; set; }
+
+            [JsonPropertyName("policy_name")]
+            public string? PolicyName { get; set; }
 
             [JsonPropertyName("created_at")]
             public DateTime CreatedAt { get; set; }
@@ -94,6 +110,12 @@ namespace Backend.Dotnet.Application.DTOs
             [JsonPropertyName("year")]
             public int Year { get; set; }
 
+            [JsonPropertyName("policy_id")]
+            public Guid? PolicyId { get; set; }
+
+            [JsonPropertyName("policy_name")]
+            public string? PolicyName { get; set; }
+
             [JsonPropertyName("created_at")]
             public DateTime CreatedAt { get; set; }
 
@@ -109,15 +131,15 @@ namespace Backend.Dotnet.Application.DTOs
     {
         public static VehicleModel ToEntity(this VehicleModelDto.CreateVehicleModelRequest request)
         {
-            return new VehicleModel(request.Brand, request.ModelName, request.Year);
+            var model = new VehicleModel(request.Brand, request.ModelName, request.Year);
+            if (request.PolicyId.HasValue)
+                model.AssignPolicy(request.PolicyId.Value);
+            return model;
         }
 
         public static void ApplyToEntity(this VehicleModelDto.UpdateVehicleModelRequest request, VehicleModel entity)
         {
-            entity.UpdateModel(
-                request.Brand, 
-                request.ModelName, 
-                request.Year);
+            entity.UpdateModel(request.Brand, request.ModelName, request.Year);
         }
 
         public static VehicleModelDto.VehicleModelResponse ToResponse(this VehicleModel entity)
@@ -128,6 +150,8 @@ namespace Backend.Dotnet.Application.DTOs
                 Brand = entity.Brand,
                 ModelName = entity.ModelName,
                 Year = entity.Year,
+                PolicyId = entity.PolicyId,
+                PolicyName = entity.Policy?.PolicyName,
                 CreatedAt = entity.CreatedAt,
                 UpdatedAt = entity.UpdatedAt
             };
@@ -141,6 +165,8 @@ namespace Backend.Dotnet.Application.DTOs
                 Brand = entity.Brand,
                 ModelName = entity.ModelName,
                 Year = entity.Year,
+                PolicyId = entity.PolicyId,
+                PolicyName = entity.Policy?.PolicyName,
                 CreatedAt = entity.CreatedAt,
                 UpdatedAt = entity.UpdatedAt,
                 VehicleCount = entity.Vehicles?.Count ?? 0

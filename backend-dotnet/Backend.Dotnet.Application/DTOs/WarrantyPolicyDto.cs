@@ -18,10 +18,6 @@ namespace Backend.Dotnet.Application.DTOs
             [StringLength(255, MinimumLength = 1, ErrorMessage = "Policy name must be between 1 and 255 characters")]
             public string PolicyName { get; set; } = string.Empty;
 
-            [JsonPropertyName("model_id")]
-            [Required(ErrorMessage = "Model ID is required")]
-            public Guid ModelId { get; set; }
-
             [JsonPropertyName("warranty_duration_months")]
             [Required(ErrorMessage = "Warranty duration is required")]
             [Range(1, 600, ErrorMessage = "Warranty duration must be between 1 and 600 months")]
@@ -76,12 +72,6 @@ namespace Backend.Dotnet.Application.DTOs
             [JsonPropertyName("policy_name")]
             public string PolicyName { get; set; } = string.Empty;
 
-            [JsonPropertyName("model_id")]
-            public Guid ModelId { get; set; }
-
-            [JsonPropertyName("model_name")]
-            public string? ModelName { get; set; }
-
             [JsonPropertyName("warranty_duration_months")]
             public int WarrantyDurationMonths { get; set; }
 
@@ -105,6 +95,9 @@ namespace Backend.Dotnet.Application.DTOs
 
             [JsonPropertyName("is_editable")]
             public bool IsEditable { get; set; }
+
+            [JsonPropertyName("assigned_model_count")]
+            public int AssignedModelCount { get; set; }
         }
 
         public class WarrantyPolicyWithDetailsResponse
@@ -114,9 +107,6 @@ namespace Backend.Dotnet.Application.DTOs
 
             [JsonPropertyName("policy_name")]
             public string PolicyName { get; set; } = string.Empty;
-
-            [JsonPropertyName("model_id")]
-            public Guid ModelId { get; set; }
 
             [JsonPropertyName("warranty_duration_months")]
             public int WarrantyDurationMonths { get; set; }
@@ -136,8 +126,8 @@ namespace Backend.Dotnet.Application.DTOs
             [JsonPropertyName("updated_at")]
             public DateTime? UpdatedAt { get; set; }
 
-            [JsonPropertyName("model")]
-            public VehicleModelDto.VehicleModelResponse Model { get; set; } = null!;
+            [JsonPropertyName("vehicle_models")]
+            public List<VehicleModelDto.VehicleModelResponse> VehicleModels { get; set; } = new();
 
             [JsonPropertyName("covered_parts")]
             public List<PolicyCoveragePartDto.PolicyCoveragePartResponse> CoveredParts { get; set; } = new();
@@ -150,7 +140,6 @@ namespace Backend.Dotnet.Application.DTOs
         {
             return new WarrantyPolicy(
                 request.PolicyName,
-                request.ModelId,
                 request.WarrantyDurationMonths,
                 request.KilometerLimit,
                 request.TermsAndConditions
@@ -173,8 +162,6 @@ namespace Backend.Dotnet.Application.DTOs
             {
                 Id = policy.Id,
                 PolicyName = policy.PolicyName,
-                ModelId = policy.ModelId,
-                ModelName = policy.Model != null ? $"{policy.Model.Brand} {policy.Model.ModelName} {policy.Model.Year}" : null,
                 WarrantyDurationMonths = policy.WarrantyDurationMonths,
                 KilometerLimit = policy.KilometerLimit,
                 TermsAndConditions = policy.TermsAndConditions,
@@ -192,14 +179,13 @@ namespace Backend.Dotnet.Application.DTOs
             {
                 Id = policy.Id,
                 PolicyName = policy.PolicyName,
-                ModelId = policy.ModelId,
                 WarrantyDurationMonths = policy.WarrantyDurationMonths,
                 KilometerLimit = policy.KilometerLimit,
                 TermsAndConditions = policy.TermsAndConditions,
                 Status = policy.Status.ToString(),
                 CreatedAt = policy.CreatedAt,
                 UpdatedAt = policy.UpdatedAt,
-                Model = policy.Model?.ToResponse(),
+                VehicleModels = policy.VehicleModels?.Select(vm => vm.ToResponse()).ToList() ?? new(),
                 CoveredParts = policy.CoverageParts?.Select(cp => cp.ToResponse()).ToList() ?? new()
             };
         }
