@@ -24,8 +24,12 @@ namespace Backend.Dotnet.Infrastructure
             services.AddScoped<ICustomerService, CustomerService>();
             services.AddScoped<IVehicleService, VehicleService>();
             services.AddScoped<IVehicleModelService, VehicleModelService>();
-            
-            
+            services.AddScoped<IWarrantyPolicyService, WarrantyPolicyService>();
+            services.AddScoped<IPartCategoryService, PartCategoryService>();
+            services.AddScoped<IPartService, PartService>();
+            services.AddScoped<IPolicyCoveragePartService, PolicyCoveragePartService>();
+
+
 
             return services;
         }
