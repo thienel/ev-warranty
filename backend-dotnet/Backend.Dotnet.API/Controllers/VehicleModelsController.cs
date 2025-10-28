@@ -28,7 +28,7 @@ namespace Backend.Dotnet.API.Controllers
             [FromQuery] string model = null,
             [FromQuery] int? year = null)
         {
-            // Brand + model + year - absolute
+            // Brand + model + year - relative
             if (!string.IsNullOrWhiteSpace(brand) &&
                 !string.IsNullOrWhiteSpace(model) &&
                 year.HasValue)
@@ -37,14 +37,14 @@ namespace Backend.Dotnet.API.Controllers
                 return result.IsSuccess ? Ok(result) : NotFound(result);
             }
 
-            // Brand - absolute - list
+            // Brand - relative - list
             if (!string.IsNullOrWhiteSpace(brand))
             {
                 var result = await _vehicleModelService.GetByBrandAsync(brand);
                 return result.IsSuccess ? Ok(result) : NotFound(result);
             }
 
-            // Model - absolute - list
+            // Model - relative - list
             if (!string.IsNullOrWhiteSpace(model))
             {
                 var result = await _vehicleModelService.GetByModelNameAsync(model);
