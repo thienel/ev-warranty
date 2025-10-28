@@ -59,7 +59,7 @@ namespace Backend.Dotnet.Application.DTOs
             public Guid CategoryId { get; set; }
         }
 
-        public class ChangeStatusRequest
+        public class PartChangeStatusRequest
         {
             [JsonPropertyName("status")]
             [Required(ErrorMessage = "Status is required")]

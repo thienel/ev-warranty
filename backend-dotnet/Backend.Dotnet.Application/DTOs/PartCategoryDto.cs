@@ -44,7 +44,7 @@ namespace Backend.Dotnet.Application.DTOs
             public Guid? NewParentCategoryId { get; set; }
         }
 
-        public class ChangeStatusRequest
+        public class CategoryChangeStatusRequest
         {
             [JsonPropertyName("status")]
             [Required(ErrorMessage = "Status is required")]
