@@ -27,10 +27,6 @@ namespace Backend.Dotnet.Infrastructure.Data.Configurations
                 .HasColumnType("varchar(255)")
                 .IsRequired();
 
-            builder.Property(wp => wp.ModelId)
-                .HasColumnName("model_id")
-                .IsRequired();
-
             builder.Property(wp => wp.WarrantyDurationMonths)
                 .HasColumnName("warranty_duration_months")
                 .HasColumnType("int")
@@ -67,23 +63,10 @@ namespace Backend.Dotnet.Infrastructure.Data.Configurations
             builder.HasIndex(wp => wp.PolicyName)
                 .HasDatabaseName("ix_warranty_policies_policy_name");
 
-            builder.HasIndex(wp => wp.ModelId)
-                .HasDatabaseName("ix_warranty_policies_model_id");
-
             builder.HasIndex(wp => wp.Status)
                 .HasDatabaseName("ix_warranty_policies_status");
 
-            // Composite index for common queries (one active policy per model)
-            builder.HasIndex(wp => new { wp.ModelId, wp.Status })
-                .HasDatabaseName("ix_warranty_policies_model_status");
-
             // Relationships
-            builder.HasOne(wp => wp.Model)
-                .WithMany()
-                .HasForeignKey(wp => wp.ModelId)
-                .OnDelete(DeleteBehavior.Restrict)
-                .IsRequired();
-
             builder.HasMany(wp => wp.CoverageParts)
                 .WithOne(pcp => pcp.Policy)
                 .HasForeignKey(pcp => pcp.PolicyId)
