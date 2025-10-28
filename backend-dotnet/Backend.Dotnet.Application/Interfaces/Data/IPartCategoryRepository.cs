@@ -14,20 +14,12 @@ namespace Backend.Dotnet.Application.Interfaces.Data
 
         Task<IEnumerable<PartCategory>> GetByStatusAsync(PartCategoryStatus status);
 
-        Task<IEnumerable<PartCategory>> GetByParentIdAsync(Guid parentCategoryId);
-        Task<IEnumerable<PartCategory>> GetRootCategoriesAsync();
-        Task<PartCategory?> GetWithHierarchyAsync(Guid categoryId);
-        Task<IEnumerable<PartCategory>> GetFullHierarchyAsync();
+        Task<IEnumerable<PartCategory>> GetByParentIdAsync(Guid parentCategoryId); // Child list
+        Task<PartCategory?> GetWithPartsAsync(Guid categoryId); // Get details of belonging part
+        Task<PartCategory?> GetWithHierarchyAsync(Guid categoryId); // Get details of category
+        Task<IEnumerable<PartCategory>> GetFullHierarchyAsync(); // Get all category
 
-        Task<PartCategory?> GetWithParentAsync(Guid categoryId);
-        Task<PartCategory?> GetWithChildrenAsync(Guid categoryId);
-        Task<PartCategory?> GetWithPartsAsync(Guid categoryId);
-
-        Task<bool> HasActivePartsAsync(Guid categoryId);
-        Task<bool> HasActiveChildrenAsync(Guid categoryId);
         Task<int> GetActivePartCountAsync(Guid categoryId);
         Task<int> GetChildCategoryCountAsync(Guid categoryId);
-        Task<bool> CanBeUsedForNewPartsAsync(Guid categoryId);
-        Task<bool> IsDescendantOfAsync(Guid categoryId, Guid potentialAncestorId);
     }
 }
