@@ -84,6 +84,23 @@ namespace Backend.Dotnet.Infrastructure.Data.Repositories
                 .CountAsync(v => v.ModelId == modelId);
         }
 
+        public async Task<IEnumerable<VehicleModel>> GetByPolicyIdAsync(Guid policyId)
+        {
+            return await _dbSet
+                .Where(vm => vm.PolicyId == policyId)
+                .OrderBy(vm => vm.Brand)
+                .ThenBy(vm => vm.ModelName)
+                .ThenBy(vm => vm.Year)
+                .ToListAsync();
+        }
+
+        public async Task<VehicleModel?> GetWithPolicyAsync(Guid modelId)
+        {
+            return await _dbSet
+                .Include(vm => vm.Policy)
+                .FirstOrDefaultAsync(vm => vm.Id == modelId);
+        }
+
         // Overide for filtering
         public override async Task<IEnumerable<VehicleModel>> GetAllAsync()
         {
