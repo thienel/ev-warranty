@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Backend.Dotnet.Infrastructure.Data.Repositories
 {
-    internal class PolicyCoveredPartRepository
+    internal class PolicyCoveragePartRepository
     {
     }
 }
