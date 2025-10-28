@@ -1,20 +1,15 @@
 ﻿using Backend.Dotnet.Domain.Abstractions;
 using Backend.Dotnet.Domain.Exceptions;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Backend.Dotnet.Domain.Entities
 {
     public enum WarrantyPolicyStatus
     {
-        Draft,
-        Active,
-        Expired,
-        Superseded,
-        Archived
+        Draft,      // Can be edited freely
+        Active,     // In use, cannot be edited
+        Expired,    // Past validity period
+        Superseded, // Replaced by newer policy
+        Archived    // Removed from active use
     }
 
     public class WarrantyPolicy : BaseEntity, IStatus<WarrantyPolicyStatus>
@@ -26,91 +21,57 @@ namespace Backend.Dotnet.Domain.Entities
         public string TermsAndConditions { get; private set; }
         public WarrantyPolicyStatus Status { get; private set; }
 
-        private readonly List<PolicyCoveredPart> _coveredParts = new();
-        public IReadOnlyCollection<PolicyCoveredPart> CoveredParts => _coveredParts.AsReadOnly();
+        // Navigation properties
+        public virtual VehicleModel Model { get; private set; }
+        private readonly List<PolicyCoveragePart> _coverageParts = new();
+        public virtual IReadOnlyCollection<PolicyCoveragePart> CoverageParts => _coverageParts.AsReadOnly();
 
-        private WarrantyPolicy() { } // EF Core
+        private WarrantyPolicy() { }
 
-        public WarrantyPolicy(
-            string policyName,
-            Guid modelId,
-            int warrantyDurationMonths,
-            int? kilometerLimit,
-            string termsAndConditions)
+        public WarrantyPolicy(string policyName, Guid modelId, int warrantyDurationMonths, int? kilometerLimit, string termsAndConditions)
         {
-            if (string.IsNullOrWhiteSpace(policyName))
-                throw new BusinessRuleViolationException("Policy name cannot be empty");
-
-            if (warrantyDurationMonths <= 0)
-                throw new BusinessRuleViolationException("Warranty duration must be greater than zero");
-
-            if (kilometerLimit.HasValue && kilometerLimit.Value <= 0)
-                throw new BusinessRuleViolationException("Kilometer limit must be greater than zero");
-
-            if (string.IsNullOrWhiteSpace(termsAndConditions))
-                throw new BusinessRuleViolationException("Terms and conditions cannot be empty");
-
-            PolicyName = policyName;
+            SetPolicyName(policyName);
             ModelId = modelId;
-            WarrantyDurationMonths = warrantyDurationMonths;
-            KilometerLimit = kilometerLimit;
-            TermsAndConditions = termsAndConditions;
+            SetWarrantyDuration(warrantyDurationMonths);
+            SetKilometerLimit(kilometerLimit);
+            SetTermsAndConditions(termsAndConditions);
             Status = WarrantyPolicyStatus.Draft;
         }
 
-        public void UpdateDetails(
-            string policyName,
-            int warrantyDurationMonths,
-            int? kilometerLimit,
-            string termsAndConditions)
+        // BEHAVIOUR
+        public void UpdateDetails(string policyName, int warrantyDurationMonths, int? kilometerLimit, string termsAndConditions)
         {
             if (Status != WarrantyPolicyStatus.Draft)
-                throw new BusinessRuleViolationException("Only draft policies can be freely edited");
+                throw new BusinessRuleViolationException("Only draft policies can be edited");
 
-            if (string.IsNullOrWhiteSpace(policyName))
-                throw new BusinessRuleViolationException("Policy name cannot be empty");
-
-            if (warrantyDurationMonths <= 0)
-                throw new BusinessRuleViolationException("Warranty duration must be greater than zero");
-
-            if (kilometerLimit.HasValue && kilometerLimit.Value <= 0)
-                throw new BusinessRuleViolationException("Kilometer limit must be greater than zero");
-
-            if (string.IsNullOrWhiteSpace(termsAndConditions))
-                throw new BusinessRuleViolationException("Terms and conditions cannot be empty");
-
-            PolicyName = policyName;
-            WarrantyDurationMonths = warrantyDurationMonths;
-            KilometerLimit = kilometerLimit;
-            TermsAndConditions = termsAndConditions;
+            SetPolicyName(policyName);
+            SetWarrantyDuration(warrantyDurationMonths);
+            SetKilometerLimit(kilometerLimit);
+            SetTermsAndConditions(termsAndConditions);
             SetUpdatedAt();
         }
 
+        // Status
         public void ChangeStatus(WarrantyPolicyStatus newStatus)
         {
             if (Status == newStatus)
                 return;
 
-            // Business rules for status transitions
-            if (Status == WarrantyPolicyStatus.Archived)
-                throw new BusinessRuleViolationException("Cannot change status of an archived policy");
-
-            if (newStatus == WarrantyPolicyStatus.Active && Status != WarrantyPolicyStatus.Draft)
-                throw new BusinessRuleViolationException("Only draft policies can be activated");
-
-            if (newStatus == WarrantyPolicyStatus.Draft && Status != WarrantyPolicyStatus.Draft)
-                throw new BusinessRuleViolationException("Cannot revert to draft status");
-
+            ValidateStatusTransition(Status, newStatus);
             Status = newStatus;
             SetUpdatedAt();
         }
 
         public void Activate()
         {
-            if (_coveredParts.Count == 0)
-                throw new BusinessRuleViolationException("Cannot activate a policy with no covered parts");
+            if (_coverageParts.Count == 0)
+                throw new BusinessRuleViolationException("Cannot activate policy without coverage parts");
 
-            ChangeStatus(WarrantyPolicyStatus.Active);
+            if (Status != WarrantyPolicyStatus.Draft)
+                throw new BusinessRuleViolationException("Only draft policies can be activated");
+
+            Status = WarrantyPolicyStatus.Active;
+            SetUpdatedAt();
         }
 
         public void Expire()
@@ -118,7 +79,8 @@ namespace Backend.Dotnet.Domain.Entities
             if (Status != WarrantyPolicyStatus.Active)
                 throw new BusinessRuleViolationException("Only active policies can be expired");
 
-            ChangeStatus(WarrantyPolicyStatus.Expired);
+            Status = WarrantyPolicyStatus.Expired;
+            SetUpdatedAt();
         }
 
         public void Supersede()
@@ -126,25 +88,106 @@ namespace Backend.Dotnet.Domain.Entities
             if (Status != WarrantyPolicyStatus.Active)
                 throw new BusinessRuleViolationException("Only active policies can be superseded");
 
-            ChangeStatus(WarrantyPolicyStatus.Superseded);
+            Status = WarrantyPolicyStatus.Superseded;
+            SetUpdatedAt();
         }
 
         public void Archive()
         {
+            if (Status == WarrantyPolicyStatus.Active)
+                throw new BusinessRuleViolationException("Cannot archive active policy");
+
+            Status = WarrantyPolicyStatus.Archived;
+            SetUpdatedAt();
+        }
+
+        // Coverage Parts
+        public void AddCoveragePart(PolicyCoveragePart coveragePart)
+        {
             if (Status != WarrantyPolicyStatus.Draft)
-                throw new BusinessRuleViolationException("Only draft policies can be archived");
+                throw new BusinessRuleViolationException("Can only add coverage parts to draft policies");
 
-            ChangeStatus(WarrantyPolicyStatus.Archived);
+            if (coveragePart == null)
+                throw new ArgumentNullException(nameof(coveragePart));
+
+            if (_coverageParts.Any(cp => cp.PartCategoryId == coveragePart.PartCategoryId))
+                throw new BusinessRuleViolationException("Part category already coverage by this policy");
+
+            _coverageParts.Add(coveragePart);
+            SetUpdatedAt();
         }
 
-        public bool CanBeAssignedToVehicles()
+        public void RemoveCoveragePart(Guid partCategoryId)
         {
-            return Status == WarrantyPolicyStatus.Active;
+            if (Status != WarrantyPolicyStatus.Draft)
+                throw new BusinessRuleViolationException("Can only remove coverage parts from draft policies");
+
+            var coveragePart = _coverageParts.FirstOrDefault(cp => cp.PartCategoryId == partCategoryId);
+            if (coveragePart == null)
+                throw new BusinessRuleViolationException("Part category not found in policy coverage");
+
+            _coverageParts.Remove(coveragePart);
+            SetUpdatedAt();
         }
 
-        public bool IsEditable()
+        // QUERY
+        public bool CanBeAssignedToVehicles() => Status == WarrantyPolicyStatus.Active;
+        public bool IsEditable() => Status == WarrantyPolicyStatus.Draft;
+        public bool IsPartCategoryCoverage(Guid partCategoryId) =>
+            _coverageParts.Any(cp => cp.PartCategoryId == partCategoryId);
+
+        // PRIVATE SETTERS
+        private void SetPolicyName(string policyName)
         {
-            return Status == WarrantyPolicyStatus.Draft;
+            if (string.IsNullOrWhiteSpace(policyName))
+                throw new BusinessRuleViolationException("Policy name cannot be empty");
+
+            if (policyName.Length > 255)
+                throw new BusinessRuleViolationException("Policy name cannot exceed 255 characters");
+
+            PolicyName = policyName.Trim();
+        }
+
+        private void SetWarrantyDuration(int months)
+        {
+            if (months <= 0)
+                throw new BusinessRuleViolationException("Warranty duration must be greater than zero");
+
+            if (months > 600)
+                throw new BusinessRuleViolationException("Warranty duration cannot exceed 600 months");
+
+            WarrantyDurationMonths = months;
+        }
+
+        private void SetKilometerLimit(int? limit)
+        {
+            if (limit.HasValue && limit.Value <= 0)
+                throw new BusinessRuleViolationException("Kilometer limit must be greater than zero");
+
+            KilometerLimit = limit;
+        }
+
+        private void SetTermsAndConditions(string terms)
+        {
+            if (string.IsNullOrWhiteSpace(terms))
+                throw new BusinessRuleViolationException("Terms and conditions cannot be empty");
+
+            if (terms.Length > 5000)
+                throw new BusinessRuleViolationException("Terms and conditions cannot exceed 5000 characters");
+
+            TermsAndConditions = terms.Trim();
+        }
+
+        private void ValidateStatusTransition(WarrantyPolicyStatus from, WarrantyPolicyStatus to)
+        {
+            if (from == WarrantyPolicyStatus.Archived)
+                throw new BusinessRuleViolationException("Cannot change status of archived policy");
+
+            if (to == WarrantyPolicyStatus.Draft && from != WarrantyPolicyStatus.Draft)
+                throw new BusinessRuleViolationException("Cannot revert to draft status");
+
+            if (to == WarrantyPolicyStatus.Active && from != WarrantyPolicyStatus.Draft)
+                throw new BusinessRuleViolationException("Only draft policies can be activated");
         }
     }
 }

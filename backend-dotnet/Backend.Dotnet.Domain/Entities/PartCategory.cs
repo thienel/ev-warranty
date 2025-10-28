@@ -5,9 +5,9 @@ namespace Backend.Dotnet.Domain.Entities
 {
     public enum PartCategoryStatus
     {
-        Active,
-        ReadOnly,   //cannot add any childPart further
-        Archived
+        Active,     // Can be used for new parts
+        ReadOnly,   // Cannot add new parts, existing parts remain
+        Archived    // Completely inactive
     }
 
     public class PartCategory : BaseEntity, IStatus<PartCategoryStatus>
@@ -18,89 +18,117 @@ namespace Backend.Dotnet.Domain.Entities
         public PartCategoryStatus Status { get; private set; }
 
         // Navigation properties
-        public PartCategory ParentCategory { get; private set; }
+        public virtual PartCategory ParentCategory { get; private set; }
+
         private readonly List<PartCategory> _childCategories = new();
-        public IReadOnlyCollection<PartCategory> ChildCategories => _childCategories.AsReadOnly();
+        public virtual IReadOnlyCollection<PartCategory> ChildCategories => _childCategories.AsReadOnly();
 
         private readonly List<Part> _parts = new();
-        public IReadOnlyCollection<Part> Parts => _parts.AsReadOnly();
+        public virtual IReadOnlyCollection<Part> Parts => _parts.AsReadOnly();
 
-        private readonly List<PolicyCoveredPart> _policyCoveredParts = new();
-        public IReadOnlyCollection<PolicyCoveredPart> PolicyCoveredParts => _policyCoveredParts.AsReadOnly();
+        private readonly List<PolicyCoveragePart> _policyCoverageParts = new();
+        public virtual IReadOnlyCollection<PolicyCoveragePart> PolicyCoverageParts => _policyCoverageParts.AsReadOnly();
 
-        private PartCategory() { } 
+        private PartCategory() { }
 
-        public PartCategory(string categoryName, string description, Guid? parentCategoryId = null)
+        public PartCategory(string categoryName, string description = null, Guid? parentCategoryId = null)
         {
-            if (string.IsNullOrWhiteSpace(categoryName))
-                throw new BusinessRuleViolationException("Category name cannot be empty");
-
-            CategoryName = categoryName;
-            Description = description;
+            SetCategoryName(categoryName);
+            SetDescription(description);
             ParentCategoryId = parentCategoryId;
             Status = PartCategoryStatus.Active;
         }
 
+        // BEHAVIOUR
         public void UpdateDetails(string categoryName, string description)
         {
             if (Status == PartCategoryStatus.Archived)
-                throw new BusinessRuleViolationException("Cannot update an archived category");
+                throw new BusinessRuleViolationException("Cannot update archived category");
 
-            if (string.IsNullOrWhiteSpace(categoryName))
-                throw new BusinessRuleViolationException("Category name cannot be empty");
-
-            CategoryName = categoryName;
-            Description = description;
+            SetCategoryName(categoryName);
+            SetDescription(description);
             SetUpdatedAt();
         }
 
         public void ChangeParent(Guid? newParentCategoryId)
         {
             if (Status == PartCategoryStatus.Archived)
-                throw new BusinessRuleViolationException("Cannot change parent of an archived category");
+                throw new BusinessRuleViolationException("Cannot change parent of archived category");
 
-            if (newParentCategoryId == Id)
-                throw new BusinessRuleViolationException("A category cannot be its own parent");
+            if (newParentCategoryId.HasValue && newParentCategoryId.Value == Id)
+                throw new BusinessRuleViolationException("Category cannot be its own parent");
 
             ParentCategoryId = newParentCategoryId;
             SetUpdatedAt();
         }
 
+        // Status
         public void ChangeStatus(PartCategoryStatus newStatus)
         {
             if (Status == newStatus)
                 return;
 
-            // Business rules for status transitions
-            if (newStatus == PartCategoryStatus.Archived && _childCategories.Exists(c => c.Status != PartCategoryStatus.Archived))
-                throw new BusinessRuleViolationException("Cannot archive a category with active child categories");
-
+            ValidateStatusTransition(Status, newStatus);
             Status = newStatus;
             SetUpdatedAt();
         }
 
         public void MakeReadOnly()
         {
-            ChangeStatus(PartCategoryStatus.ReadOnly);
+            if (Status == PartCategoryStatus.Archived)
+                throw new BusinessRuleViolationException("Cannot change status of archived category");
+
+            Status = PartCategoryStatus.ReadOnly;
+            SetUpdatedAt();
         }
 
         public void Archive()
         {
-            ChangeStatus(PartCategoryStatus.Archived);
+            if (_childCategories.Any(c => c.Status != PartCategoryStatus.Archived))
+                throw new BusinessRuleViolationException("Cannot archive category with active child categories");
+
+            Status = PartCategoryStatus.Archived;
+            SetUpdatedAt();
         }
 
         public void Activate()
         {
             if (ParentCategoryId.HasValue && ParentCategory?.Status != PartCategoryStatus.Active)
-                throw new BusinessRuleViolationException("Cannot activate a category whose parent is not active");
+                throw new BusinessRuleViolationException("Cannot activate category with non-active parent");
 
-            ChangeStatus(PartCategoryStatus.Active);
+            Status = PartCategoryStatus.Active;
+            SetUpdatedAt();
         }
 
-        public bool CanBeUsedForNewParts()
+        // QUERY
+        public bool CanBeUsedForNewParts() => Status == PartCategoryStatus.Active;
+        public bool HasActiveParts() => _parts.Any(p => p.Status == PartStatus.Available || p.Status == PartStatus.Reserved);
+        public bool HasActiveChildren() => _childCategories.Any(c => c.Status == PartCategoryStatus.Active);
+
+        // PRIVATE SETTERS
+        private void SetCategoryName(string categoryName)
         {
-            return Status == PartCategoryStatus.Active;
+            if (string.IsNullOrWhiteSpace(categoryName))
+                throw new BusinessRuleViolationException("Category name cannot be empty");
+
+            if (categoryName.Length > 255)
+                throw new BusinessRuleViolationException("Category name cannot exceed 255 characters");
+
+            CategoryName = categoryName.Trim();
         }
 
+        private void SetDescription(string description)
+        {
+            if (!string.IsNullOrWhiteSpace(description) && description.Length > 1000)
+                throw new BusinessRuleViolationException("Description cannot exceed 1000 characters");
+
+            Description = description?.Trim();
+        }
+
+        private void ValidateStatusTransition(PartCategoryStatus from, PartCategoryStatus to)
+        {
+            if (to == PartCategoryStatus.Archived && _childCategories.Any(c => c.Status != PartCategoryStatus.Archived))
+                throw new BusinessRuleViolationException("Cannot archive category with active child categories");
+        }
     }
 }
