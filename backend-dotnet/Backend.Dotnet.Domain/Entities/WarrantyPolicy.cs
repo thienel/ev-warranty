@@ -15,23 +15,23 @@ namespace Backend.Dotnet.Domain.Entities
     public class WarrantyPolicy : BaseEntity, IStatus<WarrantyPolicyStatus>
     {
         public string PolicyName { get; private set; }
-        public Guid ModelId { get; private set; }
         public int WarrantyDurationMonths { get; private set; }
         public int? KilometerLimit { get; private set; }
         public string TermsAndConditions { get; private set; }
         public WarrantyPolicyStatus Status { get; private set; }
 
         // Navigation properties
-        public virtual VehicleModel Model { get; private set; }
+        private readonly List<VehicleModel> _vehicleModels = new();
+        public virtual IReadOnlyCollection<VehicleModel> VehicleModels => _vehicleModels.AsReadOnly();
+
         private readonly List<PolicyCoveragePart> _coverageParts = new();
         public virtual IReadOnlyCollection<PolicyCoveragePart> CoverageParts => _coverageParts.AsReadOnly();
 
         private WarrantyPolicy() { }
 
-        public WarrantyPolicy(string policyName, Guid modelId, int warrantyDurationMonths, int? kilometerLimit, string termsAndConditions)
+        public WarrantyPolicy(string policyName, int warrantyDurationMonths, int? kilometerLimit, string termsAndConditions)
         {
             SetPolicyName(policyName);
-            ModelId = modelId;
             SetWarrantyDuration(warrantyDurationMonths);
             SetKilometerLimit(kilometerLimit);
             SetTermsAndConditions(termsAndConditions);
