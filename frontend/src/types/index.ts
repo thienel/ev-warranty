@@ -1,3 +1,12 @@
+import type {
+  UserRole,
+  OfficeType,
+  ClaimStatus,
+  ClaimItemStatus,
+  ClaimItemType,
+  AttachmentType,
+} from '../constants/common-constants'
+
 export interface ApiSuccessResponse<T = unknown> {
   data: T
 }
@@ -22,7 +31,7 @@ export interface User {
   id: string
   email: string
   name: string
-  role: string
+  role: UserRole
   office_id: string
   is_active?: boolean
 }
@@ -31,7 +40,7 @@ export interface UserFormData {
   name: string
   email: string
   password?: string
-  role: string
+  role: UserRole
   office_id: string
   is_active: boolean
 }
@@ -40,14 +49,14 @@ export interface CreateUserRequest {
   email: string
   name: string
   password: string
-  role: string
+  role: UserRole
   office_id: string
   is_active?: boolean
 }
 
 export interface UpdateUserRequest {
   name?: string
-  role?: string
+  role?: UserRole
   office_id?: string
   is_active?: boolean
 }
@@ -88,7 +97,7 @@ export interface LoginPayload {
 export interface Office {
   id: string
   office_name: string
-  office_type: string
+  office_type: OfficeType
   address: string
   is_active?: boolean
   created_at?: string
@@ -97,21 +106,21 @@ export interface Office {
 
 export interface OfficeFormData {
   office_name: string
-  office_type: 'EVM' | 'SC'
+  office_type: OfficeType
   address: string
   is_active: boolean
 }
 
 export interface CreateOfficeRequest {
   office_name: string
-  office_type: string
+  office_type: OfficeType
   address: string
   is_active?: boolean
 }
 
 export interface UpdateOfficeRequest {
   office_name?: string
-  office_type?: string
+  office_type?: OfficeType
   address?: string
   is_active?: boolean
 }
@@ -121,7 +130,7 @@ export interface Claim {
   customer_id: string
   vehicle_id: string
   description: string
-  status: string
+  status: ClaimStatus
   total_cost: number
   approved_by?: string
   created_at?: string
@@ -159,9 +168,9 @@ export interface ClaimItem {
   faulty_part_id: string
   replacement_part_id?: string
   issue_description: string
-  type: string
+  type: ClaimItemType
   cost: number
-  status: string
+  status: ClaimItemStatus
   created_at?: string
   updated_at?: string
 }
@@ -171,7 +180,7 @@ export interface CreateClaimItemRequest {
   faulty_part_id: string
   replacement_part_id?: string
   issue_description: string
-  type: string
+  type: ClaimItemType
   cost: number
 }
 
@@ -184,7 +193,7 @@ export interface ClaimAttachment {
   id: string
   claimID: string
   url: string
-  type: string
+  type: AttachmentType
   created_at?: string
 }
 
@@ -196,9 +205,9 @@ export interface ClaimAttachmentListResponse {
 export interface ClaimHistory {
   id: string
   claim_id: string
-  status: string
+  status: ClaimStatus
   changed_by: string
-  changedAt: string
+  changed_at: string
 }
 
 export interface SortInfo {
