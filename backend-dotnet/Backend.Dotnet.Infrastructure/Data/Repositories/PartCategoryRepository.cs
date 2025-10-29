@@ -30,14 +30,6 @@ namespace Backend.Dotnet.Infrastructure.Data.Repositories
             return await query.AnyAsync();
         }
 
-        public async Task<IEnumerable<PartCategory>> GetByStatusAsync(PartCategoryStatus status)
-        {
-            return await _dbSet
-                .Where(pc => pc.Status == status)
-                .OrderByDescending(pc => pc.CreatedAt)
-                .ToListAsync();
-        }
-
         public async Task<IEnumerable<PartCategory>> GetByParentIdAsync(Guid parentCategoryId)
         {
             return await _dbSet

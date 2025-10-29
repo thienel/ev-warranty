@@ -49,16 +49,6 @@ namespace Backend.Dotnet.Application.Services
                             ErrorCode = "PARENT_CATEGORY_NOT_FOUND"
                         };
                     }
-
-                    if (!parent.CanBeUsedForNewParts())
-                    {
-                        return new BaseResponseDto<PartCategoryResponse>
-                        {
-                            IsSuccess = false,
-                            Message = "Parent category must be active",
-                            ErrorCode = "PARENT_CATEGORY_NOT_ACTIVE"
-                        };
-                    }
                 }
 
                 var category = request.ToEntity();
@@ -178,41 +168,6 @@ namespace Backend.Dotnet.Application.Services
                 {
                     IsSuccess = false,
                     Message = "An error occurred while retrieving part category",
-                    ErrorCode = "INTERNAL_ERROR"
-                };
-            }
-        }
-
-        public async Task<BaseResponseDto<IEnumerable<PartCategoryResponse>>> GetByStatusAsync(string status)
-        {
-            try
-            {
-                if (!Enum.TryParse<PartCategoryStatus>(status, true, out var statusEnum))
-                {
-                    return new BaseResponseDto<IEnumerable<PartCategoryResponse>>
-                    {
-                        IsSuccess = false,
-                        Message = "Invalid status value. Must be Active, ReadOnly, or Archived",
-                        ErrorCode = "INVALID_STATUS"
-                    };
-                }
-
-                var categories = await _unitOfWork.PartCategories.GetByStatusAsync(statusEnum);
-                var response = categories.Select(c => c.ToResponse()).ToList();
-
-                return new BaseResponseDto<IEnumerable<PartCategoryResponse>>
-                {
-                    IsSuccess = true,
-                    Message = "Part categories retrieved successfully",
-                    Data = response
-                };
-            }
-            catch (Exception)
-            {
-                return new BaseResponseDto<IEnumerable<PartCategoryResponse>>
-                {
-                    IsSuccess = false,
-                    Message = "An error occurred while retrieving part categories",
                     ErrorCode = "INTERNAL_ERROR"
                 };
             }
@@ -366,63 +321,6 @@ namespace Backend.Dotnet.Application.Services
                 {
                     IsSuccess = false,
                     Message = "An error occurred while updating part category",
-                    ErrorCode = "INTERNAL_ERROR"
-                };
-            }
-        }
-
-        public async Task<BaseResponseDto<PartCategoryResponse>> ChangeStatusAsync(
-            Guid id, CategoryChangeStatusRequest request)
-        {
-            try
-            {
-                var category = await _unitOfWork.PartCategories.GetByIdAsync(id);
-                if (category == null)
-                {
-                    return new BaseResponseDto<PartCategoryResponse>
-                    {
-                        IsSuccess = false,
-                        Message = $"Part category with ID '{id}' not found",
-                        ErrorCode = "NOT_FOUND"
-                    };
-                }
-
-                if (!Enum.TryParse<PartCategoryStatus>(request.Status, true, out var statusEnum))
-                {
-                    return new BaseResponseDto<PartCategoryResponse>
-                    {
-                        IsSuccess = false,
-                        Message = "Invalid status value. Must be Active, ReadOnly, or Archived",
-                        ErrorCode = "INVALID_STATUS"
-                    };
-                }
-
-                category.ChangeStatus(statusEnum);
-                _unitOfWork.PartCategories.Update(category);
-                await _unitOfWork.SaveChangesAsync();
-
-                return new BaseResponseDto<PartCategoryResponse>
-                {
-                    IsSuccess = true,
-                    Message = "Category status changed successfully",
-                    Data = category.ToResponse()
-                };
-            }
-            catch (BusinessRuleViolationException ex)
-            {
-                return new BaseResponseDto<PartCategoryResponse>
-                {
-                    IsSuccess = false,
-                    Message = ex.Message,
-                    ErrorCode = ex.ErrorCode
-                };
-            }
-            catch (Exception)
-            {
-                return new BaseResponseDto<PartCategoryResponse>
-                {
-                    IsSuccess = false,
-                    Message = "An error occurred while changing status",
                     ErrorCode = "INTERNAL_ERROR"
                 };
             }

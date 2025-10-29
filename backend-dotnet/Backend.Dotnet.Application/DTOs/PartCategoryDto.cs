@@ -44,15 +44,6 @@ namespace Backend.Dotnet.Application.DTOs
             public Guid? NewParentCategoryId { get; set; }
         }
 
-        public class CategoryChangeStatusRequest
-        {
-            [JsonPropertyName("status")]
-            [Required(ErrorMessage = "Status is required")]
-            [RegularExpression("^(Active|ReadOnly|Archived)$",
-                ErrorMessage = "Status must be Active, ReadOnly, or Archived")]
-            public string Status { get; set; } = string.Empty;
-        }
-
         public class PartCategoryResponse
         {
             [JsonPropertyName("id")]
@@ -69,9 +60,6 @@ namespace Backend.Dotnet.Application.DTOs
 
             [JsonPropertyName("parent_category_name")]
             public string? ParentCategoryName { get; set; }
-
-            [JsonPropertyName("status")]
-            public string Status { get; set; } = string.Empty;
 
             [JsonPropertyName("created_at")]
             public DateTime CreatedAt { get; set; }
@@ -99,9 +87,6 @@ namespace Backend.Dotnet.Application.DTOs
 
             [JsonPropertyName("parent_category_id")]
             public Guid? ParentCategoryId { get; set; }
-
-            [JsonPropertyName("status")]
-            public string Status { get; set; } = string.Empty;
 
             [JsonPropertyName("created_at")]
             public DateTime CreatedAt { get; set; }
@@ -148,10 +133,8 @@ namespace Backend.Dotnet.Application.DTOs
                 Description = category.Description,
                 ParentCategoryId = category.ParentCategoryId,
                 ParentCategoryName = category.ParentCategory?.CategoryName,
-                Status = category.Status.ToString(),
                 CreatedAt = category.CreatedAt,
                 UpdatedAt = category.UpdatedAt,
-                CanBeUsedForNewParts = category.CanBeUsedForNewParts(),
                 HasActiveParts = category.HasActiveParts()
             };
         }
@@ -164,7 +147,6 @@ namespace Backend.Dotnet.Application.DTOs
                 CategoryName = category.CategoryName,
                 Description = category.Description,
                 ParentCategoryId = category.ParentCategoryId,
-                Status = category.Status.ToString(),
                 CreatedAt = category.CreatedAt,
                 UpdatedAt = category.UpdatedAt,
                 ParentCategory = category.ParentCategory?.ToResponse(),

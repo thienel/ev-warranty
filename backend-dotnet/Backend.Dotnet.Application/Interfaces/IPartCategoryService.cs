@@ -18,17 +18,12 @@ namespace Backend.Dotnet.Application.Interfaces
 
         Task<BaseResponseDto<PartCategoryResponse>> GetByCategoryNameAsync(string categoryName);
 
-        Task<BaseResponseDto<IEnumerable<PartCategoryResponse>>> GetByStatusAsync(string status);
-
         Task<BaseResponseDto<IEnumerable<PartCategoryResponse>>> GetByParentIdAsync(Guid parentId);
         Task<BaseResponseDto<PartCategoryWithHierarchyResponse>> GetWithHierarchyAsync(Guid id);
         Task<BaseResponseDto<IEnumerable<PartCategoryWithHierarchyResponse>>> GetFullHierarchyAsync();
 
         Task<BaseResponseDto<PartCategoryResponse>> UpdateAsync(
             Guid id, UpdatePartCategoryRequest request);
-
-        Task<BaseResponseDto<PartCategoryResponse>> ChangeStatusAsync(
-            Guid id, CategoryChangeStatusRequest request);
 
         // Soft delete
         Task<BaseResponseDto> DeleteAsync(Guid id);

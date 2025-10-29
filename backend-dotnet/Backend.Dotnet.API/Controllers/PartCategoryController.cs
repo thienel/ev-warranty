@@ -24,19 +24,12 @@ namespace Backend.Dotnet.API.Controllers
         [ProducesResponseType(typeof(BaseResponseDto), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetAll(
             [FromQuery] string name = null,
-            [FromQuery] string status = null,
             [FromQuery] Guid? parentId = null)
         {
             if (!string.IsNullOrWhiteSpace(name))
             {
                 var result = await _partCategoryService.GetByCategoryNameAsync(name);
                 return result.IsSuccess ? Ok(result) : NotFound(result);
-            }
-
-            if (!string.IsNullOrWhiteSpace(status))
-            {
-                var result = await _partCategoryService.GetByStatusAsync(status);
-                return result.IsSuccess ? Ok(result) : BadRequest(result);
             }
 
             if (parentId.HasValue)
@@ -113,21 +106,6 @@ namespace Backend.Dotnet.API.Controllers
             return Ok(result);
         }
 
-        [HttpPut("{id}/status")]
-        [ProducesResponseType(typeof(BaseResponseDto<PartCategoryResponse>), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(BaseResponseDto), StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(typeof(BaseResponseDto), StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> ChangeStatus(Guid id, [FromBody] CategoryChangeStatusRequest request)
-        {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
-            var result = await _partCategoryService.ChangeStatusAsync(id, request);
-            if (!result.IsSuccess)
-                return result.ErrorCode == "NOT_FOUND" ? NotFound(result) : BadRequest(result);
-
-            return Ok(result);
-        }
 
         [HttpDelete("{id}")]
         [ProducesResponseType(typeof(BaseResponseDto), StatusCodes.Status200OK)]

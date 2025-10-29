@@ -53,9 +53,6 @@ namespace Backend.Dotnet.Domain.Entities
 
             if (category.Id != PartCategoryId)
                 throw new BusinessRuleViolationException("Part category ID mismatch");
-
-            if (!category.CanBeUsedForNewParts())
-                throw new BusinessRuleViolationException("Cannot add inactive category to policy coverage");
         }
 
         // PRIVATE SETTERS
