@@ -1,0 +1,129 @@
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: db_postgres_go
+    environment:
+      POSTGRES_DB: go_service
+      POSTGRES_USER: go_service
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./backend-go/migrations:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U go_service -d go_service"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+    networks:
+      - backend-network
+
+  backend-go:
+    platform: linux/amd64
+    image: lethiendev/ev-warranty-go:latest
+    container_name: backend-go
+    pull_policy: always
+    environment:
+      - PORT=8080
+      - DATABASE_URL=postgres://go_service:${POSTGRES_PASSWORD}@postgres:5432/go_service?sslmode=disable
+      - LOG_LEVEL=info
+      - PUBLIC_KEY_PATH=./keys/public.pem
+      - PRIVATE_KEY_PATH=./keys/private.pem
+      - ACCESS_TOKEN_TTL=15m
+      - REFRESH_TOKEN_TTL=168h
+      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
+      - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
+      - GOOGLE_REDIRECT_URL=http://localhost/api/v1/auth/google/callback
+      - PRIVATE_PEM=${PRIVATE_PEM}
+      - PUBLIC_PEM=${PUBLIC_PEM}
+      - ADMIN_EMAIL=${ADMIN_EMAIL}
+      - ADMIN_PASSWORD=${ADMIN_PASSWORD}
+      - FRONTEND_BASE_URL=http://localhost:3000
+      - CLOUDINARY_URL=${CLOUDINARY_URL}
+      - CLOUDINARY_UPLOAD_FOLDER=${CLOUDINARY_UPLOAD_FOLDER}
+    entrypoint: ["./entrypoint.sh"]
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+    restart: unless-stopped
+    networks:
+      - backend-network
+
+  sqlserver:
+    platform: linux/amd64
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: db_sqlserver_dotnet
+    ports:
+      - "1433:1433"
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=${SA_PASSWORD}
+      - MSSQL_PID=Developer
+    volumes:
+      - sqlserver_data:/var/opt/mssql
+    healthcheck:
+      test: /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P "$$SA_PASSWORD" -Q "SELECT 1" -C || exit 1
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    restart: unless-stopped
+    networks:
+      - backend-network
+
+  backend-dotnet:
+    platform: linux/amd64
+    image: lethiendev/ev-warranty-dotnet:latest
+    container_name: backend-dotnet
+    pull_policy: always
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:8080
+      - ASPNETCORE_HTTP_PORTS=8080
+      - Logging__LogLevel__Default=Information
+      - Logging__LogLevel__Microsoft.AspNetCore=Warning
+      - ConnectionStrings__SqlServer=Server=sqlserver,1433;Database=WarrantyDb;User Id=sa;Password=${SA_PASSWORD};TrustServerCertificate=True;MultipleActiveResultSets=true
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+    restart: unless-stopped
+    networks:
+      - backend-network
+
+  nginx:
+    image: nginx:alpine
+    container_name: nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.local.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      backend-go:
+        condition: service_healthy
+      backend-dotnet:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - backend-network
+
+volumes:
+  postgres_data:
+  sqlserver_data:
+
+networks:
+  backend-network:
+    driver: bridge
