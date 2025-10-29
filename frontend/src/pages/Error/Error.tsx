@@ -1,20 +1,20 @@
-import React from "react";
-import { Button, Result } from "antd";
-import { useNavigate } from "react-router-dom";
-import "./Error.less";
-import { ERROR_MESSAGES } from "@constants/common-constants.js";
-import type { ExceptionStatusType } from "antd/es/result";
+import React from 'react'
+import { Button, Result } from 'antd'
+import { useNavigate } from 'react-router-dom'
+import './Error.less'
+import { ERROR_MESSAGES } from '@constants/common-constants.js'
+import type { ExceptionStatusType } from 'antd/es/result'
 
 interface ErrorProps {
-  code: ExceptionStatusType;
+  code: ExceptionStatusType
 }
 
 const Error: React.FC<ErrorProps> = ({ code = 404 }) => {
-  const navigate = useNavigate();
+  const navigate = useNavigate()
 
   const handleGoHome = () => {
-    navigate("/");
-  };
+    navigate('/')
+  }
 
   return (
     <div className="error-container">
@@ -31,7 +31,7 @@ const Error: React.FC<ErrorProps> = ({ code = 404 }) => {
         }
       />
     </div>
-  );
-};
+  )
+}
 
-export default Error;
+export default Error

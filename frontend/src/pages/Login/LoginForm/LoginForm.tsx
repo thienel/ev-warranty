@@ -1,28 +1,28 @@
-import React from "react";
-import { Button, Checkbox, Form, Input } from "antd";
-import type { FormInstance } from "antd";
+import React from 'react'
+import { Button, Checkbox, Form, Input } from 'antd'
+import type { FormInstance } from 'antd'
 import {
   EyeInvisibleOutlined,
   EyeTwoTone,
   GoogleOutlined,
   LockOutlined,
   UserOutlined,
-} from "@ant-design/icons";
-import "./LoginForm.less";
-import { EMAIL_RULES, PASSWORD_RULES } from "@constants/common-constants.js";
+} from '@ant-design/icons'
+import './LoginForm.less'
+import { EMAIL_RULES, PASSWORD_RULES } from '@constants/common-constants.js'
 
 interface LoginFormValues {
-  email: string;
-  password: string;
-  remember: boolean;
+  email: string
+  password: string
+  remember: boolean
 }
 
 interface LoginFormProps {
-  form: FormInstance<LoginFormValues>;
-  onLogin: (values: LoginFormValues) => void;
-  onGoogleLogin: () => void;
-  loginLoading: boolean;
-  googleLoading: boolean;
+  form: FormInstance<LoginFormValues>
+  onLogin: (values: LoginFormValues) => void
+  onGoogleLogin: () => void
+  loginLoading: boolean
+  googleLoading: boolean
 }
 
 const LoginForm: React.FC<LoginFormProps> = ({
@@ -51,11 +51,7 @@ const LoginForm: React.FC<LoginFormProps> = ({
         validateTrigger="onBlur"
         rules={EMAIL_RULES}
       >
-        <Input
-          prefix={<UserOutlined />}
-          placeholder="Enter your email"
-          size="large"
-        />
+        <Input prefix={<UserOutlined />} placeholder="Enter your email" size="large" />
       </Form.Item>
 
       <Form.Item
@@ -69,9 +65,7 @@ const LoginForm: React.FC<LoginFormProps> = ({
           prefix={<LockOutlined />}
           placeholder="Enter your password"
           size="large"
-          iconRender={(visible) =>
-            visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />
-          }
+          iconRender={(visible) => (visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />)}
         />
       </Form.Item>
 
@@ -93,7 +87,7 @@ const LoginForm: React.FC<LoginFormProps> = ({
           block
           className="login-button"
         >
-          {loginLoading ? "Signing in..." : "Sign In"}
+          {loginLoading ? 'Signing in...' : 'Sign In'}
         </Button>
       </Form.Item>
 
@@ -110,11 +104,11 @@ const LoginForm: React.FC<LoginFormProps> = ({
           block
           className="social-button"
         >
-          {googleLoading ? "Connecting..." : "Continue with Google"}
+          {googleLoading ? 'Connecting...' : 'Continue with Google'}
         </Button>
       </div>
     </Form>
-  );
-};
+  )
+}
 
-export default LoginForm;
+export default LoginForm

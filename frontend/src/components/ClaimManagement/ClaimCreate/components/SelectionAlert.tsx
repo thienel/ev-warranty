@@ -1,18 +1,15 @@
-import React from "react";
-import { Alert, Typography } from "antd";
-import type { Customer, Vehicle } from "@/types";
+import React from 'react'
+import { Alert, Typography } from 'antd'
+import type { Customer, Vehicle } from '@/types'
 
-const { Text } = Typography;
+const { Text } = Typography
 
 interface SelectionAlertProps {
-  selectedCustomer?: Customer | null;
-  selectedVehicle?: Vehicle | null;
+  selectedCustomer?: Customer | null
+  selectedVehicle?: Vehicle | null
 }
 
-const SelectionAlert: React.FC<SelectionAlertProps> = ({
-  selectedCustomer,
-  selectedVehicle,
-}) => {
+const SelectionAlert: React.FC<SelectionAlertProps> = ({ selectedCustomer, selectedVehicle }) => {
   if (selectedCustomer) {
     return (
       <Alert
@@ -31,16 +28,12 @@ const SelectionAlert: React.FC<SelectionAlertProps> = ({
               )}
               {selectedCustomer.phone_number && (
                 <div className="detail-item">
-                  <Text type="secondary">
-                    Phone: {selectedCustomer.phone_number}
-                  </Text>
+                  <Text type="secondary">Phone: {selectedCustomer.phone_number}</Text>
                 </div>
               )}
               {selectedCustomer.address && (
                 <div className="detail-item">
-                  <Text type="secondary">
-                    Address: {selectedCustomer.address}
-                  </Text>
+                  <Text type="secondary">Address: {selectedCustomer.address}</Text>
                 </div>
               )}
             </div>
@@ -50,7 +43,7 @@ const SelectionAlert: React.FC<SelectionAlertProps> = ({
         showIcon
         className="selection-alert"
       />
-    );
+    )
   }
 
   if (selectedVehicle) {
@@ -64,18 +57,13 @@ const SelectionAlert: React.FC<SelectionAlertProps> = ({
             <div className="vehicle-details">
               {selectedVehicle.license_plate && (
                 <div className="detail-item">
-                  <Text type="secondary">
-                    License Plate: {selectedVehicle.license_plate}
-                  </Text>
+                  <Text type="secondary">License Plate: {selectedVehicle.license_plate}</Text>
                 </div>
               )}
               {selectedVehicle.purchase_date && (
                 <div className="detail-item">
                   <Text type="secondary">
-                    Purchase Date:{" "}
-                    {new Date(
-                      selectedVehicle.purchase_date
-                    ).toLocaleDateString()}
+                    Purchase Date: {new Date(selectedVehicle.purchase_date).toLocaleDateString()}
                   </Text>
                 </div>
               )}
@@ -86,10 +74,10 @@ const SelectionAlert: React.FC<SelectionAlertProps> = ({
         showIcon
         className="selection-alert"
       />
-    );
+    )
   }
 
-  return null;
-};
+  return null
+}
 
-export default SelectionAlert;
+export default SelectionAlert

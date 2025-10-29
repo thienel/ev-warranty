@@ -1,13 +1,13 @@
-import React, { useCallback, useEffect, useState } from "react";
-import { API_ENDPOINTS } from "@constants/common-constants";
-import { type Vehicle, type Customer, type VehicleModel } from "@/types/index";
-import { customersApi, vehicleModelsApi } from "@services/index";
-import VehicleModal from "@components/VehicleManagement/VehicleModal/VehicleModal";
-import useManagement from "@/hooks/useManagement";
-import GenericActionBar from "@components/common/GenericActionBar/GenericActionBar";
-import GenericTable from "@components/common/GenericTable/GenericTable";
-import GenerateColumns from "./vehicleTableColumns";
-import useHandleApiError from "@/hooks/useHandleApiError";
+import React, { useCallback, useEffect, useState } from 'react'
+import { API_ENDPOINTS } from '@constants/common-constants'
+import { type Vehicle, type Customer, type VehicleModel } from '@/types/index'
+import { customersApi, vehicleModelsApi } from '@services/index'
+import VehicleModal from '@components/VehicleManagement/VehicleModal/VehicleModal'
+import useManagement from '@/hooks/useManagement'
+import GenericActionBar from '@components/common/GenericActionBar/GenericActionBar'
+import GenericTable from '@components/common/GenericTable/GenericTable'
+import GenerateColumns from './vehicleTableColumns'
+import useHandleApiError from '@/hooks/useHandleApiError'
 
 const VehicleManagement: React.FC = () => {
   const {
@@ -21,97 +21,82 @@ const VehicleManagement: React.FC = () => {
     isOpenModal,
     handleOpenModal,
     handleReset,
-  } = useManagement(API_ENDPOINTS.VEHICLES);
+  } = useManagement(API_ENDPOINTS.VEHICLES)
 
-  const [customers, setCustomers] = useState<Customer[]>([]);
-  const [vehicleModels, setVehicleModels] = useState<VehicleModel[]>([]);
-  const [customersLoading, setCustomersLoading] = useState(false);
-  const [vehicleModelsLoading, setVehicleModelsLoading] = useState(false);
-  const handleError = useHandleApiError();
+  const [customers, setCustomers] = useState<Customer[]>([])
+  const [vehicleModels, setVehicleModels] = useState<VehicleModel[]>([])
+  const [customersLoading, setCustomersLoading] = useState(false)
+  const [vehicleModelsLoading, setVehicleModelsLoading] = useState(false)
+  const handleError = useHandleApiError()
 
   const fetchCustomers = useCallback(async (): Promise<void> => {
     try {
-      setCustomersLoading(true);
-      const response = await customersApi.getAll();
+      setCustomersLoading(true)
+      const response = await customersApi.getAll()
       // Handle different response structures
-      let customersData = response.data;
-      if (
-        customersData &&
-        typeof customersData === "object" &&
-        "data" in customersData
-      ) {
-        customersData = (customersData as { data: unknown }).data as Customer[];
+      let customersData = response.data
+      if (customersData && typeof customersData === 'object' && 'data' in customersData) {
+        customersData = (customersData as { data: unknown }).data as Customer[]
       }
       if (Array.isArray(customersData)) {
-        setCustomers(customersData);
+        setCustomers(customersData)
       } else {
-        console.warn(
-          "API returned non-array data for customers:",
-          customersData
-        );
-        setCustomers([]);
+        console.warn('API returned non-array data for customers:', customersData)
+        setCustomers([])
       }
     } catch (error) {
-      console.error("Failed to fetch customers:", error);
-      handleError(error as Error);
-      setCustomers([]);
+      console.error('Failed to fetch customers:', error)
+      handleError(error as Error)
+      setCustomers([])
     } finally {
-      setCustomersLoading(false);
+      setCustomersLoading(false)
     }
-  }, [handleError]);
+  }, [handleError])
 
   const fetchVehicleModels = useCallback(async (): Promise<void> => {
     try {
-      setVehicleModelsLoading(true);
-      const response = await vehicleModelsApi.getAll();
+      setVehicleModelsLoading(true)
+      const response = await vehicleModelsApi.getAll()
       // Handle different response structures
-      let vehicleModelsData = response.data;
+      let vehicleModelsData = response.data
       if (
         vehicleModelsData &&
-        typeof vehicleModelsData === "object" &&
-        "data" in vehicleModelsData
+        typeof vehicleModelsData === 'object' &&
+        'data' in vehicleModelsData
       ) {
-        vehicleModelsData = (vehicleModelsData as { data: unknown })
-          .data as VehicleModel[];
+        vehicleModelsData = (vehicleModelsData as { data: unknown }).data as VehicleModel[]
       }
       if (Array.isArray(vehicleModelsData)) {
-        setVehicleModels(vehicleModelsData);
+        setVehicleModels(vehicleModelsData)
       } else {
-        console.warn(
-          "API returned non-array data for vehicle models:",
-          vehicleModelsData
-        );
-        setVehicleModels([]);
+        console.warn('API returned non-array data for vehicle models:', vehicleModelsData)
+        setVehicleModels([])
       }
     } catch (error) {
-      console.error("Failed to fetch vehicle models:", error);
-      handleError(error as Error);
-      setVehicleModels([]);
+      console.error('Failed to fetch vehicle models:', error)
+      handleError(error as Error)
+      setVehicleModels([])
     } finally {
-      setVehicleModelsLoading(false);
+      setVehicleModelsLoading(false)
     }
-  }, [handleError]);
+  }, [handleError])
 
   useEffect(() => {
-    console.log("VehicleManagement: Fetching customers and vehicle models...");
-    fetchCustomers();
-    fetchVehicleModels();
-  }, [fetchCustomers, fetchVehicleModels]);
+    console.log('VehicleManagement: Fetching customers and vehicle models...')
+    fetchCustomers()
+    fetchVehicleModels()
+  }, [fetchCustomers, fetchVehicleModels])
 
   // Refetch data when modal opens if lists are empty
   useEffect(() => {
     if (isOpenModal) {
       if (customers.length === 0 && !customersLoading) {
-        console.log(
-          "VehicleManagement: Modal opened with empty customers, refetching..."
-        );
-        fetchCustomers();
+        console.log('VehicleManagement: Modal opened with empty customers, refetching...')
+        fetchCustomers()
       }
       if (vehicleModels.length === 0 && !vehicleModelsLoading) {
-        console.log(
-          "VehicleManagement: Modal opened with empty vehicle models, refetching..."
-        );
-        fetchVehicleModels();
+        console.log('VehicleManagement: Modal opened with empty vehicle models, refetching...')
+        fetchVehicleModels()
       }
     }
   }, [
@@ -122,29 +107,27 @@ const VehicleManagement: React.FC = () => {
     vehicleModelsLoading,
     fetchCustomers,
     fetchVehicleModels,
-  ]);
+  ])
 
   const getCustomerName = (customerId: string): string => {
     if (!Array.isArray(customers)) {
-      console.warn("customers is not an array:", customers);
-      return "N/A";
+      console.warn('customers is not an array:', customers)
+      return 'N/A'
     }
-    const customer = customers.find((c) => c.id === customerId);
-    return customer
-      ? `${customer.first_name || ""} ${customer.last_name || ""}`.trim()
-      : "N/A";
-  };
+    const customer = customers.find((c) => c.id === customerId)
+    return customer ? `${customer.first_name || ''} ${customer.last_name || ''}`.trim() : 'N/A'
+  }
 
   const getVehicleModelName = (modelId: string): string => {
     if (!Array.isArray(vehicleModels)) {
-      console.warn("vehicleModels is not an array:", vehicleModels);
-      return "N/A";
+      console.warn('vehicleModels is not an array:', vehicleModels)
+      return 'N/A'
     }
-    const model = vehicleModels.find((m) => m.id === modelId);
-    return model ? `${model.brand} ${model.model_name} (${model.year})` : "N/A";
-  };
+    const model = vehicleModels.find((m) => m.id === modelId)
+    return model ? `${model.brand} ${model.model_name} (${model.year})` : 'N/A'
+  }
 
-  const searchFields = ["vin", "license_plate"];
+  const searchFields = ['vin', 'license_plate']
 
   return (
     <>
@@ -186,7 +169,7 @@ const VehicleManagement: React.FC = () => {
         isUpdate={isUpdate}
       />
     </>
-  );
-};
+  )
+}
 
-export default VehicleManagement;
+export default VehicleManagement

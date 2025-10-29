@@ -1,70 +1,68 @@
-import React, { useEffect, useState } from "react";
-import { Form, Card, message, Typography } from "antd";
-import "./Login.less";
-import { useDispatch } from "react-redux";
-import { API_BASE_URL, API_ENDPOINTS } from "@constants/common-constants";
-import api from "@services/api";
-import { loginSuccess } from "@redux/authSlice";
-import useDelay from "@/hooks/useDelay";
-import { useNavigate, useSearchParams } from "react-router-dom";
-import LoginForm from "./LoginForm/LoginForm";
-import { ThunderboltOutlined } from "@ant-design/icons";
-import useHandleApiError from "@/hooks/useHandleApiError";
-import type { ErrorResponse } from "@/constants/error-messages";
+import React, { useEffect, useState } from 'react'
+import { Form, Card, message, Typography } from 'antd'
+import './Login.less'
+import { useDispatch } from 'react-redux'
+import { API_BASE_URL, API_ENDPOINTS } from '@constants/common-constants'
+import api from '@services/api'
+import { loginSuccess } from '@redux/authSlice'
+import useDelay from '@/hooks/useDelay'
+import { useNavigate, useSearchParams } from 'react-router-dom'
+import LoginForm from './LoginForm/LoginForm'
+import { ThunderboltOutlined } from '@ant-design/icons'
+import useHandleApiError from '@/hooks/useHandleApiError'
+import type { ErrorResponse } from '@/constants/error-messages'
 
-const { Title } = Typography;
+const { Title } = Typography
 
 interface LoginFormValues {
-  email: string;
-  password: string;
-  remember: boolean;
+  email: string
+  password: string
+  remember: boolean
 }
 
 const Login: React.FC = () => {
-  const [form] = Form.useForm<LoginFormValues>();
-  const [loginLoading, setLoginLoading] = useState(false);
-  const [googleLoading, setGoogleLoading] = useState(false);
-  const navigate = useNavigate();
-  const dispatch = useDispatch();
-  const [searchParams] = useSearchParams();
-  const delay = useDelay(500);
-  const handleError = useHandleApiError();
+  const [form] = Form.useForm<LoginFormValues>()
+  const [loginLoading, setLoginLoading] = useState(false)
+  const [googleLoading, setGoogleLoading] = useState(false)
+  const navigate = useNavigate()
+  const dispatch = useDispatch()
+  const [searchParams] = useSearchParams()
+  const delay = useDelay(500)
+  const handleError = useHandleApiError()
 
   useEffect(() => {
-    const error = searchParams.get("error");
+    const error = searchParams.get('error')
     if (error) {
-      navigate("/login");
-      message.error(error);
+      navigate('/login')
+      message.error(error)
     }
-  }, [navigate, searchParams]);
+  }, [navigate, searchParams])
 
   const handleLogin = async (values: LoginFormValues) => {
-    setLoginLoading(true);
+    setLoginLoading(true)
     delay(async () => {
       try {
-        const res = await api.post(API_ENDPOINTS.AUTH.LOGIN, values);
-        const { token, user } = res.data.data;
-        message.success("Login successful!");
-        dispatch(
-          loginSuccess({ user, token: token, remember: values.remember })
-        );
+        const res = await api.post(API_ENDPOINTS.AUTH.LOGIN, values)
+        const { token, user } = res.data.data
+        message.success('Login successful!')
+        dispatch(loginSuccess({ user, token: token, remember: values.remember }))
       } catch (error) {
-        handleError(error as ErrorResponse);
+        handleError(error as ErrorResponse)
       } finally {
-        setLoginLoading(false);
+        setLoginLoading(false)
       }
-    });
-  };
+    })
+  }
 
   const handleGoogleLogin = async () => {
-    setGoogleLoading(true);
+    setGoogleLoading(true)
     delay(() => {
-      window.location.href = `${API_BASE_URL}${API_ENDPOINTS.AUTH.GOOGLE}`;
-    });
-  };
+      window.location.href = `${API_BASE_URL}${API_ENDPOINTS.AUTH.GOOGLE}`
+    })
+  }
 
   return (
-    <div className={`login-container ${loginLoading ? "login-loading" : ""}`}>
+    <div className={`login-container ${loginLoading ? 'login-loading' : ''}`}>
       <Card className="login-card">
         <div className="login-header">
           <div className="main-logo">
@@ -86,7 +84,7 @@ const Login: React.FC = () => {
         </div>
       </Card>
     </div>
-  );
-};
+  )
+}
 
-export default Login;
+export default Login

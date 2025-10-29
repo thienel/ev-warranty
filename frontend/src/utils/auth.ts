@@ -14,7 +14,7 @@ function decodeJwtPayload(token: string): JwtPayload | null {
     if (parts.length !== 3) {
       return null
     }
-    
+
     const payload = parts[1]
     const decoded = atob(payload.replace(/-/g, '+').replace(/_/g, '/'))
     return JSON.parse(decoded) as JwtPayload
@@ -29,14 +29,14 @@ function decodeJwtPayload(token: string): JwtPayload | null {
  */
 export function isTokenExpired(token: string | null): boolean {
   if (!token) return true
-  
+
   const decoded = decodeJwtPayload(token)
   if (!decoded || !decoded.exp) return true
-  
+
   const currentTime = Date.now() / 1000
-  
+
   // Add 30 seconds buffer before expiration
-  return decoded.exp < (currentTime + 30)
+  return decoded.exp < currentTime + 30
 }
 
 /**
@@ -44,12 +44,12 @@ export function isTokenExpired(token: string | null): boolean {
  */
 export function isTokenValid(token: string | null): boolean {
   if (!token) return false
-  
+
   const decoded = decodeJwtPayload(token)
   if (!decoded) return false
-  
+
   const currentTime = Date.now() / 1000
-  
+
   // Check if token has required fields and is not expired
   return !!(decoded.exp && decoded.sub && decoded.exp > currentTime)
 }
@@ -59,10 +59,10 @@ export function isTokenValid(token: string | null): boolean {
  */
 export function getTokenExpiration(token: string | null): Date | null {
   if (!token) return null
-  
+
   const decoded = decodeJwtPayload(token)
   if (!decoded || !decoded.exp) return null
-  
+
   return new Date(decoded.exp * 1000)
 }
 
@@ -71,7 +71,7 @@ export function getTokenExpiration(token: string | null): Date | null {
  */
 export function getUserIdFromToken(token: string | null): string | null {
   if (!token) return null
-  
+
   const decoded = decodeJwtPayload(token)
   return decoded?.sub || null
 }

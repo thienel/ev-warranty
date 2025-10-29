@@ -1,11 +1,11 @@
-import React from "react";
-import { Layout } from "antd";
-import "./LayoutContent.less";
+import React from 'react'
+import { Layout } from 'antd'
+import './LayoutContent.less'
 
-const { Content } = Layout;
+const { Content } = Layout
 
 interface LayoutContentProps {
-  children: React.ReactNode;
+  children: React.ReactNode
 }
 
 const LayoutContent: React.FC<LayoutContentProps> = ({ children }) => {
@@ -13,7 +13,7 @@ const LayoutContent: React.FC<LayoutContentProps> = ({ children }) => {
     <div className="app-content">
       <Content>{children}</Content>
     </div>
-  );
-};
+  )
+}
 
-export default LayoutContent;
+export default LayoutContent

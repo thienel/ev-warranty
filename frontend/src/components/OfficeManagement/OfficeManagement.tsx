@@ -1,11 +1,11 @@
-import React from "react";
-import { API_ENDPOINTS } from "@constants/common-constants";
-import { type Office } from "@/types/index";
-import OfficeModal from "@components/OfficeManagement/OfficeModal/OfficeModal";
-import useManagement from "@/hooks/useManagement";
-import GenericActionBar from "@components/common/GenericActionBar/GenericActionBar";
-import GenericTable from "@components/common/GenericTable/GenericTable";
-import GenerateColumns from "./officeTableColumns";
+import React from 'react'
+import { API_ENDPOINTS } from '@constants/common-constants'
+import { type Office } from '@/types/index'
+import OfficeModal from '@components/OfficeManagement/OfficeModal/OfficeModal'
+import useManagement from '@/hooks/useManagement'
+import GenericActionBar from '@components/common/GenericActionBar/GenericActionBar'
+import GenericTable from '@components/common/GenericTable/GenericTable'
+import GenerateColumns from './officeTableColumns'
 
 const OfficeManagement: React.FC = () => {
   const {
@@ -19,9 +19,9 @@ const OfficeManagement: React.FC = () => {
     isOpenModal,
     handleOpenModal,
     handleReset,
-  } = useManagement(API_ENDPOINTS.OFFICES);
+  } = useManagement(API_ENDPOINTS.OFFICES)
 
-  const searchFields = ["office_name", "office_type", "address"];
+  const searchFields = ['office_name', 'office_type', 'address']
 
   return (
     <>
@@ -58,7 +58,7 @@ const OfficeManagement: React.FC = () => {
         isUpdate={isUpdate}
       />
     </>
-  );
-};
+  )
+}
 
-export default OfficeManagement;
+export default OfficeManagement

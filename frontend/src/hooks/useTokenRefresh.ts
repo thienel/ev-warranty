@@ -19,16 +19,16 @@ export const useTokenRefresh = () => {
       const response = await axios.post(
         `${API_BASE_URL}${API_ENDPOINTS.AUTH.TOKEN}`,
         {},
-        { withCredentials: true }
+        { withCredentials: true },
       )
-      
+
       const newToken = response.data.data?.access_token
       if (newToken) {
         dispatch(setToken(newToken))
         console.log('Token refreshed successfully')
         return true
       }
-      
+
       return false
     } catch (error) {
       console.error('Token refresh failed:', error)
@@ -54,7 +54,7 @@ export const useTokenRefresh = () => {
     const expiration = getTokenExpiration(token)
     if (expiration) {
       const timeUntilExpiration = expiration.getTime() - Date.now()
-      
+
       // If token expires within threshold, refresh it
       if (timeUntilExpiration <= TOKEN_REFRESH_THRESHOLD) {
         console.log('Token expires soon, refreshing...')

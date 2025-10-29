@@ -14,10 +14,7 @@ export interface FileUploadOptions {
 /**
  * Validate a single file against upload constraints
  */
-export function validateFile(
-  file: File,
-  options: FileUploadOptions = {}
-): FileValidationResult {
+export function validateFile(file: File, options: FileUploadOptions = {}): FileValidationResult {
   const {
     maxSize = FILE_UPLOAD_CONFIG.MAX_FILE_SIZE,
     allowedTypes = FILE_UPLOAD_CONFIG.ALLOWED_TYPES,
@@ -47,11 +44,9 @@ export function validateFile(
  */
 export function validateFiles(
   files: FileList | File[],
-  options: FileUploadOptions = {}
+  options: FileUploadOptions = {},
 ): FileValidationResult {
-  const {
-    maxFiles = FILE_UPLOAD_CONFIG.MAX_FILES,
-  } = options
+  const { maxFiles = FILE_UPLOAD_CONFIG.MAX_FILES } = options
 
   const fileArray = Array.from(files)
   const errors: string[] = []
@@ -65,7 +60,7 @@ export function validateFiles(
   fileArray.forEach((file, index) => {
     const validation = validateFile(file, options)
     if (!validation.isValid) {
-      validation.errors.forEach(error => {
+      validation.errors.forEach((error) => {
         errors.push(`File ${index + 1}: ${error}`)
       })
     }
@@ -94,7 +89,7 @@ export function formatFileSize(bytes: number): string {
  * Get file extension from filename
  */
 export function getFileExtension(filename: string): string {
-  return filename.slice((filename.lastIndexOf('.') - 1 >>> 0) + 2)
+  return filename.slice(((filename.lastIndexOf('.') - 1) >>> 0) + 2)
 }
 
 /**

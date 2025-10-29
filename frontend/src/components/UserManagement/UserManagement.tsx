@@ -1,13 +1,13 @@
-import React, { useCallback, useEffect, useState } from "react";
-import { API_ENDPOINTS, ROLE_LABELS } from "@constants/common-constants";
-import { type User, type Office } from "@/types/index";
-import { officesApi } from "@services/index";
-import UserModal from "@components/UserManagement/UserModal/UserModal";
-import useManagement from "@/hooks/useManagement";
-import GenericActionBar from "@components/common/GenericActionBar/GenericActionBar";
-import GenericTable from "@components/common/GenericTable/GenericTable";
-import GenerateColumns from "./userTableColumns";
-import useHandleApiError from "@/hooks/useHandleApiError";
+import React, { useCallback, useEffect, useState } from 'react'
+import { API_ENDPOINTS, ROLE_LABELS } from '@constants/common-constants'
+import { type User, type Office } from '@/types/index'
+import { officesApi } from '@services/index'
+import UserModal from '@components/UserManagement/UserModal/UserModal'
+import useManagement from '@/hooks/useManagement'
+import GenericActionBar from '@components/common/GenericActionBar/GenericActionBar'
+import GenericTable from '@components/common/GenericTable/GenericTable'
+import GenerateColumns from './userTableColumns'
+import useHandleApiError from '@/hooks/useHandleApiError'
 
 const UserManagement: React.FC = () => {
   const {
@@ -21,88 +21,79 @@ const UserManagement: React.FC = () => {
     isOpenModal,
     handleOpenModal,
     handleReset,
-  } = useManagement(API_ENDPOINTS.USERS);
+  } = useManagement(API_ENDPOINTS.USERS)
 
-  const [offices, setOffices] = useState<Office[]>([]);
-  const [officesLoading, setOfficesLoading] = useState(false);
-  const handleError = useHandleApiError();
+  const [offices, setOffices] = useState<Office[]>([])
+  const [officesLoading, setOfficesLoading] = useState(false)
+  const handleError = useHandleApiError()
 
   const fetchOffices = useCallback(async (): Promise<void> => {
     try {
-      setOfficesLoading(true);
-      const response = await officesApi.getAll();
+      setOfficesLoading(true)
+      const response = await officesApi.getAll()
       // Handle different response structures - same as useManagement hook
-      let officesData = response.data;
+      let officesData = response.data
       // If response has nested data property, use that
-      if (
-        officesData &&
-        typeof officesData === "object" &&
-        "data" in officesData
-      ) {
-        officesData = (officesData as { data: unknown }).data as Office[];
+      if (officesData && typeof officesData === 'object' && 'data' in officesData) {
+        officesData = (officesData as { data: unknown }).data as Office[]
       }
       // Ensure we always have an array
       if (Array.isArray(officesData)) {
-        setOffices(officesData);
+        setOffices(officesData)
       } else {
-        console.warn("API returned non-array data for offices:", officesData);
-        setOffices([]);
+        console.warn('API returned non-array data for offices:', officesData)
+        setOffices([])
       }
     } catch (error) {
-      console.error("Failed to fetch offices:", error);
-      handleError(error as Error);
-      setOffices([]); // Set empty array on error
+      console.error('Failed to fetch offices:', error)
+      handleError(error as Error)
+      setOffices([]) // Set empty array on error
     } finally {
-      setOfficesLoading(false);
+      setOfficesLoading(false)
     }
-  }, [handleError]);
+  }, [handleError])
 
   useEffect(() => {
-    console.log("UserManagement: Fetching offices...");
-    fetchOffices();
-  }, [fetchOffices]);
+    console.log('UserManagement: Fetching offices...')
+    fetchOffices()
+  }, [fetchOffices])
 
   // Refetch offices when modal opens if offices list is empty
   useEffect(() => {
     if (isOpenModal && offices.length === 0 && !officesLoading) {
-      console.log(
-        "UserManagement: Modal opened with empty offices, refetching..."
-      );
-      fetchOffices();
+      console.log('UserManagement: Modal opened with empty offices, refetching...')
+      fetchOffices()
     }
-  }, [isOpenModal, offices.length, officesLoading, fetchOffices]);
+  }, [isOpenModal, offices.length, officesLoading, fetchOffices])
 
   // Debug log to track offices state changes
   useEffect(() => {
-    console.log("UserManagement: offices state changed:", {
+    console.log('UserManagement: offices state changed:', {
       isArray: Array.isArray(offices),
-      length: Array.isArray(offices) ? offices.length : "N/A",
+      length: Array.isArray(offices) ? offices.length : 'N/A',
       data: offices,
-    });
-  }, [offices]);
+    })
+  }, [offices])
 
   const getOfficeName = (officeId: string): string => {
     // Safety check: ensure offices is an array before calling find
     if (!Array.isArray(offices)) {
-      console.warn("offices is not an array:", offices);
-      return "N/A";
+      console.warn('offices is not an array:', offices)
+      return 'N/A'
     }
 
-    const office = offices.find((o) => o.id === officeId);
-    return office ? office.office_name : "N/A";
-  };
+    const office = offices.find((o) => o.id === officeId)
+    return office ? office.office_name : 'N/A'
+  }
 
-  const searchFields = ["name", "email"];
+  const searchFields = ['name', 'email']
   const searchFieldsWithRole = [
     ...searchFields,
     (user: Record<string, unknown> & { id: string | number }) => {
-      const userRecord = user as unknown as User;
-      return (
-        ROLE_LABELS[userRecord.role as keyof typeof ROLE_LABELS] ||
-        userRecord.role
-      );
+      const userRecord = user as unknown as User
+      return ROLE_LABELS[userRecord.role as keyof typeof ROLE_LABELS] || userRecord.role
     },
-  ];
+  ]
 
   return (
     <>
@@ -142,7 +133,7 @@ const UserManagement: React.FC = () => {
         isUpdate={isUpdate}
       />
     </>
-  );
-};
+  )
+}
 
-export default UserManagement;
+export default UserManagement

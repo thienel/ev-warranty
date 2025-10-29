@@ -1,7 +1,7 @@
-import React from "react";
+import React from 'react'
 
 const ClaimDetail: React.FC = () => {
-  return <div>Claim Detail</div>;
-};
+  return <div>Claim Detail</div>
+}
 
-export default ClaimDetail;
+export default ClaimDetail

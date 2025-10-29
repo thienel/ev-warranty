@@ -86,7 +86,6 @@ jobs:
             lethiendev/ev-warranty-dotnet:${{ steps.version.outputs.VERSION }}
           cache-from: type=registry,ref=lethiendev/ev-warranty-dotnet:buildcache
           cache-to: type=registry,ref=lethiendev/ev-warranty-dotnet:buildcache,mode=max
-
   build-frontend:
     needs: detect-changes
     if: needs.detect-changes.outputs.frontend == 'true'

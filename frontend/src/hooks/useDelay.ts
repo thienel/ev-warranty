@@ -11,7 +11,7 @@ const useDelay = (ms = 1000) => {
       }, ms)
       setTimer(newTimer)
     },
-    [ms, timer]
+    [ms, timer],
   )
 
   useEffect(() => {
