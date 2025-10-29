@@ -5,12 +5,12 @@ namespace Backend.Dotnet.Domain.Entities
 {
     public enum PartStatus
     {
-        Available,
-        Reserved,
-        Installed,
-        Defective,
-        Obsolete,
-        Archived
+        Available,  // In stock, ready for use
+        Reserved,   // Allocated for work order
+        Installed,  // Used in vehicle
+        Defective,  // Damaged, not usable
+        Obsolete,   // No longer in use
+        Archived    // Removed from inventory
     }
 
     public class Part : BaseEntity, IStatus<PartStatus>
@@ -23,72 +23,65 @@ namespace Backend.Dotnet.Domain.Entities
         public PartStatus Status { get; private set; }
 
         // Navigation properties
-        public PartCategory Category { get; private set; }
+        public virtual PartCategory Category { get; private set; }
 
-        private Part() { } // EF Core
+        private Part() { }
 
-        public Part(string serialNumber, string partName, decimal unitPrice, Guid categoryId, Guid? officeLocationId = null)
+        public Part(
+            string serialNumber,
+            string partName,
+            decimal unitPrice,
+            Guid categoryId,
+            Guid? officeLocationId = null)
         {
-            if (string.IsNullOrWhiteSpace(serialNumber))
-                throw new BusinessRuleViolationException("Serial number cannot be empty");
-
-            if (string.IsNullOrWhiteSpace(partName))
-                throw new BusinessRuleViolationException("Part name cannot be empty");
-
-            if (unitPrice <= 0)
-                throw new BusinessRuleViolationException("Unit price must be greater than zero");
-
-            SerialNumber = serialNumber;
-            PartName = partName;
-            UnitPrice = unitPrice;
+            SetSerialNumber(serialNumber);
+            SetPartName(partName);
+            SetUnitPrice(unitPrice);
             CategoryId = categoryId;
             OfficeLocationId = officeLocationId;
             Status = PartStatus.Available;
         }
 
+        // BEHAVIOUR
         public void UpdateDetails(string partName, decimal unitPrice, Guid? officeLocationId)
         {
             if (Status == PartStatus.Archived)
-                throw new BusinessRuleViolationException("Cannot update an archived part");
+                throw new BusinessRuleViolationException("Cannot update archived part");
 
-            if (string.IsNullOrWhiteSpace(partName))
-                throw new BusinessRuleViolationException("Part name cannot be empty");
-
-            if (unitPrice <= 0)
-                throw new BusinessRuleViolationException("Unit price must be greater than zero");
-
-            PartName = partName;
-            UnitPrice = unitPrice;
+            SetPartName(partName);
+            SetUnitPrice(unitPrice);
             OfficeLocationId = officeLocationId;
             SetUpdatedAt();
         }
 
-        public void UpdateCategory(Guid newCategoryId, PartCategory newCategory)
+        public void UpdateCategory(Guid newCategoryId)
         {
             if (Status == PartStatus.Archived)
-                throw new BusinessRuleViolationException("Cannot change category of an archived part");
+                throw new BusinessRuleViolationException("Cannot change category of archived part");
 
-            if (newCategory == null || !newCategory.CanBeUsedForNewParts())
-                throw new BusinessRuleViolationException("Cannot assign part to an inactive category");
+            if (Status == PartStatus.Installed)
+                throw new BusinessRuleViolationException("Cannot change category of installed part");
 
             CategoryId = newCategoryId;
             SetUpdatedAt();
         }
 
+        public void UpdateOfficeLocation(Guid? officeLocationId)
+        {
+            if (Status == PartStatus.Archived)
+                throw new BusinessRuleViolationException("Cannot update archived part");
+
+            OfficeLocationId = officeLocationId;
+            SetUpdatedAt();
+        }
+
+        // Status
         public void ChangeStatus(PartStatus newStatus)
         {
             if (Status == newStatus)
                 return;
 
-            // Business rules for status transitions
-            if (Status == PartStatus.Archived)
-                throw new BusinessRuleViolationException("Cannot change status of an archived part");
-
-            if (newStatus == PartStatus.Available && Status == PartStatus.Reserved)
-            {
-                // Could add additional checks here (e.g., ensure no active work order)
-            }
-
+            ValidateStatusTransition(Status, newStatus);
             Status = newStatus;
             SetUpdatedAt();
         }
@@ -96,9 +89,10 @@ namespace Backend.Dotnet.Domain.Entities
         public void Reserve()
         {
             if (Status != PartStatus.Available)
-                throw new BusinessRuleViolationException($"Cannot reserve a part with status {Status}");
+                throw new BusinessRuleViolationException($"Cannot reserve part with status {Status}");
 
-            ChangeStatus(PartStatus.Reserved);
+            Status = PartStatus.Reserved;
+            SetUpdatedAt();
         }
 
         public void MarkAsInstalled()
@@ -106,44 +100,88 @@ namespace Backend.Dotnet.Domain.Entities
             if (Status != PartStatus.Reserved)
                 throw new BusinessRuleViolationException("Only reserved parts can be marked as installed");
 
-            ChangeStatus(PartStatus.Installed);
+            Status = PartStatus.Installed;
+            SetUpdatedAt();
         }
 
         public void MarkAsDefective()
         {
             if (Status == PartStatus.Installed || Status == PartStatus.Archived)
-                throw new BusinessRuleViolationException($"Cannot mark a part with status {Status} as defective");
+                throw new BusinessRuleViolationException($"Cannot mark {Status} part as defective");
 
-            ChangeStatus(PartStatus.Defective);
+            Status = PartStatus.Defective;
+            SetUpdatedAt();
         }
 
         public void MakeObsolete()
         {
             if (Status == PartStatus.Reserved || Status == PartStatus.Installed)
-                throw new BusinessRuleViolationException($"Cannot make a part with status {Status} obsolete");
+                throw new BusinessRuleViolationException($"Cannot make {Status} part obsolete");
 
-            ChangeStatus(PartStatus.Obsolete);
+            Status = PartStatus.Obsolete;
+            SetUpdatedAt();
         }
 
         public void Archive()
         {
             if (Status == PartStatus.Reserved || Status == PartStatus.Installed)
-                throw new BusinessRuleViolationException("Cannot archive a part that is reserved or installed");
+                throw new BusinessRuleViolationException($"Cannot archive {Status} part");
 
-            ChangeStatus(PartStatus.Archived);
+            Status = PartStatus.Archived;
+            SetUpdatedAt();
         }
 
         public void MakeAvailable()
         {
             if (Status == PartStatus.Installed || Status == PartStatus.Archived)
-                throw new BusinessRuleViolationException($"Cannot make a part with status {Status} available");
+                throw new BusinessRuleViolationException($"Cannot make {Status} part available");
 
-            ChangeStatus(PartStatus.Available);
+            Status = PartStatus.Available;
+            SetUpdatedAt();
         }
 
-        public bool CanBeUsedInWorkOrder()
+        // QUERY
+        public bool CanBeUsedInWorkOrder() => Status == PartStatus.Available;
+        public bool IsInStock() => Status == PartStatus.Available || Status == PartStatus.Reserved;
+
+        // PRIVATE SETTERS
+        private void SetSerialNumber(string serialNumber)
         {
-            return Status == PartStatus.Available;
+            if (string.IsNullOrWhiteSpace(serialNumber))
+                throw new BusinessRuleViolationException("Serial number cannot be empty");
+
+            if (serialNumber.Length > 255)
+                throw new BusinessRuleViolationException("Serial number cannot exceed 255 characters");
+
+            SerialNumber = serialNumber.Trim().ToUpperInvariant();
+        }
+
+        private void SetPartName(string partName)
+        {
+            if (string.IsNullOrWhiteSpace(partName))
+                throw new BusinessRuleViolationException("Part name cannot be empty");
+
+            if (partName.Length > 255)
+                throw new BusinessRuleViolationException("Part name cannot exceed 255 characters");
+
+            PartName = partName.Trim();
+        }
+
+        private void SetUnitPrice(decimal unitPrice)
+        {
+            if (unitPrice <= 0)
+                throw new BusinessRuleViolationException("Unit price must be greater than zero");
+
+            if (unitPrice > 999999999.99m)
+                throw new BusinessRuleViolationException("Unit price cannot exceed 999,999,999.99");
+
+            UnitPrice = unitPrice;
+        }
+
+        private void ValidateStatusTransition(PartStatus from, PartStatus to)
+        {
+            if (from == PartStatus.Archived)
+                throw new BusinessRuleViolationException("Cannot change status of archived part");
         }
     }
 }

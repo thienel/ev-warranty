@@ -10,6 +10,10 @@ namespace Backend.Dotnet.Infrastructure.Data.Context
         public DbSet<Customer> Customers { get; set; }
         public DbSet<Vehicle> Vehicles { get; set; }
         public DbSet<VehicleModel> VehicleModels { get; set; }
+        public DbSet<PartCategory> PartCategorys { get; set; }
+        public DbSet<Part> Parts { get; set; }
+        public DbSet<WarrantyPolicy> WarrantyPolicys { get; set; }
+        public DbSet<PolicyCoveragePart> PolicyCoverageParts { get; set; }
 
         public AppDbContext(DbContextOptions<AppDbContext> options)
             : base(options)

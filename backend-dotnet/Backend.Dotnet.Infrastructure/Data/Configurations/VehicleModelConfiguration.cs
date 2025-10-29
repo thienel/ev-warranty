@@ -33,6 +33,10 @@ namespace Backend.Dotnet.Infrastructure.Data.Configurations
                 .HasColumnType("integer")
                 .IsRequired();
 
+            builder.Property(vm => vm.PolicyId)
+                .HasColumnName("policy_id")
+                .IsRequired(false);
+
             // DateTime
             builder.Property(vm => vm.CreatedAt)
                 .HasColumnName("created_at")
@@ -49,11 +53,20 @@ namespace Backend.Dotnet.Infrastructure.Data.Configurations
                 .IsUnique()
                 .HasDatabaseName("ix_vehicle_models_brand_model_year");
 
+            builder.HasIndex(vm => vm.PolicyId)
+               .HasDatabaseName("ix_vehicle_models_policy_id");
+
             // Relationships
             builder.HasMany(vm => vm.Vehicles)
                 .WithOne(v => v.Model)
                 .HasForeignKey(v => v.ModelId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            builder.HasOne(vm => vm.Policy)
+               .WithMany(wp => wp.VehicleModels)
+               .HasForeignKey(vm => vm.PolicyId)
+               .OnDelete(DeleteBehavior.SetNull)
+               .IsRequired(false);
         }
     }
 }

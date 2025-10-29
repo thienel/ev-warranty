@@ -8,9 +8,12 @@ namespace Backend.Dotnet.Domain.Entities
         public string Brand { get; private set; }
         public string ModelName { get; private set; }
         public int Year { get; private set; }
+        public Guid? PolicyId { get; private set; }
+
 
         // Navigation property
         public virtual ICollection<Vehicle> Vehicles { get; private set; }
+        public virtual WarrantyPolicy Policy { get; private set; }
 
         private VehicleModel()
         {
@@ -48,6 +51,18 @@ namespace Backend.Dotnet.Domain.Entities
         public void ChangeYear(int year)
         {
             SetYear(year);
+            SetUpdatedAt();
+        }
+
+        public void AssignPolicy(Guid policyId)
+        {
+            PolicyId = policyId;
+            SetUpdatedAt();
+        }
+
+        public void RemovePolicy()
+        {
+            PolicyId = null;
             SetUpdatedAt();
         }
 

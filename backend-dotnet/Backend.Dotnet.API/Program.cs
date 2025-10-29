@@ -1,3 +1,4 @@
+using Backend.Dotnet.API.Middleware;
 using Backend.Dotnet.Infrastructure;
 using Backend.Dotnet.Infrastructure.Data.Context;
 using Microsoft.EntityFrameworkCore;
@@ -21,23 +22,48 @@ namespace Backend.Dotnet.API
            builder.Services.AddInfrastructure(builder.Configuration);
            builder.Services.AddHealthChecks();
 
-           builder.Services.AddEndpointsApiExplorer();
-           builder.Services.AddSwaggerGen(c =>
-           {
-               c.SwaggerDoc("v1", new OpenApiInfo
-               {
-                   Title = "Customer Vehicle Service API",
-                   Version = "v1",
-                   Description = "RESTful API for managing customers and their vehicles",
-                   Contact = new OpenApiContact
-                   {
-                       Name = "Your Name / Team",
-                       Email = "your@email.com"
-                   }
-               });
-           });
+            builder.Services.AddEndpointsApiExplorer();
+            builder.Services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new OpenApiInfo
+                {
+                    Title = "Customer Vehicle Service API",
+                    Version = "v1",
+                    Description = "RESTful API for managing customers and their vehicles",
+                    Contact = new OpenApiContact
+                    {
+                        Name = "Your Name / Team",
+                        Email = "your@email.com"
+                    }
+                });
+                /*
+                c.AddSecurityDefinition("X-User-Role", new OpenApiSecurityScheme
+                {
+                    In = ParameterLocation.Header,
+                    Name = "X-User-Role",
+                    Type = SecuritySchemeType.ApiKey,
+                    Description = "User Role header"
+                });
 
-           var app = builder.Build();
+                c.AddSecurityRequirement(new OpenApiSecurityRequirement
+                {
+                    {
+                        new OpenApiSecurityScheme
+                        {
+                            Reference = new OpenApiReference
+                            {
+                                Type = ReferenceType.SecurityScheme,
+                                Id = "X-User-Role"
+                            }
+                        },
+                        Array.Empty<string>()
+                    }
+                });
+                */
+            });
+
+            //builder.Services.AddAuthorization();
+            var app = builder.Build();
 
            using (var scope = app.Services.CreateScope())
            {
@@ -83,19 +109,21 @@ namespace Backend.Dotnet.API
                }
            }
 
-           if (app.Environment.IsDevelopment())
-           {
-               app.MapOpenApi();
-               app.UseSwagger();
-               app.UseSwaggerUI();
-           }
+            if (app.Environment.IsDevelopment())
+            {
+                app.MapOpenApi();
+                app.UseSwagger();
+                app.UseSwaggerUI();
+            }
 
-           app.UseHttpsRedirection();
-           app.UseAuthorization();
-           app.MapControllers();
-           app.MapHealthChecks("/health");
+            app.UseHttpsRedirection();
 
-           await app.RunAsync();
-       }
+            //app.UseMiddleware<HeaderAuthMiddleware>();
+
+            app.UseAuthorization();
+            app.MapControllers();
+            app.MapHealthChecks("/health");
+            app.Run();
+        }
     }
 }

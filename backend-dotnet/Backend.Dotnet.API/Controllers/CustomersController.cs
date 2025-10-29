@@ -1,5 +1,7 @@
-﻿using Backend.Dotnet.Application.DTOs;
+﻿using Backend.Dotnet.Application.Constants;
+using Backend.Dotnet.Application.DTOs;
 using Backend.Dotnet.Application.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using static Backend.Dotnet.Application.DTOs.CustomerDto;
 
@@ -8,6 +10,7 @@ namespace Backend.Dotnet.API.Controllers
     [ApiController]
     [Route("customers")]
     [Produces("application/json")]
+    //[Authorize(Roles = SystemRoles.UserRoleScStaff)]
     public class CustomersController : ControllerBase
     {
         private readonly ICustomerService _customerService;
@@ -21,6 +24,7 @@ namespace Backend.Dotnet.API.Controllers
         /// Get customers with optional filtering
         /// </summary>
         [HttpGet]
+        //[Authorize(Roles = SystemRoles.UserRoleScTechnician)]
         [ProducesResponseType(typeof(BaseResponseDto<IEnumerable<CustomerResponse>>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BaseResponseDto), StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> GetAll(
@@ -28,6 +32,7 @@ namespace Backend.Dotnet.API.Controllers
             [FromQuery] string phone = null,
             [FromQuery] string email = null)
         {
+
             // Email - absolute
             if (!string.IsNullOrWhiteSpace(email))
             {

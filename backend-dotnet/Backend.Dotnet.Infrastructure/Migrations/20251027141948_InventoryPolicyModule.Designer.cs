@@ -4,6 +4,7 @@ using Backend.Dotnet.Infrastructure.Data.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Backend.Dotnet.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251027141948_InventoryPolicyModule")]
+    partial class InventoryPolicyModule
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -313,10 +316,6 @@ namespace Backend.Dotnet.Infrastructure.Migrations
                         .HasColumnType("varchar(100)")
                         .HasColumnName("model_name");
 
-                    b.Property<Guid?>("PolicyId")
-                        .HasColumnType("uniqueidentifier")
-                        .HasColumnName("policy_id");
-
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2")
                         .HasColumnName("updated_at");
@@ -326,9 +325,6 @@ namespace Backend.Dotnet.Infrastructure.Migrations
                         .HasColumnName("year");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("PolicyId")
-                        .HasDatabaseName("ix_vehicle_models_policy_id");
 
                     b.HasIndex("Brand", "ModelName", "Year")
                         .IsUnique()
@@ -351,6 +347,10 @@ namespace Backend.Dotnet.Infrastructure.Migrations
                     b.Property<int?>("KilometerLimit")
                         .HasColumnType("int")
                         .HasColumnName("kilometer_limit");
+
+                    b.Property<Guid>("ModelId")
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("model_id");
 
                     b.Property<string>("PolicyName")
                         .IsRequired()
@@ -379,11 +379,17 @@ namespace Backend.Dotnet.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("ModelId")
+                        .HasDatabaseName("ix_warranty_policies_model_id");
+
                     b.HasIndex("PolicyName")
                         .HasDatabaseName("ix_warranty_policies_policy_name");
 
                     b.HasIndex("Status")
                         .HasDatabaseName("ix_warranty_policies_status");
+
+                    b.HasIndex("ModelId", "Status")
+                        .HasDatabaseName("ix_warranty_policies_model_status");
 
                     b.ToTable("warranty_policies", (string)null);
                 });
@@ -447,14 +453,15 @@ namespace Backend.Dotnet.Infrastructure.Migrations
                     b.Navigation("Model");
                 });
 
-            modelBuilder.Entity("Backend.Dotnet.Domain.Entities.VehicleModel", b =>
+            modelBuilder.Entity("Backend.Dotnet.Domain.Entities.WarrantyPolicy", b =>
                 {
-                    b.HasOne("Backend.Dotnet.Domain.Entities.WarrantyPolicy", "Policy")
-                        .WithMany("VehicleModels")
-                        .HasForeignKey("PolicyId")
-                        .OnDelete(DeleteBehavior.SetNull);
+                    b.HasOne("Backend.Dotnet.Domain.Entities.VehicleModel", "Model")
+                        .WithMany()
+                        .HasForeignKey("ModelId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
-                    b.Navigation("Policy");
+                    b.Navigation("Model");
                 });
 
             modelBuilder.Entity("Backend.Dotnet.Domain.Entities.Customer", b =>
@@ -479,8 +486,6 @@ namespace Backend.Dotnet.Infrastructure.Migrations
             modelBuilder.Entity("Backend.Dotnet.Domain.Entities.WarrantyPolicy", b =>
                 {
                     b.Navigation("CoverageParts");
-
-                    b.Navigation("VehicleModels");
                 });
 #pragma warning restore 612, 618
         }

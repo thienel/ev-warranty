@@ -45,19 +45,19 @@ namespace Backend.Dotnet.Domain.Entities
         }
 
         // change method lack of vadidation, use for mapper in purpose of reducing null-coalescing
-        public void ChangePhoneNumber(string phoneNumber)
+        public void ChangePhoneNumber(string? phoneNumber)
         {
             SetPhoneNumber(phoneNumber);
             SetUpdatedAt();
         }
 
-        public void ChangeEmail(string email)
+        public void ChangeEmail(string? email)
         {
             SetEmail(email);
             SetUpdatedAt();
         }
 
-        public void ChangeAddress(string address)
+        public void ChangeAddress(string? address)
         {
             SetAddress(address);
             SetUpdatedAt();
@@ -68,7 +68,7 @@ namespace Backend.Dotnet.Domain.Entities
             if (string.IsNullOrWhiteSpace(firstName))
                 throw new BusinessRuleViolationException("First name cannot be empty");
 
-            if(firstName.Length > 100)
+            if (firstName.Length > 100)
             {
                 throw new BusinessRuleViolationException("Name cannot exceed 100 characters");
             }
@@ -82,7 +82,7 @@ namespace Backend.Dotnet.Domain.Entities
             if (string.IsNullOrWhiteSpace(lastName))
                 throw new BusinessRuleViolationException("Last name cannot be empty");
 
-            if(lastName.Length > 100)
+            if (lastName.Length > 100)
             {
                 throw new BusinessRuleViolationException("Name cannot exceed 100 characters");
             }
@@ -165,22 +165,30 @@ namespace Backend.Dotnet.Domain.Entities
             PhoneNumber = phoneNumber.Trim();
         }
 
-        private void SetEmail(string email)
+        private void SetEmail(string? email)
         {
-            if (!string.IsNullOrWhiteSpace(email))
+            if (string.IsNullOrWhiteSpace(email))
             {
-                if (!IsValidEmail(email))
-                    throw new BusinessRuleViolationException("Invalid email format");
-
-                if (email.Length > 255)
-                    throw new BusinessRuleViolationException("Email cannot exceed 255 characters");
+                Email = null;
+                return;
             }
+            if (!IsValidEmail(email))
+                throw new BusinessRuleViolationException("Invalid email format");
+
+            if (email.Length > 255)
+                throw new BusinessRuleViolationException("Email cannot exceed 255 characters");
 
             Email = email.Trim().ToLowerInvariant();
         }
 
-        private void SetAddress(string address)
+        private void SetAddress(string? address)
         {
+            if (string.IsNullOrWhiteSpace(address))
+            {
+                Address = null;
+                return;
+            }
+
             Address = address.Trim();
         }
 
