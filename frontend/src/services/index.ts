@@ -5,6 +5,7 @@ export { default as claimsApi } from './claimsApi'
 export { default as customersApi } from './customersApi'
 export { default as vehicleModelsApi } from './vehicleModelsApi'
 export { default as vehiclesApi } from './vehiclesApi'
+export { default as partCategoriesApi } from './partCategoriesApi'
 
 export { authApi as auth } from './authApi'
 export { usersApi as users } from './usersApi'
@@ -17,5 +18,6 @@ export {
 export { customersApi as customers } from './customersApi'
 export { vehicleModelsApi as vehicleModels } from './vehicleModelsApi'
 export { vehiclesApi as vehicles } from './vehiclesApi'
+export { partCategoriesApi as partCategories } from './partCategoriesApi'
 
 export { default as api } from './api'
