@@ -2,10 +2,7 @@ import React, { useEffect } from 'react'
 import { Modal, Button, Form, Input, message, Space, InputNumber } from 'antd'
 import { SafetyOutlined, ClockCircleOutlined, CarOutlined } from '@ant-design/icons'
 import { API_ENDPOINTS } from '@constants/common-constants.js'
-import {
-  type WarrantyPolicyModalProps,
-  type WarrantyPolicyFormData,
-} from '@/types/index.js'
+import { type WarrantyPolicyModalProps, type WarrantyPolicyFormData } from '@/types/index.js'
 import api from '@services/api.js'
 import useHandleApiError from '@/hooks/useHandleApiError.js'
 

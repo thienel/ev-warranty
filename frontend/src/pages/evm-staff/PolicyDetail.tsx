@@ -21,11 +21,7 @@ import {
 } from '@ant-design/icons'
 import type { ColumnsType } from 'antd/es/table'
 import AppLayout from '@components/Layout/Layout.tsx'
-import {
-  type WarrantyPolicy,
-  type PolicyCoveragePart,
-  type PartCategory,
-} from '@/types/index'
+import { type WarrantyPolicy, type PolicyCoveragePart, type PartCategory } from '@/types/index'
 import { warrantyPoliciesApi, policyCoveragePartsApi, partCategoriesApi } from '@services/index'
 import useHandleApiError from '@/hooks/useHandleApiError'
 import api from '@services/api'
@@ -237,7 +233,10 @@ const PolicyDetail: React.FC = () => {
         </Button>
       </div>
 
-      <Card title={<Title level={4}>Warranty Policy Information</Title>} style={{ marginBottom: 24 }}>
+      <Card
+        title={<Title level={4}>Warranty Policy Information</Title>}
+        style={{ marginBottom: 24 }}
+      >
         <Descriptions column={2} bordered>
           <Descriptions.Item label="Policy Name" span={2}>
             {policy.policy_name}

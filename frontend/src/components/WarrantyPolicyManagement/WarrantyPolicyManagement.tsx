@@ -11,8 +11,8 @@ import {
 import type { ColumnsType } from 'antd/es/table'
 import { useNavigate } from 'react-router-dom'
 import { API_ENDPOINTS } from '@constants/common-constants'
-import { type WarrantyPolicy } from '@/types/index'
-import { warrantyPoliciesApi } from '@services/index'
+import { type WarrantyPolicy, type VehicleModel } from '@/types/index'
+import { warrantyPoliciesApi, vehicleModelsApi } from '@services/index'
 import WarrantyPolicyModal from './WarrantyPolicyModal/WarrantyPolicyModal'
 import useHandleApiError from '@/hooks/useHandleApiError'
 import api from '@services/api'
@@ -35,14 +35,47 @@ const WarrantyPolicyManagement: React.FC = () => {
   const fetchPolicies = useCallback(async () => {
     try {
       setPoliciesLoading(true)
-      const response = await warrantyPoliciesApi.getAll()
-      let policiesData = response.data
+
+      // Fetch both policies and vehicle models in parallel
+      const [policiesResponse, vehicleModelsResponse] = await Promise.all([
+        warrantyPoliciesApi.getAll(),
+        vehicleModelsApi.getAll(),
+      ])
+
+      let policiesData = policiesResponse.data
       if (policiesData && typeof policiesData === 'object' && 'data' in policiesData) {
         policiesData = (policiesData as { data: unknown }).data as WarrantyPolicy[]
       }
-      if (Array.isArray(policiesData)) {
-        setPolicies(policiesData)
-        setFilteredPolicies(policiesData)
+
+      let vehicleModelsData = vehicleModelsResponse.data
+      if (
+        vehicleModelsData &&
+        typeof vehicleModelsData === 'object' &&
+        'data' in vehicleModelsData
+      ) {
+        vehicleModelsData = (vehicleModelsData as { data: unknown }).data as VehicleModel[]
+      }
+
+      if (Array.isArray(policiesData) && Array.isArray(vehicleModelsData)) {
+        // Map vehicle models to their policies
+        const policiesWithModels = policiesData.map((policy) => {
+          const relatedModels = vehicleModelsData
+            .filter((model: VehicleModel & { policy_id?: string }) => model.policy_id === policy.id)
+            .map((model: VehicleModel) => ({
+              id: model.id,
+              brand: model.brand,
+              model_name: model.model_name,
+              year: model.year,
+            }))
+
+          return {
+            ...policy,
+            vehicle_models: relatedModels,
+          }
+        })
+
+        setPolicies(policiesWithModels)
+        setFilteredPolicies(policiesWithModels)
       } else {
         setPolicies([])
         setFilteredPolicies([])
@@ -64,9 +97,23 @@ const WarrantyPolicyManagement: React.FC = () => {
     if (searchText.trim() === '') {
       setFilteredPolicies(policies)
     } else {
-      const filtered = policies.filter((policy) =>
-        policy.policy_name.toLowerCase().includes(searchText.toLowerCase()),
-      )
+      const searchLower = searchText.toLowerCase()
+      const filtered = policies.filter((policy) => {
+        // Search by policy name
+        if (policy.policy_name.toLowerCase().includes(searchLower)) {
+          return true
+        }
+        // Search by vehicle model names
+        if (policy.vehicle_models && policy.vehicle_models.length > 0) {
+          return policy.vehicle_models.some(
+            (model) =>
+              model.brand.toLowerCase().includes(searchLower) ||
+              model.model_name.toLowerCase().includes(searchLower) ||
+              `${model.brand} ${model.model_name}`.toLowerCase().includes(searchLower),
+          )
+        }
+        return false
+      })
       setFilteredPolicies(filtered)
     }
   }, [searchText, policies])
@@ -107,6 +154,7 @@ const WarrantyPolicyManagement: React.FC = () => {
       title: 'Policy Name',
       dataIndex: 'policy_name',
       key: 'policy_name',
+      width: '25%',
       render: (text: string) => (
         <Space>
           <SafetyOutlined style={{ color: '#697565' }} />
@@ -115,11 +163,35 @@ const WarrantyPolicyManagement: React.FC = () => {
       ),
     },
     {
+      title: 'Vehicle Models',
+      dataIndex: 'vehicle_models',
+      key: 'vehicle_models',
+      width: '25%',
+      render: (_: unknown, record: WarrantyPolicy) => {
+        if (!record.vehicle_models || record.vehicle_models.length === 0) {
+          return <span style={{ color: '#999' }}>No models assigned</span>
+        }
+        const modelNames = record.vehicle_models
+          .map((model) => `${model.brand} ${model.model_name} (${model.year})`)
+          .join(', ')
+        return (
+          <span
+            style={{
+              whiteSpace: 'normal',
+              wordBreak: 'break-word',
+            }}
+          >
+            {modelNames}
+          </span>
+        )
+      },
+    },
+    {
       title: 'Duration (Months)',
       dataIndex: 'warranty_duration_months',
       key: 'warranty_duration_months',
       align: 'center',
-      width: 180,
+      width: '12%',
       render: (months: number) => <span>{months}</span>,
     },
     {
@@ -127,25 +199,33 @@ const WarrantyPolicyManagement: React.FC = () => {
       dataIndex: 'kilometer_limit',
       key: 'kilometer_limit',
       align: 'right',
-      width: 180,
+      width: '12%',
       render: (limit?: number) => (limit ? `${limit.toLocaleString()} km` : 'N/A'),
+    },
+    {
+      title: 'Details',
+      key: 'details',
+      align: 'center',
+      width: '8%',
+      render: (_: unknown, record: WarrantyPolicy) => (
+        <Space size="middle">
+          <Button
+            type="text"
+            icon={<EyeOutlined />}
+            onClick={() => handleViewDetails(record.id)}
+            title="View Details"
+            style={{ color: '#1890ff' }}
+          />
+        </Space>
+      ),
     },
     {
       title: 'Actions',
       key: 'actions',
       align: 'center',
-      width: 250,
+      width: '18%',
       render: (_: unknown, record: WarrantyPolicy) => (
         <Space size="small">
-          <Button
-            type="default"
-            size="small"
-            icon={<EyeOutlined />}
-            onClick={() => handleViewDetails(record.id)}
-            style={{ color: '#52c41a' }}
-          >
-            View Details
-          </Button>
           <Button
             type="text"
             size="small"
@@ -173,14 +253,21 @@ const WarrantyPolicyManagement: React.FC = () => {
 
   return (
     <>
-      <div style={{ marginBottom: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      <div
+        style={{
+          marginBottom: 16,
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+        }}
+      >
         <Input
-          placeholder="Search by policy name..."
+          placeholder="Search by policy name or vehicle model..."
           prefix={<SearchOutlined />}
           value={searchText}
           onChange={(e) => setSearchText(e.target.value)}
           allowClear
-          style={{ width: 300 }}
+          style={{ width: 350 }}
         />
         <Button type="primary" icon={<PlusOutlined />} onClick={() => handleOpenPolicyModal()}>
           Add Policy

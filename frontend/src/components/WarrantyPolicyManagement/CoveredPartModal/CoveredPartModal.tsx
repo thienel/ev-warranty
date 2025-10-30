@@ -126,9 +126,7 @@ const CoveredPartModal: React.FC<PolicyCoveragePartModalProps> = ({
           label="Coverage Conditions"
           name="coverage_conditions"
           validateFirst
-          rules={[
-            { max: 1000, message: 'Coverage conditions cannot exceed 1000 characters' },
-          ]}
+          rules={[{ max: 1000, message: 'Coverage conditions cannot exceed 1000 characters' }]}
         >
           <TextArea
             placeholder="Enter coverage conditions (optional)"
