@@ -52,11 +52,6 @@ namespace Backend.Dotnet.Infrastructure.Data.Configurations
             builder.HasIndex(pcp => pcp.PartCategoryId)
                 .HasDatabaseName("ix_policy_coverage_parts_part_category_id");
 
-            // Unique constraint: one policy can only cover each category once
-            builder.HasIndex(pcp => new { pcp.PolicyId, pcp.PartCategoryId })
-                .IsUnique()
-                .HasDatabaseName("ix_policy_coverage_parts_policy_category_unique");
-
             // Relationships
             builder.HasOne(pcp => pcp.Policy)
                 .WithMany(wp => wp.CoverageParts)
