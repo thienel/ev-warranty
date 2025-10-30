@@ -285,6 +285,8 @@ export interface VehicleModel {
   brand: string
   model_name: string
   year: number
+  policy_id?: string
+  policy_name?: string
   created_at: string
   updated_at?: string
 }
@@ -449,6 +451,12 @@ export interface WarrantyPolicy {
   terms_and_conditions: string
   created_at: string
   updated_at?: string
+  vehicle_models?: Array<{
+    id: string
+    brand: string
+    model_name: string
+    year: number
+  }>
 }
 
 export interface WarrantyPolicyFormData {
