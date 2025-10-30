@@ -327,13 +327,6 @@
             }
           },
           {
-            "name": "status",
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
             "name": "parentId",
             "in": "query",
             "schema": {
@@ -635,75 +628,6 @@
           },
           "400": {
             "description": "Bad Request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/BaseResponseDto"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/part-categories/{id}/status": {
-      "put": {
-        "tags": [
-          "PartCategories"
-        ],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CategoryChangeStatusRequest"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CategoryChangeStatusRequest"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/CategoryChangeStatusRequest"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PartCategoryResponseBaseResponseDto"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad Request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/BaseResponseDto"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Not Found",
             "content": {
               "application/json": {
                 "schema": {
@@ -2401,20 +2325,6 @@
         },
         "additionalProperties": false
       },
-      "CategoryChangeStatusRequest": {
-        "required": [
-          "status"
-        ],
-        "type": "object",
-        "properties": {
-          "status": {
-            "minLength": 1,
-            "pattern": "^(Active|ReadOnly|Archived)$",
-            "type": "string"
-          }
-        },
-        "additionalProperties": false
-      },
       "ChangePartCategoryRequest": {
         "required": [
           "category_id"
@@ -2790,10 +2700,6 @@
             "type": "string",
             "nullable": true
           },
-          "status": {
-            "type": "string",
-            "nullable": true
-          },
           "created_at": {
             "type": "string",
             "format": "date-time"
@@ -2874,10 +2780,6 @@
           "parent_category_id": {
             "type": "string",
             "format": "uuid",
-            "nullable": true
-          },
-          "status": {
-            "type": "string",
             "nullable": true
           },
           "created_at": {
