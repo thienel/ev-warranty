@@ -91,6 +91,7 @@ services:
       - Logging__LogLevel__Default=Information
       - Logging__LogLevel__Microsoft.AspNetCore=Warning
       - ConnectionStrings__SqlServer=Server=sqlserver,1433;Database=WarrantyDb;User Id=sa;Password=${SA_PASSWORD};TrustServerCertificate=True;MultipleActiveResultSets=true
+      - SA_PASSWORD=${SA_PASSWORD}
     depends_on:
       sqlserver:
         condition: service_healthy

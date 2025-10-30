@@ -1,0 +1,18 @@
+-- Set required SQL Server options
+SET QUOTED_IDENTIFIER ON;
+SET ANSI_NULLS ON;
+SET ANSI_PADDING ON;
+SET ANSI_WARNINGS ON;
+SET CONCAT_NULL_YIELDS_NULL ON;
+SET ARITHABORT ON;
+
+DELETE FROM policy_coverage_parts;
+DELETE FROM parts;
+DELETE FROM vehicles;
+
+DELETE FROM part_categories;
+DELETE FROM vehicle_models;
+DELETE FROM customers;
+
+DELETE FROM warranty_policies;
+

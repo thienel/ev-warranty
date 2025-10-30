@@ -1,4 +1,4 @@
-include .envrc
+DATABASE_URL ?= $(shell grep '^DATABASE_URL=' .env 2>/dev/null | cut -d '=' -f2)
 
 .PHONY: confirm
 confirm:
