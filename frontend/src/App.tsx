@@ -21,6 +21,7 @@ import ClaimCreate from '@pages/sc-staff/ClaimCreate'
 import Customers from '@pages/sc-staff/Customers'
 import Vehicles from '@pages/evm-staff/Vehicles'
 import VehicleModels from '@pages/evm-staff/VehicleModels'
+import PartCategories from '@/pages/evm-staff/PartCategories'
 
 import type { RootState } from '@redux/store'
 import { App as AntdApp, ConfigProvider } from 'antd'
@@ -105,6 +106,10 @@ const App: React.FC = () => {
             {
               path: 'vehicle-models',
               element: <VehicleModels />,
+            },
+            {
+              path: 'part-categories',
+              element: <PartCategories />,
             },
           ],
         },

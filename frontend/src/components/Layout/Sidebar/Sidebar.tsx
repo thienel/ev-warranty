@@ -169,10 +169,10 @@ const MENU_ITEMS: Record<UserRole, MenuItemData[]> = {
       path: '/evm-staff/vehicle-models',
     },
     {
-      key: 'parts',
+      key: 'part-categories',
       icon: <ToolOutlined />,
-      label: 'Parts',
-      path: '/evm-staff/parts',
+      label: 'Part Categories',
+      path: '/evm-staff/part-categories',
     },
   ],
   [USER_ROLES.SC_STAFF]: [
