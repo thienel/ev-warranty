@@ -397,3 +397,46 @@ export interface PartCategoryModalProps extends BaseModalProps {
   partCategories: PartCategory[]
   partCategoriesLoading?: boolean
 }
+
+export interface Part {
+  id: string
+  serial_number: string
+  part_name: string
+  unit_price: number
+  category_id: string
+  category_name?: string
+  office_location_id?: string
+  status: string
+  created_at: string
+  updated_at?: string
+}
+
+export interface PartFormData {
+  serial_number: string
+  part_name: string
+  unit_price: number
+  category_id: string
+  office_location_id?: string
+}
+
+export interface CreatePartRequest {
+  serial_number: string
+  part_name: string
+  unit_price: number
+  category_id: string
+  office_location_id?: string
+}
+
+export interface UpdatePartRequest {
+  part_name: string
+  unit_price: number
+  office_location_id?: string
+}
+
+export interface PartModalProps extends BaseModalProps {
+  part?: Part | null
+  partCategories: PartCategory[]
+  offices: Office[]
+  partCategoriesLoading?: boolean
+  officesLoading?: boolean
+}
