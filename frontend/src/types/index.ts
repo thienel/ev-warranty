@@ -364,3 +364,36 @@ export interface VehicleModalProps extends BaseModalProps {
   customersLoading?: boolean
   vehicleModelsLoading?: boolean
 }
+
+export interface PartCategory {
+  id: string
+  category_name: string
+  description?: string
+  parent_category_id?: string
+  parent_category_name?: string
+  created_at: string
+  updated_at?: string
+}
+
+export interface PartCategoryFormData {
+  category_name: string
+  description?: string
+  parent_category_id?: string
+}
+
+export interface CreatePartCategoryRequest {
+  category_name: string
+  description?: string
+  parent_category_id?: string
+}
+
+export interface UpdatePartCategoryRequest {
+  category_name: string
+  description?: string
+}
+
+export interface PartCategoryModalProps extends BaseModalProps {
+  partCategory?: PartCategory | null
+  partCategories: PartCategory[]
+  partCategoriesLoading?: boolean
+}
