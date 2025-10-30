@@ -12,8 +12,6 @@ namespace Backend.Dotnet.Application.Interfaces.Data
         Task<PartCategory?> GetByCategoryNameAsync(string categoryName);
         Task<bool> CategoryNameExistsAsync(string categoryName, Guid? excludeCategoryId = null);
 
-        Task<IEnumerable<PartCategory>> GetByStatusAsync(PartCategoryStatus status);
-
         Task<IEnumerable<PartCategory>> GetByParentIdAsync(Guid parentCategoryId); // Child list
         Task<PartCategory?> GetWithPartsAsync(Guid categoryId); // Get details of belonging part
         Task<PartCategory?> GetWithHierarchyAsync(Guid categoryId); // Get details of category

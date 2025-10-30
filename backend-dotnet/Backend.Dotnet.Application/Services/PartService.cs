@@ -48,16 +48,6 @@ namespace Backend.Dotnet.Application.Services
                     };
                 }
 
-                if (!category.CanBeUsedForNewParts())
-                {
-                    return new BaseResponseDto<PartResponse>
-                    {
-                        IsSuccess = false,
-                        Message = "Category is not active and cannot be used for new parts",
-                        ErrorCode = "CATEGORY_NOT_ACTIVE"
-                    };
-                }
-
                 var part = request.ToEntity();
                 await _unitOfWork.Parts.AddAsync(part);
                 await _unitOfWork.SaveChangesAsync();

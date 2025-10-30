@@ -36,13 +36,6 @@ namespace Backend.Dotnet.Infrastructure.Data.Configurations
                 .HasColumnName("parent_category_id")
                 .IsRequired(false);
 
-            builder.Property(pc => pc.Status)
-                .HasColumnName("status")
-                .HasColumnType("varchar(20)")
-                .IsRequired()
-                .HasConversion<string>()
-                .HasDefaultValue(PartCategoryStatus.Active);
-
             builder.Property(pc => pc.CreatedAt)
                 .HasColumnName("created_at")
                 .HasColumnType("datetime2")
@@ -60,9 +53,6 @@ namespace Backend.Dotnet.Infrastructure.Data.Configurations
 
             builder.HasIndex(pc => pc.ParentCategoryId)
                 .HasDatabaseName("ix_part_categories_parent_category_id");
-
-            builder.HasIndex(pc => pc.Status)
-                .HasDatabaseName("ix_part_categories_status");
 
             // Self-referencing relationship
             builder.HasOne(pc => pc.ParentCategory)
