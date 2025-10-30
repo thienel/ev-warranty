@@ -23,6 +23,8 @@ import Vehicles from '@pages/evm-staff/Vehicles'
 import VehicleModels from '@pages/evm-staff/VehicleModels'
 import PartCategories from '@/pages/evm-staff/PartCategories'
 import Inventories from '@pages/evm-staff/Inventories'
+import Policies from '@pages/evm-staff/Policies'
+import PolicyDetail from '@pages/evm-staff/PolicyDetail'
 
 import type { RootState } from '@redux/store'
 import { App as AntdApp, ConfigProvider } from 'antd'
@@ -115,6 +117,13 @@ const App: React.FC = () => {
             {
               path: 'inventories',
               element: <Inventories />,
+            },
+            {
+              path: 'policies',
+              children: [
+                { path: '', element: <Policies /> },
+                { path: ':id', element: <PolicyDetail /> },
+              ],
             },
           ],
         },
