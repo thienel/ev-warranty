@@ -78,6 +78,8 @@ export const API_ENDPOINTS = {
   VEHICLE_MODELS: '/api/v1/vehicle-models',
   PART_CATEGORIES: '/api/v1/part-categories',
   PARTS: '/api/v1/parts',
+  WARRANTY_POLICIES: '/api/v1/warranty-policies',
+  POLICY_COVERAGE_PARTS: '/api/v1/policy-coverage-parts',
 
   CLAIM_ACTIONS: {
     SUBMIT: (id: string) => `/api/v1/claims/${id}/submit`,

@@ -440,3 +440,71 @@ export interface PartModalProps extends BaseModalProps {
   partCategoriesLoading?: boolean
   officesLoading?: boolean
 }
+
+export interface WarrantyPolicy {
+  id: string
+  policy_name: string
+  warranty_duration_months: number
+  kilometer_limit?: number
+  terms_and_conditions: string
+  created_at: string
+  updated_at?: string
+}
+
+export interface WarrantyPolicyFormData {
+  policy_name: string
+  warranty_duration_months: number
+  kilometer_limit?: number
+  terms_and_conditions: string
+}
+
+export interface CreateWarrantyPolicyRequest {
+  policy_name: string
+  warranty_duration_months: number
+  kilometer_limit?: number
+  terms_and_conditions: string
+}
+
+export interface UpdateWarrantyPolicyRequest {
+  policy_name: string
+  warranty_duration_months: number
+  kilometer_limit?: number
+  terms_and_conditions: string
+}
+
+export interface PolicyCoveragePart {
+  id: string
+  policy_id: string
+  policy_name?: string
+  part_category_id: string
+  coverage_conditions?: string
+  created_at: string
+  updated_at?: string
+}
+
+export interface PolicyCoveragePartFormData {
+  policy_id: string
+  part_category_id: string
+  coverage_conditions?: string
+}
+
+export interface CreatePolicyCoveragePartRequest {
+  policy_id: string
+  part_category_id: string
+  coverage_conditions?: string
+}
+
+export interface UpdatePolicyCoveragePartRequest {
+  coverage_conditions?: string
+}
+
+export interface WarrantyPolicyModalProps extends BaseModalProps {
+  policy?: WarrantyPolicy | null
+}
+
+export interface PolicyCoveragePartModalProps extends BaseModalProps {
+  coveragePart?: PolicyCoveragePart | null
+  policyId: string
+  partCategories: PartCategory[]
+  partCategoriesLoading?: boolean
+}
