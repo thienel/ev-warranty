@@ -90,14 +90,8 @@ namespace Backend.Dotnet.Application.DTOs
             [JsonPropertyName("updated_at")]
             public DateTime? UpdatedAt { get; set; }
 
-            [JsonPropertyName("can_be_assigned_to_vehicles")]
-            public bool CanBeAssignedToVehicles { get; set; }
-
-            [JsonPropertyName("is_editable")]
-            public bool IsEditable { get; set; }
-
-            [JsonPropertyName("assigned_model_count")]
-            public int AssignedModelCount { get; set; }
+            [JsonPropertyName("vehicle_model")]
+            public VehicleModelDto.VehicleModelResponse? AssignedModel { get; set; }
         }
 
         public class WarrantyPolicyWithDetailsResponse
@@ -126,8 +120,8 @@ namespace Backend.Dotnet.Application.DTOs
             [JsonPropertyName("updated_at")]
             public DateTime? UpdatedAt { get; set; }
 
-            [JsonPropertyName("vehicle_models")]
-            public List<VehicleModelDto.VehicleModelResponse> VehicleModels { get; set; } = new();
+            [JsonPropertyName("vehicle_model")]
+            public VehicleModelDto.VehicleModelResponse? AssignedModel { get; set; }
 
             [JsonPropertyName("covered_parts")]
             public List<PolicyCoveragePartDto.PolicyCoveragePartResponse> CoveredParts { get; set; } = new();
@@ -168,8 +162,7 @@ namespace Backend.Dotnet.Application.DTOs
                 Status = policy.Status.ToString(),
                 CreatedAt = policy.CreatedAt,
                 UpdatedAt = policy.UpdatedAt,
-                CanBeAssignedToVehicles = policy.CanBeAssignedToVehicles(),
-                IsEditable = policy.IsEditable()
+                AssignedModel = null
             };
         }
 
@@ -185,7 +178,7 @@ namespace Backend.Dotnet.Application.DTOs
                 Status = policy.Status.ToString(),
                 CreatedAt = policy.CreatedAt,
                 UpdatedAt = policy.UpdatedAt,
-                VehicleModels = policy.VehicleModels?.Select(vm => vm.ToResponse()).ToList() ?? new(),
+                AssignedModel = policy.AssignedModel?.ToResponse(),
                 CoveredParts = policy.CoverageParts?.Select(cp => cp.ToResponse()).ToList() ?? new()
             };
         }

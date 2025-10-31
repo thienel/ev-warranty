@@ -18,6 +18,10 @@ namespace Backend.Dotnet.Application.Interfaces.Data
         Task<WarrantyPolicy?> GetWithDetailsAsync(Guid policyId);
         Task<IEnumerable<WarrantyPolicy>> GetAllWithDetailsAsync(WarrantyPolicyStatus? status = null);
 
+        Task<VehicleModel?> GetAssignedModelAsync(Guid policyId);
+
+
+        Task<bool> IsPolicyAssignedAsync(Guid policyId, Guid? excludeModelId = null);
         Task<bool> CanBeAssignedToVehiclesAsync(Guid policyId);
         Task<int> GetCoveragePartCountAsync(Guid policyId);
     }
