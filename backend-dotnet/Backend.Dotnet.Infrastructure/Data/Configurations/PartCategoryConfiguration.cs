@@ -24,12 +24,12 @@ namespace Backend.Dotnet.Infrastructure.Data.Configurations
             // Properties
             builder.Property(pc => pc.CategoryName)
                 .HasColumnName("category_name")
-                .HasColumnType("varchar(255)")
+                .HasMaxLength(255)
                 .IsRequired();
 
             builder.Property(pc => pc.Description)
                 .HasColumnName("description")
-                .HasColumnType("text")
+                .HasColumnType("nvarchar(max)")
                 .IsRequired(false);
 
             builder.Property(pc => pc.ParentCategoryId)

@@ -23,7 +23,7 @@ namespace Backend.Dotnet.Infrastructure.Data.Context
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
-
+            // refer EF Core global conventions // EF Core BaseEntityConfiguration pattern
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
         }
 

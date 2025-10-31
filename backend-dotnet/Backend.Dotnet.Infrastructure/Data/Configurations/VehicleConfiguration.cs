@@ -20,12 +20,12 @@ namespace Backend.Dotnet.Infrastructure.Data.Configurations
             // Properties
             builder.Property(v => v.Vin)
                 .HasColumnName("vin")
-                .HasColumnType("varchar(17)")
+                .HasMaxLength(17)
                 .IsRequired();
 
             builder.Property(v => v.LicensePlate)
                 .HasColumnName("license_plate")
-                .HasColumnType("varchar(20)")
+                .HasMaxLength(20)
                 .IsRequired(false);
 
             builder.Property(v => v.CustomerId)

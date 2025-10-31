@@ -20,12 +20,12 @@ namespace Backend.Dotnet.Infrastructure.Data.Configurations
             // Properties
             builder.Property(vm => vm.Brand)
                 .HasColumnName("brand")
-                .HasColumnType("varchar(100)")
+                .HasMaxLength(100)
                 .IsRequired();
 
             builder.Property(vm => vm.ModelName)
                 .HasColumnName("model_name")
-                .HasColumnType("varchar(100)")
+                .HasMaxLength(100)
                 .IsRequired();
 
             builder.Property(vm => vm.Year)

@@ -20,27 +20,27 @@ namespace Backend.Dotnet.Infrastructure.Data.Configurations
             // Properties
             builder.Property(c => c.FirstName)
                 .HasColumnName("first_name")
-                .HasColumnType("varchar(100)")
+                .HasMaxLength(100)
                 .IsRequired();
 
             builder.Property(c => c.LastName)
                 .HasColumnName("last_name")
-                .HasColumnType("varchar(100)")
+                .HasMaxLength(100)
                 .IsRequired();
 
             builder.Property(c => c.PhoneNumber)
                 .HasColumnName("phone_number")
-                .HasColumnType("varchar(20)")
+                .HasMaxLength(20)
                 .IsRequired();
 
             builder.Property(c => c.Email)
                 .HasColumnName("email")
-                .HasColumnType("varchar(255)")
+                .HasMaxLength(255)
                 .IsRequired(false);
 
             builder.Property(c => c.Address)
                 .HasColumnName("address")
-                .HasColumnType("text")
+                .HasColumnType("nvarchar(max)")
                 .IsRequired(false);
 
             // datetime2s
