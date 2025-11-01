@@ -20,6 +20,91 @@ END
 
 BEGIN TRANSACTION;
 
+INSERT INTO warranty_policies (id, policy_name, warranty_duration_months, kilometer_limit, terms_and_conditions, created_at)
+VALUES
+    -- VinFast Models
+    ('050e8400-e29b-41d4-a716-446655440001', 'VF8_2023_WARRANTY', 120, 200000, N'Bảo hành 10 năm hoặc 200,000 km (tùy điều kiện nào đến trước). Pin và động cơ điện được bảo hành trọn đời theo điều kiện sử dụng. Bảo dưỡng định kỳ theo khuyến cáo nhà sản xuất. Không áp dụng cho xe sử dụng vào mục đích thương mại.', GETDATE()),
+    ('050e8400-e29b-41d4-a716-446655440002', 'VF8_2024_WARRANTY', 120, 200000, N'Bảo hành 10 năm hoặc 200,000 km (tùy điều kiện nào đến trước). Pin và động cơ điện được bảo hành trọn đời theo điều kiện sử dụng. Bảo dưỡng định kỳ theo khuyến cáo nhà sản xuất. Không áp dụng cho xe sử dụng vào mục đích thương mại.', GETDATE()),
+    ('050e8400-e29b-41d4-a716-446655440003', 'VF8_2025_WARRANTY', 120, 200000, N'Bảo hành 10 năm hoặc 200,000 km (tùy điều kiện nào đến trước). Pin và động cơ điện được bảo hành trọn đời theo điều kiện sử dụng. Bảo dưỡng định kỳ theo khuyến cáo nhà sản xuất. Không áp dụng cho xe sử dụng vào mục đích thương mại.', GETDATE()),
+    ('050e8400-e29b-41d4-a716-446655440004', 'VF9_2023_WARRANTY', 120, 200000, N'Bảo hành 10 năm hoặc 200,000 km (tùy điều kiện nào đến trước). Pin và động cơ điện được bảo hành trọn đời theo điều kiện sử dụng. Bảo dưỡng định kỳ theo khuyến cáo nhà sản xuất. Không áp dụng cho xe sử dụng vào mục đích thương mại.', GETDATE()),
+    ('050e8400-e29b-41d4-a716-446655440005', 'VF9_2024_WARRANTY', 120, 200000, N'Bảo hành 10 năm hoặc 200,000 km (tùy điều kiện nào đến trước). Pin và động cơ điện được bảo hành trọn đời theo điều kiện sử dụng. Bảo dưỡng định kỳ theo khuyến cáo nhà sản xuất. Không áp dụng cho xe sử dụng vào mục đích thương mại.', GETDATE()),
+    ('050e8400-e29b-41d4-a716-446655440006', 'VF9_2025_WARRANTY', 120, 200000, N'Bảo hành 10 năm hoặc 200,000 km (tùy điều kiện nào đến trước). Pin và động cơ điện được bảo hành trọn đời theo điều kiện sử dụng. Bảo dưỡng định kỳ theo khuyến cáo nhà sản xuất. Không áp dụng cho xe sử dụng vào mục đích thương mại.', GETDATE()),
+    ('050e8400-e29b-41d4-a716-446655440007', 'VFE34_2022_WARRANTY', 84, 150000, N'Bảo hành 7 năm hoặc 150,000 km (tùy điều kiện nào đến trước). Pin được bảo hành 8 năm hoặc 160,000 km. Bảo dưỡng định kỳ miễn phí 3 năm đầu. Áp dụng cho cả mục đích cá nhân và thương mại.', GETDATE()),
+    ('050e8400-e29b-41d4-a716-446655440008', 'VFE34_2023_WARRANTY', 84, 150000, N'Bảo hành 7 năm hoặc 150,000 km (tùy điều kiện nào đến trước). Pin được bảo hành 8 năm hoặc 160,000 km. Bảo dưỡng định kỳ miễn phí 3 năm đầu. Áp dụng cho cả mục đích cá nhân và thương mại.', GETDATE()),
+    ('050e8400-e29b-41d4-a716-446655440009', 'VFE34_2024_WARRANTY', 84, 150000, N'Bảo hành 7 năm hoặc 150,000 km (tùy điều kiện nào đến trước). Pin được bảo hành 8 năm hoặc 160,000 km. Bảo dưỡng định kỳ miễn phí 3 năm đầu. Áp dụng cho cả mục đích cá nhân và thương mại.', GETDATE()),
+    ('050e8400-e29b-41d4-a716-446655440010', 'VFE34_2025_WARRANTY', 84, 150000, N'Bảo hành 7 năm hoặc 150,000 km (tùy điều kiện nào đến trước). Pin được bảo hành 8 năm hoặc 160,000 km. Bảo dưỡng định kỳ miễn phí 3 năm đầu. Áp dụng cho cả mục đích cá nhân và thương mại.', GETDATE()),
+    ('050e8400-e29b-41d4-a716-446655440011', 'VF5_2023_WARRANTY', 120, 200000, N'Bảo hành 10 năm hoặc 200,000 km (tùy điều kiện nào đến trước). Pin được bảo hành trọn đời theo điều kiện sử dụng. Hỗ trợ cứu hộ 24/7 miễn phí trong thời gian bảo hành. Không áp dụng cho xe sử dụng vào mục đích thương mại.', GETDATE()),
+    ('050e8400-e29b-41d4-a716-446655440012', 'VF5_2024_WARRANTY', 120, 200000, N'Bảo hành 10 năm hoặc 200,000 km (tùy điều kiện nào đến trước). Pin được bảo hành trọn đời theo điều kiện sử dụng. Hỗ trợ cứu hộ 24/7 miễn phí trong thời gian bảo hành. Không áp dụng cho xe sử dụng vào mục đích thương mại.', GETDATE()),
+    ('050e8400-e29b-41d4-a716-446655440013', 'VF5_2025_WARRANTY', 120, 200000, N'Bảo hành 10 năm hoặc 200,000 km (tùy điều kiện nào đến trước). Pin được bảo hành trọn đời theo điều kiện sử dụng. Hỗ trợ cứu hộ 24/7 miễn phí trong thời gian bảo hành. Không áp dụng cho xe sử dụng vào mục đích thương mại.', GETDATE()),
+    ('050e8400-e29b-41d4-a716-446655440014', 'VF6_2024_WARRANTY', 120, 200000, N'Bảo hành 10 năm hoặc 200,000 km (tùy điều kiện nào đến trước). Pin được bảo hành trọn đời theo điều kiện sử dụng. Hỗ trợ cứu hộ 24/7 miễn phí trong thời gian bảo hành. Không áp dụng cho xe sử dụng vào mục đích thương mại.', GETDATE()),
+    ('050e8400-e29b-41d4-a716-446655440015', 'VF6_2025_WARRANTY', 120, 200000, N'Bảo hành 10 năm hoặc 200,000 km (tùy điều kiện nào đến trước). Pin được bảo hành trọn đời theo điều kiện sử dụng. Hỗ trợ cứu hộ 24/7 miễn phí trong thời gian bảo hành. Không áp dụng cho xe sử dụng vào mục đích thương mại.', GETDATE()),
+    ('050e8400-e29b-41d4-a716-446655440016', 'VF7_2024_WARRANTY', 120, 200000, N'Bảo hành 10 năm hoặc 200,000 km (tùy điều kiện nào đến trước). Pin được bảo hành trọn đời theo điều kiện sử dụng. Hỗ trợ cứu hộ 24/7 miễn phí trong thời gian bảo hành. Không áp dụng cho xe sử dụng vào mục đích thương mại.', GETDATE()),
+    ('050e8400-e29b-41d4-a716-446655440017', 'VF7_2025_WARRANTY', 120, 200000, N'Bảo hành 10 năm hoặc 200,000 km (tùy điều kiện nào đến trước). Pin được bảo hành trọn đời theo điều kiện sử dụng. Hỗ trợ cứu hộ 24/7 miễn phí trong thời gian bảo hành. Không áp dụng cho xe sử dụng vào mục đích thương mại.', GETDATE()),
+    ('050e8400-e29b-41d4-a716-446655440018', 'VF3_2024_WARRANTY', 96, 160000, N'Bảo hành 8 năm hoặc 160,000 km (tùy điều kiện nào đến trước). Pin được bảo hành 10 năm. Bảo dưỡng định kỳ miễn phí 2 năm đầu. Không áp dụng cho xe sử dụng vào mục đích thương mại.', GETDATE()),
+    ('050e8400-e29b-41d4-a716-446655440019', 'VF3_2025_WARRANTY', 96, 160000, N'Bảo hành 8 năm hoặc 160,000 km (tùy điều kiện nào đến trước). Pin được bảo hành 10 năm. Bảo dưỡng định kỳ miễn phí 2 năm đầu. Không áp dụng cho xe sử dụng vào mục đích thương mại.', GETDATE()),
+
+    -- BYD Atto 3
+    ('050e8400-e29b-41d4-a716-446655440020', 'BYD_ATTO3_2022_WARRANTY', 72, 150000, N'Bảo hành 6 năm hoặc 150,000 km (tùy điều kiện nào đến trước). Pin và hệ thống điện được bảo hành 8 năm hoặc 150,000 km. Bảo dưỡng định kỳ theo khuyến cáo. Áp dụng cho xe sử dụng cá nhân.', GETDATE()),
+    ('050e8400-e29b-41d4-a716-446655440021', 'BYD_ATTO3_2023_WARRANTY', 72, 150000, N'Bảo hành 6 năm hoặc 150,000 km (tùy điều kiện nào đến trước). Pin và hệ thống điện được bảo hành 8 năm hoặc 150,000 km. Bảo dưỡng định kỳ theo khuyến cáo. Áp dụng cho xe sử dụng cá nhân.', GETDATE()),
+    ('050e8400-e29b-41d4-a716-446655440022', 'BYD_ATTO3_2024_WARRANTY', 72, 150000, N'Bảo hành 6 năm hoặc 150,000 km (tùy điều kiện nào đến trước). Pin và hệ thống điện được bảo hành 8 năm hoặc 150,000 km. Bảo dưỡng định kỳ theo khuyến cáo. Áp dụng cho xe sử dụng cá nhân.', GETDATE()),
+    ('050e8400-e29b-41d4-a716-446655440023', 'BYD_ATTO3_2025_WARRANTY', 72, 150000, N'Bảo hành 6 năm hoặc 150,000 km (tùy điều kiện nào đến trước). Pin và hệ thống điện được bảo hành 8 năm hoặc 150,000 km. Bảo dưỡng định kỳ theo khuyến cáo. Áp dụng cho xe sử dụng cá nhân.', GETDATE()),
+
+    -- BYD Dolphin
+    ('050e8400-e29b-41d4-a716-446655440024', 'BYD_DOLPHIN_2023_WARRANTY', 72, 150000, N'Bảo hành 6 năm hoặc 150,000 km (tùy điều kiện nào đến trước). Pin và hệ thống điện được bảo hành 8 năm hoặc 150,000 km. Bảo dưỡng định kỳ theo khuyến cáo. Áp dụng cho xe sử dụng cá nhân.', GETDATE()),
+    ('050e8400-e29b-41d4-a716-446655440025', 'BYD_DOLPHIN_2024_WARRANTY', 72, 150000, N'Bảo hành 6 năm hoặc 150,000 km (tùy điều kiện nào đến trước). Pin và hệ thống điện được bảo hành 8 năm hoặc 150,000 km. Bảo dưỡng định kỳ theo khuyến cáo. Áp dụng cho xe sử dụng cá nhân.', GETDATE()),
+    ('050e8400-e29b-41d4-a716-446655440026', 'BYD_DOLPHIN_2025_WARRANTY', 72, 150000, N'Bảo hành 6 năm hoặc 150,000 km (tùy điều kiện nào đến trước). Pin và hệ thống điện được bảo hành 8 năm hoặc 150,000 km. Bảo dưỡng định kỳ theo khuyến cáo. Áp dụng cho xe sử dụng cá nhân.', GETDATE()),
+
+    -- BYD Seal
+    ('050e8400-e29b-41d4-a716-446655440027', 'BYD_SEAL_2023_WARRANTY', 72, 150000, N'Bảo hành 6 năm hoặc 150,000 km (tùy điều kiện nào đến trước). Pin và hệ thống điện được bảo hành 8 năm hoặc 150,000 km. Hỗ trợ cứu hộ 24/7 trong thời gian bảo hành. Áp dụng cho xe sử dụng cá nhân.', GETDATE()),
+    ('050e8400-e29b-41d4-a716-446655440028', 'BYD_SEAL_2024_WARRANTY', 72, 150000, N'Bảo hành 6 năm hoặc 150,000 km (tùy điều kiện nào đến trước). Pin và hệ thống điện được bảo hành 8 năm hoặc 150,000 km. Hỗ trợ cứu hộ 24/7 trong thời gian bảo hành. Áp dụng cho xe sử dụng cá nhân.', GETDATE()),
+    ('050e8400-e29b-41d4-a716-446655440029', 'BYD_SEAL_2025_WARRANTY', 72, 150000, N'Bảo hành 6 năm hoặc 150,000 km (tùy điều kiện nào đến trước). Pin và hệ thống điện được bảo hành 8 năm hoặc 150,000 km. Hỗ trợ cứu hộ 24/7 trong thời gian bảo hành. Áp dụng cho xe sử dụng cá nhân.', GETDATE()),
+
+    -- BYD Tang
+    ('050e8400-e29b-41d4-a716-446655440030', 'BYD_TANG_2024_WARRANTY', 72, 150000, N'Bảo hành 6 năm hoặc 150,000 km (tùy điều kiện nào đến trước). Pin và hệ thống điện được bảo hành 8 năm hoặc 150,000 km. Hỗ trợ cứu hộ 24/7 trong thời gian bảo hành. Áp dụng cho xe sử dụng cá nhân.', GETDATE()),
+    ('050e8400-e29b-41d4-a716-446655440031', 'BYD_TANG_2025_WARRANTY', 72, 150000, N'Bảo hành 6 năm hoặc 150,000 km (tùy điều kiện nào đến trước). Pin và hệ thống điện được bảo hành 8 năm hoặc 150,000 km. Hỗ trợ cứu hộ 24/7 trong thời gian bảo hành. Áp dụng cho xe sử dụng cá nhân.', GETDATE()),
+
+    -- BYD Seal U
+    ('050e8400-e29b-41d4-a716-446655440032', 'BYD_SEALU_2024_WARRANTY', 72, 150000, N'Bảo hành 6 năm hoặc 150,000 km (tùy điều kiện nào đến trước). Pin và hệ thống điện được bảo hành 8 năm hoặc 150,000 km. Hỗ trợ cứu hộ 24/7 trong thời gian bảo hành. Áp dụng cho xe sử dụng cá nhân.', GETDATE()),
+    ('050e8400-e29b-41d4-a716-446655440033', 'BYD_SEALU_2025_WARRANTY', 72, 150000, N'Bảo hành 6 năm hoặc 150,000 km (tùy điều kiện nào đến trước). Pin và hệ thống điện được bảo hành 8 năm hoặc 150,000 km. Hỗ trợ cứu hộ 24/7 trong thời gian bảo hành. Áp dụng cho xe sử dụng cá nhân.', GETDATE()),
+
+    -- BYD M6
+    ('050e8400-e29b-41d4-a716-446655440034', 'BYD_M6_2024_WARRANTY', 72, 150000, N'Bảo hành 6 năm hoặc 150,000 km (tùy điều kiện nào đến trước). Pin và hệ thống điện được bảo hành 8 năm hoặc 150,000 km. Hỗ trợ cứu hộ 24/7 trong thời gian bảo hành. Áp dụng cho xe sử dụng cá nhân.', GETDATE()),
+    ('050e8400-e29b-41d4-a716-446655440035', 'BYD_M6_2025_WARRANTY', 72, 150000, N'Bảo hành 6 năm hoặc 150,000 km (tùy điều kiện nào đến trước). Pin và hệ thống điện được bảo hành 8 năm hoặc 150,000 km. Hỗ trợ cứu hộ 24/7 trong thời gian bảo hành. Áp dụng cho xe sử dụng cá nhân.', GETDATE()),
+
+    -- Mercedes-Benz EQA
+    ('050e8400-e29b-41d4-a716-446655440036', 'MB_EQA_2023_WARRANTY', 48, 100000, N'Bảo hành 4 năm hoặc 100,000 km (tùy điều kiện nào đến trước). Pin được bảo hành 8 năm hoặc 160,000 km. Bảo dưỡng định kỳ tại hệ thống đại lý ủy quyền Mercedes-Benz. Áp dụng cho xe sử dụng cá nhân.', GETDATE()),
+    ('050e8400-e29b-41d4-a716-446655440037', 'MB_EQA_2024_WARRANTY', 48, 100000, N'Bảo hành 4 năm hoặc 100,000 km (tùy điều kiện nào đến trước). Pin được bảo hành 8 năm hoặc 160,000 km. Bảo dưỡng định kỳ tại hệ thống đại lý ủy quyền Mercedes-Benz. Áp dụng cho xe sử dụng cá nhân.', GETDATE()),
+    ('050e8400-e29b-41d4-a716-446655440038', 'MB_EQA_2025_WARRANTY', 48, 100000, N'Bảo hành 4 năm hoặc 100,000 km (tùy điều kiện nào đến trước). Pin được bảo hành 8 năm hoặc 160,000 km. Bảo dưỡng định kỳ tại hệ thống đại lý ủy quyền Mercedes-Benz. Áp dụng cho xe sử dụng cá nhân.', GETDATE()),
+
+    -- Mercedes-Benz EQB
+    ('050e8400-e29b-41d4-a716-446655440039', 'MB_EQB_2023_WARRANTY', 48, 100000, N'Bảo hành 4 năm hoặc 100,000 km (tùy điều kiện nào đến trước). Pin được bảo hành 8 năm hoặc 160,000 km. Bảo dưỡng định kỳ tại hệ thống đại lý ủy quyền Mercedes-Benz. Áp dụng cho xe sử dụng cá nhân.', GETDATE()),
+    ('050e8400-e29b-41d4-a716-446655440040', 'MB_EQB_2024_WARRANTY', 48, 100000, N'Bảo hành 4 năm hoặc 100,000 km (tùy điều kiện nào đến trước). Pin được bảo hành 8 năm hoặc 160,000 km. Bảo dưỡng định kỳ tại hệ thống đại lý ủy quyền Mercedes-Benz. Áp dụng cho xe sử dụng cá nhân.', GETDATE()),
+    ('050e8400-e29b-41d4-a716-446655440041', 'MB_EQB_2025_WARRANTY', 48, 100000, N'Bảo hành 4 năm hoặc 100,000 km (tùy điều kiện nào đến trước). Pin được bảo hành 8 năm hoặc 160,000 km. Bảo dưỡng định kỳ tại hệ thống đại lý ủy quyền Mercedes-Benz. Áp dụng cho xe sử dụng cá nhân.', GETDATE()),
+
+    -- Mercedes-Benz EQC
+    ('050e8400-e29b-41d4-a716-446655440042', 'MB_EQC_2022_WARRANTY', 48, 100000, N'Bảo hành 4 năm hoặc 100,000 km (tùy điều kiện nào đến trước). Pin được bảo hành 8 năm hoặc 160,000 km. Bảo dưỡng định kỳ tại hệ thống đại lý ủy quyền Mercedes-Benz. Áp dụng cho xe sử dụng cá nhân.', GETDATE()),
+    ('050e8400-e29b-41d4-a716-446655440043', 'MB_EQC_2023_WARRANTY', 48, 100000, N'Bảo hành 4 năm hoặc 100,000 km (tùy điều kiện nào đến trước). Pin được bảo hành 8 năm hoặc 160,000 km. Bảo dưỡng định kỳ tại hệ thống đại lý ủy quyền Mercedes-Benz. Áp dụng cho xe sử dụng cá nhân.', GETDATE()),
+    ('050e8400-e29b-41d4-a716-446655440044', 'MB_EQC_2024_WARRANTY', 48, 100000, N'Bảo hành 4 năm hoặc 100,000 km (tùy điều kiện nào đến trước). Pin được bảo hành 8 năm hoặc 160,000 km. Bảo dưỡng định kỳ tại hệ thống đại lý ủy quyền Mercedes-Benz. Áp dụng cho xe sử dụng cá nhân.', GETDATE()),
+
+    -- Mercedes-Benz EQE
+    ('050e8400-e29b-41d4-a716-446655440045', 'MB_EQE_2023_WARRANTY', 48, 100000, N'Bảo hành 4 năm hoặc 100,000 km (tùy điều kiện nào đến trước). Pin được bảo hành 8 năm hoặc 160,000 km. Bảo dưỡng định kỳ tại hệ thống đại lý ủy quyền Mercedes-Benz. Hỗ trợ cứu hộ 24/7. Áp dụng cho xe sử dụng cá nhân.', GETDATE()),
+    ('050e8400-e29b-41d4-a716-446655440046', 'MB_EQE_2024_WARRANTY', 48, 100000, N'Bảo hành 4 năm hoặc 100,000 km (tùy điều kiện nào đến trước). Pin được bảo hành 8 năm hoặc 160,000 km. Bảo dưỡng định kỳ tại hệ thống đại lý ủy quyền Mercedes-Benz. Hỗ trợ cứu hộ 24/7. Áp dụng cho xe sử dụng cá nhân.', GETDATE()),
+    ('050e8400-e29b-41d4-a716-446655440047', 'MB_EQE_2025_WARRANTY', 48, 100000, N'Bảo hành 4 năm hoặc 100,000 km (tùy điều kiện nào đến trước). Pin được bảo hành 8 năm hoặc 160,000 km. Bảo dưỡng định kỳ tại hệ thống đại lý ủy quyền Mercedes-Benz. Hỗ trợ cứu hộ 24/7. Áp dụng cho xe sử dụng cá nhân.', GETDATE()),
+
+    -- Mercedes-Benz EQE SUV
+    ('050e8400-e29b-41d4-a716-446655440048', 'MB_EQESUV_2023_WARRANTY', 48, 100000, N'Bảo hành 4 năm hoặc 100,000 km (tùy điều kiện nào đến trước). Pin được bảo hành 8 năm hoặc 160,000 km. Bảo dưỡng định kỳ tại hệ thống đại lý ủy quyền Mercedes-Benz. Hỗ trợ cứu hộ 24/7. Áp dụng cho xe sử dụng cá nhân.', GETDATE()),
+    ('050e8400-e29b-41d4-a716-446655440049', 'MB_EQESUV_2024_WARRANTY', 48, 100000, N'Bảo hành 4 năm hoặc 100,000 km (tùy điều kiện nào đến trước). Pin được bảo hành 8 năm hoặc 160,000 km. Bảo dưỡng định kỳ tại hệ thống đại lý ủy quyền Mercedes-Benz. Hỗ trợ cứu hộ 24/7. Áp dụng cho xe sử dụng cá nhân.', GETDATE()),
+    ('050e8400-e29b-41d4-a716-446655440050', 'MB_EQESUV_2025_WARRANTY', 48, 100000, N'Bảo hành 4 năm hoặc 100,000 km (tùy điều kiện nào đến trước). Pin được bảo hành 8 năm hoặc 160,000 km. Bảo dưỡng định kỳ tại hệ thống đại lý ủy quyền Mercedes-Benz. Hỗ trợ cứu hộ 24/7. Áp dụng cho xe sử dụng cá nhân.', GETDATE()),
+
+    ('050e8400-e29b-41d4-a716-446655440051', 'MB_EQS_2023_WARRANTY', 48, 100000, N'Bảo hành 4 năm hoặc 100,000 km (tùy điều kiện nào đến trước). Pin được bảo hành 8 năm hoặc 160,000 km. Bảo dưỡng định kỳ tại hệ thống đại lý ủy quyền Mercedes-Benz. Hỗ trợ cứu hộ 24/7. Áp dụng cho xe sử dụng cá nhân.', GETDATE()),
+    ('050e8400-e29b-41d4-a716-446655440052', 'MB_EQS_2024_WARRANTY', 48, 100000, N'Bảo hành 4 năm hoặc 100,000 km (tùy điều kiện nào đến trước). Pin được bảo hành 8 năm hoặc 160,000 km. Bảo dưỡng định kỳ tại hệ thống đại lý ủy quyền Mercedes-Benz. Hỗ trợ cứu hộ 24/7. Áp dụng cho xe sử dụng cá nhân.', GETDATE()),
+    ('050e8400-e29b-41d4-a716-446655440053', 'MB_EQS_2025_WARRANTY', 48, 100000, N'Bảo hành 4 năm hoặc 100,000 km (tùy điều kiện nào đến trước). Pin được bảo hành 8 năm hoặc 160,000 km. Bảo dưỡng định kỳ tại hệ thống đại lý ủy quyền Mercedes-Benz. Hỗ trợ cứu hộ 24/7. Áp dụng cho xe sử dụng cá nhân.', GETDATE()),
+
+    ('050e8400-e29b-41d4-a716-446655440054', 'MB_EQSSUV_2023_WARRANTY', 48, 100000, N'Bảo hành 4 năm hoặc 100,000 km (tùy điều kiện nào đến trước). Pin được bảo hành 8 năm hoặc 160,000 km. Bảo dưỡng định kỳ tại hệ thống đại lý ủy quyền Mercedes-Benz. Hỗ trợ cứu hộ 24/7. Áp dụng cho xe sử dụng cá nhân.', GETDATE()),
+    ('050e8400-e29b-41d4-a716-446655440055', 'MB_EQSSUV_2024_WARRANTY', 48, 100000, N'Bảo hành 4 năm hoặc 100,000 km (tùy điều kiện nào đến trước). Pin được bảo hành 8 năm hoặc 160,000 km. Bảo dưỡng định kỳ tại hệ thống đại lý ủy quyền Mercedes-Benz. Hỗ trợ cứu hộ 24/7. Áp dụng cho xe sử dụng cá nhân.', GETDATE()),
+    ('050e8400-e29b-41d4-a716-446655440056', 'MB_EQSSUV_2025_WARRANTY', 48, 100000, N'Bảo hành 4 năm hoặc 100,000 km (tùy điều kiện nào đến trước). Pin được bảo hành 8 năm hoặc 160,000 km. Bảo dưỡng định kỳ tại hệ thống đại lý ủy quyền Mercedes-Benz. Hỗ trợ cứu hộ 24/7. Áp dụng cho xe sử dụng cá nhân.', GETDATE());
+
+
 -- Insert Vehicle Models (EV models from VinFast, BYD, and Mercedes-Benz available in Vietnam)
 
 -- =========================================================
@@ -385,92 +470,7 @@ VALUES
     ('750e8400-e29b-41d4-a716-446655440061', 'VF3VWX456YZA780', 'LRBFXBSA8MD567890', '850e8400-e29b-41d4-a716-446655440061', @vf3_2025, '2025-03-12', GETDATE()),
     ('750e8400-e29b-41d4-a716-446655440062', 'BYDATT789BCD010', '2GNAXUEV6M6234567', '850e8400-e29b-41d4-a716-446655440062', @byd_atto3_2024, '2024-05-04', GETDATE()),
     ('750e8400-e29b-41d4-a716-446655440063', 'BYDDOL012EFG340', 'VF1RFB00567345678', '850e8400-e29b-41d4-a716-446655440063', @byd_dolphin_2023, '2023-12-17', GETDATE()),
-    ('750e8400-e29b-41d4-a716-446655440064', 'BYDSEA345HJK670', 'ZHWGJ6AT5MLA56789', '850e8400-e29b-41d4-a716-446655440064', @byd_seal_2025, '2025-06-28', GETDATE());
-
-
-INSERT INTO warranty_policies (id, policy_name, warranty_duration_months, kilometer_limit, terms_and_conditions, created_at)
-VALUES
-    -- VinFast Models
-    ('050e8400-e29b-41d4-a716-446655440001', 'VF8_2023_WARRANTY', 120, 200000, N'Bảo hành 10 năm hoặc 200,000 km (tùy điều kiện nào đến trước). Pin và động cơ điện được bảo hành trọn đời theo điều kiện sử dụng. Bảo dưỡng định kỳ theo khuyến cáo nhà sản xuất. Không áp dụng cho xe sử dụng vào mục đích thương mại.', GETDATE()),
-    ('050e8400-e29b-41d4-a716-446655440002', 'VF8_2024_WARRANTY', 120, 200000, N'Bảo hành 10 năm hoặc 200,000 km (tùy điều kiện nào đến trước). Pin và động cơ điện được bảo hành trọn đời theo điều kiện sử dụng. Bảo dưỡng định kỳ theo khuyến cáo nhà sản xuất. Không áp dụng cho xe sử dụng vào mục đích thương mại.', GETDATE()),
-    ('050e8400-e29b-41d4-a716-446655440003', 'VF8_2025_WARRANTY', 120, 200000, N'Bảo hành 10 năm hoặc 200,000 km (tùy điều kiện nào đến trước). Pin và động cơ điện được bảo hành trọn đời theo điều kiện sử dụng. Bảo dưỡng định kỳ theo khuyến cáo nhà sản xuất. Không áp dụng cho xe sử dụng vào mục đích thương mại.', GETDATE()),
-    ('050e8400-e29b-41d4-a716-446655440004', 'VF9_2023_WARRANTY', 120, 200000, N'Bảo hành 10 năm hoặc 200,000 km (tùy điều kiện nào đến trước). Pin và động cơ điện được bảo hành trọn đời theo điều kiện sử dụng. Bảo dưỡng định kỳ theo khuyến cáo nhà sản xuất. Không áp dụng cho xe sử dụng vào mục đích thương mại.', GETDATE()),
-    ('050e8400-e29b-41d4-a716-446655440005', 'VF9_2024_WARRANTY', 120, 200000, N'Bảo hành 10 năm hoặc 200,000 km (tùy điều kiện nào đến trước). Pin và động cơ điện được bảo hành trọn đời theo điều kiện sử dụng. Bảo dưỡng định kỳ theo khuyến cáo nhà sản xuất. Không áp dụng cho xe sử dụng vào mục đích thương mại.', GETDATE()),
-    ('050e8400-e29b-41d4-a716-446655440006', 'VF9_2025_WARRANTY', 120, 200000, N'Bảo hành 10 năm hoặc 200,000 km (tùy điều kiện nào đến trước). Pin và động cơ điện được bảo hành trọn đời theo điều kiện sử dụng. Bảo dưỡng định kỳ theo khuyến cáo nhà sản xuất. Không áp dụng cho xe sử dụng vào mục đích thương mại.', GETDATE()),
-    ('050e8400-e29b-41d4-a716-446655440007', 'VFE34_2022_WARRANTY', 84, 150000, N'Bảo hành 7 năm hoặc 150,000 km (tùy điều kiện nào đến trước). Pin được bảo hành 8 năm hoặc 160,000 km. Bảo dưỡng định kỳ miễn phí 3 năm đầu. Áp dụng cho cả mục đích cá nhân và thương mại.', GETDATE()),
-    ('050e8400-e29b-41d4-a716-446655440008', 'VFE34_2023_WARRANTY', 84, 150000, N'Bảo hành 7 năm hoặc 150,000 km (tùy điều kiện nào đến trước). Pin được bảo hành 8 năm hoặc 160,000 km. Bảo dưỡng định kỳ miễn phí 3 năm đầu. Áp dụng cho cả mục đích cá nhân và thương mại.', GETDATE()),
-    ('050e8400-e29b-41d4-a716-446655440009', 'VFE34_2024_WARRANTY', 84, 150000, N'Bảo hành 7 năm hoặc 150,000 km (tùy điều kiện nào đến trước). Pin được bảo hành 8 năm hoặc 160,000 km. Bảo dưỡng định kỳ miễn phí 3 năm đầu. Áp dụng cho cả mục đích cá nhân và thương mại.', GETDATE()),
-    ('050e8400-e29b-41d4-a716-446655440010', 'VFE34_2025_WARRANTY', 84, 150000, N'Bảo hành 7 năm hoặc 150,000 km (tùy điều kiện nào đến trước). Pin được bảo hành 8 năm hoặc 160,000 km. Bảo dưỡng định kỳ miễn phí 3 năm đầu. Áp dụng cho cả mục đích cá nhân và thương mại.', GETDATE()),
-    ('050e8400-e29b-41d4-a716-446655440011', 'VF5_2023_WARRANTY', 120, 200000, N'Bảo hành 10 năm hoặc 200,000 km (tùy điều kiện nào đến trước). Pin được bảo hành trọn đời theo điều kiện sử dụng. Hỗ trợ cứu hộ 24/7 miễn phí trong thời gian bảo hành. Không áp dụng cho xe sử dụng vào mục đích thương mại.', GETDATE()),
-    ('050e8400-e29b-41d4-a716-446655440012', 'VF5_2024_WARRANTY', 120, 200000, N'Bảo hành 10 năm hoặc 200,000 km (tùy điều kiện nào đến trước). Pin được bảo hành trọn đời theo điều kiện sử dụng. Hỗ trợ cứu hộ 24/7 miễn phí trong thời gian bảo hành. Không áp dụng cho xe sử dụng vào mục đích thương mại.', GETDATE()),
-    ('050e8400-e29b-41d4-a716-446655440013', 'VF5_2025_WARRANTY', 120, 200000, N'Bảo hành 10 năm hoặc 200,000 km (tùy điều kiện nào đến trước). Pin được bảo hành trọn đời theo điều kiện sử dụng. Hỗ trợ cứu hộ 24/7 miễn phí trong thời gian bảo hành. Không áp dụng cho xe sử dụng vào mục đích thương mại.', GETDATE()),
-    ('050e8400-e29b-41d4-a716-446655440014', 'VF6_2024_WARRANTY', 120, 200000, N'Bảo hành 10 năm hoặc 200,000 km (tùy điều kiện nào đến trước). Pin được bảo hành trọn đời theo điều kiện sử dụng. Hỗ trợ cứu hộ 24/7 miễn phí trong thời gian bảo hành. Không áp dụng cho xe sử dụng vào mục đích thương mại.', GETDATE()),
-    ('050e8400-e29b-41d4-a716-446655440015', 'VF6_2025_WARRANTY', 120, 200000, N'Bảo hành 10 năm hoặc 200,000 km (tùy điều kiện nào đến trước). Pin được bảo hành trọn đời theo điều kiện sử dụng. Hỗ trợ cứu hộ 24/7 miễn phí trong thời gian bảo hành. Không áp dụng cho xe sử dụng vào mục đích thương mại.', GETDATE()),
-    ('050e8400-e29b-41d4-a716-446655440016', 'VF7_2024_WARRANTY', 120, 200000, N'Bảo hành 10 năm hoặc 200,000 km (tùy điều kiện nào đến trước). Pin được bảo hành trọn đời theo điều kiện sử dụng. Hỗ trợ cứu hộ 24/7 miễn phí trong thời gian bảo hành. Không áp dụng cho xe sử dụng vào mục đích thương mại.', GETDATE()),
-    ('050e8400-e29b-41d4-a716-446655440017', 'VF7_2025_WARRANTY', 120, 200000, N'Bảo hành 10 năm hoặc 200,000 km (tùy điều kiện nào đến trước). Pin được bảo hành trọn đời theo điều kiện sử dụng. Hỗ trợ cứu hộ 24/7 miễn phí trong thời gian bảo hành. Không áp dụng cho xe sử dụng vào mục đích thương mại.', GETDATE()),
-    ('050e8400-e29b-41d4-a716-446655440018', 'VF3_2024_WARRANTY', 96, 160000, N'Bảo hành 8 năm hoặc 160,000 km (tùy điều kiện nào đến trước). Pin được bảo hành 10 năm. Bảo dưỡng định kỳ miễn phí 2 năm đầu. Không áp dụng cho xe sử dụng vào mục đích thương mại.', GETDATE()),
-    ('050e8400-e29b-41d4-a716-446655440019', 'VF3_2025_WARRANTY', 96, 160000, N'Bảo hành 8 năm hoặc 160,000 km (tùy điều kiện nào đến trước). Pin được bảo hành 10 năm. Bảo dưỡng định kỳ miễn phí 2 năm đầu. Không áp dụng cho xe sử dụng vào mục đích thương mại.', GETDATE()),
-
-    -- BYD Atto 3
-    ('050e8400-e29b-41d4-a716-446655440020', 'BYD_ATTO3_2022_WARRANTY', 72, 150000, N'Bảo hành 6 năm hoặc 150,000 km (tùy điều kiện nào đến trước). Pin và hệ thống điện được bảo hành 8 năm hoặc 150,000 km. Bảo dưỡng định kỳ theo khuyến cáo. Áp dụng cho xe sử dụng cá nhân.', GETDATE()),
-    ('050e8400-e29b-41d4-a716-446655440021', 'BYD_ATTO3_2023_WARRANTY', 72, 150000, N'Bảo hành 6 năm hoặc 150,000 km (tùy điều kiện nào đến trước). Pin và hệ thống điện được bảo hành 8 năm hoặc 150,000 km. Bảo dưỡng định kỳ theo khuyến cáo. Áp dụng cho xe sử dụng cá nhân.', GETDATE()),
-    ('050e8400-e29b-41d4-a716-446655440022', 'BYD_ATTO3_2024_WARRANTY', 72, 150000, N'Bảo hành 6 năm hoặc 150,000 km (tùy điều kiện nào đến trước). Pin và hệ thống điện được bảo hành 8 năm hoặc 150,000 km. Bảo dưỡng định kỳ theo khuyến cáo. Áp dụng cho xe sử dụng cá nhân.', GETDATE()),
-    ('050e8400-e29b-41d4-a716-446655440023', 'BYD_ATTO3_2025_WARRANTY', 72, 150000, N'Bảo hành 6 năm hoặc 150,000 km (tùy điều kiện nào đến trước). Pin và hệ thống điện được bảo hành 8 năm hoặc 150,000 km. Bảo dưỡng định kỳ theo khuyến cáo. Áp dụng cho xe sử dụng cá nhân.', GETDATE()),
-
-    -- BYD Dolphin
-    ('050e8400-e29b-41d4-a716-446655440024', 'BYD_DOLPHIN_2023_WARRANTY', 72, 150000, N'Bảo hành 6 năm hoặc 150,000 km (tùy điều kiện nào đến trước). Pin và hệ thống điện được bảo hành 8 năm hoặc 150,000 km. Bảo dưỡng định kỳ theo khuyến cáo. Áp dụng cho xe sử dụng cá nhân.', GETDATE()),
-    ('050e8400-e29b-41d4-a716-446655440025', 'BYD_DOLPHIN_2024_WARRANTY', 72, 150000, N'Bảo hành 6 năm hoặc 150,000 km (tùy điều kiện nào đến trước). Pin và hệ thống điện được bảo hành 8 năm hoặc 150,000 km. Bảo dưỡng định kỳ theo khuyến cáo. Áp dụng cho xe sử dụng cá nhân.', GETDATE()),
-    ('050e8400-e29b-41d4-a716-446655440026', 'BYD_DOLPHIN_2025_WARRANTY', 72, 150000, N'Bảo hành 6 năm hoặc 150,000 km (tùy điều kiện nào đến trước). Pin và hệ thống điện được bảo hành 8 năm hoặc 150,000 km. Bảo dưỡng định kỳ theo khuyến cáo. Áp dụng cho xe sử dụng cá nhân.', GETDATE()),
-
-    -- BYD Seal
-    ('050e8400-e29b-41d4-a716-446655440027', 'BYD_SEAL_2023_WARRANTY', 72, 150000, N'Bảo hành 6 năm hoặc 150,000 km (tùy điều kiện nào đến trước). Pin và hệ thống điện được bảo hành 8 năm hoặc 150,000 km. Hỗ trợ cứu hộ 24/7 trong thời gian bảo hành. Áp dụng cho xe sử dụng cá nhân.', GETDATE()),
-    ('050e8400-e29b-41d4-a716-446655440028', 'BYD_SEAL_2024_WARRANTY', 72, 150000, N'Bảo hành 6 năm hoặc 150,000 km (tùy điều kiện nào đến trước). Pin và hệ thống điện được bảo hành 8 năm hoặc 150,000 km. Hỗ trợ cứu hộ 24/7 trong thời gian bảo hành. Áp dụng cho xe sử dụng cá nhân.', GETDATE()),
-    ('050e8400-e29b-41d4-a716-446655440029', 'BYD_SEAL_2025_WARRANTY', 72, 150000, N'Bảo hành 6 năm hoặc 150,000 km (tùy điều kiện nào đến trước). Pin và hệ thống điện được bảo hành 8 năm hoặc 150,000 km. Hỗ trợ cứu hộ 24/7 trong thời gian bảo hành. Áp dụng cho xe sử dụng cá nhân.', GETDATE()),
-
-    -- BYD Tang
-    ('050e8400-e29b-41d4-a716-446655440030', 'BYD_TANG_2024_WARRANTY', 72, 150000, N'Bảo hành 6 năm hoặc 150,000 km (tùy điều kiện nào đến trước). Pin và hệ thống điện được bảo hành 8 năm hoặc 150,000 km. Hỗ trợ cứu hộ 24/7 trong thời gian bảo hành. Áp dụng cho xe sử dụng cá nhân.', GETDATE()),
-    ('050e8400-e29b-41d4-a716-446655440031', 'BYD_TANG_2025_WARRANTY', 72, 150000, N'Bảo hành 6 năm hoặc 150,000 km (tùy điều kiện nào đến trước). Pin và hệ thống điện được bảo hành 8 năm hoặc 150,000 km. Hỗ trợ cứu hộ 24/7 trong thời gian bảo hành. Áp dụng cho xe sử dụng cá nhân.', GETDATE()),
-
-    -- BYD Seal U
-    ('050e8400-e29b-41d4-a716-446655440032', 'BYD_SEALU_2024_WARRANTY', 72, 150000, N'Bảo hành 6 năm hoặc 150,000 km (tùy điều kiện nào đến trước). Pin và hệ thống điện được bảo hành 8 năm hoặc 150,000 km. Hỗ trợ cứu hộ 24/7 trong thời gian bảo hành. Áp dụng cho xe sử dụng cá nhân.', GETDATE()),
-    ('050e8400-e29b-41d4-a716-446655440033', 'BYD_SEALU_2025_WARRANTY', 72, 150000, N'Bảo hành 6 năm hoặc 150,000 km (tùy điều kiện nào đến trước). Pin và hệ thống điện được bảo hành 8 năm hoặc 150,000 km. Hỗ trợ cứu hộ 24/7 trong thời gian bảo hành. Áp dụng cho xe sử dụng cá nhân.', GETDATE()),
-
-    -- BYD M6
-    ('050e8400-e29b-41d4-a716-446655440034', 'BYD_M6_2024_WARRANTY', 72, 150000, N'Bảo hành 6 năm hoặc 150,000 km (tùy điều kiện nào đến trước). Pin và hệ thống điện được bảo hành 8 năm hoặc 150,000 km. Hỗ trợ cứu hộ 24/7 trong thời gian bảo hành. Áp dụng cho xe sử dụng cá nhân.', GETDATE()),
-    ('050e8400-e29b-41d4-a716-446655440035', 'BYD_M6_2025_WARRANTY', 72, 150000, N'Bảo hành 6 năm hoặc 150,000 km (tùy điều kiện nào đến trước). Pin và hệ thống điện được bảo hành 8 năm hoặc 150,000 km. Hỗ trợ cứu hộ 24/7 trong thời gian bảo hành. Áp dụng cho xe sử dụng cá nhân.', GETDATE()),
-
-    -- Mercedes-Benz EQA
-    ('050e8400-e29b-41d4-a716-446655440036', 'MB_EQA_2023_WARRANTY', 48, 100000, N'Bảo hành 4 năm hoặc 100,000 km (tùy điều kiện nào đến trước). Pin được bảo hành 8 năm hoặc 160,000 km. Bảo dưỡng định kỳ tại hệ thống đại lý ủy quyền Mercedes-Benz. Áp dụng cho xe sử dụng cá nhân.', GETDATE()),
-    ('050e8400-e29b-41d4-a716-446655440037', 'MB_EQA_2024_WARRANTY', 48, 100000, N'Bảo hành 4 năm hoặc 100,000 km (tùy điều kiện nào đến trước). Pin được bảo hành 8 năm hoặc 160,000 km. Bảo dưỡng định kỳ tại hệ thống đại lý ủy quyền Mercedes-Benz. Áp dụng cho xe sử dụng cá nhân.', GETDATE()),
-    ('050e8400-e29b-41d4-a716-446655440038', 'MB_EQA_2025_WARRANTY', 48, 100000, N'Bảo hành 4 năm hoặc 100,000 km (tùy điều kiện nào đến trước). Pin được bảo hành 8 năm hoặc 160,000 km. Bảo dưỡng định kỳ tại hệ thống đại lý ủy quyền Mercedes-Benz. Áp dụng cho xe sử dụng cá nhân.', GETDATE()),
-
-    -- Mercedes-Benz EQB
-    ('050e8400-e29b-41d4-a716-446655440039', 'MB_EQB_2023_WARRANTY', 48, 100000, N'Bảo hành 4 năm hoặc 100,000 km (tùy điều kiện nào đến trước). Pin được bảo hành 8 năm hoặc 160,000 km. Bảo dưỡng định kỳ tại hệ thống đại lý ủy quyền Mercedes-Benz. Áp dụng cho xe sử dụng cá nhân.', GETDATE()),
-    ('050e8400-e29b-41d4-a716-446655440040', 'MB_EQB_2024_WARRANTY', 48, 100000, N'Bảo hành 4 năm hoặc 100,000 km (tùy điều kiện nào đến trước). Pin được bảo hành 8 năm hoặc 160,000 km. Bảo dưỡng định kỳ tại hệ thống đại lý ủy quyền Mercedes-Benz. Áp dụng cho xe sử dụng cá nhân.', GETDATE()),
-    ('050e8400-e29b-41d4-a716-446655440041', 'MB_EQB_2025_WARRANTY', 48, 100000, N'Bảo hành 4 năm hoặc 100,000 km (tùy điều kiện nào đến trước). Pin được bảo hành 8 năm hoặc 160,000 km. Bảo dưỡng định kỳ tại hệ thống đại lý ủy quyền Mercedes-Benz. Áp dụng cho xe sử dụng cá nhân.', GETDATE()),
-
-    -- Mercedes-Benz EQC
-    ('050e8400-e29b-41d4-a716-446655440042', 'MB_EQC_2022_WARRANTY', 48, 100000, N'Bảo hành 4 năm hoặc 100,000 km (tùy điều kiện nào đến trước). Pin được bảo hành 8 năm hoặc 160,000 km. Bảo dưỡng định kỳ tại hệ thống đại lý ủy quyền Mercedes-Benz. Áp dụng cho xe sử dụng cá nhân.', GETDATE()),
-    ('050e8400-e29b-41d4-a716-446655440043', 'MB_EQC_2023_WARRANTY', 48, 100000, N'Bảo hành 4 năm hoặc 100,000 km (tùy điều kiện nào đến trước). Pin được bảo hành 8 năm hoặc 160,000 km. Bảo dưỡng định kỳ tại hệ thống đại lý ủy quyền Mercedes-Benz. Áp dụng cho xe sử dụng cá nhân.', GETDATE()),
-    ('050e8400-e29b-41d4-a716-446655440044', 'MB_EQC_2024_WARRANTY', 48, 100000, N'Bảo hành 4 năm hoặc 100,000 km (tùy điều kiện nào đến trước). Pin được bảo hành 8 năm hoặc 160,000 km. Bảo dưỡng định kỳ tại hệ thống đại lý ủy quyền Mercedes-Benz. Áp dụng cho xe sử dụng cá nhân.', GETDATE()),
-
-    -- Mercedes-Benz EQE
-    ('050e8400-e29b-41d4-a716-446655440045', 'MB_EQE_2023_WARRANTY', 48, 100000, N'Bảo hành 4 năm hoặc 100,000 km (tùy điều kiện nào đến trước). Pin được bảo hành 8 năm hoặc 160,000 km. Bảo dưỡng định kỳ tại hệ thống đại lý ủy quyền Mercedes-Benz. Hỗ trợ cứu hộ 24/7. Áp dụng cho xe sử dụng cá nhân.', GETDATE()),
-    ('050e8400-e29b-41d4-a716-446655440046', 'MB_EQE_2024_WARRANTY', 48, 100000, N'Bảo hành 4 năm hoặc 100,000 km (tùy điều kiện nào đến trước). Pin được bảo hành 8 năm hoặc 160,000 km. Bảo dưỡng định kỳ tại hệ thống đại lý ủy quyền Mercedes-Benz. Hỗ trợ cứu hộ 24/7. Áp dụng cho xe sử dụng cá nhân.', GETDATE()),
-    ('050e8400-e29b-41d4-a716-446655440047', 'MB_EQE_2025_WARRANTY', 48, 100000, N'Bảo hành 4 năm hoặc 100,000 km (tùy điều kiện nào đến trước). Pin được bảo hành 8 năm hoặc 160,000 km. Bảo dưỡng định kỳ tại hệ thống đại lý ủy quyền Mercedes-Benz. Hỗ trợ cứu hộ 24/7. Áp dụng cho xe sử dụng cá nhân.', GETDATE()),
-
-    -- Mercedes-Benz EQE SUV
-    ('050e8400-e29b-41d4-a716-446655440048', 'MB_EQESUV_2023_WARRANTY', 48, 100000, N'Bảo hành 4 năm hoặc 100,000 km (tùy điều kiện nào đến trước). Pin được bảo hành 8 năm hoặc 160,000 km. Bảo dưỡng định kỳ tại hệ thống đại lý ủy quyền Mercedes-Benz. Hỗ trợ cứu hộ 24/7. Áp dụng cho xe sử dụng cá nhân.', GETDATE()),
-    ('050e8400-e29b-41d4-a716-446655440049', 'MB_EQESUV_2024_WARRANTY', 48, 100000, N'Bảo hành 4 năm hoặc 100,000 km (tùy điều kiện nào đến trước). Pin được bảo hành 8 năm hoặc 160,000 km. Bảo dưỡng định kỳ tại hệ thống đại lý ủy quyền Mercedes-Benz. Hỗ trợ cứu hộ 24/7. Áp dụng cho xe sử dụng cá nhân.', GETDATE()),
-    ('050e8400-e29b-41d4-a716-446655440050', 'MB_EQESUV_2025_WARRANTY', 48, 100000, N'Bảo hành 4 năm hoặc 100,000 km (tùy điều kiện nào đến trước). Pin được bảo hành 8 năm hoặc 160,000 km. Bảo dưỡng định kỳ tại hệ thống đại lý ủy quyền Mercedes-Benz. Hỗ trợ cứu hộ 24/7. Áp dụng cho xe sử dụng cá nhân.', GETDATE()),
-
-    ('050e8400-e29b-41d4-a716-446655440051', 'MB_EQS_2023_WARRANTY', 48, 100000, N'Bảo hành 4 năm hoặc 100,000 km (tùy điều kiện nào đến trước). Pin được bảo hành 8 năm hoặc 160,000 km. Bảo dưỡng định kỳ tại hệ thống đại lý ủy quyền Mercedes-Benz. Hỗ trợ cứu hộ 24/7. Áp dụng cho xe sử dụng cá nhân.', GETDATE()),
-    ('050e8400-e29b-41d4-a716-446655440052', 'MB_EQS_2024_WARRANTY', 48, 100000, N'Bảo hành 4 năm hoặc 100,000 km (tùy điều kiện nào đến trước). Pin được bảo hành 8 năm hoặc 160,000 km. Bảo dưỡng định kỳ tại hệ thống đại lý ủy quyền Mercedes-Benz. Hỗ trợ cứu hộ 24/7. Áp dụng cho xe sử dụng cá nhân.', GETDATE()),
-    ('050e8400-e29b-41d4-a716-446655440053', 'MB_EQS_2025_WARRANTY', 48, 100000, N'Bảo hành 4 năm hoặc 100,000 km (tùy điều kiện nào đến trước). Pin được bảo hành 8 năm hoặc 160,000 km. Bảo dưỡng định kỳ tại hệ thống đại lý ủy quyền Mercedes-Benz. Hỗ trợ cứu hộ 24/7. Áp dụng cho xe sử dụng cá nhân.', GETDATE()),
-
-    ('050e8400-e29b-41d4-a716-446655440054', 'MB_EQSSUV_2023_WARRANTY', 48, 100000, N'Bảo hành 4 năm hoặc 100,000 km (tùy điều kiện nào đến trước). Pin được bảo hành 8 năm hoặc 160,000 km. Bảo dưỡng định kỳ tại hệ thống đại lý ủy quyền Mercedes-Benz. Hỗ trợ cứu hộ 24/7. Áp dụng cho xe sử dụng cá nhân.', GETDATE()),
-    ('050e8400-e29b-41d4-a716-446655440055', 'MB_EQSSUV_2024_WARRANTY', 48, 100000, N'Bảo hành 4 năm hoặc 100,000 km (tùy điều kiện nào đến trước). Pin được bảo hành 8 năm hoặc 160,000 km. Bảo dưỡng định kỳ tại hệ thống đại lý ủy quyền Mercedes-Benz. Hỗ trợ cứu hộ 24/7. Áp dụng cho xe sử dụng cá nhân.', GETDATE()),
-    ('050e8400-e29b-41d4-a716-446655440056', 'MB_EQSSUV_2025_WARRANTY', 48, 100000, N'Bảo hành 4 năm hoặc 100,000 km (tùy điều kiện nào đến trước). Pin được bảo hành 8 năm hoặc 160,000 km. Bảo dưỡng định kỳ tại hệ thống đại lý ủy quyền Mercedes-Benz. Hỗ trợ cứu hộ 24/7. Áp dụng cho xe sử dụng cá nhân.', GETDATE());
+    ('750e8400-e29b-41d4-a716-446655440064', 'BYDSEA345HJK670', 'ZHWGJ6AT5MLA56789', '850e8400-e29b-41d4-a716-446655440064', @byd_seal_2025, '2025-06-28', GETDATE())
 
 INSERT INTO part_categories (id, category_name, description, parent_category_id, created_at)
 VALUES
