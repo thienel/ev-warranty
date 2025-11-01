@@ -3,7 +3,7 @@ name: CI Pipeline
 on:
   push:
     branches:
-      - '**'
+      - "**"
 
 jobs:
   detect-changes:
@@ -35,7 +35,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: "20"
 
       - name: Cache Node modules
         uses: actions/cache@v3
@@ -56,7 +56,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v4
         with:
-          go-version: '1.24'
+          go-version: "1.24"
 
       - name: Cache Go modules
         uses: actions/cache@v3
@@ -79,7 +79,7 @@ jobs:
       - name: Set up .NET
         uses: actions/setup-dotnet@v3
         with:
-          dotnet-version: '9.0.x'
+          dotnet-version: "9.0.x"
 
       - name: Cache .NET NuGet packages
         uses: actions/cache@v3

@@ -27,7 +27,7 @@
       .main-logo {
         width: 48px;
         height: 48px;
-        margin: auto auto ;
+        margin: auto auto;
         border-radius: @border-radius-lg;
         background: @primary-color;
         display: flex;
@@ -47,7 +47,6 @@
 
     .login-body {
       padding: @padding-lg;
-
     }
   }
 
@@ -61,14 +60,18 @@
   .login-error {
     .login-card {
       border-color: fade(@error-color, 30%);
-      box-shadow: 0 0 0 1px fade(@error-color, 10%), @box-shadow-medium;
+      box-shadow:
+        0 0 0 1px fade(@error-color, 10%),
+        @box-shadow-medium;
     }
   }
 
   .login-success {
     .login-card {
       border-color: fade(@success-color, 30%);
-      box-shadow: 0 0 0 1px fade(@success-color, 10%), @box-shadow-medium;
+      box-shadow:
+        0 0 0 1px fade(@success-color, 10%),
+        @box-shadow-medium;
     }
   }
 }

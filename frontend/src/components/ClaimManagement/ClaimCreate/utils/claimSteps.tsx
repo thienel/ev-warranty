@@ -1,64 +1,64 @@
-import React from "react";
-import { UserOutlined, CarOutlined, FileTextOutlined } from "@ant-design/icons";
-import type { Customer, Vehicle } from "@/types";
+import React from 'react'
+import { UserOutlined, CarOutlined, FileTextOutlined } from '@ant-design/icons'
+import type { Customer, Vehicle } from '@/types'
 
 export interface ClaimStep {
-  title: string;
-  icon: React.ReactNode;
-  description: string;
+  title: string
+  icon: React.ReactNode
+  description: string
 }
 
 export const getClaimSteps = (): ClaimStep[] => [
   {
-    title: "Select Customer",
+    title: 'Select Customer',
     icon: <UserOutlined />,
-    description: "Search and select the customer",
+    description: 'Search and select the customer',
   },
   {
-    title: "Select Vehicle",
+    title: 'Select Vehicle',
     icon: <CarOutlined />,
-    description: "Choose the vehicle for warranty claim",
+    description: 'Choose the vehicle for warranty claim',
   },
   {
-    title: "Claim Details",
+    title: 'Claim Details',
     icon: <FileTextOutlined />,
-    description: "Provide claim description",
+    description: 'Provide claim description',
   },
-];
+]
 
 export const isStepValid = (
   step: number,
   selectedCustomer: Customer | null,
-  selectedVehicle: Vehicle | null
+  selectedVehicle: Vehicle | null,
 ): boolean => {
   switch (step) {
     case 0:
-      return !!selectedCustomer;
+      return !!selectedCustomer
     case 1:
-      return !!selectedCustomer && !!selectedVehicle;
+      return !!selectedCustomer && !!selectedVehicle
     case 2:
-      return !!selectedCustomer && !!selectedVehicle;
+      return !!selectedCustomer && !!selectedVehicle
     default:
-      return false;
+      return false
   }
-};
+}
 
 export const getStepStatus = (
   currentStep: number,
-  stepIndex: number
-): "finish" | "process" | "wait" => {
-  if (currentStep > stepIndex) return "finish";
-  if (currentStep === stepIndex) return "process";
-  return "wait";
-};
+  stepIndex: number,
+): 'finish' | 'process' | 'wait' => {
+  if (currentStep > stepIndex) return 'finish'
+  if (currentStep === stepIndex) return 'process'
+  return 'wait'
+}
 
 export const canNavigateToStep = (
   targetStep: number,
   selectedCustomer: Customer | null,
-  selectedVehicle: Vehicle | null
+  selectedVehicle: Vehicle | null,
 ): boolean => {
-  if (targetStep === 0) return true;
-  if (targetStep === 1) return !!selectedCustomer;
-  if (targetStep === 2) return !!selectedCustomer && !!selectedVehicle;
-  return false;
-};
+  if (targetStep === 0) return true
+  if (targetStep === 1) return !!selectedCustomer
+  if (targetStep === 2) return !!selectedCustomer && !!selectedVehicle
+  return false
+}

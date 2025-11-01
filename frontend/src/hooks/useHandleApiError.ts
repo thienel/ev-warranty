@@ -42,7 +42,12 @@ const useHandleApiError = () => {
   const dispatch = useDispatch()
 
   const handleAuthError = useCallback(
-    async (error: ErrorResponse, errorCode: ErrorCode, errorMessage: string, options: HandleApiErrorOptions) => {
+    async (
+      error: ErrorResponse,
+      errorCode: ErrorCode,
+      errorMessage: string,
+      options: HandleApiErrorOptions,
+    ) => {
       const { showNotification, duration, onAuthError } = options
 
       if (showNotification) {
@@ -63,7 +68,7 @@ const useHandleApiError = () => {
 
       onAuthError?.(error, errorCode)
     },
-    [navigate, dispatch]
+    [navigate, dispatch],
   )
 
   const handleGeneralError = useCallback((errorMessage: string, options: HandleApiErrorOptions) => {
@@ -106,7 +111,7 @@ const useHandleApiError = () => {
         shouldRedirect: errorCode ? shouldRedirectToLogin(errorCode) : false,
       }
     },
-    [handleAuthError, handleGeneralError]
+    [handleAuthError, handleGeneralError],
   )
 }
 

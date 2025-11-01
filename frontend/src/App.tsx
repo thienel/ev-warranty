@@ -1,140 +1,159 @@
-import React from "react";
-import { Navigate, Outlet, useRoutes } from "react-router-dom";
-import Login from "@pages/Login/Login";
-import { useSelector } from "react-redux";
-import CallBack from "@pages/CallBack";
-import Users from "@pages/admin/Users";
-import AppLayout from "@components/Layout/Layout";
-import Offices from "@pages/admin/Offices";
-import Error from "@pages/Error/Error";
-import useCheckRole from "@/hooks/useCheckRole";
-import { USER_ROLES } from "@constants/common-constants";
-import { useTokenRefresh } from "@/hooks/useTokenRefresh";
+import React from 'react'
+import { Navigate, Outlet, useRoutes } from 'react-router-dom'
+import Login from '@pages/Login/Login'
+import { useSelector } from 'react-redux'
+import CallBack from '@pages/CallBack'
+import Users from '@pages/admin/Users'
+import AppLayout from '@components/Layout/Layout'
+import Offices from '@pages/admin/Offices'
+import Error from '@pages/Error/Error'
+import useCheckRole from '@/hooks/useCheckRole'
+import { USER_ROLES } from '@constants/common-constants'
+import { useTokenRefresh } from '@/hooks/useTokenRefresh'
 
-import EVMStaffClaims from "@pages/evm-staff/Claims";
-import SCStaffClaims from "@pages/sc-staff/Claims";
-import SCTechnicianClaims from "@pages/sc-technician/Claims";
-import ClaimDetail from "@pages/claims/ClaimDetail";
-import ClaimCreate from "@pages/sc-staff/ClaimCreate";
+import EVMStaffClaims from '@pages/evm-staff/Claims'
+import SCStaffClaims from '@pages/sc-staff/Claims'
+import SCTechnicianClaims from '@pages/sc-technician/Claims'
+import ClaimDetail from '@pages/claims/ClaimDetail'
+import ClaimCreate from '@pages/sc-staff/ClaimCreate'
 
 // New management pages
-import Customers from "@pages/sc-staff/Customers";
-import Vehicles from "@pages/evm-staff/Vehicles";
-import VehicleModels from "@pages/evm-staff/VehicleModels";
+import Customers from '@pages/sc-staff/Customers'
+import Vehicles from '@pages/evm-staff/Vehicles'
+import VehicleModels from '@pages/evm-staff/VehicleModels'
+import PartCategories from '@/pages/evm-staff/PartCategories'
+import Inventories from '@pages/evm-staff/Inventories'
+import Policies from '@pages/evm-staff/Policies'
+import PolicyDetail from '@pages/evm-staff/PolicyDetail'
 
-import type { RootState } from "@redux/store";
-import { ConfigProvider } from "antd";
-import { antdThemeConfig } from "./styles/antdThemeConfig";
+import type { RootState } from '@redux/store'
+import { App as AntdApp, ConfigProvider } from 'antd'
+import { antdThemeConfig } from './styles/antdThemeConfig'
 
 export const ProtectedRoute: React.FC = () => {
-  const authState = useSelector((state: RootState) => state.auth);
-  const isAuthenticated = authState?.isAuthenticated || false;
+  const authState = useSelector((state: RootState) => state.auth)
+  const isAuthenticated = authState?.isAuthenticated || false
 
-  return isAuthenticated ? <Outlet /> : <Navigate to="/login" replace />;
-};
+  return isAuthenticated ? <Outlet /> : <Navigate to="/login" replace />
+}
 
 export const PublicRoute: React.FC = () => {
-  const authState = useSelector((state: RootState) => state.auth);
-  const isAuthenticated = authState?.isAuthenticated || false;
+  const authState = useSelector((state: RootState) => state.auth)
+  const isAuthenticated = authState?.isAuthenticated || false
 
-  return !isAuthenticated ? <Outlet /> : <Navigate to="/" replace />;
-};
+  return !isAuthenticated ? <Outlet /> : <Navigate to="/" replace />
+}
 
 export const AdminRoute: React.FC = () => {
-  const isRightRole = useCheckRole(USER_ROLES.ADMIN);
+  const isRightRole = useCheckRole(USER_ROLES.ADMIN)
 
-  return isRightRole ? <Outlet /> : <Navigate to="/unauthorized" replace />;
-};
+  return isRightRole ? <Outlet /> : <Navigate to="/unauthorized" replace />
+}
 
 export const EVMStaffRoute: React.FC = () => {
-  const isRightRole = useCheckRole(USER_ROLES.EVM_STAFF);
+  const isRightRole = useCheckRole(USER_ROLES.EVM_STAFF)
 
-  return isRightRole ? <Outlet /> : <Navigate to="/unauthorized" replace />;
-};
+  return isRightRole ? <Outlet /> : <Navigate to="/unauthorized" replace />
+}
 
 export const SCStaffRoute: React.FC = () => {
-  const isRightRole = useCheckRole(USER_ROLES.SC_STAFF);
+  const isRightRole = useCheckRole(USER_ROLES.SC_STAFF)
 
-  return isRightRole ? <Outlet /> : <Navigate to="/unauthorized" replace />;
-};
+  return isRightRole ? <Outlet /> : <Navigate to="/unauthorized" replace />
+}
 
 export const SCTechnicianRoute: React.FC = () => {
-  const isRightRole = useCheckRole(USER_ROLES.SC_TECHNICIAN);
+  const isRightRole = useCheckRole(USER_ROLES.SC_TECHNICIAN)
 
-  return isRightRole ? <Outlet /> : <Navigate to="/unauthorized" replace />;
-};
+  return isRightRole ? <Outlet /> : <Navigate to="/unauthorized" replace />
+}
 
 const App: React.FC = () => {
   // Initialize token refresh management
-  useTokenRefresh();
+  useTokenRefresh()
 
   const routes = [
     {
       element: <ProtectedRoute />,
       children: [
-        { path: "/", element: <AppLayout /> },
+        { path: '/', element: <AppLayout /> },
         {
-          path: "/admin",
+          path: '/admin',
           element: <AdminRoute />,
           children: [
             {
-              path: "users",
+              path: 'users',
               element: <Users />,
             },
             {
-              path: "offices",
+              path: 'offices',
               element: <Offices />,
             },
           ],
         },
         {
-          path: "/evm-staff",
+          path: '/evm-staff',
           element: <EVMStaffRoute />,
           children: [
             {
-              path: "claims",
+              path: 'claims',
               children: [
-                { path: "", element: <EVMStaffClaims /> },
-                { path: ":id", element: <ClaimDetail /> },
+                { path: '', element: <EVMStaffClaims /> },
+                { path: ':id', element: <ClaimDetail /> },
               ],
             },
             {
-              path: "vehicles",
+              path: 'vehicles',
               element: <Vehicles />,
             },
             {
-              path: "vehicle-models",
+              path: 'vehicle-models',
               element: <VehicleModels />,
+            },
+            {
+              path: 'part-categories',
+              element: <PartCategories />,
+            },
+            {
+              path: 'inventories',
+              element: <Inventories />,
+            },
+            {
+              path: 'policies',
+              children: [
+                { path: '', element: <Policies /> },
+                { path: ':id', element: <PolicyDetail /> },
+              ],
             },
           ],
         },
         {
-          path: "/sc-staff",
+          path: '/sc-staff',
           element: <SCStaffRoute />,
           children: [
             {
-              path: "claims",
+              path: 'claims',
               children: [
-                { path: "", element: <SCStaffClaims /> },
-                { path: "create", element: <ClaimCreate /> },
-                { path: ":id", element: <ClaimDetail /> },
+                { path: '', element: <SCStaffClaims /> },
+                { path: 'create', element: <ClaimCreate /> },
+                { path: ':id', element: <ClaimDetail /> },
               ],
             },
             {
-              path: "customers",
+              path: 'customers',
               element: <Customers />,
             },
           ],
         },
         {
-          path: "/sc-technician",
+          path: '/sc-technician',
           element: <SCTechnicianRoute />,
           children: [
             {
-              path: "claims",
+              path: 'claims',
               children: [
-                { path: "", element: <SCTechnicianClaims /> },
-                { path: ":id", element: <ClaimDetail /> },
+                { path: '', element: <SCTechnicianClaims /> },
+                { path: ':id', element: <ClaimDetail /> },
               ],
             },
           ],
@@ -144,27 +163,29 @@ const App: React.FC = () => {
     {
       element: <PublicRoute />,
       children: [
-        { path: "/login", element: <Login /> },
-        { path: "/callback", element: <CallBack /> },
+        { path: '/login', element: <Login /> },
+        { path: '/callback', element: <CallBack /> },
       ],
     },
     {
-      path: "/unauthorized",
+      path: '/unauthorized',
       element: <Error code={403} />,
     },
     {
-      path: "/servererror",
+      path: '/servererror',
       element: <Error code={500} />,
     },
     {
-      path: "*",
+      path: '*',
       element: <Error code={404} />,
     },
-  ];
+  ]
 
   return (
-    <ConfigProvider theme={antdThemeConfig}>{useRoutes(routes)}</ConfigProvider>
-  );
-};
+    <ConfigProvider theme={antdThemeConfig}>
+      <AntdApp>{useRoutes(routes)}</AntdApp>
+    </ConfigProvider>
+  )
+}
 
-export default App;
+export default App

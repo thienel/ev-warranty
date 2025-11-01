@@ -12,9 +12,7 @@
   "paths": {
     "/customers": {
       "get": {
-        "tags": [
-          "Customers"
-        ],
+        "tags": ["Customers"],
         "parameters": [
           {
             "name": "name",
@@ -62,9 +60,7 @@
         }
       },
       "post": {
-        "tags": [
-          "Customers"
-        ],
+        "tags": ["Customers"],
         "requestBody": {
           "content": {
             "application/json": {
@@ -110,9 +106,7 @@
     },
     "/customers/{id}": {
       "get": {
-        "tags": [
-          "Customers"
-        ],
+        "tags": ["Customers"],
         "parameters": [
           {
             "name": "id",
@@ -148,9 +142,7 @@
         }
       },
       "put": {
-        "tags": [
-          "Customers"
-        ],
+        "tags": ["Customers"],
         "parameters": [
           {
             "name": "id",
@@ -215,9 +207,7 @@
         }
       },
       "delete": {
-        "tags": [
-          "Customers"
-        ],
+        "tags": ["Customers"],
         "parameters": [
           {
             "name": "id",
@@ -265,9 +255,7 @@
     },
     "/customers/{id}/restore": {
       "post": {
-        "tags": [
-          "Customers"
-        ],
+        "tags": ["Customers"],
         "parameters": [
           {
             "name": "id",
@@ -1386,9 +1374,7 @@
     },
     "/vehicle-models": {
       "get": {
-        "tags": [
-          "VehicleModels"
-        ],
+        "tags": ["VehicleModels"],
         "parameters": [
           {
             "name": "brand",
@@ -1437,9 +1423,7 @@
         }
       },
       "post": {
-        "tags": [
-          "VehicleModels"
-        ],
+        "tags": ["VehicleModels"],
         "requestBody": {
           "content": {
             "application/json": {
@@ -1485,9 +1469,7 @@
     },
     "/vehicle-models/{id}": {
       "get": {
-        "tags": [
-          "VehicleModels"
-        ],
+        "tags": ["VehicleModels"],
         "parameters": [
           {
             "name": "id",
@@ -1523,9 +1505,7 @@
         }
       },
       "put": {
-        "tags": [
-          "VehicleModels"
-        ],
+        "tags": ["VehicleModels"],
         "parameters": [
           {
             "name": "id",
@@ -1590,9 +1570,7 @@
         }
       },
       "delete": {
-        "tags": [
-          "VehicleModels"
-        ],
+        "tags": ["VehicleModels"],
         "parameters": [
           {
             "name": "id",
@@ -1640,9 +1618,7 @@
     },
     "/vehicles": {
       "get": {
-        "tags": [
-          "Vehicles"
-        ],
+        "tags": ["Vehicles"],
         "parameters": [
           {
             "name": "vin",
@@ -1699,9 +1675,7 @@
         }
       },
       "post": {
-        "tags": [
-          "Vehicles"
-        ],
+        "tags": ["Vehicles"],
         "requestBody": {
           "content": {
             "application/json": {
@@ -1747,9 +1721,7 @@
     },
     "/vehicles/{id}": {
       "get": {
-        "tags": [
-          "Vehicles"
-        ],
+        "tags": ["Vehicles"],
         "parameters": [
           {
             "name": "id",
@@ -1785,9 +1757,7 @@
         }
       },
       "put": {
-        "tags": [
-          "Vehicles"
-        ],
+        "tags": ["Vehicles"],
         "parameters": [
           {
             "name": "id",
@@ -1852,9 +1822,7 @@
         }
       },
       "delete": {
-        "tags": [
-          "Vehicles"
-        ],
+        "tags": ["Vehicles"],
         "parameters": [
           {
             "name": "id",
@@ -1902,9 +1870,7 @@
     },
     "/vehicles/{id}/restore": {
       "post": {
-        "tags": [
-          "Vehicles"
-        ],
+        "tags": ["Vehicles"],
         "parameters": [
           {
             "name": "id",
@@ -2353,10 +2319,7 @@
         "additionalProperties": false
       },
       "CreateCustomerRequest": {
-        "required": [
-          "first_name",
-          "last_name"
-        ],
+        "required": ["first_name", "last_name"],
         "type": "object",
         "properties": {
           "first_name": {
@@ -2479,11 +2442,7 @@
         "additionalProperties": false
       },
       "CreateVehicleModelRequest": {
-        "required": [
-          "brand",
-          "model_name",
-          "year"
-        ],
+        "required": ["brand", "model_name", "year"],
         "type": "object",
         "properties": {
           "brand": {
@@ -2511,11 +2470,7 @@
         "additionalProperties": false
       },
       "CreateVehicleRequest": {
-        "required": [
-          "customer_id",
-          "model_id",
-          "vin"
-        ],
+        "required": ["customer_id", "model_id", "vin"],
         "type": "object",
         "properties": {
           "vin": {
@@ -3172,10 +3127,7 @@
         "additionalProperties": false
       },
       "UpdateCustomerRequest": {
-        "required": [
-          "first_name",
-          "last_name"
-        ],
+        "required": ["first_name", "last_name"],
         "type": "object",
         "properties": {
           "first_name": {
@@ -3270,11 +3222,7 @@
         "additionalProperties": false
       },
       "UpdateVehicleModelRequest": {
-        "required": [
-          "brand",
-          "model_name",
-          "year"
-        ],
+        "required": ["brand", "model_name", "year"],
         "type": "object",
         "properties": {
           "brand": {
@@ -3297,11 +3245,7 @@
         "additionalProperties": false
       },
       "UpdateVehicleRequest": {
-        "required": [
-          "customer_id",
-          "model_id",
-          "vin"
-        ],
+        "required": ["customer_id", "model_id", "vin"],
         "type": "object",
         "properties": {
           "vin": {

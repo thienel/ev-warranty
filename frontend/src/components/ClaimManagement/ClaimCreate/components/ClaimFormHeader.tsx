@@ -1,21 +1,17 @@
-import React from "react";
-import { Button, Typography, Progress } from "antd";
-import { ArrowLeftOutlined } from "@ant-design/icons";
+import React from 'react'
+import { Button, Typography, Progress } from 'antd'
+import { ArrowLeftOutlined } from '@ant-design/icons'
 
-const { Title, Text } = Typography;
+const { Title, Text } = Typography
 
 interface ClaimFormHeaderProps {
-  onBack: () => void;
-  currentStep: number;
-  totalSteps: number;
+  onBack: () => void
+  currentStep: number
+  totalSteps: number
 }
 
-const ClaimFormHeader: React.FC<ClaimFormHeaderProps> = ({
-  onBack,
-  currentStep,
-  totalSteps,
-}) => {
-  const progressPercent = Math.round(((currentStep + 1) / totalSteps) * 100);
+const ClaimFormHeader: React.FC<ClaimFormHeaderProps> = ({ onBack, currentStep, totalSteps }) => {
+  const progressPercent = Math.round(((currentStep + 1) / totalSteps) * 100)
 
   return (
     <div className="claim-create-header">
@@ -37,8 +33,8 @@ const ClaimFormHeader: React.FC<ClaimFormHeaderProps> = ({
             Create New Warranty Claim
           </Title>
           <Text className="page-description">
-            Create a new warranty claim for a customer's vehicle. Follow the
-            steps below to complete the process.
+            Create a new warranty claim for a customer's vehicle. Follow the steps below to complete
+            the process.
           </Text>
         </div>
 
@@ -48,8 +44,8 @@ const ClaimFormHeader: React.FC<ClaimFormHeaderProps> = ({
             percent={progressPercent}
             size={80}
             strokeColor={{
-              "0%": "#697565",
-              "100%": "#5a6358",
+              '0%': '#697565',
+              '100%': '#5a6358',
             }}
             format={() => (
               <div className="progress-content">
@@ -61,7 +57,7 @@ const ClaimFormHeader: React.FC<ClaimFormHeaderProps> = ({
         </div>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default ClaimFormHeader;
+export default ClaimFormHeader

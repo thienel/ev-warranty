@@ -19,7 +19,8 @@
  */
 
 // ===== GLOBAL BASE STYLES =====
-html, body {
+html,
+body {
   overscroll-behavior: none !important;
 }
 
@@ -67,7 +68,12 @@ a {
 }
 
 // ===== TYPOGRAPHY & LINK OVERRIDES =====
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   color: @text-heading !important;
   font-weight: @font-weight-semibold !important;
 
@@ -97,7 +103,11 @@ p {
 .ant-typography {
   color: @text-color !important;
 
-  h1, h2, h3, h4, h5 {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5 {
     color: @text-heading !important;
   }
 
@@ -874,7 +884,8 @@ p {
       background-color: @primary-active !important;
       border-color: @primary-active !important;
     }
-  }  &-input:focus + .ant-checkbox-inner {
+  }
+  &-input:focus + .ant-checkbox-inner {
     border-color: @primary-color !important;
     box-shadow: 0 0 0 3px fade(@primary-color, 12%) !important;
   }
@@ -1785,17 +1796,32 @@ p {
 // ===== SKELETON OVERRIDES =====
 .ant-skeleton {
   &-title {
-    background: linear-gradient(90deg, @fill-secondary 25%, @fill-color 50%, @fill-secondary 75%) !important;
+    background: linear-gradient(
+      90deg,
+      @fill-secondary 25%,
+      @fill-color 50%,
+      @fill-secondary 75%
+    ) !important;
     background-size: 200% 100% !important;
   }
 
   &-paragraph > li {
-    background: linear-gradient(90deg, @fill-secondary 25%, @fill-color 50%, @fill-secondary 75%) !important;
+    background: linear-gradient(
+      90deg,
+      @fill-secondary 25%,
+      @fill-color 50%,
+      @fill-secondary 75%
+    ) !important;
     background-size: 200% 100% !important;
   }
 
   &-avatar {
-    background: linear-gradient(90deg, @fill-secondary 25%, @fill-color 50%, @fill-secondary 75%) !important;
+    background: linear-gradient(
+      90deg,
+      @fill-secondary 25%,
+      @fill-color 50%,
+      @fill-secondary 75%
+    ) !important;
     background-size: 200% 100% !important;
   }
 }
@@ -1977,7 +2003,7 @@ p {
 // ===== WATERMARK OVERRIDES =====
 .ant-watermark {
   pointer-events: none !important;
-  
+
   &-text {
     color: fade(@text-quaternary, 50%) !important;
   }
@@ -2082,7 +2108,8 @@ p {
 }
 
 @keyframes pulse {
-  0%, 100% {
+  0%,
+  100% {
     opacity: 1;
   }
   50% {

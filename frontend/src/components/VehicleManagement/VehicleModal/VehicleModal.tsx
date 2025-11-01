@@ -1,21 +1,12 @@
-import React, { useEffect } from "react";
-import {
-  Modal,
-  Button,
-  Form,
-  Input,
-  message,
-  Select,
-  Space,
-  DatePicker,
-} from "antd";
-import { CarOutlined, UserOutlined, FileTextOutlined } from "@ant-design/icons";
-import { type VehicleModalProps, type VehicleFormData } from "@/types/index";
-import { vehiclesApi } from "@services/index";
-import useHandleApiError from "@/hooks/useHandleApiError";
-import dayjs from "dayjs";
+import React, { useEffect } from 'react'
+import { Modal, Button, Form, Input, message, Select, Space, DatePicker } from 'antd'
+import { CarOutlined, UserOutlined, FileTextOutlined } from '@ant-design/icons'
+import { type VehicleModalProps, type VehicleFormData } from '@/types/index'
+import { vehiclesApi } from '@services/index'
+import useHandleApiError from '@/hooks/useHandleApiError'
+import dayjs from 'dayjs'
 
-const { Option } = Select;
+const { Option } = Select
 
 const VehicleModal: React.FC<VehicleModalProps> = ({
   loading,
@@ -29,8 +20,8 @@ const VehicleModal: React.FC<VehicleModalProps> = ({
   vehicleModelsLoading = false,
   isUpdate,
 }) => {
-  const [form] = Form.useForm<VehicleFormData>();
-  const handleError = useHandleApiError();
+  const [form] = Form.useForm<VehicleFormData>()
+  const handleError = useHandleApiError()
 
   // Populate form when vehicle prop changes or modal opens
   useEffect(() => {
@@ -42,62 +33,56 @@ const VehicleModal: React.FC<VehicleModalProps> = ({
           license_plate: vehicle.license_plate,
           customer_id: vehicle.customer_id,
           model_id: vehicle.model_id,
-          purchase_date: vehicle.purchase_date
-            ? dayjs(vehicle.purchase_date)
-            : undefined,
-        });
+          purchase_date: vehicle.purchase_date ? dayjs(vehicle.purchase_date) : undefined,
+        })
       } else {
         // When creating new, reset form
-        form.resetFields();
+        form.resetFields()
       }
     }
-  }, [form, vehicle, isUpdate, opened]);
+  }, [form, vehicle, isUpdate, opened])
 
   // Clear form when modal closes
   useEffect(() => {
     if (!opened) {
-      form.resetFields();
+      form.resetFields()
     }
-  }, [form, opened]);
+  }, [form, opened])
 
   const handleSubmit = async (values: VehicleFormData): Promise<void> => {
-    setLoading(true);
+    setLoading(true)
     try {
       const payload = {
         ...values,
         purchase_date: values.purchase_date
-          ? (values.purchase_date as { format: (f: string) => string }).format(
-              "YYYY-MM-DD"
-            )
+          ? (values.purchase_date as { format: (f: string) => string }).format('YYYY-MM-DD')
           : undefined,
-      };
-
-      if (isUpdate) {
-        await vehiclesApi.update(vehicle?.id || '', payload);
-        message.success("Vehicle updated successfully");
-      } else {
-        await vehiclesApi.create(payload);
-        message.success("Vehicle created successfully");
       }
 
-      onClose();
+      if (isUpdate) {
+        await vehiclesApi.update(vehicle?.id || '', payload)
+        message.success('Vehicle updated successfully')
+      } else {
+        await vehiclesApi.create(payload)
+        message.success('Vehicle created successfully')
+      }
+
+      onClose()
     } catch (error) {
-      handleError(error as Error);
+      handleError(error as Error)
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   return (
     <Modal
       title={
-        <Space style={{ margin: "14px 0" }}>
-          {isUpdate ? "Edit Vehicle" : "Add New Vehicle"}
-        </Space>
+        <Space style={{ margin: '14px 0' }}>{isUpdate ? 'Edit Vehicle' : 'Add New Vehicle'}</Space>
       }
       open={opened}
       onCancel={onClose}
-      style={{ margin: "auto" }}
+      style={{ margin: 'auto' }}
       footer={null}
       width={600}
       destroyOnHidden
@@ -107,18 +92,18 @@ const VehicleModal: React.FC<VehicleModalProps> = ({
         layout="vertical"
         onFinish={handleSubmit}
         autoComplete="off"
-        key={vehicle?.id || "new"}
+        key={vehicle?.id || 'new'}
       >
         <Form.Item
           label="VIN"
           name="vin"
           validateFirst
           rules={[
-            { required: true, message: "Please enter VIN" },
-            { min: 17, max: 17, message: "VIN must be exactly 17 characters" },
+            { required: true, message: 'Please enter VIN' },
+            { min: 17, max: 17, message: 'VIN must be exactly 17 characters' },
             {
               pattern: /^[A-HJ-NPR-Z0-9]{17}$/,
-              message: "Invalid VIN format (no I, O, Q allowed)",
+              message: 'Invalid VIN format (no I, O, Q allowed)',
             },
           ]}
         >
@@ -127,10 +112,10 @@ const VehicleModal: React.FC<VehicleModalProps> = ({
             prefix={<FileTextOutlined />}
             size="large"
             maxLength={17}
-            style={{ textTransform: "uppercase" }}
+            style={{ textTransform: 'uppercase' }}
             onChange={(e) => {
-              const value = e.target.value.toUpperCase();
-              form.setFieldValue("vin", value);
+              const value = e.target.value.toUpperCase()
+              form.setFieldValue('vin', value)
             }}
           />
         </Form.Item>
@@ -139,11 +124,10 @@ const VehicleModal: React.FC<VehicleModalProps> = ({
           label="License Plate"
           name="license_plate"
           rules={[
-            { required: true, message: "Please enter license plate" },
+            { required: true, message: 'Please enter license plate' },
             {
               pattern: /^[0-9]{2}[A-Z]{1,2}-[0-9]{4,5}$/,
-              message:
-                "Invalid license plate format (e.g., 29A-12345 or 51B-1234)",
+              message: 'Invalid license plate format (e.g., 29A-12345 or 51B-1234)',
             },
           ]}
         >
@@ -152,22 +136,22 @@ const VehicleModal: React.FC<VehicleModalProps> = ({
             prefix={<CarOutlined />}
             size="large"
             maxLength={10}
-            style={{ textTransform: "uppercase" }}
+            style={{ textTransform: 'uppercase' }}
           />
         </Form.Item>
 
         <Form.Item
           label="Customer"
           name="customer_id"
-          rules={[{ required: true, message: "Please select a customer" }]}
+          rules={[{ required: true, message: 'Please select a customer' }]}
         >
           <Select
             placeholder={
               customersLoading
-                ? "Loading customers..."
+                ? 'Loading customers...'
                 : customers.length === 0
-                  ? "No customers available"
-                  : "Select customer"
+                  ? 'No customers available'
+                  : 'Select customer'
             }
             size="large"
             showSearch
@@ -175,17 +159,14 @@ const VehicleModal: React.FC<VehicleModalProps> = ({
             loading={customersLoading}
             disabled={customersLoading}
             filterOption={(input, option) =>
-              option?.children
-                ?.toString()
-                .toLowerCase()
-                .includes(input.toLowerCase()) ?? false
+              option?.children?.toString().toLowerCase().includes(input.toLowerCase()) ?? false
             }
           >
             {customers.map((customer) => (
               <Option key={customer.id} value={customer.id}>
                 <Space>
                   <UserOutlined />
-                  {`${customer.first_name || ""} ${customer.last_name || ""}`.trim()}
+                  {`${customer.first_name || ''} ${customer.last_name || ''}`.trim()}
                 </Space>
               </Option>
             ))}
@@ -195,15 +176,15 @@ const VehicleModal: React.FC<VehicleModalProps> = ({
         <Form.Item
           label="Vehicle Model"
           name="model_id"
-          rules={[{ required: true, message: "Please select a vehicle model" }]}
+          rules={[{ required: true, message: 'Please select a vehicle model' }]}
         >
           <Select
             placeholder={
               vehicleModelsLoading
-                ? "Loading vehicle models..."
+                ? 'Loading vehicle models...'
                 : vehicleModels.length === 0
-                  ? "No vehicle models available"
-                  : "Select vehicle model"
+                  ? 'No vehicle models available'
+                  : 'Select vehicle model'
             }
             size="large"
             showSearch
@@ -211,10 +192,7 @@ const VehicleModal: React.FC<VehicleModalProps> = ({
             loading={vehicleModelsLoading}
             disabled={vehicleModelsLoading}
             filterOption={(input, option) =>
-              option?.children
-                ?.toString()
-                .toLowerCase()
-                .includes(input.toLowerCase()) ?? false
+              option?.children?.toString().toLowerCase().includes(input.toLowerCase()) ?? false
             }
           >
             {vehicleModels.map((model) => (
@@ -235,11 +213,9 @@ const VehicleModal: React.FC<VehicleModalProps> = ({
             {
               validator: (_, value) => {
                 if (value && value.isAfter(dayjs())) {
-                  return Promise.reject(
-                    new Error("Purchase date cannot be in the future")
-                  );
+                  return Promise.reject(new Error('Purchase date cannot be in the future'))
                 }
-                return Promise.resolve();
+                return Promise.resolve()
               },
             },
           ]}
@@ -247,34 +223,25 @@ const VehicleModal: React.FC<VehicleModalProps> = ({
           <DatePicker
             placeholder="Select purchase date (optional)"
             size="large"
-            style={{ width: "100%" }}
+            style={{ width: '100%' }}
             format="YYYY-MM-DD"
-            disabledDate={(current) =>
-              current && current > dayjs().endOf("day")
-            }
+            disabledDate={(current) => current && current > dayjs().endOf('day')}
           />
         </Form.Item>
 
-        <Form.Item
-          style={{ marginBottom: 0, textAlign: "right", marginTop: "24px" }}
-        >
+        <Form.Item style={{ marginBottom: 0, textAlign: 'right', marginTop: '24px' }}>
           <Space>
             <Button size="large" onClick={onClose}>
               Cancel
             </Button>
-            <Button
-              type="primary"
-              htmlType="submit"
-              loading={loading}
-              size="large"
-            >
-              {isUpdate ? "Update Vehicle" : "Create Vehicle"}
+            <Button type="primary" htmlType="submit" loading={loading} size="large">
+              {isUpdate ? 'Update Vehicle' : 'Create Vehicle'}
             </Button>
           </Space>
         </Form.Item>
       </Form>
     </Modal>
-  );
-};
+  )
+}
 
-export default VehicleModal;
+export default VehicleModal

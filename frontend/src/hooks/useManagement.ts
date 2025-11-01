@@ -22,7 +22,9 @@ interface UseManagementReturn<T> {
   handleReset: () => Promise<void>
 }
 
-const useManagement = <T = Record<string, unknown>>(apiEndpoint: string): UseManagementReturn<T> => {
+const useManagement = <T = Record<string, unknown>>(
+  apiEndpoint: string,
+): UseManagementReturn<T> => {
   const [items, setItems] = useState<T[]>([])
   const [loading, setLoading] = useState(false)
   const [searchText, setSearchText] = useState('')
@@ -42,12 +44,12 @@ const useManagement = <T = Record<string, unknown>>(apiEndpoint: string): UseMan
       const response = await api.get(apiEndpoint)
       // Handle different response structures
       let itemData = response.data
-      
+
       // If response has nested data property, use that
       if (itemData && typeof itemData === 'object' && 'data' in itemData) {
         itemData = itemData.data
       }
-      
+
       // Ensure we always have an array
       if (Array.isArray(itemData)) {
         setItems(itemData)

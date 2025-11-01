@@ -1,46 +1,35 @@
-import React from "react";
-import {
-  Card,
-  Form,
-  Input,
-  Button,
-  Space,
-  Typography,
-  Divider,
-  Row,
-  Col,
-  Steps,
-} from "antd";
+import React from 'react'
+import { Card, Form, Input, Button, Space, Typography, Divider, Row, Col, Steps } from 'antd'
 import {
   SaveOutlined,
   CheckCircleOutlined,
   UserOutlined,
   CarOutlined,
   FileTextOutlined,
-} from "@ant-design/icons";
-import { useNavigate, useLocation } from "react-router-dom";
-import CustomerSearch from "./components/CustomerSearch";
-import VehicleSearch from "./components/VehicleSearch";
-import ClaimFormHeader from "./components/ClaimFormHeader";
-import StepCard from "./components/StepCard";
-import SelectionAlert from "./components/SelectionAlert";
-import { useClaimFormState } from "./hooks/useClaimFormState";
-import { useClaimSubmission } from "./hooks/useClaimSubmission";
-import { getClaimsBasePath } from "@/utils/navigationHelpers";
-import { getClaimSteps, isStepValid, getStepStatus } from "./utils/claimSteps";
-import "./ClaimCreate.less";
+} from '@ant-design/icons'
+import { useNavigate, useLocation } from 'react-router-dom'
+import CustomerSearch from './components/CustomerSearch'
+import VehicleSearch from './components/VehicleSearch'
+import ClaimFormHeader from './components/ClaimFormHeader'
+import StepCard from './components/StepCard'
+import SelectionAlert from './components/SelectionAlert'
+import { useClaimFormState } from './hooks/useClaimFormState'
+import { useClaimSubmission } from './hooks/useClaimSubmission'
+import { getClaimsBasePath } from '@/utils/navigationHelpers'
+import { getClaimSteps, isStepValid, getStepStatus } from './utils/claimSteps'
+import './ClaimCreate.less'
 
-const { Text } = Typography;
-const { TextArea } = Input;
+const { Text } = Typography
+const { TextArea } = Input
 
 interface ClaimFormValues {
-  description: string;
+  description: string
 }
 
 const ClaimCreate: React.FC = () => {
-  const [form] = Form.useForm<ClaimFormValues>();
-  const navigate = useNavigate();
-  const location = useLocation();
+  const [form] = Form.useForm<ClaimFormValues>()
+  const navigate = useNavigate()
+  const location = useLocation()
 
   // Custom hooks for state management
   const {
@@ -50,35 +39,31 @@ const ClaimCreate: React.FC = () => {
     handleCustomerSelect,
     handleVehicleSelect,
     handleStepChange,
-  } = useClaimFormState();
+  } = useClaimFormState()
 
-  const { loading, submitClaim } = useClaimSubmission();
+  const { loading, submitClaim } = useClaimSubmission()
 
   // Get steps configuration
-  const steps = getClaimSteps();
+  const steps = getClaimSteps()
 
   // Handle form submission
   const handleSubmit = async (values: ClaimFormValues) => {
-    const result = await submitClaim(values, selectedCustomer, selectedVehicle);
+    const result = await submitClaim(values, selectedCustomer, selectedVehicle)
     if (!result.success && result.shouldNavigateToStep !== undefined) {
-      handleStepChange(result.shouldNavigateToStep);
+      handleStepChange(result.shouldNavigateToStep)
     }
-  };
+  }
 
   // Handle going back
   const handleBack = () => {
-    const basePath = getClaimsBasePath(location.pathname);
-    navigate(basePath);
-  };
+    const basePath = getClaimsBasePath(location.pathname)
+    navigate(basePath)
+  }
 
   return (
     <div className="claim-create">
       {/* Header Section */}
-      <ClaimFormHeader
-        onBack={handleBack}
-        currentStep={currentStep}
-        totalSteps={steps.length}
-      />
+      <ClaimFormHeader onBack={handleBack} currentStep={currentStep} totalSteps={steps.length} />
 
       {/* Steps Navigation */}
       <Card className="steps-card">
@@ -96,12 +81,7 @@ const ClaimCreate: React.FC = () => {
 
       {/* Form Content */}
       <div className="form-container">
-        <Form
-          form={form}
-          layout="vertical"
-          onFinish={handleSubmit}
-          disabled={loading}
-        >
+        <Form form={form} layout="vertical" onFinish={handleSubmit} disabled={loading}>
           <Row gutter={[24, 24]}>
             {/* Customer Selection */}
             <Col xs={24} lg={12}>
@@ -163,16 +143,15 @@ const ClaimCreate: React.FC = () => {
                   rules={[
                     {
                       required: true,
-                      message: "Please provide a description of the issue",
+                      message: 'Please provide a description of the issue',
                     },
                     {
                       min: 10,
-                      message:
-                        "Description must be at least 10 characters long",
+                      message: 'Description must be at least 10 characters long',
                     },
                     {
                       max: 1000,
-                      message: "Description cannot exceed 1000 characters",
+                      message: 'Description cannot exceed 1000 characters',
                     },
                   ]}
                 >
@@ -192,7 +171,7 @@ const ClaimCreate: React.FC = () => {
           <Divider />
 
           {/* Action Buttons */}
-          <div style={{ textAlign: "center" }}>
+          <div style={{ textAlign: 'center' }}>
             <Space size="large">
               <Button onClick={handleBack} disabled={loading} size="large">
                 Cancel
@@ -213,7 +192,7 @@ const ClaimCreate: React.FC = () => {
         </Form>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default ClaimCreate;
+export default ClaimCreate
