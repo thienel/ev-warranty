@@ -154,6 +154,7 @@ const PolicyDetail: React.FC = () => {
       title: 'Part Category',
       dataIndex: 'part_category_id',
       key: 'part_category_id',
+      width: '30%',
       render: (categoryId: string) => (
         <Space>
           <AppstoreOutlined style={{ color: '#697565' }} />
@@ -172,7 +173,7 @@ const PolicyDetail: React.FC = () => {
       title: 'Actions',
       key: 'actions',
       align: 'center',
-      width: 150,
+      width: '20%',
       render: (_: unknown, record: PolicyCoveragePart) => (
         <Space size="small">
           <Button
@@ -280,7 +281,14 @@ const PolicyDetail: React.FC = () => {
           columns={coveredPartsColumns}
           rowKey="id"
           loading={coveredPartsLoading}
-          pagination={{ pageSize: 10 }}
+          pagination={{
+            total: coveredParts.length,
+            showSizeChanger: true,
+            showQuickJumper: true,
+            pageSizeOptions: ['10', '20', '50', '100'],
+            defaultPageSize: 10,
+            showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} items`,
+          }}
         />
       </Card>
 
