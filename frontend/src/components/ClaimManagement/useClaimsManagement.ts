@@ -59,7 +59,7 @@ const useClaimsManagement = (): UseClaimsManagementReturn => {
       try {
         setLoading(true)
         const response = await claimsApi.getAll(params || pagination)
-        const claimsData = Array.isArray(response.data?.claims) ? response.data.claims : []
+        const claimsData = Array.isArray(response.data) ? response.data : []
         console.log('Fetched claims:', response)
         setClaims(claimsData)
       } catch (error) {

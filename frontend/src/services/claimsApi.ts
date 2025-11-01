@@ -12,11 +12,10 @@ import type {
   ClaimItemListResponse,
   ClaimAttachmentListResponse,
   PaginationParams,
-  ClaimListResponse,
 } from '@/types'
 
 export const claimsApi = {
-  getAll: (params?: PaginationParams): Promise<ApiSuccessResponse<ClaimListResponse>> => {
+  getAll: (params?: PaginationParams): Promise<ApiSuccessResponse<Claim[]>> => {
     const searchParams = new URLSearchParams()
     if (params?.page) searchParams.append('page', params.page.toString())
     if (params?.limit) searchParams.append('limit', params.limit.toString())
