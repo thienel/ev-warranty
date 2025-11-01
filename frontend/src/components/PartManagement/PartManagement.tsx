@@ -40,11 +40,9 @@ const PartManagement: React.FC = () => {
       if (Array.isArray(categoriesData)) {
         setPartCategories(categoriesData)
       } else {
-        console.warn('API returned non-array data for part categories:', categoriesData)
         setPartCategories([])
       }
     } catch (error) {
-      console.error('Failed to fetch part categories:', error)
       handleError(error as Error)
       setPartCategories([])
     } finally {
@@ -63,11 +61,9 @@ const PartManagement: React.FC = () => {
       if (Array.isArray(officesData)) {
         setOffices(officesData)
       } else {
-        console.warn('API returned non-array data for offices:', officesData)
         setOffices([])
       }
     } catch (error) {
-      console.error('Failed to fetch offices:', error)
       handleError(error as Error)
       setOffices([])
     } finally {
@@ -76,7 +72,6 @@ const PartManagement: React.FC = () => {
   }, [handleError])
 
   useEffect(() => {
-    console.log('PartManagement: Fetching part categories and offices...')
     fetchPartCategories()
     fetchOffices()
   }, [fetchPartCategories, fetchOffices])
@@ -85,11 +80,9 @@ const PartManagement: React.FC = () => {
   useEffect(() => {
     if (isOpenModal) {
       if (partCategories.length === 0 && !partCategoriesLoading) {
-        console.log('PartManagement: Modal opened with empty categories, refetching...')
         fetchPartCategories()
       }
       if (offices.length === 0 && !officesLoading) {
-        console.log('PartManagement: Modal opened with empty offices, refetching...')
         fetchOffices()
       }
     }
@@ -105,7 +98,6 @@ const PartManagement: React.FC = () => {
 
   const getOfficeName = (officeId: string): string => {
     if (!Array.isArray(offices)) {
-      console.warn('offices is not an array:', offices)
       return 'N/A'
     }
 

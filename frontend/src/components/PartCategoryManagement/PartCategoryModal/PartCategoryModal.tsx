@@ -55,7 +55,6 @@ const PartCategoryModal: React.FC<PartCategoryModalProps> = ({
 
   const handleSubmit = async (values: PartCategoryFormData): Promise<void> => {
     setLoading(true)
-    console.log('Submitting part category data:', values)
     try {
       // Ensure empty parent_category_id is sent as undefined/null instead of empty string
       const payload = {

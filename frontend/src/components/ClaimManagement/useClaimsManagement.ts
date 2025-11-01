@@ -63,17 +63,11 @@ const useClaimsManagement = (): UseClaimsManagementReturn => {
     async (params?: PaginationParams) => {
       try {
         setLoading(true)
-        // Fetch claims
         const response = await claimsApi.getAll(params || pagination)
         const claimsData = Array.isArray(response.data) ? response.data : []
 
-        // Fetch all customers
         const customersResponse = await customersApi.getAll()
-        console.log('Customers response:', customersResponse)
-        console.log('Customers response.data type:', typeof customersResponse.data)
-        console.log('Customers response.data:', customersResponse.data)
 
-        // Handle DotNetApiResponse structure: { data: Customer[] } or { data: { data: Customer[] } }
         let customers: Customer[] = []
         if (customersResponse.data) {
           if (Array.isArray(customersResponse.data)) {
@@ -82,32 +76,24 @@ const useClaimsManagement = (): UseClaimsManagementReturn => {
             typeof customersResponse.data === 'object' &&
             'data' in customersResponse.data
           ) {
-            // If data is wrapped in another data property
             const nestedData = (customersResponse.data as Record<string, unknown>).data
             customers = Array.isArray(nestedData) ? nestedData : []
           }
         }
-        console.log('Customers array:', customers)
 
-        // Create a map of customer_id to customer name
         const customerMap = new Map<string, string>()
         if (customers.length > 0) {
           customers.forEach((customer: Customer) => {
             const fullName = `${customer.first_name} ${customer.last_name}`.trim()
             customerMap.set(customer.id, fullName)
-            console.log(`Mapped customer ${customer.id} to ${fullName}`)
           })
         }
 
-        console.log('Customer map:', customerMap)
-
-        // Enrich claims with customer names
         const enrichedClaims: EnrichedClaim[] = claimsData.map((claim) => ({
           ...claim,
           customer_name: customerMap.get(claim.customer_id) || claim.customer_id,
         }))
 
-        console.log('Fetched claims:', enrichedClaims)
         setClaims(enrichedClaims)
       } catch (error) {
         handleError(error as ErrorResponse)

@@ -30,9 +30,8 @@ const LayoutHeader: React.FC<LayoutHeaderProps> = ({ collapsed, onToggleCollapse
     try {
       // Call logout API to invalidate refresh token on server
       await api.post(API_ENDPOINTS.AUTH.LOGOUT, {}, { withCredentials: true })
-    } catch (error) {
+    } catch {
       // Ignore errors from logout API (e.g., if token already expired)
-      console.warn('Logout API error (ignored):', error)
     } finally {
       // Always clear local state regardless of API result
       dispatch(logout())

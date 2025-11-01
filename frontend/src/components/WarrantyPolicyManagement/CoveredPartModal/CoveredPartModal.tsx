@@ -48,7 +48,6 @@ const CoveredPartModal: React.FC<PolicyCoveragePartModalProps> = ({
 
   const handleSubmit = async (values: PolicyCoveragePartFormData): Promise<void> => {
     setLoading(true)
-    console.log('Submitting policy coverage part data:', values)
     try {
       const payload = {
         ...values,

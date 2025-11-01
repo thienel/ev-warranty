@@ -51,7 +51,6 @@ export const useClaimSubmission = () => {
       navigate(getClaimsBasePath(location.pathname))
       return { success: true }
     } catch (error) {
-      console.error('Failed to create claim:', error)
       handleError(error as Error)
       return { success: false }
     } finally {

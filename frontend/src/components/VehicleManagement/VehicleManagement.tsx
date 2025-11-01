@@ -41,11 +41,9 @@ const VehicleManagement: React.FC = () => {
       if (Array.isArray(customersData)) {
         setCustomers(customersData)
       } else {
-        console.warn('API returned non-array data for customers:', customersData)
         setCustomers([])
       }
     } catch (error) {
-      console.error('Failed to fetch customers:', error)
       handleError(error as Error)
       setCustomers([])
     } finally {
@@ -69,11 +67,9 @@ const VehicleManagement: React.FC = () => {
       if (Array.isArray(vehicleModelsData)) {
         setVehicleModels(vehicleModelsData)
       } else {
-        console.warn('API returned non-array data for vehicle models:', vehicleModelsData)
         setVehicleModels([])
       }
     } catch (error) {
-      console.error('Failed to fetch vehicle models:', error)
       handleError(error as Error)
       setVehicleModels([])
     } finally {
@@ -82,7 +78,6 @@ const VehicleManagement: React.FC = () => {
   }, [handleError])
 
   useEffect(() => {
-    console.log('VehicleManagement: Fetching customers and vehicle models...')
     fetchCustomers()
     fetchVehicleModels()
   }, [fetchCustomers, fetchVehicleModels])
@@ -91,11 +86,9 @@ const VehicleManagement: React.FC = () => {
   useEffect(() => {
     if (isOpenModal) {
       if (customers.length === 0 && !customersLoading) {
-        console.log('VehicleManagement: Modal opened with empty customers, refetching...')
         fetchCustomers()
       }
       if (vehicleModels.length === 0 && !vehicleModelsLoading) {
-        console.log('VehicleManagement: Modal opened with empty vehicle models, refetching...')
         fetchVehicleModels()
       }
     }
@@ -111,7 +104,6 @@ const VehicleManagement: React.FC = () => {
 
   const getCustomerName = (customerId: string): string => {
     if (!Array.isArray(customers)) {
-      console.warn('customers is not an array:', customers)
       return 'N/A'
     }
     const customer = customers.find((c) => c.id === customerId)
@@ -120,7 +112,6 @@ const VehicleManagement: React.FC = () => {
 
   const getVehicleModelName = (modelId: string): string => {
     if (!Array.isArray(vehicleModels)) {
-      console.warn('vehicleModels is not an array:', vehicleModels)
       return 'N/A'
     }
     const model = vehicleModels.find((m) => m.id === modelId)

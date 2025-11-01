@@ -50,7 +50,6 @@ const PartModal: React.FC<PartModalProps> = ({
 
   const handleSubmit = async (values: PartFormData): Promise<void> => {
     setLoading(true)
-    console.log('Submitting part data:', values)
     try {
       const payload = {
         ...values,

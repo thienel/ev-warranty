@@ -18,8 +18,7 @@ function decodeJwtPayload(token: string): JwtPayload | null {
     const payload = parts[1]
     const decoded = atob(payload.replace(/-/g, '+').replace(/_/g, '/'))
     return JSON.parse(decoded) as JwtPayload
-  } catch (error) {
-    console.error('Error decoding JWT payload:', error)
+  } catch {
     return null
   }
 }

@@ -133,7 +133,6 @@ const CustomerSearch: React.FC<CustomerSearchProps> = ({
 
         setOptions(customerOptions)
       } catch (error) {
-        console.error('Failed to search customers:', error)
         handleError(error as Error)
         setOptions([])
       } finally {
