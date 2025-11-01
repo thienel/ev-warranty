@@ -13,8 +13,6 @@ import { API_ENDPOINTS } from '@constants/common-constants.js'
 import { useDispatch } from 'react-redux'
 import { logout } from '@redux/authSlice'
 import { persistor } from '@redux/store'
-import useHandleApiError from '@/hooks/useHandleApiError'
-import type { ErrorResponse } from '@/constants/error-messages'
 
 const { Header } = Layout
 const { Text } = Typography
@@ -27,16 +25,19 @@ interface LayoutHeaderProps {
 
 const LayoutHeader: React.FC<LayoutHeaderProps> = ({ collapsed, onToggleCollapse, title }) => {
   const dispatch = useDispatch()
-  const handleError = useHandleApiError()
 
   const handleLogout = async () => {
     try {
+      // Call logout API to invalidate refresh token on server
       await api.post(API_ENDPOINTS.AUTH.LOGOUT, {}, { withCredentials: true })
+    } catch (error) {
+      // Ignore errors from logout API (e.g., if token already expired)
+      console.warn('Logout API error (ignored):', error)
+    } finally {
+      // Always clear local state regardless of API result
       dispatch(logout())
       await persistor.purge()
       message.success('Logout successful!')
-    } catch (error) {
-      handleError(error as ErrorResponse)
     }
   }
 

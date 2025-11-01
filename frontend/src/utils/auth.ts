@@ -35,8 +35,8 @@ export function isTokenExpired(token: string | null): boolean {
 
   const currentTime = Date.now() / 1000
 
-  // Add 30 seconds buffer before expiration
-  return decoded.exp < currentTime + 30
+  // Token is expired if current time is past expiration
+  return decoded.exp <= currentTime
 }
 
 /**

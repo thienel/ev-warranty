@@ -16,6 +16,7 @@ export const useTokenRefresh = () => {
 
   const refreshToken = useCallback(async (): Promise<boolean> => {
     try {
+      console.log('Attempting to refresh token...')
       const response = await axios.post(
         `${API_BASE_URL}${API_ENDPOINTS.AUTH.TOKEN}`,
         {},
@@ -25,15 +26,25 @@ export const useTokenRefresh = () => {
       const newToken = response.data.data?.access_token
       if (newToken) {
         dispatch(setToken(newToken))
-        console.log('Token refreshed successfully')
+        console.log('✓ Token refreshed successfully')
         return true
       }
 
+      console.warn('No access token in refresh response')
       return false
-    } catch (error) {
-      console.error('Token refresh failed:', error)
-      dispatch(logout())
-      await persistor.purge()
+    } catch (error: unknown) {
+      const err = error as { response?: { status?: number; data?: unknown }; message?: string }
+      console.error('✗ Token refresh failed:', err?.response?.data || err?.message)
+
+      // Only logout if it's a real authentication error
+      // Don't logout on network errors or temporary failures
+      if (err?.response?.status === 401 || err?.response?.status === 404) {
+        console.log('Refresh token invalid or not found, logging out')
+        dispatch(logout())
+        await persistor.purge()
+        window.location.replace('/login')
+      }
+
       return false
     }
   }, [dispatch])
@@ -42,11 +53,10 @@ export const useTokenRefresh = () => {
     if (!token || !isAuthenticated) return
 
     if (isTokenExpired(token)) {
-      console.log('Token is expired, attempting refresh...')
+      console.log('⚠ Access token is expired, attempting refresh...')
       const refreshed = await refreshToken()
       if (!refreshed) {
-        console.log('Token refresh failed, logging out')
-        window.location.replace('/login')
+        console.log('✗ Token refresh failed after expiration')
       }
       return
     }
@@ -54,10 +64,13 @@ export const useTokenRefresh = () => {
     const expiration = getTokenExpiration(token)
     if (expiration) {
       const timeUntilExpiration = expiration.getTime() - Date.now()
+      const minutesUntilExpiration = Math.floor(timeUntilExpiration / 60000)
 
-      // If token expires within threshold, refresh it
-      if (timeUntilExpiration <= TOKEN_REFRESH_THRESHOLD) {
-        console.log('Token expires soon, refreshing...')
+      // If token expires within threshold, refresh it proactively
+      if (timeUntilExpiration <= TOKEN_REFRESH_THRESHOLD && timeUntilExpiration > 0) {
+        console.log(
+          `⏰ Access token expires in ${minutesUntilExpiration} minutes, refreshing proactively...`,
+        )
         await refreshToken()
       }
     }

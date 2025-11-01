@@ -2,7 +2,6 @@ import axios, { type AxiosRequestConfig, type AxiosResponse, AxiosError } from '
 import store, { persistor } from '@/redux/store'
 import { setToken, logout } from '@/redux/authSlice'
 import { API_BASE_URL, API_ENDPOINTS } from '@constants/common-constants'
-import { isTokenExpired, isTokenValid } from '@/utils/auth'
 
 interface ExtendedAxiosRequestConfig extends AxiosRequestConfig {
   _retry?: boolean
@@ -41,13 +40,6 @@ api.interceptors.request.use(
     const authState = store.getState().auth
     const token = authState?.token
     if (token) {
-      // Check if token is valid and not expired before making request
-      if (!isTokenValid(token) || isTokenExpired(token)) {
-        console.warn('Invalid or expired token detected, clearing auth state')
-        store.dispatch(logout())
-        return Promise.reject(new Error('Invalid or expired token'))
-      }
-
       config.headers = config.headers || {}
       config.headers.Authorization = `Bearer ${token}`
     }
@@ -61,6 +53,11 @@ api.interceptors.response.use(
   async (error: AxiosError) => {
     const originalRequest = error.config as ExtendedAxiosRequestConfig
     const { status } = error.response || {}
+
+    // Don't retry token refresh for logout endpoint
+    if (originalRequest?.url?.includes(API_ENDPOINTS.AUTH.LOGOUT)) {
+      return Promise.reject(error)
+    }
 
     if (status === 401 && !originalRequest?._retry) {
       if (isRefreshing) {
