@@ -2797,7 +2797,7 @@
           "child_categories": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/PartCategoryResponse"
+              "$ref": "#/components/schemas/PartCategoryWithHierarchyResponse"
             },
             "nullable": true
           },
@@ -3571,15 +3571,8 @@
             "format": "date-time",
             "nullable": true
           },
-          "can_be_assigned_to_vehicles": {
-            "type": "boolean"
-          },
-          "is_editable": {
-            "type": "boolean"
-          },
-          "assigned_model_count": {
-            "type": "integer",
-            "format": "int32"
+          "vehicle_model": {
+            "$ref": "#/components/schemas/VehicleModelResponse"
           }
         },
         "additionalProperties": false
@@ -3665,12 +3658,8 @@
             "format": "date-time",
             "nullable": true
           },
-          "vehicle_models": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/VehicleModelResponse"
-            },
-            "nullable": true
+          "vehicle_model": {
+            "$ref": "#/components/schemas/VehicleModelResponse"
           },
           "covered_parts": {
             "type": "array",
