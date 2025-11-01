@@ -81,15 +81,12 @@ func (h *claimHandler) GetByID(c *gin.Context) {
 
 // GetAll godoc
 // @Summary Get all claims
-// @Description Retrieve a list of all claims with optional filtering and pagination
+// @Description Retrieve all warranty claims
 // @Tags claims
 // @Accept json
 // @Produce json
 // @Security Bearer
-// @Param status query string false "Filter by claim status"
-// @Param page query int false "Page number for pagination"
-// @Param limit query int false "Number of items per page"
-// @Success 200 {object} dtos.SuccessResponse{data=[]services.ClaimListResult} "Claims retrieved successfully"
+// @Success 200 {object} dtos.SuccessResponse{data=[]entities.Claim} "Claims retrieved successfully"
 // @Failure 401 {object} dtos.ErrorResponse "Unauthorized"
 // @Failure 500 {object} dtos.ErrorResponse "Internal server error"
 // @Router /claims [get]

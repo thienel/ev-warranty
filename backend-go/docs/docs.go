@@ -309,7 +309,7 @@ const docTemplate = `{
                         "Bearer": []
                     }
                 ],
-                "description": "Retrieve a list of all claims with optional filtering and pagination",
+                "description": "Retrieve all warranty claims",
                 "consumes": [
                     "application/json"
                 ],
@@ -320,26 +320,6 @@ const docTemplate = `{
                     "claims"
                 ],
                 "summary": "Get all claims",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Filter by claim status",
-                        "name": "status",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "description": "Page number for pagination",
-                        "name": "page",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "description": "Number of items per page",
-                        "name": "limit",
-                        "in": "query"
-                    }
-                ],
                 "responses": {
                     "200": {
                         "description": "Claims retrieved successfully",
@@ -354,7 +334,7 @@ const docTemplate = `{
                                         "data": {
                                             "type": "array",
                                             "items": {
-                                                "$ref": "#/definitions/services.ClaimListResult"
+                                                "$ref": "#/definitions/entities.Claim"
                                             }
                                         }
                                     }
@@ -2891,29 +2871,6 @@ const docTemplate = `{
                 },
                 "updated_at": {
                     "type": "string"
-                }
-            }
-        },
-        "services.ClaimListResult": {
-            "type": "object",
-            "properties": {
-                "claims": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/entities.Claim"
-                    }
-                },
-                "page": {
-                    "type": "integer"
-                },
-                "page_size": {
-                    "type": "integer"
-                },
-                "total": {
-                    "type": "integer"
-                },
-                "total_pages": {
-                    "type": "integer"
                 }
             }
         }

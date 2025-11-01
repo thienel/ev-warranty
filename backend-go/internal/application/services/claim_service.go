@@ -8,7 +8,6 @@ import (
 	"ev-warranty-go/internal/domain/entities"
 	"ev-warranty-go/internal/infrastructure/cloudinary"
 	"ev-warranty-go/pkg/logger"
-	"time"
 
 	"github.com/google/uuid"
 )
@@ -22,29 +21,6 @@ type CreateClaimCommand struct {
 
 type UpdateClaimCommand struct {
 	Description string
-}
-
-type ClaimFilters struct {
-	CustomerID *uuid.UUID
-	VehicleID  *uuid.UUID
-	Status     *string
-	FromDate   *time.Time
-	ToDate     *time.Time
-}
-
-type Pagination struct {
-	Page     int
-	PageSize int
-	SortBy   string
-	SortDir  string
-}
-
-type ClaimListResult struct {
-	Claims     []*entities.Claim `json:"claims"`
-	Total      int64             `json:"total"`
-	Page       int               `json:"page"`
-	PageSize   int               `json:"page_size"`
-	TotalPages int               `json:"total_pages"`
 }
 
 type ClaimService interface {
