@@ -4,6 +4,7 @@ using Backend.Dotnet.Infrastructure.Data.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Backend.Dotnet.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251031012632_ChangeVehicleModelPolicyToOneToOne")]
+    partial class ChangeVehicleModelPolicyToOneToOne
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -30,7 +33,7 @@ namespace Backend.Dotnet.Infrastructure.Migrations
                         .HasColumnName("id");
 
                     b.Property<string>("Address")
-                        .HasColumnType("nvarchar(max)")
+                        .HasColumnType("text")
                         .HasColumnName("address");
 
                     b.Property<DateTime>("CreatedAt")
@@ -42,26 +45,22 @@ namespace Backend.Dotnet.Infrastructure.Migrations
                         .HasColumnName("deleted_at");
 
                     b.Property<string>("Email")
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)")
+                        .HasColumnType("varchar(255)")
                         .HasColumnName("email");
 
                     b.Property<string>("FirstName")
                         .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)")
+                        .HasColumnType("varchar(100)")
                         .HasColumnName("first_name");
 
                     b.Property<string>("LastName")
                         .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)")
+                        .HasColumnType("varchar(100)")
                         .HasColumnName("last_name");
 
                     b.Property<string>("PhoneNumber")
                         .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)")
+                        .HasColumnType("varchar(20)")
                         .HasColumnName("phone_number");
 
                     b.Property<DateTime?>("UpdatedAt")
@@ -100,21 +99,18 @@ namespace Backend.Dotnet.Infrastructure.Migrations
 
                     b.Property<string>("PartName")
                         .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)")
+                        .HasColumnType("varchar(255)")
                         .HasColumnName("part_name");
 
                     b.Property<string>("SerialNumber")
                         .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)")
+                        .HasColumnType("varchar(255)")
                         .HasColumnName("serial_number");
 
                     b.Property<string>("Status")
                         .IsRequired()
                         .ValueGeneratedOnAdd()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)")
+                        .HasColumnType("varchar(50)")
                         .HasDefaultValue("Available")
                         .HasColumnName("status");
 
@@ -156,8 +152,7 @@ namespace Backend.Dotnet.Infrastructure.Migrations
 
                     b.Property<string>("CategoryName")
                         .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)")
+                        .HasColumnType("varchar(255)")
                         .HasColumnName("category_name");
 
                     b.Property<DateTime>("CreatedAt")
@@ -165,7 +160,7 @@ namespace Backend.Dotnet.Infrastructure.Migrations
                         .HasColumnName("created_at");
 
                     b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)")
+                        .HasColumnType("text")
                         .HasColumnName("description");
 
                     b.Property<Guid?>("ParentCategoryId")
@@ -196,7 +191,7 @@ namespace Backend.Dotnet.Infrastructure.Migrations
                         .HasColumnName("id");
 
                     b.Property<string>("CoverageConditions")
-                        .HasColumnType("nvarchar(max)")
+                        .HasColumnType("text")
                         .HasColumnName("coverage_conditions");
 
                     b.Property<DateTime>("CreatedAt")
@@ -246,8 +241,7 @@ namespace Backend.Dotnet.Infrastructure.Migrations
                         .HasColumnName("deleted_at");
 
                     b.Property<string>("LicensePlate")
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)")
+                        .HasColumnType("varchar(20)")
                         .HasColumnName("license_plate");
 
                     b.Property<Guid>("ModelId")
@@ -264,8 +258,7 @@ namespace Backend.Dotnet.Infrastructure.Migrations
 
                     b.Property<string>("Vin")
                         .IsRequired()
-                        .HasMaxLength(17)
-                        .HasColumnType("nvarchar(17)")
+                        .HasColumnType("varchar(17)")
                         .HasColumnName("vin");
 
                     b.HasKey("Id");
@@ -297,8 +290,7 @@ namespace Backend.Dotnet.Infrastructure.Migrations
 
                     b.Property<string>("Brand")
                         .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)")
+                        .HasColumnType("varchar(100)")
                         .HasColumnName("brand");
 
                     b.Property<DateTime>("CreatedAt")
@@ -307,8 +299,7 @@ namespace Backend.Dotnet.Infrastructure.Migrations
 
                     b.Property<string>("ModelName")
                         .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)")
+                        .HasColumnType("varchar(100)")
                         .HasColumnName("model_name");
 
                     b.Property<Guid?>("PolicyId")
@@ -357,21 +348,19 @@ namespace Backend.Dotnet.Infrastructure.Migrations
 
                     b.Property<string>("PolicyName")
                         .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)")
+                        .HasColumnType("varchar(255)")
                         .HasColumnName("policy_name");
 
                     b.Property<string>("Status")
                         .IsRequired()
                         .ValueGeneratedOnAdd()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)")
+                        .HasColumnType("varchar(50)")
                         .HasDefaultValue("Draft")
                         .HasColumnName("status");
 
                     b.Property<string>("TermsAndConditions")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)")
+                        .HasColumnType("text")
                         .HasColumnName("terms_and_conditions");
 
                     b.Property<DateTime?>("UpdatedAt")

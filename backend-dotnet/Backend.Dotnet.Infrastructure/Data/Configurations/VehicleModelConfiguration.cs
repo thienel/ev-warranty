@@ -20,12 +20,12 @@ namespace Backend.Dotnet.Infrastructure.Data.Configurations
             // Properties
             builder.Property(vm => vm.Brand)
                 .HasColumnName("brand")
-                .HasColumnType("varchar(100)")
+                .HasMaxLength(100)
                 .IsRequired();
 
             builder.Property(vm => vm.ModelName)
                 .HasColumnName("model_name")
-                .HasColumnType("varchar(100)")
+                .HasMaxLength(100)
                 .IsRequired();
 
             builder.Property(vm => vm.Year)
@@ -53,8 +53,11 @@ namespace Backend.Dotnet.Infrastructure.Data.Configurations
                 .IsUnique()
                 .HasDatabaseName("ix_vehicle_models_brand_model_year");
 
+            // Unique
             builder.HasIndex(vm => vm.PolicyId)
-               .HasDatabaseName("ix_vehicle_models_policy_id");
+                .IsUnique()
+                .HasFilter("policy_id IS NOT NULL")
+                .HasDatabaseName("ix_vehicle_models_policy_id");
 
             // Relationships
             builder.HasMany(vm => vm.Vehicles)
@@ -63,8 +66,8 @@ namespace Backend.Dotnet.Infrastructure.Data.Configurations
                 .OnDelete(DeleteBehavior.Restrict);
 
             builder.HasOne(vm => vm.Policy)
-               .WithMany(wp => wp.VehicleModels)
-               .HasForeignKey(vm => vm.PolicyId)
+               .WithOne()
+               .HasForeignKey<VehicleModel>(vm => vm.PolicyId)
                .OnDelete(DeleteBehavior.SetNull)
                .IsRequired(false);
         }

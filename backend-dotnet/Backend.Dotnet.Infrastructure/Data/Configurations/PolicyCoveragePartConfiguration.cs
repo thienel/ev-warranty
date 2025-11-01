@@ -32,7 +32,7 @@ namespace Backend.Dotnet.Infrastructure.Data.Configurations
 
             builder.Property(pcp => pcp.CoverageConditions)
                 .HasColumnName("coverage_conditions")
-                .HasColumnType("text")
+                .HasColumnType("nvarchar(max)")
                 .IsRequired(false);
 
             builder.Property(pcp => pcp.CreatedAt)

@@ -21,8 +21,7 @@ namespace Backend.Dotnet.Domain.Entities
         public WarrantyPolicyStatus Status { get; private set; }
 
         // Navigation properties
-        private readonly List<VehicleModel> _vehicleModels = new();
-        public virtual IReadOnlyCollection<VehicleModel> VehicleModels => _vehicleModels.AsReadOnly();
+        public virtual VehicleModel? AssignedModel { get; private set; }
 
         private readonly List<PolicyCoveragePart> _coverageParts = new();
         public virtual IReadOnlyCollection<PolicyCoveragePart> CoverageParts => _coverageParts.AsReadOnly();

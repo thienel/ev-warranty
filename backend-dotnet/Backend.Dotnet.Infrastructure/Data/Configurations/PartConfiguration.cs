@@ -24,12 +24,12 @@ namespace Backend.Dotnet.Infrastructure.Data.Configurations
             // Properties
             builder.Property(p => p.SerialNumber)
                 .HasColumnName("serial_number")
-                .HasColumnType("varchar(255)")
+                .HasMaxLength(255)
                 .IsRequired();
 
             builder.Property(p => p.PartName)
                 .HasColumnName("part_name")
-                .HasColumnType("varchar(255)")
+                .HasMaxLength(255)
                 .IsRequired();
 
             builder.Property(p => p.UnitPrice)
@@ -47,7 +47,7 @@ namespace Backend.Dotnet.Infrastructure.Data.Configurations
 
             builder.Property(p => p.Status)
                 .HasColumnName("status")
-                .HasColumnType("varchar(50)")
+                .HasMaxLength(50)
                 .IsRequired()
                 .HasConversion<string>()
                 .HasDefaultValue(PartStatus.Available);

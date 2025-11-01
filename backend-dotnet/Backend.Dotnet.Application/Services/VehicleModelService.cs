@@ -322,6 +322,64 @@ namespace Backend.Dotnet.Application.Services
             }
         }
 
+        public async Task<BaseResponseDto<VehicleModelResponse>> AssignPolicyAsync(Guid modelId, Guid policyId)
+        {
+            try
+            {
+                var model = await _unitOfWork.VehicleModels.GetByIdAsync(modelId);
+                var policy = await _unitOfWork.WarrantyPolicies.GetByIdAsync(policyId);
+                if (policy == null)
+                {
+                    return new BaseResponseDto<VehicleModelResponse>
+                    {
+                        IsSuccess = false,
+                        Message = $"Warranty policy with ID '{policyId}' not found",
+                        ErrorCode = "POLICY_NOT_FOUND"
+                    };
+                }
+
+                var isAssigned = await _unitOfWork.WarrantyPolicies.IsPolicyAssignedAsync(policyId);
+                if (isAssigned)
+                {
+                    return new BaseResponseDto<VehicleModelResponse>
+                    {
+                        IsSuccess = false,
+                        Message = "This policy is already assigned to another vehicle model",
+                        ErrorCode = "POLICY_ALREADY_ASSIGNED"
+                    };
+                }
+
+                model.AssignPolicy(policyId);
+                _unitOfWork.VehicleModels.Update(model);
+                await _unitOfWork.SaveChangesAsync();
+
+                return new BaseResponseDto<VehicleModelResponse>
+                {
+                    IsSuccess = true,
+                    Message = "Policy assigned successfully",
+                    Data = model.ToResponse()
+                };
+            }
+            catch (BusinessRuleViolationException ex)
+            {
+                return new BaseResponseDto<VehicleModelResponse>
+                {
+                    IsSuccess = false,
+                    Message = ex.Message,
+                    ErrorCode = ex.ErrorCode
+                };
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponseDto<VehicleModelResponse>
+                {
+                    IsSuccess = false,
+                    Message = "An error occurred while assigning policy",
+                    ErrorCode = "INTERNAL_ERROR"
+                };
+            }
+        }
+
         // HARD DELETE OPERATION
         public async Task<BaseResponseDto> DeleteAsync(Guid id)
         {

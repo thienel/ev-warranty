@@ -1,11 +1,6 @@
 ﻿using Backend.Dotnet.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Backend.Dotnet.Infrastructure.Data.Configurations
 {
@@ -24,7 +19,7 @@ namespace Backend.Dotnet.Infrastructure.Data.Configurations
             // Properties
             builder.Property(wp => wp.PolicyName)
                 .HasColumnName("policy_name")
-                .HasColumnType("varchar(255)")
+                .HasMaxLength(255)
                 .IsRequired();
 
             builder.Property(wp => wp.WarrantyDurationMonths)
@@ -39,12 +34,12 @@ namespace Backend.Dotnet.Infrastructure.Data.Configurations
 
             builder.Property(wp => wp.TermsAndConditions)
                 .HasColumnName("terms_and_conditions")
-                .HasColumnType("text")
+                .HasColumnType("nvarchar(max)")
                 .IsRequired();
 
             builder.Property(wp => wp.Status)
                 .HasColumnName("status")
-                .HasColumnType("varchar(50)")
+                .HasMaxLength(50)
                 .IsRequired()
                 .HasConversion<string>()
                 .HasDefaultValue(WarrantyPolicyStatus.Draft);

@@ -98,7 +98,7 @@ namespace Backend.Dotnet.Application.DTOs
             public PartCategoryResponse? ParentCategory { get; set; }
 
             [JsonPropertyName("child_categories")]
-            public List<PartCategoryResponse> ChildCategories { get; set; } = new();
+            public List<PartCategoryWithHierarchyResponse> ChildCategories { get; set; } = new();
 
             [JsonPropertyName("parts_count")]
             public int PartsCount { get; set; }
@@ -150,7 +150,8 @@ namespace Backend.Dotnet.Application.DTOs
                 CreatedAt = category.CreatedAt,
                 UpdatedAt = category.UpdatedAt,
                 ParentCategory = category.ParentCategory?.ToResponse(),
-                ChildCategories = category.ChildCategories?.Select(c => c.ToResponse()).ToList() ?? new(),
+                ChildCategories = category.ChildCategories?.Select(c => c.ToWithHierarchyResponse()).ToList() 
+                        ?? new List<PartCategoryDto.PartCategoryWithHierarchyResponse>(),
                 PartsCount = category.Parts?.Count ?? 0
             };
         }

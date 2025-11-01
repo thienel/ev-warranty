@@ -40,7 +40,7 @@ namespace Backend.Dotnet.Infrastructure.Data.Repositories
         public async Task<WarrantyPolicy?> GetWithDetailsAsync(Guid policyId)
         {
             return await _dbSet
-                .Include(wp => wp.VehicleModels)
+                .Include(wp => wp.AssignedModel)
                 .Include(wp => wp.CoverageParts)
                     .ThenInclude(cp => cp.PartCategory)
                 .FirstOrDefaultAsync(wp => wp.Id == policyId);
@@ -49,7 +49,7 @@ namespace Backend.Dotnet.Infrastructure.Data.Repositories
         public async Task<IEnumerable<WarrantyPolicy>> GetAllWithDetailsAsync(WarrantyPolicyStatus? status = null)
         {
             IQueryable<WarrantyPolicy> query = _dbSet
-               .Include(wp => wp.VehicleModels)
+               .Include(wp => wp.AssignedModel)
                .Include(wp => wp.CoverageParts)
                .OrderByDescending(wp => wp.CreatedAt);
             //IOrderedQueryable implement IQueryable
@@ -61,6 +61,22 @@ namespace Backend.Dotnet.Infrastructure.Data.Repositories
 
             return await query
                .ToListAsync();
+        }
+
+        public async Task<VehicleModel?> GetAssignedModelAsync(Guid policyId)
+        {
+            return await _context.Set<VehicleModel>()
+                .FirstOrDefaultAsync(vm => vm.PolicyId == policyId);
+        }
+
+        public async Task<bool> IsPolicyAssignedAsync(Guid policyId, Guid? excludeModelId = null)
+        {
+            var query = _dbSet.Where(vm => vm.Id == policyId);
+
+            if (excludeModelId.HasValue)
+                query = query.Where(vm => vm.Id != excludeModelId.Value);
+
+            return await query.AnyAsync();
         }
 
         public async Task<bool> CanBeAssignedToVehiclesAsync(Guid policyId)
