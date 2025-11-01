@@ -26,22 +26,27 @@ const GenerateColumns = (
   return [
     {
       title: <span style={{ padding: '0 14px', display: 'inline-block' }}>Customer Name</span>,
-      dataIndex: 'customer_id',
-      key: 'customer_id',
+      dataIndex: 'customer_name',
+      key: 'customer_name',
       width: '25%',
       sorter: (a: Record<string, unknown>, b: Record<string, unknown>) => {
-        const aClaim = a as unknown as Claim
-        const bClaim = b as unknown as Claim
-        return (aClaim.customer_id || '')
+        const aClaim = a as unknown as Claim & { customer_name?: string }
+        const bClaim = b as unknown as Claim & { customer_name?: string }
+        return (aClaim.customer_name || aClaim.customer_id || '')
           .toString()
-          .localeCompare((bClaim.customer_id || '').toString())
+          .localeCompare((bClaim.customer_name || bClaim.customer_id || '').toString())
       },
       sortOrder:
-        sortedInfo.columnKey === 'customer_id'
+        sortedInfo.columnKey === 'customer_name'
           ? (sortedInfo.order as 'ascend' | 'descend' | null)
           : null,
-      render: (text: string, record: Record<string, unknown>) => {
-        const claim = record as unknown as Claim
+      render: (_text: string, record: Record<string, unknown>) => {
+        const claim = record as unknown as Claim & { customer_name?: string }
+        console.log('Rendering claim:', claim)
+        console.log('Customer name:', claim.customer_name)
+        console.log('Customer ID:', claim.customer_id)
+        const displayName =
+          claim.customer_name || `Customer ${claim.customer_id?.slice(0, 8)}` || 'N/A'
         return (
           <Space
             style={{
@@ -51,7 +56,7 @@ const GenerateColumns = (
             }}
           >
             <UserOutlined style={{ color: '#697565' }} />
-            <span>{text || `Customer ${claim.customer_id?.slice(0, 8)}` || 'N/A'}</span>
+            <span>{displayName}</span>
           </Space>
         )
       },

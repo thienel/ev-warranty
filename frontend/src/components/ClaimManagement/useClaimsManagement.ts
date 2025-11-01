@@ -1,15 +1,20 @@
 import { useCallback, useEffect, useState } from 'react'
 import { claimsApi } from '@/services/claimsApi'
+import { customersApi } from '@/services/customersApi'
 import useDelay from '@/hooks/useDelay'
 import useHandleApiError from '@/hooks/useHandleApiError'
 import type { ErrorResponse } from '@/constants/error-messages'
-import type { Claim, PaginationParams } from '@/types'
+import type { Claim, PaginationParams, Customer } from '@/types'
 import { allowRoles } from '@/utils/navigationHelpers'
 import { USER_ROLES } from '@/constants/common-constants'
 
+interface EnrichedClaim extends Claim {
+  customer_name?: string
+}
+
 interface UseClaimsManagementReturn {
-  claims: Claim[]
-  setClaims: (claims: Claim[]) => void
+  claims: EnrichedClaim[]
+  setClaims: (claims: EnrichedClaim[]) => void
   loading: boolean
   setLoading: (loading: boolean) => void
   searchText: string
@@ -34,7 +39,7 @@ interface UseClaimsManagementReturn {
 }
 
 const useClaimsManagement = (): UseClaimsManagementReturn => {
-  const [claims, setClaims] = useState<Claim[]>([])
+  const [claims, setClaims] = useState<EnrichedClaim[]>([])
   const [loading, setLoading] = useState(false)
   const [searchText, setSearchText] = useState('')
   const [updateClaim, setUpdateClaim] = useState<Claim | null>(null)
@@ -58,10 +63,52 @@ const useClaimsManagement = (): UseClaimsManagementReturn => {
     async (params?: PaginationParams) => {
       try {
         setLoading(true)
+        // Fetch claims
         const response = await claimsApi.getAll(params || pagination)
         const claimsData = Array.isArray(response.data) ? response.data : []
-        console.log('Fetched claims:', response)
-        setClaims(claimsData)
+
+        // Fetch all customers
+        const customersResponse = await customersApi.getAll()
+        console.log('Customers response:', customersResponse)
+        console.log('Customers response.data type:', typeof customersResponse.data)
+        console.log('Customers response.data:', customersResponse.data)
+
+        // Handle DotNetApiResponse structure: { data: Customer[] } or { data: { data: Customer[] } }
+        let customers: Customer[] = []
+        if (customersResponse.data) {
+          if (Array.isArray(customersResponse.data)) {
+            customers = customersResponse.data
+          } else if (
+            typeof customersResponse.data === 'object' &&
+            'data' in customersResponse.data
+          ) {
+            // If data is wrapped in another data property
+            const nestedData = (customersResponse.data as Record<string, unknown>).data
+            customers = Array.isArray(nestedData) ? nestedData : []
+          }
+        }
+        console.log('Customers array:', customers)
+
+        // Create a map of customer_id to customer name
+        const customerMap = new Map<string, string>()
+        if (customers.length > 0) {
+          customers.forEach((customer: Customer) => {
+            const fullName = `${customer.first_name} ${customer.last_name}`.trim()
+            customerMap.set(customer.id, fullName)
+            console.log(`Mapped customer ${customer.id} to ${fullName}`)
+          })
+        }
+
+        console.log('Customer map:', customerMap)
+
+        // Enrich claims with customer names
+        const enrichedClaims: EnrichedClaim[] = claimsData.map((claim) => ({
+          ...claim,
+          customer_name: customerMap.get(claim.customer_id) || claim.customer_id,
+        }))
+
+        console.log('Fetched claims:', enrichedClaims)
+        setClaims(enrichedClaims)
       } catch (error) {
         handleError(error as ErrorResponse)
         setClaims([])
