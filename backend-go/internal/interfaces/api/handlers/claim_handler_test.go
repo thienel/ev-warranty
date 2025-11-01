@@ -12,7 +12,6 @@ import (
 	"ev-warranty-go/pkg/mocks"
 	"net/http"
 	"net/http/httptest"
-	"net/url"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -136,16 +135,9 @@ var _ = Describe("ClaimHandler", func() {
 			r.GET("/claims", handler.GetAll)
 		})
 
-		It("should retrieve claims successfully with default pagination", func() {
-			expectedResult := &services.ClaimListResult{
-				Claims:     []*entities.Claim{sampleClaim},
-				Total:      1,
-				Page:       1,
-				PageSize:   10,
-				TotalPages: 1,
-			}
-			mockService.EXPECT().GetAll(mock.Anything, mock.AnythingOfType("services.ClaimFilters"), mock.AnythingOfType("services.Pagination")).
-				Return(expectedResult, nil).Once()
+		It("should retrieve all claims successfully", func() {
+			expectedClaims := []*entities.Claim{sampleClaim}
+			mockService.EXPECT().GetAll(mock.Anything).Return(expectedClaims, nil).Once()
 
 			req, _ := http.NewRequest(http.MethodGet, "/claims", nil)
 			r.ServeHTTP(w, req)
@@ -153,53 +145,17 @@ var _ = Describe("ClaimHandler", func() {
 			ExpectResponseNotNil(w, http.StatusOK)
 		})
 
-		It("should handle query parameters correctly", func() {
-			expectedResult := &services.ClaimListResult{
-				Claims:     []*entities.Claim{},
-				Total:      0,
-				Page:       2,
-				PageSize:   5,
-				TotalPages: 1,
-			}
+		It("should handle empty claims list", func() {
+			mockService.EXPECT().GetAll(mock.Anything).Return([]*entities.Claim{}, nil).Once()
 
-			mockService.EXPECT().GetAll(mock.Anything, mock.MatchedBy(func(filters services.ClaimFilters) bool {
-				return filters.Status != nil && *filters.Status == entities.ClaimStatusSubmitted &&
-					filters.CustomerID != nil && *filters.CustomerID == sampleClaim.CustomerID
-			}), mock.MatchedBy(func(pagination services.Pagination) bool {
-				return pagination.Page == 2 && pagination.PageSize == 5
-			})).Return(expectedResult, nil).Once()
-
-			queryParams := url.Values{}
-			queryParams.Add("status", entities.ClaimStatusSubmitted)
-			queryParams.Add("customer_id", sampleClaim.CustomerID.String())
-			queryParams.Add("page", "2")
-			queryParams.Add("page_size", "5")
-
-			req, _ := http.NewRequest(http.MethodGet, "/claims?"+queryParams.Encode(), nil)
+			req, _ := http.NewRequest(http.MethodGet, "/claims", nil)
 			r.ServeHTTP(w, req)
 
 			ExpectResponseNotNil(w, http.StatusOK)
 		})
 
-		DescribeTable("should handle invalid query parameters",
-			func(queryParam, value, expectedError string) {
-				queryParams := url.Values{}
-				queryParams.Add(queryParam, value)
-
-				req, _ := http.NewRequest(http.MethodGet, "/claims?"+queryParams.Encode(), nil)
-				r.ServeHTTP(w, req)
-
-				ExpectErrorCode(w, http.StatusBadRequest, expectedError)
-			},
-			Entry("invalid customer_id UUID", "customer_id", "invalid-uuid", apperrors.ErrorCodeInvalidQueryParameter),
-			Entry("invalid vehicle_id UUID", "vehicle_id", "invalid-uuid", apperrors.ErrorCodeInvalidQueryParameter),
-			Entry("invalid status", "status", "INVALID_STATUS", apperrors.ErrorCodeInvalidQueryParameter),
-			Entry("invalid from_date", "from_date", "invalid-date", apperrors.ErrorCodeInvalidQueryParameter),
-			Entry("invalid to_date", "to_date", "invalid-date", apperrors.ErrorCodeInvalidQueryParameter),
-		)
-
 		It("should handle service errors", func() {
-			mockService.EXPECT().GetAll(mock.Anything, mock.Anything, mock.Anything).
+			mockService.EXPECT().GetAll(mock.Anything).
 				Return(nil, errors.New("database error")).Once()
 
 			req, _ := http.NewRequest(http.MethodGet, "/claims", nil)

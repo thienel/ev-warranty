@@ -8,7 +8,6 @@ import (
 	"ev-warranty-go/internal/domain/entities"
 	"ev-warranty-go/internal/infrastructure/cloudinary"
 	"ev-warranty-go/pkg/logger"
-	"time"
 
 	"github.com/google/uuid"
 )
@@ -24,32 +23,9 @@ type UpdateClaimCommand struct {
 	Description string
 }
 
-type ClaimFilters struct {
-	CustomerID *uuid.UUID
-	VehicleID  *uuid.UUID
-	Status     *string
-	FromDate   *time.Time
-	ToDate     *time.Time
-}
-
-type Pagination struct {
-	Page     int
-	PageSize int
-	SortBy   string
-	SortDir  string
-}
-
-type ClaimListResult struct {
-	Claims     []*entities.Claim `json:"claims"`
-	Total      int64             `json:"total"`
-	Page       int               `json:"page"`
-	PageSize   int               `json:"page_size"`
-	TotalPages int               `json:"total_pages"`
-}
-
 type ClaimService interface {
 	GetByID(ctx context.Context, id uuid.UUID) (*entities.Claim, error)
-	GetAll(ctx context.Context, filters ClaimFilters, pagination Pagination) (*ClaimListResult, error)
+	GetAll(ctx context.Context) ([]*entities.Claim, error)
 
 	Create(tx application.Tx, cmd *CreateClaimCommand) (*entities.Claim, error)
 	Update(tx application.Tx, id uuid.UUID, cmd *UpdateClaimCommand) error
@@ -94,39 +70,13 @@ func (s *claimService) GetByID(ctx context.Context, id uuid.UUID) (*entities.Cla
 	return s.claimRepo.FindByID(ctx, id)
 }
 
-func (s *claimService) GetAll(ctx context.Context, filters ClaimFilters, pagination Pagination) (*ClaimListResult, error) {
-	repoFilters := repositories.ClaimFilters{
-		CustomerID: filters.CustomerID,
-		VehicleID:  filters.VehicleID,
-		Status:     filters.Status,
-		FromDate:   filters.FromDate,
-		ToDate:     filters.ToDate,
-	}
-
-	repoPagination := repositories.Pagination{
-		Page:     pagination.Page,
-		PageSize: pagination.PageSize,
-		SortBy:   pagination.SortBy,
-		SortDir:  pagination.SortDir,
-	}
-
-	claims, total, err := s.claimRepo.FindAll(ctx, repoFilters, repoPagination)
+func (s *claimService) GetAll(ctx context.Context) ([]*entities.Claim, error) {
+	claims, err := s.claimRepo.FindAll(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	totalPages := 0
-	if pagination.PageSize > 0 {
-		totalPages = int((total + int64(pagination.PageSize) - 1) / int64(pagination.PageSize))
-	}
-
-	return &ClaimListResult{
-		Claims:     claims,
-		Total:      total,
-		Page:       pagination.Page,
-		PageSize:   pagination.PageSize,
-		TotalPages: totalPages,
-	}, nil
+	return claims, err
 }
 
 func (s *claimService) Create(tx application.Tx, cmd *CreateClaimCommand) (*entities.Claim, error) {

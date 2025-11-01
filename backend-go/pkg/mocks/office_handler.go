@@ -120,35 +120,35 @@ func (_c *OfficeHandler_GetAll_Call) RunAndReturn(run func(*gin.Context)) *Offic
 	return _c
 }
 
-// GetById provides a mock function with given fields: c
+// GetByID provides a mock function with given fields: c
 func (_m *OfficeHandler) GetByID(c *gin.Context) {
 	_m.Called(c)
 }
 
-// OfficeHandler_GetById_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetByID'
-type OfficeHandler_GetById_Call struct {
+// OfficeHandler_GetByID_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetByID'
+type OfficeHandler_GetByID_Call struct {
 	*mock.Call
 }
 
-// GetById is a helper method to define mock.On call
+// GetByID is a helper method to define mock.On call
 //   - c *gin.Context
-func (_e *OfficeHandler_Expecter) GetById(c interface{}) *OfficeHandler_GetById_Call {
-	return &OfficeHandler_GetById_Call{Call: _e.mock.On("GetByID", c)}
+func (_e *OfficeHandler_Expecter) GetByID(c interface{}) *OfficeHandler_GetByID_Call {
+	return &OfficeHandler_GetByID_Call{Call: _e.mock.On("GetByID", c)}
 }
 
-func (_c *OfficeHandler_GetById_Call) Run(run func(c *gin.Context)) *OfficeHandler_GetById_Call {
+func (_c *OfficeHandler_GetByID_Call) Run(run func(c *gin.Context)) *OfficeHandler_GetByID_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		run(args[0].(*gin.Context))
 	})
 	return _c
 }
 
-func (_c *OfficeHandler_GetById_Call) Return() *OfficeHandler_GetById_Call {
+func (_c *OfficeHandler_GetByID_Call) Return() *OfficeHandler_GetByID_Call {
 	_c.Call.Return()
 	return _c
 }
 
-func (_c *OfficeHandler_GetById_Call) RunAndReturn(run func(*gin.Context)) *OfficeHandler_GetById_Call {
+func (_c *OfficeHandler_GetByID_Call) RunAndReturn(run func(*gin.Context)) *OfficeHandler_GetByID_Call {
 	_c.Run(run)
 	return _c
 }

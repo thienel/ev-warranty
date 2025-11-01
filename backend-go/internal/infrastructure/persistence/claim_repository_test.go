@@ -313,29 +313,12 @@ var _ = Describe("ClaimRepository", func() {
 	})
 
 	Describe("FindAll", func() {
-		var filters repositories.ClaimFilters
-		var pagination repositories.Pagination
-
-		BeforeEach(func() {
-			filters = repositories.ClaimFilters{}
-			pagination = repositories.Pagination{
-				Page:     1,
-				PageSize: 10,
-				SortBy:   "created_at",
-				SortDir:  "DESC",
-			}
-		})
-
-		Context("when claims are found without filters", func() {
-			It("should return all claims with pagination", func() {
+		Context("when claims are found", func() {
+			It("should return all claims", func() {
 				claimID1 := uuid.New()
 				claimID2 := uuid.New()
 				vehicleID := uuid.New()
 				customerID := uuid.New()
-
-				countRows := sqlmock.NewRows([]string{"count"}).AddRow(2)
-				mock.ExpectQuery(regexp.QuoteMeta(`SELECT count(*) FROM "claims" WHERE "claims"."deleted_at" IS NULL`)).
-					WillReturnRows(countRows)
 
 				rows := sqlmock.NewRows([]string{
 					"id", "vehicle_id", "customer_id", "description", "status",
@@ -348,285 +331,41 @@ var _ = Describe("ClaimRepository", func() {
 					2000.0, nil, time.Now(), time.Now(), nil,
 				)
 
-				mock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "claims" WHERE "claims"."deleted_at" IS NULL ORDER BY created_at DESC LIMIT $1`)).
-					WithArgs(10).
+				mock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "claims" WHERE "claims"."deleted_at" IS NULL`)).
 					WillReturnRows(rows)
 
-				claims, total, err := repository.FindAll(ctx, filters, pagination)
+				claims, err := repository.FindAll(ctx)
 
 				Expect(err).NotTo(HaveOccurred())
 				Expect(claims).To(HaveLen(2))
-				Expect(total).To(Equal(int64(2)))
 			})
 		})
 
-		Context("when filtering by customer ID", func() {
-			It("should return filtered claims", func() {
-				customerID := uuid.New()
-				filters.CustomerID = &customerID
-
-				countRows := sqlmock.NewRows([]string{"count"}).AddRow(1)
-				mock.ExpectQuery(regexp.QuoteMeta(`SELECT count(*) FROM "claims" WHERE customer_id = $1 AND "claims"."deleted_at" IS NULL`)).
-					WithArgs(customerID).
-					WillReturnRows(countRows)
-
-				claimID := uuid.New()
-				vehicleID := uuid.New()
-				rows := sqlmock.NewRows([]string{
-					"id", "vehicle_id", "customer_id", "description", "status",
-					"total_cost", "approved_by", "created_at", "updated_at", "deleted_at",
-				}).AddRow(
-					claimID, vehicleID, customerID, "Claim", entities.ClaimStatusDraft,
-					1000.0, nil, time.Now(), time.Now(), nil,
-				)
-
-				mock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "claims" WHERE customer_id = $1 AND "claims"."deleted_at" IS NULL ORDER BY created_at DESC LIMIT $2`)).
-					WithArgs(customerID, 10).
-					WillReturnRows(rows)
-
-				claims, total, err := repository.FindAll(ctx, filters, pagination)
-
-				Expect(err).NotTo(HaveOccurred())
-				Expect(claims).To(HaveLen(1))
-				Expect(total).To(Equal(int64(1)))
-				Expect(claims[0].CustomerID).To(Equal(customerID))
-			})
-		})
-
-		Context("when filtering by vehicle ID", func() {
-			It("should return filtered claims", func() {
-				vehicleID := uuid.New()
-				filters.VehicleID = &vehicleID
-
-				countRows := sqlmock.NewRows([]string{"count"}).AddRow(1)
-				mock.ExpectQuery(regexp.QuoteMeta(`SELECT count(*) FROM "claims" WHERE vehicle_id = $1 AND "claims"."deleted_at" IS NULL`)).
-					WithArgs(vehicleID).
-					WillReturnRows(countRows)
-
-				claimID := uuid.New()
-				customerID := uuid.New()
-				rows := sqlmock.NewRows([]string{
-					"id", "vehicle_id", "customer_id", "description", "status",
-					"total_cost", "approved_by", "created_at", "updated_at", "deleted_at",
-				}).AddRow(
-					claimID, vehicleID, customerID, "Claim", entities.ClaimStatusDraft,
-					1000.0, nil, time.Now(), time.Now(), nil,
-				)
-
-				mock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "claims" WHERE vehicle_id = $1 AND "claims"."deleted_at" IS NULL ORDER BY created_at DESC LIMIT $2`)).
-					WithArgs(vehicleID, 10).
-					WillReturnRows(rows)
-
-				claims, total, err := repository.FindAll(ctx, filters, pagination)
-
-				Expect(err).NotTo(HaveOccurred())
-				Expect(claims).To(HaveLen(1))
-				Expect(total).To(Equal(int64(1)))
-				Expect(claims[0].VehicleID).To(Equal(vehicleID))
-			})
-		})
-
-		Context("when filtering by status", func() {
-			It("should return filtered claims", func() {
-				status := entities.ClaimStatusApproved
-				filters.Status = &status
-
-				countRows := sqlmock.NewRows([]string{"count"}).AddRow(1)
-				mock.ExpectQuery(regexp.QuoteMeta(`SELECT count(*) FROM "claims" WHERE status = $1 AND "claims"."deleted_at" IS NULL`)).
-					WithArgs(status).
-					WillReturnRows(countRows)
-
-				claimID := uuid.New()
-				vehicleID := uuid.New()
-				customerID := uuid.New()
-				rows := sqlmock.NewRows([]string{
-					"id", "vehicle_id", "customer_id", "description", "status",
-					"total_cost", "approved_by", "created_at", "updated_at", "deleted_at",
-				}).AddRow(
-					claimID, vehicleID, customerID, "Claim", status,
-					1000.0, nil, time.Now(), time.Now(), nil,
-				)
-
-				mock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "claims" WHERE status = $1 AND "claims"."deleted_at" IS NULL ORDER BY created_at DESC LIMIT $2`)).
-					WithArgs(status, 10).
-					WillReturnRows(rows)
-
-				claims, total, err := repository.FindAll(ctx, filters, pagination)
-
-				Expect(err).NotTo(HaveOccurred())
-				Expect(claims).To(HaveLen(1))
-				Expect(total).To(Equal(int64(1)))
-				Expect(claims[0].Status).To(Equal(status))
-			})
-		})
-
-		Context("when filtering by date range", func() {
-			It("should return claims within date range", func() {
-				fromDate := time.Now().AddDate(0, 0, -7)
-				toDate := time.Now()
-				filters.FromDate = &fromDate
-				filters.ToDate = &toDate
-
-				countRows := sqlmock.NewRows([]string{"count"}).AddRow(1)
-				mock.ExpectQuery(regexp.QuoteMeta(`SELECT count(*) FROM "claims" WHERE created_at >= $1 AND created_at <= $2 AND "claims"."deleted_at" IS NULL`)).
-					WithArgs(fromDate, toDate).
-					WillReturnRows(countRows)
-
-				claimID := uuid.New()
-				vehicleID := uuid.New()
-				customerID := uuid.New()
-				rows := sqlmock.NewRows([]string{
-					"id", "vehicle_id", "customer_id", "description", "status",
-					"total_cost", "approved_by", "created_at", "updated_at", "deleted_at",
-				}).AddRow(
-					claimID, vehicleID, customerID, "Claim", entities.ClaimStatusDraft,
-					1000.0, nil, time.Now(), time.Now(), nil,
-				)
-
-				mock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "claims" WHERE created_at >= $1 AND created_at <= $2 AND "claims"."deleted_at" IS NULL ORDER BY created_at DESC LIMIT $3`)).
-					WithArgs(fromDate, toDate, 10).
-					WillReturnRows(rows)
-
-				claims, total, err := repository.FindAll(ctx, filters, pagination)
-
-				Expect(err).NotTo(HaveOccurred())
-				Expect(claims).To(HaveLen(1))
-				Expect(total).To(Equal(int64(1)))
-			})
-		})
-
-		Context("boundary cases for pagination", func() {
-			It("should handle page size of 0 (no pagination)", func() {
-				pagination.PageSize = 0
-
-				countRows := sqlmock.NewRows([]string{"count"}).AddRow(0)
-				mock.ExpectQuery(regexp.QuoteMeta(`SELECT count(*) FROM "claims" WHERE "claims"."deleted_at" IS NULL`)).
-					WillReturnRows(countRows)
-
+		Context("when no claims are found", func() {
+			It("should return empty slice", func() {
 				rows := sqlmock.NewRows([]string{
 					"id", "vehicle_id", "customer_id", "description", "status",
 					"total_cost", "approved_by", "created_at", "updated_at", "deleted_at",
 				})
 
-				mock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "claims" WHERE "claims"."deleted_at" IS NULL ORDER BY created_at DESC`)).
+				mock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "claims" WHERE "claims"."deleted_at" IS NULL`)).
 					WillReturnRows(rows)
 
-				claims, total, err := repository.FindAll(ctx, filters, pagination)
+				claims, err := repository.FindAll(ctx)
 
 				Expect(err).NotTo(HaveOccurred())
 				Expect(claims).To(BeEmpty())
-				Expect(total).To(Equal(int64(0)))
-			})
-
-			It("should handle sorting with empty SortDir (defaults to ASC)", func() {
-				pagination.SortBy = "status"
-				pagination.SortDir = ""
-
-				countRows := sqlmock.NewRows([]string{"count"}).AddRow(1)
-				mock.ExpectQuery(regexp.QuoteMeta(`SELECT count(*) FROM "claims" WHERE "claims"."deleted_at" IS NULL`)).
-					WillReturnRows(countRows)
-
-				claimID := uuid.New()
-				vehicleID := uuid.New()
-				customerID := uuid.New()
-				rows := sqlmock.NewRows([]string{
-					"id", "vehicle_id", "customer_id", "description", "status",
-					"total_cost", "approved_by", "created_at", "updated_at", "deleted_at",
-				}).AddRow(
-					claimID, vehicleID, customerID, "Claim", entities.ClaimStatusDraft,
-					1000.0, nil, time.Now(), time.Now(), nil,
-				)
-
-				mock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "claims" WHERE "claims"."deleted_at" IS NULL ORDER BY status ASC LIMIT $1`)).
-					WithArgs(10).
-					WillReturnRows(rows)
-
-				claims, total, err := repository.FindAll(ctx, filters, pagination)
-
-				Expect(err).NotTo(HaveOccurred())
-				Expect(claims).To(HaveLen(1))
-				Expect(total).To(Equal(int64(1)))
-			})
-
-			It("should handle empty SortBy (defaults to created_at DESC)", func() {
-				pagination.SortBy = ""
-				pagination.SortDir = ""
-
-				countRows := sqlmock.NewRows([]string{"count"}).AddRow(1)
-				mock.ExpectQuery(regexp.QuoteMeta(`SELECT count(*) FROM "claims" WHERE "claims"."deleted_at" IS NULL`)).
-					WillReturnRows(countRows)
-
-				claimID := uuid.New()
-				vehicleID := uuid.New()
-				customerID := uuid.New()
-				rows := sqlmock.NewRows([]string{
-					"id", "vehicle_id", "customer_id", "description", "status",
-					"total_cost", "approved_by", "created_at", "updated_at", "deleted_at",
-				}).AddRow(
-					claimID, vehicleID, customerID, "Claim", entities.ClaimStatusDraft,
-					1000.0, nil, time.Now(), time.Now(), nil,
-				)
-
-				mock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "claims" WHERE "claims"."deleted_at" IS NULL ORDER BY created_at DESC LIMIT $1`)).
-					WithArgs(10).
-					WillReturnRows(rows)
-
-				claims, total, err := repository.FindAll(ctx, filters, pagination)
-
-				Expect(err).NotTo(HaveOccurred())
-				Expect(claims).To(HaveLen(1))
-				Expect(total).To(Equal(int64(1)))
-			})
-
-			It("should handle large page numbers", func() {
-				pagination.Page = 100
-				offset := (100 - 1) * 10
-
-				countRows := sqlmock.NewRows([]string{"count"}).AddRow(0)
-				mock.ExpectQuery(regexp.QuoteMeta(`SELECT count(*) FROM "claims" WHERE "claims"."deleted_at" IS NULL`)).
-					WillReturnRows(countRows)
-
-				rows := sqlmock.NewRows([]string{
-					"id", "vehicle_id", "customer_id", "description", "status",
-					"total_cost", "approved_by", "created_at", "updated_at", "deleted_at",
-				})
-
-				mock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "claims" WHERE "claims"."deleted_at" IS NULL ORDER BY created_at DESC LIMIT $1 OFFSET $2`)).
-					WithArgs(10, offset).
-					WillReturnRows(rows)
-
-				claims, total, err := repository.FindAll(ctx, filters, pagination)
-
-				Expect(err).NotTo(HaveOccurred())
-				Expect(claims).To(BeEmpty())
-				Expect(total).To(Equal(int64(0)))
 			})
 		})
 
 		Context("when there is a database error", func() {
-			It("should return DBOperationError on count", func() {
-				mock.ExpectQuery(regexp.QuoteMeta(`SELECT count(*) FROM "claims" WHERE "claims"."deleted_at" IS NULL`)).
-					WillReturnError(errors.New("database connection failed"))
-
-				claims, total, err := repository.FindAll(ctx, filters, pagination)
-
-				Expect(claims).To(BeNil())
-				Expect(total).To(Equal(int64(0)))
-				ExpectAppError(err, apperrors.ErrorCodeDBOperation)
-			})
-
-			It("should return DBOperationError on find", func() {
-				countRows := sqlmock.NewRows([]string{"count"}).AddRow(1)
-				mock.ExpectQuery(regexp.QuoteMeta(`SELECT count(*) FROM "claims" WHERE "claims"."deleted_at" IS NULL`)).
-					WillReturnRows(countRows)
-
+			It("should return DBOperationError", func() {
 				mock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "claims" WHERE "claims"."deleted_at" IS NULL`)).
 					WillReturnError(errors.New("database connection failed"))
 
-				claims, total, err := repository.FindAll(ctx, filters, pagination)
+				claims, err := repository.FindAll(ctx)
 
 				Expect(claims).To(BeNil())
-				Expect(total).To(Equal(int64(0)))
 				ExpectAppError(err, apperrors.ErrorCodeDBOperation)
 			})
 		})

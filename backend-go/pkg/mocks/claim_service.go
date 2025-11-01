@@ -135,29 +135,29 @@ func (_c *ClaimService_Create_Call) RunAndReturn(run func(application.Tx, *servi
 	return _c
 }
 
-// GetAll provides a mock function with given fields: ctx, filters, pagination
-func (_m *ClaimService) GetAll(ctx context.Context, filters services.ClaimFilters, pagination services.Pagination) (*services.ClaimListResult, error) {
-	ret := _m.Called(ctx, filters, pagination)
+// GetAll provides a mock function with given fields: ctx
+func (_m *ClaimService) GetAll(ctx context.Context) ([]*entities.Claim, error) {
+	ret := _m.Called(ctx)
 
 	if len(ret) == 0 {
 		panic("no return value specified for GetAll")
 	}
 
-	var r0 *services.ClaimListResult
+	var r0 []*entities.Claim
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, services.ClaimFilters, services.Pagination) (*services.ClaimListResult, error)); ok {
-		return rf(ctx, filters, pagination)
+	if rf, ok := ret.Get(0).(func(context.Context) ([]*entities.Claim, error)); ok {
+		return rf(ctx)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, services.ClaimFilters, services.Pagination) *services.ClaimListResult); ok {
-		r0 = rf(ctx, filters, pagination)
+	if rf, ok := ret.Get(0).(func(context.Context) []*entities.Claim); ok {
+		r0 = rf(ctx)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*services.ClaimListResult)
+			r0 = ret.Get(0).([]*entities.Claim)
 		}
 	}
 
-	if rf, ok := ret.Get(1).(func(context.Context, services.ClaimFilters, services.Pagination) error); ok {
-		r1 = rf(ctx, filters, pagination)
+	if rf, ok := ret.Get(1).(func(context.Context) error); ok {
+		r1 = rf(ctx)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -172,25 +172,23 @@ type ClaimService_GetAll_Call struct {
 
 // GetAll is a helper method to define mock.On call
 //   - ctx context.Context
-//   - filters services.ClaimFilters
-//   - pagination services.Pagination
-func (_e *ClaimService_Expecter) GetAll(ctx interface{}, filters interface{}, pagination interface{}) *ClaimService_GetAll_Call {
-	return &ClaimService_GetAll_Call{Call: _e.mock.On("GetAll", ctx, filters, pagination)}
+func (_e *ClaimService_Expecter) GetAll(ctx interface{}) *ClaimService_GetAll_Call {
+	return &ClaimService_GetAll_Call{Call: _e.mock.On("GetAll", ctx)}
 }
 
-func (_c *ClaimService_GetAll_Call) Run(run func(ctx context.Context, filters services.ClaimFilters, pagination services.Pagination)) *ClaimService_GetAll_Call {
+func (_c *ClaimService_GetAll_Call) Run(run func(ctx context.Context)) *ClaimService_GetAll_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(services.ClaimFilters), args[2].(services.Pagination))
+		run(args[0].(context.Context))
 	})
 	return _c
 }
 
-func (_c *ClaimService_GetAll_Call) Return(_a0 *services.ClaimListResult, _a1 error) *ClaimService_GetAll_Call {
+func (_c *ClaimService_GetAll_Call) Return(_a0 []*entities.Claim, _a1 error) *ClaimService_GetAll_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
-func (_c *ClaimService_GetAll_Call) RunAndReturn(run func(context.Context, services.ClaimFilters, services.Pagination) (*services.ClaimListResult, error)) *ClaimService_GetAll_Call {
+func (_c *ClaimService_GetAll_Call) RunAndReturn(run func(context.Context) ([]*entities.Claim, error)) *ClaimService_GetAll_Call {
 	_c.Call.Return(run)
 	return _c
 }

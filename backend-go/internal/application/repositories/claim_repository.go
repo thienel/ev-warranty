@@ -17,7 +17,7 @@ type ClaimRepository interface {
 	SoftDelete(tx application.Tx, id uuid.UUID) error
 
 	FindByID(ctx context.Context, id uuid.UUID) (*entities.Claim, error)
-	FindAll(ctx context.Context, filters ClaimFilters, pagination Pagination) ([]*entities.Claim, int64, error)
+	FindAll(ctx context.Context) ([]*entities.Claim, error)
 	FindByCustomerID(ctx context.Context, customerID uuid.UUID) ([]*entities.Claim, error)
 	FindByVehicleID(ctx context.Context, vehicleID uuid.UUID) ([]*entities.Claim, error)
 }

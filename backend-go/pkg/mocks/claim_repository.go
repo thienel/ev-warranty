@@ -10,8 +10,6 @@ import (
 
 	mock "github.com/stretchr/testify/mock"
 
-	repositories "ev-warranty-go/internal/application/repositories"
-
 	uuid "github.com/google/uuid"
 )
 
@@ -75,41 +73,34 @@ func (_c *ClaimRepository_Create_Call) RunAndReturn(run func(application.Tx, *en
 	return _c
 }
 
-// FindAll provides a mock function with given fields: ctx, filters, pagination
-func (_m *ClaimRepository) FindAll(ctx context.Context, filters repositories.ClaimFilters, pagination repositories.Pagination) ([]*entities.Claim, int64, error) {
-	ret := _m.Called(ctx, filters, pagination)
+// FindAll provides a mock function with given fields: ctx
+func (_m *ClaimRepository) FindAll(ctx context.Context) ([]*entities.Claim, error) {
+	ret := _m.Called(ctx)
 
 	if len(ret) == 0 {
 		panic("no return value specified for FindAll")
 	}
 
 	var r0 []*entities.Claim
-	var r1 int64
-	var r2 error
-	if rf, ok := ret.Get(0).(func(context.Context, repositories.ClaimFilters, repositories.Pagination) ([]*entities.Claim, int64, error)); ok {
-		return rf(ctx, filters, pagination)
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context) ([]*entities.Claim, error)); ok {
+		return rf(ctx)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, repositories.ClaimFilters, repositories.Pagination) []*entities.Claim); ok {
-		r0 = rf(ctx, filters, pagination)
+	if rf, ok := ret.Get(0).(func(context.Context) []*entities.Claim); ok {
+		r0 = rf(ctx)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).([]*entities.Claim)
 		}
 	}
 
-	if rf, ok := ret.Get(1).(func(context.Context, repositories.ClaimFilters, repositories.Pagination) int64); ok {
-		r1 = rf(ctx, filters, pagination)
+	if rf, ok := ret.Get(1).(func(context.Context) error); ok {
+		r1 = rf(ctx)
 	} else {
-		r1 = ret.Get(1).(int64)
+		r1 = ret.Error(1)
 	}
 
-	if rf, ok := ret.Get(2).(func(context.Context, repositories.ClaimFilters, repositories.Pagination) error); ok {
-		r2 = rf(ctx, filters, pagination)
-	} else {
-		r2 = ret.Error(2)
-	}
-
-	return r0, r1, r2
+	return r0, r1
 }
 
 // ClaimRepository_FindAll_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'FindAll'
@@ -119,25 +110,23 @@ type ClaimRepository_FindAll_Call struct {
 
 // FindAll is a helper method to define mock.On call
 //   - ctx context.Context
-//   - filters repositories.ClaimFilters
-//   - pagination repositories.Pagination
-func (_e *ClaimRepository_Expecter) FindAll(ctx interface{}, filters interface{}, pagination interface{}) *ClaimRepository_FindAll_Call {
-	return &ClaimRepository_FindAll_Call{Call: _e.mock.On("FindAll", ctx, filters, pagination)}
+func (_e *ClaimRepository_Expecter) FindAll(ctx interface{}) *ClaimRepository_FindAll_Call {
+	return &ClaimRepository_FindAll_Call{Call: _e.mock.On("FindAll", ctx)}
 }
 
-func (_c *ClaimRepository_FindAll_Call) Run(run func(ctx context.Context, filters repositories.ClaimFilters, pagination repositories.Pagination)) *ClaimRepository_FindAll_Call {
+func (_c *ClaimRepository_FindAll_Call) Run(run func(ctx context.Context)) *ClaimRepository_FindAll_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(repositories.ClaimFilters), args[2].(repositories.Pagination))
+		run(args[0].(context.Context))
 	})
 	return _c
 }
 
-func (_c *ClaimRepository_FindAll_Call) Return(_a0 []*entities.Claim, _a1 int64, _a2 error) *ClaimRepository_FindAll_Call {
-	_c.Call.Return(_a0, _a1, _a2)
+func (_c *ClaimRepository_FindAll_Call) Return(_a0 []*entities.Claim, _a1 error) *ClaimRepository_FindAll_Call {
+	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
-func (_c *ClaimRepository_FindAll_Call) RunAndReturn(run func(context.Context, repositories.ClaimFilters, repositories.Pagination) ([]*entities.Claim, int64, error)) *ClaimRepository_FindAll_Call {
+func (_c *ClaimRepository_FindAll_Call) RunAndReturn(run func(context.Context) ([]*entities.Claim, error)) *ClaimRepository_FindAll_Call {
 	_c.Call.Return(run)
 	return _c
 }
