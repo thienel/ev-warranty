@@ -97,21 +97,13 @@ func (h *claimHandler) GetAll(c *gin.Context) {
 	ctx, cancel := context.WithTimeout(c.Request.Context(), requestTimeout)
 	defer cancel()
 
-	filters, err := parseClaimFilters(c)
+	claims, err := h.service.GetAll(ctx)
 	if err != nil {
 		handleError(h.log, c, err)
 		return
 	}
 
-	pagination := parsePagination(c)
-
-	result, err := h.service.GetAll(ctx, filters, pagination)
-	if err != nil {
-		handleError(h.log, c, err)
-		return
-	}
-
-	writeSuccessResponse(c, http.StatusOK, result)
+	writeSuccessResponse(c, http.StatusOK, claims)
 }
 
 // Create godoc

@@ -79,54 +79,13 @@ func (c *claimRepository) FindByID(ctx context.Context, id uuid.UUID) (*entities
 	return &claim, nil
 }
 
-func (c *claimRepository) FindAll(ctx context.Context,
-	filters repositories.ClaimFilters, pagination repositories.Pagination) ([]*entities.Claim, int64, error) {
-
+func (c *claimRepository) FindAll(ctx context.Context) ([]*entities.Claim, error) {
 	var claims []*entities.Claim
-	var total int64
-
-	query := c.db.WithContext(ctx).Model(&entities.Claim{})
-
-	if filters.CustomerID != nil {
-		query = query.Where("customer_id = ?", *filters.CustomerID)
-	}
-	if filters.VehicleID != nil {
-		query = query.Where("vehicle_id = ?", *filters.VehicleID)
-	}
-	if filters.Status != nil {
-		query = query.Where("status = ?", *filters.Status)
-	}
-	if filters.FromDate != nil {
-		query = query.Where("created_at >= ?", *filters.FromDate)
-	}
-	if filters.ToDate != nil {
-		query = query.Where("created_at <= ?", *filters.ToDate)
+	if err := c.db.WithContext(ctx).Find(&claims).Error; err != nil {
+		return nil, apperrors.NewDBOperationError(err)
 	}
 
-	if err := query.Count(&total).Error; err != nil {
-		return nil, 0, apperrors.NewDBOperationError(err)
-	}
-
-	if pagination.PageSize > 0 {
-		offset := (pagination.Page - 1) * pagination.PageSize
-		query = query.Offset(offset).Limit(pagination.PageSize)
-	}
-
-	if pagination.SortBy != "" {
-		sortDir := "ASC"
-		if pagination.SortDir != "" {
-			sortDir = pagination.SortDir
-		}
-		query = query.Order(pagination.SortBy + " " + sortDir)
-	} else {
-		query = query.Order("created_at DESC")
-	}
-
-	if err := query.Find(&claims).Error; err != nil {
-		return nil, 0, apperrors.NewDBOperationError(err)
-	}
-
-	return claims, total, nil
+	return claims, nil
 }
 
 func (c *claimRepository) FindByCustomerID(ctx context.Context, customerID uuid.UUID) ([]*entities.Claim, error) {

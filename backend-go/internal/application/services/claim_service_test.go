@@ -83,80 +83,44 @@ var _ = Describe("ClaimService", func() {
 
 	Describe("GetAll", func() {
 		Context("when claims are found", func() {
-			It("should return paginated claims", func() {
-				filters := services.ClaimFilters{}
-				pagination := services.Pagination{
-					Page:     1,
-					PageSize: 10,
-					SortBy:   "created_at",
-					SortDir:  "desc",
-				}
-
+			It("should return all claims", func() {
 				expectedClaims := []*entities.Claim{
 					{ID: uuid.New(), Status: entities.ClaimStatusDraft},
 					{ID: uuid.New(), Status: entities.ClaimStatusSubmitted},
 				}
 
-				mockClaimRepo.EXPECT().FindAll(ctx, mock.AnythingOfType("repositories.ClaimFilters"),
-					mock.AnythingOfType("repositories.Pagination")).Return(expectedClaims, int64(2), nil).Once()
+				mockClaimRepo.EXPECT().FindAll(ctx).Return(expectedClaims, nil).Once()
 
-				result, err := service.GetAll(ctx, filters, pagination)
+				claims, err := service.GetAll(ctx)
 
 				Expect(err).NotTo(HaveOccurred())
-				Expect(result).NotTo(BeNil())
-				Expect(result.Claims).To(HaveLen(2))
-				Expect(result.Total).To(Equal(int64(2)))
-				Expect(result.Page).To(Equal(1))
-				Expect(result.PageSize).To(Equal(10))
-				Expect(result.TotalPages).To(Equal(1))
+				Expect(claims).NotTo(BeNil())
+				Expect(claims).To(HaveLen(2))
 			})
 		})
 
 		Context("when no claims are found", func() {
-			It("should return empty result", func() {
-				filters := services.ClaimFilters{}
-				pagination := services.Pagination{Page: 1, PageSize: 10}
+			It("should return empty slice", func() {
+				mockClaimRepo.EXPECT().FindAll(ctx).Return([]*entities.Claim{}, nil).Once()
 
-				mockClaimRepo.EXPECT().FindAll(ctx, mock.AnythingOfType("repositories.ClaimFilters"),
-					mock.AnythingOfType("repositories.Pagination")).Return([]*entities.Claim{}, int64(0), nil).Once()
-
-				result, err := service.GetAll(ctx, filters, pagination)
+				claims, err := service.GetAll(ctx)
 
 				Expect(err).NotTo(HaveOccurred())
-				Expect(result.Claims).To(BeEmpty())
-				Expect(result.Total).To(Equal(int64(0)))
+				Expect(claims).To(BeEmpty())
 			})
 		})
 
 		Context("when repository returns error", func() {
 			It("should return the error", func() {
-				filters := services.ClaimFilters{}
-				pagination := services.Pagination{Page: 1, PageSize: 10}
 				dbErr := apperrors.New(500, apperrors.ErrorCodeDBOperation, errors.New("database error"))
 
-				mockClaimRepo.EXPECT().FindAll(ctx, mock.AnythingOfType("repositories.ClaimFilters"),
-					mock.AnythingOfType("repositories.Pagination")).Return(nil, int64(0), dbErr).Once()
+				mockClaimRepo.EXPECT().FindAll(ctx).Return(nil, dbErr).Once()
 
-				result, err := service.GetAll(ctx, filters, pagination)
+				claims, err := service.GetAll(ctx)
 
 				Expect(err).To(HaveOccurred())
-				Expect(result).To(BeNil())
+				Expect(claims).To(BeNil())
 				Expect(err).To(Equal(dbErr))
-			})
-		})
-
-		Context("when PageSize is 0", func() {
-			It("should return totalPages as 0", func() {
-				filters := services.ClaimFilters{}
-				pagination := services.Pagination{Page: 1, PageSize: 0}
-
-				mockClaimRepo.EXPECT().FindAll(ctx, mock.AnythingOfType("repositories.ClaimFilters"),
-					mock.AnythingOfType("repositories.Pagination")).Return([]*entities.Claim{}, int64(5), nil).Once()
-
-				result, err := service.GetAll(ctx, filters, pagination)
-
-				Expect(err).NotTo(HaveOccurred())
-				Expect(result.TotalPages).To(Equal(0))
 			})
 		})
 	})
