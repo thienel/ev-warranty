@@ -1,4 +1,4 @@
-DATABASE_URL ?= $(shell grep '^DATABASE_URL=' .env 2>/dev/null | cut -d '=' -f2)
+DATABASE_URL ?= $(shell awk -F '=' '/^DATABASE_URL=/{print substr($$0, index($$0,"=")+1)}' .env 2>/dev/null)
 
 .PHONY: confirm
 confirm:

@@ -30,7 +30,7 @@ definitions:
         minLength: 10
         type: string
       part_category_id:
-        type: integer
+        type: string
       replacement_part_id:
         type: string
       type:
@@ -210,7 +210,7 @@ definitions:
     type: object
   entities.ClaimAttachment:
     properties:
-      claimID:
+      claim_id:
         type: string
       created_at:
         type: string
@@ -249,7 +249,7 @@ definitions:
       issue_description:
         type: string
       part_category_id:
-        type: integer
+        type: string
       replacement_part_id:
         type: string
       status:

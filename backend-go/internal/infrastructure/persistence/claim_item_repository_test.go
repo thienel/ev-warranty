@@ -461,17 +461,18 @@ var _ = Describe("ClaimItemRepository", func() {
 				itemID1 := uuid.New()
 				itemID2 := uuid.New()
 				partID := uuid.New()
+				cateID := uuid.New()
 				replacementPartID := uuid.New()
 
 				rows := sqlmock.NewRows([]string{
 					"id", "claim_id", "part_category_id", "faulty_part_id", "replacement_part_id",
 					"issue_description", "status", "type", "cost", "created_at", "updated_at", "deleted_at",
 				}).AddRow(
-					itemID1, claimID, 1, partID, &replacementPartID, "Issue 1",
+					itemID1, claimID, cateID, partID, &replacementPartID, "Issue 1",
 					entities.ClaimItemStatusPending, entities.ClaimItemTypeReplacement,
 					1000.0, time.Now(), time.Now(), nil,
 				).AddRow(
-					itemID2, claimID, 2, partID, nil, "Issue 2",
+					itemID2, claimID, cateID, partID, nil, "Issue 2",
 					entities.ClaimItemStatusApproved, entities.ClaimItemTypeRepair,
 					2000.0, time.Now(), time.Now(), nil,
 				)
@@ -524,12 +525,13 @@ var _ = Describe("ClaimItemRepository", func() {
 			It("should handle items without replacement parts", func() {
 				itemID := uuid.New()
 				partID := uuid.New()
+				cateID := uuid.New()
 
 				rows := sqlmock.NewRows([]string{
 					"id", "claim_id", "part_category_id", "faulty_part_id", "replacement_part_id",
 					"issue_description", "status", "type", "cost", "created_at", "updated_at", "deleted_at",
 				}).AddRow(
-					itemID, claimID, 1, partID, nil, "Repair only",
+					itemID, claimID, cateID, partID, nil, "Repair only",
 					entities.ClaimItemStatusPending, entities.ClaimItemTypeRepair,
 					500.0, time.Now(), time.Now(), nil,
 				)
@@ -612,16 +614,17 @@ var _ = Describe("ClaimItemRepository", func() {
 				itemID1 := uuid.New()
 				itemID2 := uuid.New()
 				partID := uuid.New()
+				cateID := uuid.New()
 
 				rows := sqlmock.NewRows([]string{
 					"id", "claim_id", "part_category_id", "faulty_part_id", "replacement_part_id",
 					"issue_description", "status", "type", "cost", "created_at", "updated_at", "deleted_at",
 				}).AddRow(
-					itemID1, claimID, 1, partID, nil, "Issue 1",
+					itemID1, claimID, cateID, partID, nil, "Issue 1",
 					entities.ClaimItemStatusApproved, entities.ClaimItemTypeReplacement,
 					1000.0, time.Now(), time.Now(), nil,
 				).AddRow(
-					itemID2, claimID, 2, partID, nil, "Issue 2",
+					itemID2, claimID, cateID, partID, nil, "Issue 2",
 					entities.ClaimItemStatusApproved, entities.ClaimItemTypeRepair,
 					2000.0, time.Now(), time.Now(), nil,
 				)
@@ -674,12 +677,13 @@ var _ = Describe("ClaimItemRepository", func() {
 			It("should handle pending status", func() {
 				itemID := uuid.New()
 				partID := uuid.New()
+				cateID := uuid.New()
 
 				rows := sqlmock.NewRows([]string{
 					"id", "claim_id", "part_category_id", "faulty_part_id", "replacement_part_id",
 					"issue_description", "status", "type", "cost", "created_at", "updated_at", "deleted_at",
 				}).AddRow(
-					itemID, claimID, 1, partID, nil, "Pending item",
+					itemID, claimID, cateID, partID, nil, "Pending item",
 					entities.ClaimItemStatusPending, entities.ClaimItemTypeRepair,
 					500.0, time.Now(), time.Now(), nil,
 				)
@@ -698,12 +702,13 @@ var _ = Describe("ClaimItemRepository", func() {
 			It("should handle rejected status", func() {
 				itemID := uuid.New()
 				partID := uuid.New()
+				cateID := uuid.New()
 
 				rows := sqlmock.NewRows([]string{
 					"id", "claim_id", "part_category_id", "faulty_part_id", "replacement_part_id",
 					"issue_description", "status", "type", "cost", "created_at", "updated_at", "deleted_at",
 				}).AddRow(
-					itemID, claimID, 1, partID, nil, "Rejected item",
+					itemID, claimID, cateID, partID, nil, "Rejected item",
 					entities.ClaimItemStatusRejected, entities.ClaimItemTypeRepair,
 					500.0, time.Now(), time.Now(), nil,
 				)
@@ -727,7 +732,7 @@ func newClaimItem() *entities.ClaimItem {
 	return &entities.ClaimItem{
 		ID:                uuid.New(),
 		ClaimID:           uuid.New(),
-		PartCategoryID:    1,
+		PartCategoryID:    uuid.New(),
 		FaultyPartID:      uuid.New(),
 		ReplacementPartID: &replacementPartID,
 		IssueDescription:  "Test issue description",

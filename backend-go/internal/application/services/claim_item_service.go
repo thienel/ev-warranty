@@ -11,7 +11,7 @@ import (
 )
 
 type CreateClaimItemCommand struct {
-	PartCategoryID    int
+	PartCategoryID    uuid.UUID
 	FaultyPartID      uuid.UUID
 	ReplacementPartID *uuid.UUID
 	IssueDescription  string
