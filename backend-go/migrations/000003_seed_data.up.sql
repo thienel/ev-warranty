@@ -514,4 +514,168 @@ INSERT INTO claim_histories (id, claim_id, status, changed_by, changed_at) VALUE
 ('950e8400-e29b-41d4-a716-446655440118', '650e8400-e29b-41d4-a716-446655440063', 'REJECTED', '550e8400-e29b-41d4-a716-446655440103', NOW() - INTERVAL '110 days'),
 ('950e8400-e29b-41d4-a716-446655440119', '650e8400-e29b-41d4-a716-446655440064', 'REJECTED', '550e8400-e29b-41d4-a716-446655440102', NOW() - INTERVAL '115 days');
 
+-- Insert Claim Items for APPROVED and PARTIALLY_APPROVED Claims
+-- Claim Items for APPROVED Claims (Claims 051-075)
+
+-- Claim 051 (claim_id: 650e8400-e29b-41d4-a716-44665544003d) - Thay thế motor cửa sổ trời VF8
+INSERT INTO claim_items (id, claim_id, part_serial_number, issue_description, quantity, quoted_price, approved_price, status, created_at, updated_at) VALUES
+('a50e8400-e29b-41d4-a716-446655440001', '650e8400-e29b-41d4-a716-44665544003d', 'VF8-ROOF-MTR-001', 'Motor cửa sổ trời bị hỏng, không mở được', 1, 2500000, 2500000, 'APPROVED', NOW() - INTERVAL '20 days', NOW() - INTERVAL '5 days'),
+('a50e8400-e29b-41d4-a716-446655440002', '650e8400-e29b-41d4-a716-44665544003d', 'VF8-ROOF-SEAL-001', 'Gioăng cửa sổ trời bị mòn', 1, 350000, 0, 'REJECTED', NOW() - INTERVAL '20 days', NOW() - INTERVAL '5 days');
+
+-- Claim 052 (claim_id: 650e8400-e29b-41d4-a716-44665544003e) - Sửa chữa hệ thống điều hòa VF9
+INSERT INTO claim_items (id, claim_id, part_serial_number, issue_description, quantity, quoted_price, approved_price, status, created_at, updated_at) VALUES
+('a50e8400-e29b-41d4-a716-446655440003', '650e8400-e29b-41d4-a716-44665544003e', 'VF9-AC-COMP-001', 'Compressor điều hòa kêu lạ', 1, 2800000, 2800000, 'APPROVED', NOW() - INTERVAL '25 days', NOW() - INTERVAL '8 days'),
+('a50e8400-e29b-41d4-a716-446655440004', '650e8400-e29b-41d4-a716-44665544003e', 'VF9-AC-FILTER-001', 'Lọc gió điều hòa cần thay', 1, 400000, 400000, 'APPROVED', NOW() - INTERVAL '25 days', NOW() - INTERVAL '8 days');
+
+-- Claim 053 (claim_id: 650e8400-e29b-41d4-a716-44665544003f) - Thay thế cảm biến lùi VF e34
+INSERT INTO claim_items (id, claim_id, part_serial_number, issue_description, quantity, quoted_price, approved_price, status, created_at, updated_at) VALUES
+('a50e8400-e29b-41d4-a716-446655440005', '650e8400-e29b-41d4-a716-44665544003f', 'VFE34-SENS-PARK-R', 'Cảm biến lùi bên phải hỏng', 1, 800000, 800000, 'APPROVED', NOW() - INTERVAL '23 days', NOW() - INTERVAL '6 days');
+
+-- Claim 054 (claim_id: 650e8400-e29b-41d4-a716-446655440040) - Thay thế đèn pha LED VF8
+INSERT INTO claim_items (id, claim_id, part_serial_number, issue_description, quantity, quoted_price, approved_price, status, created_at, updated_at) VALUES
+('a50e8400-e29b-41d4-a716-446655440006', '650e8400-e29b-41d4-a716-446655440040', 'VF8-LED-HEAD-L', 'Đèn pha LED trái bị mờ', 1, 1800000, 1800000, 'APPROVED', NOW() - INTERVAL '30 days', NOW() - INTERVAL '12 days');
+
+-- Claim 055 (claim_id: 650e8400-e29b-41d4-a716-446655440041) - Sửa chữa hệ thống phanh VF9
+INSERT INTO claim_items (id, claim_id, part_serial_number, issue_description, quantity, quoted_price, approved_price, status, created_at, updated_at) VALUES
+('a50e8400-e29b-41d4-a716-446655440007', '650e8400-e29b-41d4-a716-446655440041', 'VF9-BRAKE-PAD-FR', 'Má phanh trước mòn', 1, 2200000, 2200000, 'APPROVED', NOW() - INTERVAL '27 days', NOW() - INTERVAL '10 days'),
+('a50e8400-e29b-41d4-a716-446655440008', '650e8400-e29b-41d4-a716-446655440041', 'VF9-BRAKE-DISC-FR', 'Đĩa phanh trước bị rạn', 1, 2300000, 2300000, 'APPROVED', NOW() - INTERVAL '27 days', NOW() - INTERVAL '10 days');
+
+-- Claim 056 (claim_id: 650e8400-e29b-41d4-a716-446655440042) - Thay thế màn hình trung tâm VF e34
+INSERT INTO claim_items (id, claim_id, part_serial_number, issue_description, quantity, quoted_price, approved_price, status, created_at, updated_at) VALUES
+('a50e8400-e29b-41d4-a716-446655440009', '650e8400-e29b-41d4-a716-446655440042', 'VFE34-DISP-CENT-10', 'Màn hình 10 inch bị đơ', 1, 15000000, 15000000, 'APPROVED', NOW() - INTERVAL '35 days', NOW() - INTERVAL '15 days');
+
+-- Claim 057 (claim_id: 650e8400-e29b-41d4-a716-446655440043) - Sửa chữa hệ thống sạc VF8
+INSERT INTO claim_items (id, claim_id, part_serial_number, issue_description, quantity, quoted_price, approved_price, status, created_at, updated_at) VALUES
+('a50e8400-e29b-41d4-a716-44665544000a', '650e8400-e29b-41d4-a716-446655440043', 'VF8-CHG-PORT-001', 'Cổng sạc bị lỏng', 1, 3200000, 3200000, 'APPROVED', NOW() - INTERVAL '33 days', NOW() - INTERVAL '18 days'),
+('a50e8400-e29b-41d4-a716-44665544000b', '650e8400-e29b-41d4-a716-446655440043', 'VF8-CHG-CABLE-001', 'Dây sạc bị đứt', 1, 2000000, 2000000, 'APPROVED', NOW() - INTERVAL '33 days', NOW() - INTERVAL '18 days');
+
+-- Claim 058 (claim_id: 650e8400-e29b-41d4-a716-446655440044) - Thay thế module bluetooth VF9
+INSERT INTO claim_items (id, claim_id, part_serial_number, issue_description, quantity, quoted_price, approved_price, status, created_at, updated_at) VALUES
+('a50e8400-e29b-41d4-a716-44665544000c', '650e8400-e29b-41d4-a716-446655440044', 'VF9-BT-MODULE-001', 'Module bluetooth không kết nối', 1, 1200000, 1200000, 'APPROVED', NOW() - INTERVAL '37 days', NOW() - INTERVAL '20 days');
+
+-- Claim 059 (claim_id: 650e8400-e29b-41d4-a716-446655440045) - Sửa chữa cảm biến áp suất lốp VF e34
+INSERT INTO claim_items (id, claim_id, part_serial_number, issue_description, quantity, quoted_price, approved_price, status, created_at, updated_at) VALUES
+('a50e8400-e29b-41d4-a716-44665544000d', '650e8400-e29b-41d4-a716-446655440045', 'VFE34-TPMS-FL', 'Cảm biến áp suất lốp trước trái lỗi', 1, 600000, 600000, 'APPROVED', NOW() - INTERVAL '40 days', NOW() - INTERVAL '22 days');
+
+-- Claim 060 (claim_id: 650e8400-e29b-41d4-a716-446655440046) - Thay thế dây đai an toàn VF8
+INSERT INTO claim_items (id, claim_id, part_serial_number, issue_description, quantity, quoted_price, approved_price, status, created_at, updated_at) VALUES
+('a50e8400-e29b-41d4-a716-44665544000e', '650e8400-e29b-41d4-a716-446655440046', 'VF8-SEATBELT-DR', 'Dây đai an toàn tài xế bị kẹt', 1, 900000, 900000, 'APPROVED', NOW() - INTERVAL '45 days', NOW() - INTERVAL '25 days');
+
+-- Claim 061 (claim_id: 650e8400-e29b-41d4-a716-446655440047) - Sửa chữa motor gương chiếu hậu VF9
+INSERT INTO claim_items (id, claim_id, part_serial_number, issue_description, quantity, quoted_price, approved_price, status, created_at, updated_at) VALUES
+('a50e8400-e29b-41d4-a716-44665544000f', '650e8400-e29b-41d4-a716-446655440047', 'VF9-MIRROR-MTR-L', 'Motor gương trái không gập', 1, 750000, 750000, 'APPROVED', NOW() - INTERVAL '43 days', NOW() - INTERVAL '28 days');
+
+-- Claim 062 (claim_id: 650e8400-e29b-41d4-a716-446655440048) - Thay thế cảm biến nhiệt độ VF e34
+INSERT INTO claim_items (id, claim_id, part_serial_number, issue_description, quantity, quoted_price, approved_price, status, created_at, updated_at) VALUES
+('a50e8400-e29b-41d4-a716-446655440010', '650e8400-e29b-41d4-a716-446655440048', 'VFE34-TEMP-SENS-001', 'Cảm biến nhiệt độ cabin sai số', 1, 1100000, 1100000, 'APPROVED', NOW() - INTERVAL '47 days', NOW() - INTERVAL '30 days');
+
+-- Claim 063 (claim_id: 650e8400-e29b-41d4-a716-446655440049) - Sửa chữa hệ thống cruise control VF8
+INSERT INTO claim_items (id, claim_id, part_serial_number, issue_description, quantity, quoted_price, approved_price, status, created_at, updated_at) VALUES
+('a50e8400-e29b-41d4-a716-446655440011', '650e8400-e29b-41d4-a716-446655440049', 'VF8-CC-MODULE-001', 'Module cruise control lỗi', 1, 2800000, 2800000, 'APPROVED', NOW() - INTERVAL '50 days', NOW() - INTERVAL '35 days');
+
+-- Claim 064 (claim_id: 650e8400-e29b-41d4-a716-44665544004a) - Thay thế camera 360 VF9
+INSERT INTO claim_items (id, claim_id, part_serial_number, issue_description, quantity, quoted_price, approved_price, status, created_at, updated_at) VALUES
+('a50e8400-e29b-41d4-a716-446655440012', '650e8400-e29b-41d4-a716-44665544004a', 'VF9-CAM360-FRONT', 'Camera trước bị mờ hình', 1, 4500000, 4500000, 'APPROVED', NOW() - INTERVAL '55 days', NOW() - INTERVAL '40 days'),
+('a50e8400-e29b-41d4-a716-446655440013', '650e8400-e29b-41d4-a716-44665544004a', 'VF9-CAM360-REAR', 'Camera sau bị lỗi', 1, 4000000, 4000000, 'APPROVED', NOW() - INTERVAL '55 days', NOW() - INTERVAL '40 days');
+
+-- Claim 065 (claim_id: 650e8400-e29b-41d4-a716-44665544004b) - Sửa chữa hệ thống sưởi VF e34
+INSERT INTO claim_items (id, claim_id, part_serial_number, issue_description, quantity, quoted_price, approved_price, status, created_at, updated_at) VALUES
+('a50e8400-e29b-41d4-a716-446655440014', '650e8400-e29b-41d4-a716-44665544004b', 'VFE34-HEATER-CORE', 'Lõi sưởi bị tắc', 1, 1500000, 1500000, 'APPROVED', NOW() - INTERVAL '53 days', NOW() - INTERVAL '38 days');
+
+-- Claim 066 (claim_id: 650e8400-e29b-41d4-a716-44665544004c) - Thay thế ECU điều khiển VF8
+INSERT INTO claim_items (id, claim_id, part_serial_number, issue_description, quantity, quoted_price, approved_price, status, created_at, updated_at) VALUES
+('a50e8400-e29b-41d4-a716-446655440015', '650e8400-e29b-41d4-a716-44665544004c', 'VF8-ECU-MAIN-001', 'ECU chính bị lỗi phần mềm', 1, 25000000, 25000000, 'APPROVED', NOW() - INTERVAL '65 days', NOW() - INTERVAL '45 days');
+
+-- Claim 067 (claim_id: 650e8400-e29b-41d4-a716-44665544004d) - Sửa chữa motor cửa sổ VF9
+INSERT INTO claim_items (id, claim_id, part_serial_number, issue_description, quantity, quoted_price, approved_price, status, created_at, updated_at) VALUES
+('a50e8400-e29b-41d4-a716-446655440016', '650e8400-e29b-41d4-a716-44665544004d', 'VF9-WIN-MTR-RL', 'Motor cửa sổ sau trái kẹt', 1, 1300000, 1300000, 'APPROVED', NOW() - INTERVAL '57 days', NOW() - INTERVAL '42 days');
+
+-- Claim 068 (claim_id: 650e8400-e29b-41d4-a716-44665544004e) - Thay thế bộ inverter VF e34
+INSERT INTO claim_items (id, claim_id, part_serial_number, issue_description, quantity, quoted_price, approved_price, status, created_at, updated_at) VALUES
+('a50e8400-e29b-41d4-a716-446655440017', '650e8400-e29b-41d4-a716-44665544004e', 'VFE34-INV-MAIN-001', 'Bộ inverter chính quá nhiệt', 1, 18000000, 18000000, 'APPROVED', NOW() - INTERVAL '65 days', NOW() - INTERVAL '50 days');
+
+-- Claim 069 (claim_id: 650e8400-e29b-41d4-a716-44665544004f) - Sửa chữa hệ thống ABS VF8
+INSERT INTO claim_items (id, claim_id, part_serial_number, issue_description, quantity, quoted_price, approved_price, status, created_at, updated_at) VALUES
+('a50e8400-e29b-41d4-a716-446655440018', '650e8400-e29b-41d4-a716-44665544004f', 'VF8-ABS-MODULE-001', 'Module ABS báo lỗi', 1, 6500000, 6500000, 'APPROVED', NOW() - INTERVAL '63 days', NOW() - INTERVAL '48 days');
+
+-- Claim 070 (claim_id: 650e8400-e29b-41d4-a716-446655440050) - Thay thế cảm biến gia tốc VF9
+INSERT INTO claim_items (id, claim_id, part_serial_number, issue_description, quantity, quoted_price, approved_price, status, created_at, updated_at) VALUES
+('a50e8400-e29b-41d4-a716-446655440019', '650e8400-e29b-41d4-a716-446655440050', 'VF9-ACC-SENS-001', 'Cảm biến gia tốc đo sai', 1, 950000, 950000, 'APPROVED', NOW() - INTERVAL '67 days', NOW() - INTERVAL '52 days');
+
+-- Claim 071 (claim_id: 650e8400-e29b-41d4-a716-446655440051) - Sửa chữa hệ thống làm mát pin VF e34
+INSERT INTO claim_items (id, claim_id, part_serial_number, issue_description, quantity, quoted_price, approved_price, status, created_at, updated_at) VALUES
+('a50e8400-e29b-41d4-a716-44665544001a', '650e8400-e29b-41d4-a716-446655440051', 'VFE34-BAT-COOL-PMP', 'Bơm làm mát pin hỏng', 1, 8000000, 8000000, 'APPROVED', NOW() - INTERVAL '70 days', NOW() - INTERVAL '55 days'),
+('a50e8400-e29b-41d4-a716-44665544001b', '650e8400-e29b-41d4-a716-446655440051', 'VFE34-BAT-COOL-RAD', 'Két làm mát pin rò rỉ', 1, 4000000, 4000000, 'APPROVED', NOW() - INTERVAL '70 days', NOW() - INTERVAL '55 days');
+
+-- Claim 072 (claim_id: 650e8400-e29b-41d4-a716-446655440052) - Thay thế màn hình HUD VF8
+INSERT INTO claim_items (id, claim_id, part_serial_number, issue_description, quantity, quoted_price, approved_price, status, created_at, updated_at) VALUES
+('a50e8400-e29b-41d4-a716-44665544001c', '650e8400-e29b-41d4-a716-446655440052', 'VF8-HUD-DISP-001', 'Màn hình HUD hiển thị mờ', 1, 22000000, 22000000, 'APPROVED', NOW() - INTERVAL '73 days', NOW() - INTERVAL '58 days');
+
+-- Claim 073 (claim_id: 650e8400-e29b-41d4-a716-446655440053) - Sửa chữa cảm biến mưa VF9
+INSERT INTO claim_items (id, claim_id, part_serial_number, issue_description, quantity, quoted_price, approved_price, status, created_at, updated_at) VALUES
+('a50e8400-e29b-41d4-a716-44665544001d', '650e8400-e29b-41d4-a716-446655440053', 'VF9-RAIN-SENS-001', 'Cảm biến mưa nhạy độ kém', 1, 650000, 650000, 'APPROVED', NOW() - INTERVAL '75 days', NOW() - INTERVAL '60 days');
+
+-- Claim 074 (claim_id: 650e8400-e29b-41d4-a716-446655440054) - Thay thế module wifi VF e34
+INSERT INTO claim_items (id, claim_id, part_serial_number, issue_description, quantity, quoted_price, approved_price, status, created_at, updated_at) VALUES
+('a50e8400-e29b-41d4-a716-44665544001e', '650e8400-e29b-41d4-a716-446655440054', 'VFE34-WIFI-MODULE-001', 'Module wifi mất kết nối', 1, 1400000, 1400000, 'APPROVED', NOW() - INTERVAL '77 days', NOW() - INTERVAL '62 days');
+
+-- Claim 075 (claim_id: 650e8400-e29b-41d4-a716-446655440055) - Sửa chữa hệ thống sạc không dây VF8
+INSERT INTO claim_items (id, claim_id, part_serial_number, issue_description, quantity, quoted_price, approved_price, status, created_at, updated_at) VALUES
+('a50e8400-e29b-41d4-a716-44665544001f', '650e8400-e29b-41d4-a716-446655440055', 'VF8-WLESS-CHG-PAD', 'Đế sạc không dây không hoạt động', 1, 3500000, 3500000, 'APPROVED', NOW() - INTERVAL '80 days', NOW() - INTERVAL '65 days');
+
+-- Claim Items for PARTIALLY_APPROVED Claims (Claims 076-085)
+
+-- Claim 076 (claim_id: 650e8400-e29b-41d4-a716-446655440056) - Sửa chữa một phần hệ thống pin VF9
+INSERT INTO claim_items (id, claim_id, part_serial_number, issue_description, quantity, quoted_price, approved_price, status, created_at, updated_at) VALUES
+('a50e8400-e29b-41d4-a716-446655440020', '650e8400-e29b-41d4-a716-446655440056', 'VF9-BAT-CELL-MOD-3', 'Module pin số 3 sụt dung lượng', 1, 12000000, 8500000, 'APPROVED', NOW() - INTERVAL '85 days', NOW() - INTERVAL '70 days'),
+('a50e8400-e29b-41d4-a716-446655440021', '650e8400-e29b-41d4-a716-446655440056', 'VF9-BAT-BMS-001', 'BMS cần nâng cấp phần mềm', 1, 5000000, 0, 'REJECTED', NOW() - INTERVAL '85 days', NOW() - INTERVAL '70 days');
+
+-- Claim 077 (claim_id: 650e8400-e29b-41d4-a716-446655440057) - Thay thế một số linh kiện âm thanh VF e34
+INSERT INTO claim_items (id, claim_id, part_serial_number, issue_description, quantity, quoted_price, approved_price, status, created_at, updated_at) VALUES
+('a50e8400-e29b-41d4-a716-446655440022', '650e8400-e29b-41d4-a716-446655440057', 'VFE34-SPKR-DOOR-FL', 'Loa cửa trước trái bị rè', 1, 1200000, 1200000, 'APPROVED', NOW() - INTERVAL '83 days', NOW() - INTERVAL '68 days'),
+('a50e8400-e29b-41d4-a716-446655440023', '650e8400-e29b-41d4-a716-446655440057', 'VFE34-SPKR-DOOR-FR', 'Loa cửa trước phải bị rè', 1, 1200000, 1000000, 'APPROVED', NOW() - INTERVAL '83 days', NOW() - INTERVAL '68 days'),
+('a50e8400-e29b-41d4-a716-446655440024', '650e8400-e29b-41d4-a716-446655440057', 'VFE34-AMP-MAIN-001', 'Ampli âm thanh cần thay', 1, 3500000, 0, 'REJECTED', NOW() - INTERVAL '83 days', NOW() - INTERVAL '68 days');
+
+-- Claim 078 (claim_id: 650e8400-e29b-41d4-a716-446655440058) - Sửa chữa một phần hệ thống lái VF8
+INSERT INTO claim_items (id, claim_id, part_serial_number, issue_description, quantity, quoted_price, approved_price, status, created_at, updated_at) VALUES
+('a50e8400-e29b-41d4-a716-446655440025', '650e8400-e29b-41d4-a716-446655440058', 'VF8-STEER-RACK-001', 'Trợ lực lái điện bị nặng', 1, 6500000, 4200000, 'APPROVED', NOW() - INTERVAL '90 days', NOW() - INTERVAL '75 days'),
+('a50e8400-e29b-41d4-a716-446655440026', '650e8400-e29b-41d4-a716-446655440058', 'VF8-STEER-SENS-001', 'Cảm biến góc lái', 1, 1800000, 0, 'REJECTED', NOW() - INTERVAL '90 days', NOW() - INTERVAL '75 days');
+
+-- Claim 079 (claim_id: 650e8400-e29b-41d4-a716-446655440059) - Thay thế một số cảm biến VF9
+INSERT INTO claim_items (id, claim_id, part_serial_number, issue_description, quantity, quoted_price, approved_price, status, created_at, updated_at) VALUES
+('a50e8400-e29b-41d4-a716-446655440027', '650e8400-e29b-41d4-a716-446655440059', 'VF9-PARK-SENS-FR', 'Cảm biến lùi trước', 1, 800000, 800000, 'APPROVED', NOW() - INTERVAL '87 days', NOW() - INTERVAL '72 days'),
+('a50e8400-e29b-41d4-a716-446655440028', '650e8400-e29b-41d4-a716-446655440059', 'VF9-PARK-SENS-RR', 'Cảm biến lùi sau', 1, 800000, 800000, 'APPROVED', NOW() - INTERVAL '87 days', NOW() - INTERVAL '72 days'),
+('a50e8400-e29b-41d4-a716-446655440029', '650e8400-e29b-41d4-a716-446655440059', 'VF9-BLIND-SPOT-L', 'Cảm biến điểm mù trái', 1, 1500000, 200000, 'APPROVED', NOW() - INTERVAL '87 days', NOW() - INTERVAL '72 days'),
+('a50e8400-e29b-41d4-a716-44665544002a', '650e8400-e29b-41d4-a716-446655440059', 'VF9-BLIND-SPOT-R', 'Cảm biến điểm mù phải', 1, 1500000, 0, 'REJECTED', NOW() - INTERVAL '87 days', NOW() - INTERVAL '72 days');
+
+-- Claim 080 (claim_id: 650e8400-e29b-41d4-a716-44665544005a) - Sửa chữa một phần ghế massage VF e34
+INSERT INTO claim_items (id, claim_id, part_serial_number, issue_description, quantity, quoted_price, approved_price, status, created_at, updated_at) VALUES
+('a50e8400-e29b-41d4-a716-44665544002b', '650e8400-e29b-41d4-a716-44665544005a', 'VFE34-SEAT-MASSAGE-DR', 'Module massage ghế lái', 1, 3200000, 3200000, 'APPROVED', NOW() - INTERVAL '95 days', NOW() - INTERVAL '80 days'),
+('a50e8400-e29b-41d4-a716-44665544002c', '650e8400-e29b-41d4-a716-44665544005a', 'VFE34-SEAT-MASSAGE-PS', 'Module massage ghế phụ', 1, 3200000, 0, 'REJECTED', NOW() - INTERVAL '95 days', NOW() - INTERVAL '80 days');
+
+-- Claim 081 (claim_id: 650e8400-e29b-41d4-a716-44665544005b) - Thay thế một số linh kiện navigation VF8
+INSERT INTO claim_items (id, claim_id, part_serial_number, issue_description, quantity, quoted_price, approved_price, status, created_at, updated_at) VALUES
+('a50e8400-e29b-41d4-a716-44665544002d', '650e8400-e29b-41d4-a716-44665544005b', 'VF8-GPS-ANTENNA-001', 'Anten GPS yếu tín hiệu', 1, 1500000, 1500000, 'APPROVED', NOW() - INTERVAL '93 days', NOW() - INTERVAL '78 days'),
+('a50e8400-e29b-41d4-a716-44665544002e', '650e8400-e29b-41d4-a716-44665544005b', 'VF8-NAV-MODULE-001', 'Module navigation', 1, 2500000, 1300000, 'APPROVED', NOW() - INTERVAL '93 days', NOW() - INTERVAL '78 days');
+
+-- Claim 082 (claim_id: 650e8400-e29b-41d4-a716-44665544005c) - Sửa chữa một phần hệ thống tự động đỗ xe VF9
+INSERT INTO claim_items (id, claim_id, part_serial_number, issue_description, quantity, quoted_price, approved_price, status, created_at, updated_at) VALUES
+('a50e8400-e29b-41d4-a716-44665544002f', '650e8400-e29b-41d4-a716-44665544005c', 'VF9-AUTOPARK-CAM-FR', 'Camera tự động đỗ xe trước', 1, 3500000, 3500000, 'APPROVED', NOW() - INTERVAL '100 days', NOW() - INTERVAL '85 days'),
+('a50e8400-e29b-41d4-a716-446655440030', '650e8400-e29b-41d4-a716-44665544005c', 'VF9-AUTOPARK-RADAR', 'Radar tự động đỗ xe', 1, 4000000, 2000000, 'APPROVED', NOW() - INTERVAL '100 days', NOW() - INTERVAL '85 days');
+
+-- Claim 083 (claim_id: 650e8400-e29b-41d4-a716-44665544005d) - Thay thế một số module điều khiển VF e34
+INSERT INTO claim_items (id, claim_id, part_serial_number, issue_description, quantity, quoted_price, approved_price, status, created_at, updated_at) VALUES
+('a50e8400-e29b-41d4-a716-446655440031', '650e8400-e29b-41d4-a716-44665544005d', 'VFE34-BCM-MODULE-001', 'Body Control Module lỗi', 1, 8500000, 7200000, 'APPROVED', NOW() - INTERVAL '97 days', NOW() - INTERVAL '82 days'),
+('a50e8400-e29b-41d4-a716-446655440032', '650e8400-e29b-41d4-a716-44665544005d', 'VFE34-TCM-MODULE-001', 'Transmission Control Module', 1, 3500000, 0, 'REJECTED', NOW() - INTERVAL '97 days', NOW() - INTERVAL '82 days');
+
+-- Claim 084 (claim_id: 650e8400-e29b-41d4-a716-44665544005e) - Sửa chữa một phần hệ thống cảnh báo VF8
+INSERT INTO claim_items (id, claim_id, part_serial_number, issue_description, quantity, quoted_price, approved_price, status, created_at, updated_at) VALUES
+('a50e8400-e29b-41d4-a716-446655440033', '650e8400-e29b-41d4-a716-44665544005e', 'VF8-FCW-RADAR-001', 'Radar cảnh báo va chạm', 1, 2500000, 1650000, 'APPROVED', NOW() - INTERVAL '103 days', NOW() - INTERVAL '88 days'),
+('a50e8400-e29b-41d4-a716-446655440034', '650e8400-e29b-41d4-a716-44665544005e', 'VF8-LDW-CAM-001', 'Camera cảnh báo làn đường', 1, 1800000, 0, 'REJECTED', NOW() - INTERVAL '103 days', NOW() - INTERVAL '88 days');
+
+-- Claim 085 (claim_id: 650e8400-e29b-41d4-a716-44665544005f) - Thay thế một số linh kiện kiểm soát ổn định VF9
+INSERT INTO claim_items (id, claim_id, part_serial_number, issue_description, quantity, quoted_price, approved_price, status, created_at, updated_at) VALUES
+('a50e8400-e29b-41d4-a716-446655440035', '650e8400-e29b-41d4-a716-44665544005f', 'VF9-ESC-MODULE-001', 'Module kiểm soát ổn định điện tử', 1, 5500000, 3800000, 'APPROVED', NOW() - INTERVAL '105 days', NOW() - INTERVAL '90 days'),
+('a50e8400-e29b-41d4-a716-446655440036', '650e8400-e29b-41d4-a716-44665544005f', 'VF9-YAW-SENS-001', 'Cảm biến góc nghiêng', 1, 2200000, 0, 'REJECTED', NOW() - INTERVAL '105 days', NOW() - INTERVAL '90 days');
+
 COMMIT;

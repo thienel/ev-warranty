@@ -137,6 +137,16 @@ export interface Claim {
   updated_at?: string
 }
 
+export interface ClaimDetail extends Claim {
+  customer?: Customer
+  vehicle?: VehicleDetail
+}
+
+export interface VehicleDetail extends Vehicle {
+  customer?: Customer
+  model?: VehicleModel
+}
+
 export interface ClaimFormData {
   customer_id: string
   vehicle_id: string
