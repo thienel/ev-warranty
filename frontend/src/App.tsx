@@ -14,7 +14,6 @@ import { useTokenRefresh } from '@/hooks/useTokenRefresh'
 import EVMStaffClaims from '@pages/evm-staff/Claims'
 import SCStaffClaims from '@pages/sc-staff/Claims'
 import SCTechnicianClaims from '@pages/sc-technician/Claims'
-import ClaimDetail from '@pages/claims/ClaimDetail'
 import ClaimCreate from '@pages/sc-staff/ClaimCreate'
 
 // New management pages
@@ -29,6 +28,7 @@ import PolicyDetail from '@pages/evm-staff/PolicyDetail'
 import type { RootState } from '@redux/store'
 import { App as AntdApp, ConfigProvider } from 'antd'
 import { antdThemeConfig } from './styles/antdThemeConfig'
+import ClaimDetailRefactored from './pages/claims/ClaimDetail'
 
 export const ProtectedRoute: React.FC = () => {
   const authState = useSelector((state: RootState) => state.auth)
@@ -99,7 +99,7 @@ const App: React.FC = () => {
               path: 'claims',
               children: [
                 { path: '', element: <EVMStaffClaims /> },
-                { path: ':id', element: <ClaimDetail /> },
+                { path: ':id', element: <ClaimDetailRefactored /> },
               ],
             },
             {
@@ -136,7 +136,7 @@ const App: React.FC = () => {
               children: [
                 { path: '', element: <SCStaffClaims /> },
                 { path: 'create', element: <ClaimCreate /> },
-                { path: ':id', element: <ClaimDetail /> },
+                { path: ':id', element: <ClaimDetailRefactored /> },
               ],
             },
             {
@@ -153,7 +153,7 @@ const App: React.FC = () => {
               path: 'claims',
               children: [
                 { path: '', element: <SCTechnicianClaims /> },
-                { path: ':id', element: <ClaimDetail /> },
+                { path: ':id', element: <ClaimDetailRefactored /> },
               ],
             },
           ],
