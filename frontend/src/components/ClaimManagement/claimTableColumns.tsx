@@ -1,4 +1,4 @@
-import { CLAIM_STATUS_LABELS } from '@constants/common-constants.js'
+import { CLAIM_STATUS_LABELS, CLAIM_STATUS_FILTERS } from '@constants/common-constants.js'
 import { Button, Space } from 'antd'
 import { EyeOutlined, UserOutlined, CarOutlined, CalendarOutlined } from '@ant-design/icons'
 import { type Claim } from '@/types/index.js'
@@ -85,13 +85,7 @@ const GenerateColumns = (
       key: 'status',
       align: 'center' as const,
       width: '15%',
-      filters: [
-        { text: 'Submitted', value: 'SUBMITTED' },
-        { text: 'Processing', value: 'PROCESSING' },
-        { text: 'Approved', value: 'APPROVED' },
-        { text: 'Rejected', value: 'REJECTED' },
-        { text: 'Completed', value: 'COMPLETED' },
-      ],
+      filters: CLAIM_STATUS_FILTERS,
       filteredValue: (filteredInfo.status as React.Key[] | null) || null,
       onFilter: (value: boolean | React.Key, record: Record<string, unknown>) => {
         const claim = record as unknown as Claim

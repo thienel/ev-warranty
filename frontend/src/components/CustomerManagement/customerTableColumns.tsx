@@ -104,7 +104,13 @@ const GenerateColumns = (
       width: '25%',
       ellipsis: true,
       render: (text: string) => (
-        <Space style={{ padding: '0 14px' }}>
+        <Space
+          style={{
+            padding: '0 14px',
+            whiteSpace: 'normal',
+            wordBreak: 'break-word',
+          }}
+        >
           <HomeOutlined style={{ color: '#697565' }} />
           <span>{text || 'N/A'}</span>
         </Space>
