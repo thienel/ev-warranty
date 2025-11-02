@@ -41,11 +41,9 @@ const UserManagement: React.FC = () => {
       if (Array.isArray(officesData)) {
         setOffices(officesData)
       } else {
-        console.warn('API returned non-array data for offices:', officesData)
         setOffices([])
       }
     } catch (error) {
-      console.error('Failed to fetch offices:', error)
       handleError(error as Error)
       setOffices([]) // Set empty array on error
     } finally {
@@ -54,31 +52,19 @@ const UserManagement: React.FC = () => {
   }, [handleError])
 
   useEffect(() => {
-    console.log('UserManagement: Fetching offices...')
     fetchOffices()
   }, [fetchOffices])
 
   // Refetch offices when modal opens if offices list is empty
   useEffect(() => {
     if (isOpenModal && offices.length === 0 && !officesLoading) {
-      console.log('UserManagement: Modal opened with empty offices, refetching...')
       fetchOffices()
     }
   }, [isOpenModal, offices.length, officesLoading, fetchOffices])
 
-  // Debug log to track offices state changes
-  useEffect(() => {
-    console.log('UserManagement: offices state changed:', {
-      isArray: Array.isArray(offices),
-      length: Array.isArray(offices) ? offices.length : 'N/A',
-      data: offices,
-    })
-  }, [offices])
-
   const getOfficeName = (officeId: string): string => {
     // Safety check: ensure offices is an array before calling find
     if (!Array.isArray(offices)) {
-      console.warn('offices is not an array:', offices)
       return 'N/A'
     }
 

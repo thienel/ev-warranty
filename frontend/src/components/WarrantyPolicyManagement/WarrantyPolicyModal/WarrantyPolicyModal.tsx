@@ -43,7 +43,6 @@ const WarrantyPolicyModal: React.FC<WarrantyPolicyModalProps> = ({
 
   const handleSubmit = async (values: WarrantyPolicyFormData): Promise<void> => {
     setLoading(true)
-    console.log('Submitting warranty policy data:', values)
     try {
       const payload = {
         ...values,

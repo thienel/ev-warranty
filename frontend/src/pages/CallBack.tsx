@@ -32,7 +32,6 @@ const CallBack: React.FC = () => {
         const responseData = res.data
 
         if (!responseData.data?.valid) {
-          console.error('Token validation failed:', responseData.message)
           message.error('Login failed. Invalid token provided.')
           dispatch(logout()) // Clear invalid token
           navigate('/login')
@@ -49,7 +48,6 @@ const CallBack: React.FC = () => {
           navigate('/')
         }
       } catch (error) {
-        console.error('Token validation error:', error)
         await handleError(error as Error)
         dispatch(logout()) // Clear token on error
         navigate('/login')

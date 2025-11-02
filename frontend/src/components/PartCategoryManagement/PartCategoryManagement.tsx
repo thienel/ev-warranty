@@ -41,11 +41,9 @@ const PartCategoryManagement: React.FC = () => {
       if (Array.isArray(categoriesData)) {
         setAllPartCategories(categoriesData)
       } else {
-        console.warn('API returned non-array data for part categories:', categoriesData)
         setAllPartCategories([])
       }
     } catch (error) {
-      console.error('Failed to fetch part categories:', error)
       handleError(error as Error)
       setAllPartCategories([]) // Set empty array on error
     } finally {
@@ -54,26 +52,15 @@ const PartCategoryManagement: React.FC = () => {
   }, [handleError])
 
   useEffect(() => {
-    console.log('PartCategoryManagement: Fetching part categories...')
     fetchPartCategories()
   }, [fetchPartCategories])
 
   // Refetch part categories when modal opens if list is empty
   useEffect(() => {
     if (isOpenModal && allPartCategories.length === 0 && !partCategoriesLoading) {
-      console.log('PartCategoryManagement: Modal opened with empty categories, refetching...')
       fetchPartCategories()
     }
   }, [isOpenModal, allPartCategories.length, partCategoriesLoading, fetchPartCategories])
-
-  // Debug log to track part categories state changes
-  useEffect(() => {
-    console.log('PartCategoryManagement: part categories state changed:', {
-      isArray: Array.isArray(allPartCategories),
-      length: Array.isArray(allPartCategories) ? allPartCategories.length : 'N/A',
-      data: allPartCategories,
-    })
-  }, [allPartCategories])
 
   const searchFields = ['category_name', 'description', 'parent_category_name']
 

@@ -42,9 +42,6 @@ const GenerateColumns = (
           : null,
       render: (_text: string, record: Record<string, unknown>) => {
         const claim = record as unknown as Claim & { customer_name?: string }
-        console.log('Rendering claim:', claim)
-        console.log('Customer name:', claim.customer_name)
-        console.log('Customer ID:', claim.customer_id)
         const displayName =
           claim.customer_name || `Customer ${claim.customer_id?.slice(0, 8)}` || 'N/A'
         return (

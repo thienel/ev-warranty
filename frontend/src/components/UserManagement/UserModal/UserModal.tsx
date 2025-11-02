@@ -26,18 +26,6 @@ const UserModal: React.FC<UserModalProps> = ({
   const [form] = Form.useForm<UserFormData>()
   const handleError = useHandleApiError()
 
-  // Debug log to track offices prop changes
-  useEffect(() => {
-    console.log('UserModal: offices prop changed:', {
-      isArray: Array.isArray(offices),
-      length: Array.isArray(offices) ? offices.length : 'N/A',
-      data: offices,
-      opened,
-      officesLoading,
-      isUpdate,
-    })
-  }, [offices, opened, officesLoading, isUpdate])
-
   // Populate form when user prop changes or modal opens
   useEffect(() => {
     if (opened) {

@@ -41,8 +41,7 @@ const VehicleSearch: React.FC<VehicleListProps> = ({
         if (Array.isArray(modelsData)) {
           setVehicleModels(modelsData)
         }
-      } catch (error) {
-        console.error('Failed to load vehicle models:', error)
+      } catch {
         setVehicleModels([])
       }
     }
@@ -86,7 +85,6 @@ const VehicleSearch: React.FC<VehicleListProps> = ({
           setVehicles([])
         }
       } catch (error) {
-        console.error('Failed to load customer vehicles:', error)
         handleError(error as Error)
         setVehicles([])
       } finally {

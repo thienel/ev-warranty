@@ -123,7 +123,7 @@ const GenerateColumns = (
       key: 'action',
       fixed: 'right' as const,
       align: 'center' as const,
-      width: '10%',
+      width: '20%',
       render: (_: unknown, record: Record<string, unknown>) => {
         const vehicleModel = record as unknown as VehicleModel
         return (
@@ -134,7 +134,9 @@ const GenerateColumns = (
               onClick={() =>
                 onOpenModal(record as Record<string, unknown> & { id: string | number }, true)
               }
-            />
+            >
+              Edit
+            </Button>
             <Popconfirm
               title="Delete vehicle model"
               description="Are you sure you want to delete this vehicle model?"
@@ -143,7 +145,9 @@ const GenerateColumns = (
               cancelText="Cancel"
               okButtonProps={{ danger: true }}
             >
-              <Button type="text" danger icon={<DeleteOutlined />} />
+              <Button type="text" danger icon={<DeleteOutlined />}>
+                Delete
+              </Button>
             </Popconfirm>
           </Space>
         )

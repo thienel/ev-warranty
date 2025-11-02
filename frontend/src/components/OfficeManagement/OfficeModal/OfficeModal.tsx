@@ -47,7 +47,6 @@ const OfficeModal: React.FC<OfficeModalProps> = ({
 
   const handleSubmit = async (values: OfficeFormData): Promise<void> => {
     setLoading(true)
-    console.log('Submitting office data:', values)
     try {
       const payload = { ...values }
 

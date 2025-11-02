@@ -54,11 +54,9 @@ const useManagement = <T = Record<string, unknown>>(
       if (Array.isArray(itemData)) {
         setItems(itemData)
       } else {
-        console.warn('API returned non-array data for', apiEndpoint, ':', itemData)
         setItems([])
       }
     } catch (error) {
-      console.error('Failed to fetch items from', apiEndpoint, ':', error)
       handleError(error as ErrorResponse)
       setItems([]) // Set empty array on error
     }

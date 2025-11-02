@@ -32,7 +32,7 @@ const GenerateColumns = (
       title: <span style={{ padding: '0 14px', display: 'inline-block' }}>VIN</span>,
       dataIndex: 'vin',
       key: 'vin',
-      width: '21%',
+      width: '225px',
       sorter: (a: Record<string, unknown>, b: Record<string, unknown>) => {
         const aVehicle = a as unknown as Vehicle
         const bVehicle = b as unknown as Vehicle
@@ -57,7 +57,7 @@ const GenerateColumns = (
       title: <span style={{ padding: '0 14px', display: 'inline-block' }}>License Plate</span>,
       dataIndex: 'license_plate',
       key: 'license_plate',
-      width: '14%',
+      width: '225px',
       sorter: (a: Record<string, unknown>, b: Record<string, unknown>) => {
         const aVehicle = a as unknown as Vehicle
         const bVehicle = b as unknown as Vehicle
@@ -78,7 +78,6 @@ const GenerateColumns = (
       title: 'Customer',
       dataIndex: 'customer_id',
       key: 'customer_id',
-      width: '20%',
       render: (customerId: string) => (
         <Space style={{ padding: '0 14px' }}>
           <UserOutlined style={{ color: '#697565' }} />
@@ -90,7 +89,6 @@ const GenerateColumns = (
       title: 'Vehicle Model',
       dataIndex: 'model_id',
       key: 'model_id',
-      width: '25%',
       render: (modelId: string) => (
         <Space style={{ padding: '0 14px' }}>
           <CarOutlined style={{ color: '#697565' }} />
@@ -102,7 +100,7 @@ const GenerateColumns = (
       title: 'Purchase Date',
       dataIndex: 'purchase_date',
       key: 'purchase_date',
-      width: '15%',
+      width: '150px',
       align: 'center' as const,
       sorter: (a: Record<string, unknown>, b: Record<string, unknown>) => {
         const aVehicle = a as unknown as Vehicle
@@ -127,7 +125,7 @@ const GenerateColumns = (
       key: 'action',
       fixed: 'right' as const,
       align: 'center' as const,
-      width: '10%',
+      width: '100px',
       render: (_: unknown, record: Record<string, unknown>) => {
         const vehicle = record as unknown as Vehicle
         return (

@@ -22,18 +22,22 @@ export const useTokenRefresh = () => {
         { withCredentials: true },
       )
 
-      const newToken = response.data.data?.access_token
+      const newToken = response.data.data?.token
       if (newToken) {
         dispatch(setToken(newToken))
-        console.log('Token refreshed successfully')
         return true
       }
 
       return false
-    } catch (error) {
-      console.error('Token refresh failed:', error)
-      dispatch(logout())
-      await persistor.purge()
+    } catch (error: unknown) {
+      const err = error as { response?: { status?: number; data?: unknown }; message?: string }
+
+      if (err?.response?.status === 401 || err?.response?.status === 404) {
+        dispatch(logout())
+        await persistor.purge()
+        window.location.replace('/login')
+      }
+
       return false
     }
   }, [dispatch])
@@ -42,12 +46,7 @@ export const useTokenRefresh = () => {
     if (!token || !isAuthenticated) return
 
     if (isTokenExpired(token)) {
-      console.log('Token is expired, attempting refresh...')
-      const refreshed = await refreshToken()
-      if (!refreshed) {
-        console.log('Token refresh failed, logging out')
-        window.location.replace('/login')
-      }
+      await refreshToken()
       return
     }
 
@@ -55,22 +54,17 @@ export const useTokenRefresh = () => {
     if (expiration) {
       const timeUntilExpiration = expiration.getTime() - Date.now()
 
-      // If token expires within threshold, refresh it
-      if (timeUntilExpiration <= TOKEN_REFRESH_THRESHOLD) {
-        console.log('Token expires soon, refreshing...')
+      if (timeUntilExpiration <= TOKEN_REFRESH_THRESHOLD && timeUntilExpiration > 0) {
         await refreshToken()
       }
     }
   }, [token, isAuthenticated, refreshToken])
 
-  // Set up periodic token check
   useEffect(() => {
     if (!isAuthenticated || !token) return
 
-    // Check immediately
     checkTokenExpiration()
 
-    // Set up interval for periodic checks
     const interval = setInterval(checkTokenExpiration, TOKEN_REFRESH_INTERVAL)
 
     return () => clearInterval(interval)

@@ -2,7 +2,6 @@ import axios, { type AxiosRequestConfig, type AxiosResponse, AxiosError } from '
 import store, { persistor } from '@/redux/store'
 import { setToken, logout } from '@/redux/authSlice'
 import { API_BASE_URL, API_ENDPOINTS } from '@constants/common-constants'
-import { isTokenExpired, isTokenValid } from '@/utils/auth'
 
 interface ExtendedAxiosRequestConfig extends AxiosRequestConfig {
   _retry?: boolean
@@ -41,13 +40,6 @@ api.interceptors.request.use(
     const authState = store.getState().auth
     const token = authState?.token
     if (token) {
-      // Check if token is valid and not expired before making request
-      if (!isTokenValid(token) || isTokenExpired(token)) {
-        console.warn('Invalid or expired token detected, clearing auth state')
-        store.dispatch(logout())
-        return Promise.reject(new Error('Invalid or expired token'))
-      }
-
       config.headers = config.headers || {}
       config.headers.Authorization = `Bearer ${token}`
     }
@@ -62,27 +54,34 @@ api.interceptors.response.use(
     const originalRequest = error.config as ExtendedAxiosRequestConfig
     const { status } = error.response || {}
 
-    if (status === 401 && !originalRequest?._retry) {
+    // Don't retry token refresh for logout endpoint or if no config
+    if (!originalRequest || originalRequest?.url?.includes(API_ENDPOINTS.AUTH.LOGOUT)) {
+      return Promise.reject(error)
+    }
+
+    // Don't retry token refresh endpoint itself
+    if (originalRequest?.url?.includes(API_ENDPOINTS.AUTH.TOKEN)) {
+      return Promise.reject(error)
+    }
+
+    if (status === 401 && !originalRequest._retry) {
       if (isRefreshing) {
         // If token is being refreshed, queue this request
         return new Promise((resolve, reject) => {
           failedQueue.push({ resolve, reject })
         })
           .then((token) => {
-            if (originalRequest?.headers) {
+            if (originalRequest.headers && token) {
               originalRequest.headers.Authorization = `Bearer ${token}`
             }
-            return api(originalRequest as AxiosRequestConfig)
+            return api(originalRequest)
           })
           .catch((err) => {
             return Promise.reject(err)
           })
       }
 
-      if (originalRequest) {
-        originalRequest._retry = true
-      }
-
+      originalRequest._retry = true
       isRefreshing = true
 
       try {
@@ -91,17 +90,23 @@ api.interceptors.response.use(
           {},
           { withCredentials: true },
         )
-        const newToken = res.data.data.access_token
+        const newToken = res.data.data?.token
+
+        if (!newToken) {
+          throw new Error('No access token received')
+        }
 
         store.dispatch(setToken(newToken))
         processQueue(null, newToken)
 
-        if (originalRequest?.headers) {
+        if (originalRequest.headers) {
           originalRequest.headers.Authorization = `Bearer ${newToken}`
         }
 
-        return api(originalRequest as AxiosRequestConfig)
+        isRefreshing = false
+        return api(originalRequest)
       } catch (refreshError) {
+        isRefreshing = false
         processQueue(refreshError, null)
         store.dispatch(logout())
         await persistor.purge()
@@ -112,8 +117,6 @@ api.interceptors.response.use(
         }
 
         return Promise.reject(refreshError)
-      } finally {
-        isRefreshing = false
       }
     }
 
