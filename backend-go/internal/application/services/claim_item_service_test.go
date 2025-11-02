@@ -158,7 +158,7 @@ var _ = Describe("ClaimItemService", func() {
 		BeforeEach(func() {
 			claimID = uuid.New()
 			cmd = &services.CreateClaimItemCommand{
-				PartCategoryID:   1,
+				PartCategoryID:   uuid.New(),
 				FaultyPartID:     uuid.New(),
 				IssueDescription: "Part is damaged",
 				Status:           entities.ClaimItemStatusPending,

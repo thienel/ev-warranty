@@ -63,7 +63,7 @@ var _ = Describe("ClaimItemHandler", func() {
 		claimID = uuid.New()
 		itemID = uuid.New()
 		validReq = dtos.CreateClaimItemRequest{
-			PartCategoryID:    1,
+			PartCategoryID:    uuid.New(),
 			FaultyPartID:      uuid.New(),
 			ReplacementPartID: func() *uuid.UUID { id := uuid.New(); return &id }(),
 			IssueDescription:  "Test issue description for replacement",

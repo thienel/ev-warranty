@@ -2515,7 +2515,7 @@ const docTemplate = `{
                     "minLength": 10
                 },
                 "part_category_id": {
-                    "type": "integer"
+                    "type": "string"
                 },
                 "replacement_part_id": {
                     "type": "string"
@@ -2773,7 +2773,7 @@ const docTemplate = `{
         "entities.ClaimAttachment": {
             "type": "object",
             "properties": {
-                "claimID": {
+                "claim_id": {
                     "type": "string"
                 },
                 "created_at": {
@@ -2832,7 +2832,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "part_category_id": {
-                    "type": "integer"
+                    "type": "string"
                 },
                 "replacement_part_id": {
                     "type": "string"

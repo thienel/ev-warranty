@@ -17,7 +17,7 @@ type UpdateClaimRequest struct {
 }
 
 type CreateClaimItemRequest struct {
-	PartCategoryID    int        `json:"part_category_id" binding:"required"`
+	PartCategoryID    uuid.UUID  `json:"part_category_id" binding:"required"`
 	FaultyPartID      uuid.UUID  `json:"faulty_part_id" binding:"required"`
 	ReplacementPartID *uuid.UUID `json:"replacement_part_id"`
 	IssueDescription  string     `json:"issue_description" binding:"required,min=10,max=1000"`
