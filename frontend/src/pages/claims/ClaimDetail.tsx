@@ -20,7 +20,6 @@ import {
   UserOutlined,
   CarOutlined,
   FileTextOutlined,
-  DollarOutlined,
   CalendarOutlined,
   PaperClipOutlined,
   ToolOutlined,
@@ -34,6 +33,8 @@ import {
   type Customer,
   type VehicleDetail,
   type VehicleModel,
+  type PartCategory,
+  type Part,
 } from '@/types/index'
 import {
   claims as claimsApi,
@@ -42,12 +43,15 @@ import {
   customersApi,
   vehiclesApi,
   vehicleModelsApi,
+  partCategoriesApi,
+  partsApi,
 } from '@services/index'
 import useHandleApiError from '@/hooks/useHandleApiError'
 import {
   CLAIM_STATUS_LABELS,
   CLAIM_ITEM_STATUS_LABELS,
   ATTACHMENT_TYPE_LABELS,
+  CLAIM_ITEM_TYPE_LABELS,
 } from '@constants/common-constants'
 import { getClaimsBasePath } from '@/utils/navigationHelpers'
 import './ClaimDetail.less'
@@ -64,6 +68,8 @@ const ClaimDetail: React.FC = () => {
   const [vehicle, setVehicle] = useState<VehicleDetail | null>(null)
   const [claimItems, setClaimItems] = useState<ClaimItem[]>([])
   const [attachments, setAttachments] = useState<ClaimAttachment[]>([])
+  const [partCategories, setPartCategories] = useState<PartCategory[]>([])
+  const [parts, setParts] = useState<Part[]>([])
 
   const [claimLoading, setClaimLoading] = useState(false)
   const [customerLoading, setCustomerLoading] = useState(false)
@@ -150,6 +156,60 @@ const ClaimDetail: React.FC = () => {
     [handleError],
   )
 
+  // Fetch parts for claim items
+  const fetchPartsForClaimItems = useCallback(
+    async (claimItems: ClaimItem[]) => {
+      if (claimItems.length === 0) return
+
+      try {
+        // Get unique part IDs from claim items
+        const uniquePartIds = Array.from(new Set(claimItems.map((item) => item.faulty_part_id)))
+
+        // Fetch each part individually
+        const partPromises = uniquePartIds.map((partId) => partsApi.getById(partId))
+        const partResponses = await Promise.allSettled(partPromises)
+
+        const fetchedParts: Part[] = []
+        let hasFailures = false
+
+        partResponses.forEach((response, index) => {
+          if (response.status === 'fulfilled') {
+            let partData = response.value.data
+            if (partData && typeof partData === 'object' && 'data' in partData) {
+              partData = (partData as { data: unknown }).data as Part
+            }
+            fetchedParts.push(partData as Part)
+          } else {
+            console.warn(`Part ${uniquePartIds[index]} not found, it may have been deleted`)
+            hasFailures = true
+          }
+        })
+
+        // If we couldn't fetch some parts individually, fall back to fetching all parts
+        if (hasFailures && fetchedParts.length < uniquePartIds.length) {
+          console.warn('Some parts not found individually, falling back to fetch all parts')
+          try {
+            const response = await partsApi.getAll()
+            let partsData = response.data
+            if (partsData && typeof partsData === 'object' && 'data' in partsData) {
+              partsData = (partsData as { data: unknown }).data as Part[]
+            }
+            setParts(partsData as Part[])
+            return
+          } catch (fallbackError) {
+            console.error('Failed to fetch all parts as fallback:', fallbackError)
+          }
+        }
+
+        setParts(fetchedParts)
+      } catch (error) {
+        handleError(error as Error)
+        setParts([])
+      }
+    },
+    [handleError],
+  )
+
   // Fetch claim items
   const fetchClaimItems = useCallback(async () => {
     if (!id) return
@@ -160,17 +220,25 @@ const ClaimDetail: React.FC = () => {
       const itemsData: unknown = response.data
 
       // Backend returns: { data: ClaimItem[] } not { data: { items: ClaimItem[] } }
+      let items: ClaimItem[] = []
       if (itemsData && typeof itemsData === 'object' && 'data' in itemsData) {
         const nestedData = (itemsData as { data: unknown }).data
         if (Array.isArray(nestedData)) {
+          items = nestedData
           setClaimItems(nestedData)
         } else {
           setClaimItems([])
         }
       } else if (Array.isArray(itemsData)) {
+        items = itemsData
         setClaimItems(itemsData)
       } else {
         setClaimItems([])
+      }
+
+      // Fetch parts for the claim items
+      if (items.length > 0) {
+        await fetchPartsForClaimItems(items)
       }
     } catch (error) {
       handleError(error as Error)
@@ -178,7 +246,7 @@ const ClaimDetail: React.FC = () => {
     } finally {
       setItemsLoading(false)
     }
-  }, [id, handleError])
+  }, [id, handleError, fetchPartsForClaimItems])
 
   // Fetch claim attachments
   const fetchAttachments = useCallback(async () => {
@@ -210,6 +278,21 @@ const ClaimDetail: React.FC = () => {
     }
   }, [id, handleError])
 
+  // Fetch part categories
+  const fetchPartCategories = useCallback(async () => {
+    try {
+      const response = await partCategoriesApi.getAll()
+      let categoriesData = response.data
+      if (categoriesData && typeof categoriesData === 'object' && 'data' in categoriesData) {
+        categoriesData = (categoriesData as { data: unknown }).data as PartCategory[]
+      }
+      setPartCategories(categoriesData as PartCategory[])
+    } catch (error) {
+      handleError(error as Error)
+      setPartCategories([])
+    }
+  }, [handleError])
+
   // Initial fetch claim
   useEffect(() => {
     if (id) {
@@ -217,7 +300,9 @@ const ClaimDetail: React.FC = () => {
       fetchClaimItems()
       fetchAttachments()
     }
-  }, [id, fetchClaim, fetchClaimItems, fetchAttachments])
+    // Fetch part categories for displaying category names
+    fetchPartCategories()
+  }, [id, fetchClaim, fetchClaimItems, fetchAttachments, fetchPartCategories])
 
   // Fetch customer and vehicle when claim is loaded
   useEffect(() => {
@@ -252,51 +337,95 @@ const ClaimDetail: React.FC = () => {
     return colors[status] || 'default'
   }
 
-  const getItemStatusColor = (status: string): string => {
-    const colors: Record<string, string> = {
-      PENDING: 'default',
-      APPROVED: 'green',
-      REJECTED: 'red',
-      COMPLETED: 'purple',
+  // Get part category name by ID
+  const getPartCategoryName = (categoryId: string): string => {
+    const category = partCategories.find((cat) => cat.id === categoryId)
+    return category?.category_name || `Category ${categoryId.slice(0, 8)}...`
+  }
+
+  // Get part serial number by ID
+  const getPartSerialNumber = (partId: string): string => {
+    const part = parts.find((part) => part.id === partId)
+    if (part?.serial_number) {
+      return part.serial_number
     }
-    return colors[status] || 'default'
+    // If part not found, show a more user-friendly message
+    return 'N/A (Part not found)'
+  }
+
+  // Get part name by ID
+  const getPartName = (partId: string): string => {
+    const part = parts.find((part) => part.id === partId)
+    if (part?.part_name) {
+      return part.part_name
+    }
+    // If part not found, show a more user-friendly message
+    return 'N/A (Part not found)'
   }
 
   // Claim items table columns
   const claimItemColumns: ColumnsType<ClaimItem> = [
     {
-      title: 'Item ID',
-      dataIndex: 'id',
-      key: 'id',
+      title: 'Serial no.',
+      dataIndex: 'faulty_part_id',
+      key: 'serial_number',
       width: '15%',
-      render: (id: string) => <Text code>{id.slice(0, 8)}...</Text>,
+      render: (_, record: ClaimItem) => {
+        const serialNumber = getPartSerialNumber(record.faulty_part_id)
+        const isNotFound = serialNumber.includes('not found')
+        return (
+          <Text type={isNotFound ? 'secondary' : undefined} italic={isNotFound}>
+            {serialNumber}
+          </Text>
+        )
+      },
     },
     {
       title: 'Part Category',
       dataIndex: 'part_category_id',
       key: 'part_category_id',
       width: '15%',
+      render: (_, record: ClaimItem) => <Text>{getPartCategoryName(record.part_category_id)}</Text>,
     },
     {
       title: 'Faulty Part',
       dataIndex: 'faulty_part_id',
       key: 'faulty_part_id',
       width: '12%',
-      render: (id: string) => <Text code>{id.slice(0, 8)}...</Text>,
+      render: (_, record: ClaimItem) => {
+        const partName = getPartName(record.faulty_part_id)
+        const isNotFound = partName.includes('not found')
+        return (
+          <Text type={isNotFound ? 'secondary' : undefined} italic={isNotFound}>
+            {partName}
+          </Text>
+        )
+      },
     },
     {
       title: 'Issue Description',
       dataIndex: 'issue_description',
       key: 'issue_description',
       width: '25%',
-      ellipsis: true,
+      render: (text: string) => (
+        <div
+          style={{
+            whiteSpace: 'normal',
+            wordBreak: 'break-word',
+          }}
+        >
+          {text}
+        </div>
+      ),
     },
     {
       title: 'Type',
       dataIndex: 'type',
       key: 'type',
       width: '10%',
-      render: (type: string) => <Tag color="blue">{type}</Tag>,
+      render: (type: string) => (
+        <>{CLAIM_ITEM_TYPE_LABELS[type as keyof typeof CLAIM_ITEM_TYPE_LABELS] || type}</>
+      ),
     },
     {
       title: 'Cost',
@@ -306,7 +435,10 @@ const ClaimDetail: React.FC = () => {
       align: 'right',
       render: (cost: number) => (
         <Text strong style={{ color: '#52c41a' }}>
-          ${cost.toLocaleString()}
+          {cost.toLocaleString('vi-VN', {
+            style: 'currency',
+            currency: 'VND',
+          })}
         </Text>
       ),
     },
@@ -316,9 +448,7 @@ const ClaimDetail: React.FC = () => {
       key: 'status',
       width: '13%',
       render: (status: string) => (
-        <Tag color={getItemStatusColor(status)}>
-          {CLAIM_ITEM_STATUS_LABELS[status as keyof typeof CLAIM_ITEM_STATUS_LABELS] || status}
-        </Tag>
+        <>{CLAIM_ITEM_STATUS_LABELS[status as keyof typeof CLAIM_ITEM_STATUS_LABELS] || status}</>
       ),
     },
   ]
@@ -348,21 +478,11 @@ const ClaimDetail: React.FC = () => {
       <div className="claim-detail-page">
         <Space direction="vertical" size="large" style={{ width: '100%' }}>
           {/* Header */}
-          <Card>
-            <Space style={{ width: '100%', justifyContent: 'space-between' }}>
-              <Button icon={<ArrowLeftOutlined />} onClick={handleBack}>
-                Back to Claims
-              </Button>
-              <Space>
-                <Tag
-                  color={getStatusColor(claim.status)}
-                  style={{ fontSize: '14px', padding: '4px 12px' }}
-                >
-                  {CLAIM_STATUS_LABELS[claim.status] || claim.status}
-                </Tag>
-              </Space>
-            </Space>
-          </Card>
+          <Space style={{ width: '100%', justifyContent: 'space-between' }}>
+            <Button icon={<ArrowLeftOutlined />} onClick={handleBack}>
+              Back to Claims
+            </Button>
+          </Space>
 
           {/* Claim Information */}
           <Card
@@ -374,7 +494,7 @@ const ClaimDetail: React.FC = () => {
           >
             <Descriptions bordered column={2}>
               <Descriptions.Item label="Claim ID" span={2}>
-                <Text code>{claim.id}</Text>
+                <Text>{claim.id}</Text>
               </Descriptions.Item>
               <Descriptions.Item label="Description" span={2}>
                 <Paragraph style={{ marginBottom: 0, whiteSpace: 'pre-wrap' }}>
@@ -383,16 +503,18 @@ const ClaimDetail: React.FC = () => {
               </Descriptions.Item>
               <Descriptions.Item label="Total Cost">
                 <Space>
-                  <DollarOutlined style={{ color: '#52c41a' }} />
                   <Text strong style={{ fontSize: '16px', color: '#52c41a' }}>
-                    ${claim.total_cost.toLocaleString()}
+                    {claim.total_cost.toLocaleString('vi-VN', {
+                      style: 'currency',
+                      currency: 'VND',
+                    })}
                   </Text>
                 </Space>
               </Descriptions.Item>
               <Descriptions.Item label="Status">
-                <Tag color={getStatusColor(claim.status)}>
+                <Text color={getStatusColor(claim.status)}>
                   {CLAIM_STATUS_LABELS[claim.status] || claim.status}
-                </Tag>
+                </Text>
               </Descriptions.Item>
               <Descriptions.Item label="Created At">
                 <Space>
@@ -408,7 +530,7 @@ const ClaimDetail: React.FC = () => {
               </Descriptions.Item>
               {claim.approved_by && (
                 <Descriptions.Item label="Approved By" span={2}>
-                  <Text code>{claim.approved_by}</Text>
+                  <Text>{claim.approved_by}</Text>
                 </Descriptions.Item>
               )}
             </Descriptions>
@@ -427,9 +549,6 @@ const ClaimDetail: React.FC = () => {
               >
                 {customer ? (
                   <Descriptions bordered column={1}>
-                    <Descriptions.Item label="Customer ID">
-                      <Text code>{customer.id}</Text>
-                    </Descriptions.Item>
                     <Descriptions.Item label="Name">
                       <Text strong>
                         {customer.full_name || `${customer.first_name} ${customer.last_name}`}
@@ -463,9 +582,6 @@ const ClaimDetail: React.FC = () => {
               >
                 {vehicle ? (
                   <Descriptions bordered column={1}>
-                    <Descriptions.Item label="Vehicle ID">
-                      <Text code>{vehicle.id}</Text>
-                    </Descriptions.Item>
                     <Descriptions.Item label="VIN">
                       <Text strong>{vehicle.vin}</Text>
                     </Descriptions.Item>

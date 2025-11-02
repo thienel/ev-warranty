@@ -128,10 +128,14 @@ export const CLAIM_STATUS_LABELS: Record<ClaimStatus, string> = {
 export const CLAIM_ITEM_TYPES = {
   REPAIR: 'REPAIR',
   REPLACEMENT: 'REPLACEMENT',
-  INSPECTION: 'INSPECTION',
 } as const
 
 export type ClaimItemType = (typeof CLAIM_ITEM_TYPES)[keyof typeof CLAIM_ITEM_TYPES]
+
+export const CLAIM_ITEM_TYPE_LABELS: Record<ClaimItemType, string> = {
+  [CLAIM_ITEM_TYPES.REPAIR]: 'Repair',
+  [CLAIM_ITEM_TYPES.REPLACEMENT]: 'Replacement',
+}
 
 export const CLAIM_ITEM_STATUSES = {
   PENDING: 'PENDING',
