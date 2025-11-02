@@ -9,6 +9,7 @@ import {
   vehicleModelsApi,
   partCategoriesApi,
   partsApi,
+  warrantyPoliciesApi,
 } from '@services/index'
 import useHandleApiError from '@/hooks/useHandleApiError'
 import type {
@@ -20,6 +21,7 @@ import type {
   VehicleModel,
   PartCategory,
   Part,
+  WarrantyPolicy,
 } from '@/types/index'
 
 interface UseClaimDataReturn {
@@ -31,6 +33,7 @@ interface UseClaimDataReturn {
   attachments: ClaimAttachment[]
   partCategories: PartCategory[]
   parts: Part[]
+  warrantyPolicy: WarrantyPolicy | null
 
   // Loading states
   claimLoading: boolean
@@ -38,6 +41,7 @@ interface UseClaimDataReturn {
   vehicleLoading: boolean
   itemsLoading: boolean
   attachmentsLoading: boolean
+  warrantyPolicyLoading: boolean
 
   // Refetch functions
   refetchClaim: () => Promise<void>
@@ -56,6 +60,7 @@ export const useClaimData = (claimId?: string): UseClaimDataReturn => {
   const [attachments, setAttachments] = useState<ClaimAttachment[]>([])
   const [partCategories, setPartCategories] = useState<PartCategory[]>([])
   const [parts, setParts] = useState<Part[]>([])
+  const [warrantyPolicy, setWarrantyPolicy] = useState<WarrantyPolicy | null>(null)
 
   // Loading states
   const [claimLoading, setClaimLoading] = useState(false)
@@ -63,6 +68,7 @@ export const useClaimData = (claimId?: string): UseClaimDataReturn => {
   const [vehicleLoading, setVehicleLoading] = useState(false)
   const [itemsLoading, setItemsLoading] = useState(false)
   const [attachmentsLoading, setAttachmentsLoading] = useState(false)
+  const [warrantyPolicyLoading, setWarrantyPolicyLoading] = useState(false)
 
   // Fetch claim details
   const fetchClaim = useCallback(async () => {
@@ -280,6 +286,27 @@ export const useClaimData = (claimId?: string): UseClaimDataReturn => {
     }
   }, [handleError])
 
+  // Fetch warranty policy by vehicle model's policy ID
+  const fetchWarrantyPolicy = useCallback(
+    async (policyId: string) => {
+      try {
+        setWarrantyPolicyLoading(true)
+        const response = await warrantyPoliciesApi.getById(policyId)
+        let policyData = response.data
+        if (policyData && typeof policyData === 'object' && 'data' in policyData) {
+          policyData = (policyData as { data: unknown }).data as WarrantyPolicy
+        }
+        setWarrantyPolicy(policyData as WarrantyPolicy)
+      } catch (error) {
+        handleError(error as Error)
+        setWarrantyPolicy(null)
+      } finally {
+        setWarrantyPolicyLoading(false)
+      }
+    },
+    [handleError],
+  )
+
   // Initial data fetch
   useEffect(() => {
     if (claimId) {
@@ -303,6 +330,15 @@ export const useClaimData = (claimId?: string): UseClaimDataReturn => {
     }
   }, [claim, fetchCustomer, fetchVehicle])
 
+  // Fetch warranty policy when vehicle is loaded and has policy_id
+  useEffect(() => {
+    if (vehicle?.model?.policy_id) {
+      fetchWarrantyPolicy(vehicle.model.policy_id)
+    } else {
+      setWarrantyPolicy(null)
+    }
+  }, [vehicle, fetchWarrantyPolicy])
+
   return {
     // Data
     claim,
@@ -312,6 +348,7 @@ export const useClaimData = (claimId?: string): UseClaimDataReturn => {
     attachments,
     partCategories,
     parts,
+    warrantyPolicy,
 
     // Loading states
     claimLoading,
@@ -319,6 +356,7 @@ export const useClaimData = (claimId?: string): UseClaimDataReturn => {
     vehicleLoading,
     itemsLoading,
     attachmentsLoading,
+    warrantyPolicyLoading,
 
     // Refetch functions
     refetchClaim: fetchClaim,
