@@ -1,6 +1,6 @@
 import React from 'react'
-import { Table, Button, Typography, Divider, Card } from 'antd'
-import { ToolOutlined, PlusOutlined } from '@ant-design/icons'
+import { Table, Button, Typography, Divider, Card, Space } from 'antd'
+import { ToolOutlined, PlusOutlined, CheckOutlined, CloseOutlined, FileSearchOutlined } from '@ant-design/icons'
 import type { ColumnsType } from 'antd/es/table'
 import { CLAIM_ITEM_STATUS_LABELS, CLAIM_ITEM_TYPE_LABELS } from '@constants/common-constants'
 import type { ClaimItem, PartCategory, Part } from '@/types/index'
@@ -13,7 +13,13 @@ interface ClaimItemsTableProps {
   parts: Part[]
   loading: boolean
   canAddItems: boolean
+  canApproveClaimItems?: boolean
+  canRejectClaimItems?: boolean
+  canViewPolicyCoverage?: boolean
   onAddItem: () => void
+  onApproveItem?: (itemId: string) => void
+  onRejectItem?: (itemId: string) => void
+  onViewCoverage?: (categoryId: string, categoryName: string) => void
 }
 
 const ClaimItemsTable: React.FC<ClaimItemsTableProps> = ({
@@ -22,7 +28,13 @@ const ClaimItemsTable: React.FC<ClaimItemsTableProps> = ({
   parts,
   loading,
   canAddItems,
+  canApproveClaimItems = false,
+  canRejectClaimItems = false,
+  canViewPolicyCoverage = false,
   onAddItem,
+  onApproveItem,
+  onRejectItem,
+  onViewCoverage,
 }) => {
   // Get part category name by ID
   const getPartCategoryName = (categoryId: string): string => {
@@ -139,6 +151,62 @@ const ClaimItemsTable: React.FC<ClaimItemsTableProps> = ({
       ),
     },
   ]
+
+  // Add Actions column if user can approve/reject claim items or view coverage
+  if (canApproveClaimItems || canRejectClaimItems || canViewPolicyCoverage) {
+    claimItemColumns.push({
+      title: 'Actions',
+      key: 'actions',
+      width: '20%',
+      render: (_, record: ClaimItem) => {
+        const categoryName = getPartCategoryName(record.part_category_id)
+        
+        return (
+          <Space size="small" direction="vertical">
+            {/* Approve/Reject actions - only for PENDING items */}
+            {record.status === 'PENDING' && (
+              <Space size="small">
+                {canApproveClaimItems && onApproveItem && (
+                  <Button
+                    type="primary"
+                    size="small"
+                    icon={<CheckOutlined />}
+                    onClick={() => onApproveItem(record.id)}
+                  >
+                    Approve
+                  </Button>
+                )}
+                {canRejectClaimItems && onRejectItem && (
+                  <Button
+                    type="default"
+                    danger
+                    size="small"
+                    icon={<CloseOutlined />}
+                    onClick={() => onRejectItem(record.id)}
+                  >
+                    Reject
+                  </Button>
+                )}
+              </Space>
+            )}
+            
+            {/* View Coverage button - always available if permission allows */}
+            {canViewPolicyCoverage && onViewCoverage && (
+              <Button
+                type="default"
+                size="small"
+                icon={<FileSearchOutlined />}
+                onClick={() => onViewCoverage(record.part_category_id, categoryName)}
+                style={{ width: '100%' }}
+              >
+                View Coverage
+              </Button>
+            )}
+          </Space>
+        )
+      },
+    })
+  }
 
   return (
     <Card
