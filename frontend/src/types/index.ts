@@ -174,7 +174,7 @@ export interface ClaimListResponse {
 export interface ClaimItem {
   id: string
   claim_id: string
-  part_category_id: number
+  part_category_id: string
   faulty_part_id: string
   replacement_part_id?: string
   issue_description: string
@@ -186,7 +186,7 @@ export interface ClaimItem {
 }
 
 export interface CreateClaimItemRequest {
-  part_category_id: number
+  part_category_id: string
   faulty_part_id: string
   replacement_part_id?: string
   issue_description: string
