@@ -20,7 +20,7 @@ CREATE INDEX IF NOT EXISTS idx_claims_vehicle_id ON claims(vehicle_id);
 CREATE TABLE IF NOT EXISTS claim_items (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     claim_id UUID NOT NULL,
-    part_category_id INTEGER NOT NULL,
+    part_category_id UUID NOT NULL,
     faulty_part_id UUID NOT NULL,
     replacement_part_id UUID,
     issue_description TEXT NOT NULL,
