@@ -1,12 +1,5 @@
 import { Button, Popconfirm, Space, Tag } from 'antd'
-import {
-  DeleteOutlined,
-  EditOutlined,
-  ToolOutlined,
-  BarcodeOutlined,
-  AppstoreOutlined,
-  HomeOutlined,
-} from '@ant-design/icons'
+import { DeleteOutlined, EditOutlined } from '@ant-design/icons'
 import { type Part } from '@/types/index.js'
 
 type OnOpenModal = (
@@ -47,7 +40,7 @@ const GenerateColumns = (
       title: <span style={{ padding: '0 14px', display: 'inline-block' }}>Serial Number</span>,
       dataIndex: 'serial_number',
       key: 'serial_number',
-      width: '15%',
+      width: '210px',
       sorter: (a: Record<string, unknown>, b: Record<string, unknown>) => {
         const aPart = a as unknown as Part
         const bPart = b as unknown as Part
@@ -65,7 +58,6 @@ const GenerateColumns = (
             wordBreak: 'break-word',
           }}
         >
-          <BarcodeOutlined style={{ color: '#697565' }} />
           <span>{text || 'N/A'}</span>
         </Space>
       ),
@@ -74,7 +66,7 @@ const GenerateColumns = (
       title: <span style={{ padding: '0 14px', display: 'inline-block' }}>Part Name</span>,
       dataIndex: 'part_name',
       key: 'part_name',
-      width: '18%',
+      width: '20%',
       sorter: (a: Record<string, unknown>, b: Record<string, unknown>) => {
         const aPart = a as unknown as Part
         const bPart = b as unknown as Part
@@ -86,7 +78,6 @@ const GenerateColumns = (
           : null,
       render: (text: string) => (
         <Space style={{ padding: '0 14px', whiteSpace: 'normal', wordBreak: 'break-word' }}>
-          <ToolOutlined style={{ color: '#697565' }} />
           <span>{text || 'N/A'}</span>
         </Space>
       ),
@@ -96,7 +87,6 @@ const GenerateColumns = (
       dataIndex: 'unit_price',
       key: 'unit_price',
       align: 'right' as const,
-      width: '12%',
       sorter: (a: Record<string, unknown>, b: Record<string, unknown>) => {
         const aPart = a as unknown as Part
         const bPart = b as unknown as Part
@@ -122,10 +112,8 @@ const GenerateColumns = (
       dataIndex: 'category_name',
       key: 'category_name',
       align: 'center' as const,
-      width: '15%',
       render: (text: string) => (
         <Space>
-          <AppstoreOutlined style={{ color: '#697565' }} />
           <span>{text || 'N/A'}</span>
         </Space>
       ),
@@ -135,10 +123,8 @@ const GenerateColumns = (
       dataIndex: 'office_location_id',
       key: 'office_location_id',
       align: 'center' as const,
-      width: '13%',
       render: (officeId: string) => (
         <Space>
-          <HomeOutlined style={{ color: '#697565' }} />
           <span>{officeId ? getOfficeName(officeId) : 'N/A'}</span>
         </Space>
       ),
@@ -147,8 +133,8 @@ const GenerateColumns = (
       title: 'Status',
       dataIndex: 'status',
       key: 'status',
+      width: '100px',
       align: 'center' as const,
-      width: '12%',
       render: (status: string) => {
         const label = PART_STATUS_LABELS[status as keyof typeof PART_STATUS_LABELS] || status
         const color = PART_STATUS_COLORS[status as keyof typeof PART_STATUS_COLORS] || 'default'
@@ -159,7 +145,7 @@ const GenerateColumns = (
       title: 'Actions',
       key: 'actions',
       align: 'center' as const,
-      width: '15%',
+      width: '75px',
       render: (_: unknown, record: Record<string, unknown>) => {
         const part = record as unknown as Part
         return (
@@ -172,9 +158,7 @@ const GenerateColumns = (
                 onOpenModal(record as Record<string, unknown> & { id: string | number }, true)
               }
               style={{ color: '#1890ff' }}
-            >
-              Edit
-            </Button>
+            />
             <Popconfirm
               title="Delete Part"
               description="Are you sure you want to delete this part?"
@@ -183,9 +167,7 @@ const GenerateColumns = (
               cancelText="No"
               placement="topRight"
             >
-              <Button type="text" size="small" icon={<DeleteOutlined />} danger>
-                Delete
-              </Button>
+              <Button type="text" size="small" icon={<DeleteOutlined />} danger />
             </Popconfirm>
           </Space>
         )
