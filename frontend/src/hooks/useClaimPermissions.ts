@@ -11,6 +11,7 @@ interface UseClaimPermissionsReturn {
   canApproveClaim: boolean
   canRejectClaim: boolean
   canViewClaim: boolean
+  canAddAttachments: boolean
 }
 
 export const useClaimPermissions = (claim: ClaimDetail | null): UseClaimPermissionsReturn => {
@@ -77,6 +78,17 @@ export const useClaimPermissions = (claim: ClaimDetail | null): UseClaimPermissi
     return true
   }, [user])
 
+  const canAddAttachments = useCallback((): boolean => {
+    if (!user || !claim) return false
+
+    // Only SC_TECHNICIAN can add attachments
+    if (user.role !== USER_ROLES.SC_TECHNICIAN) return false
+
+    // Only allow adding attachments when claim is in DRAFT or REQUEST_INFO status
+    const allowedStatuses = [CLAIM_STATUSES.DRAFT, CLAIM_STATUSES.REQUEST_INFO] as const
+    return allowedStatuses.includes(claim.status as (typeof allowedStatuses)[number])
+  }, [user, claim])
+
   return {
     canAddItems: canAddItems(),
     canEditClaim: canEditClaim(),
@@ -84,6 +96,7 @@ export const useClaimPermissions = (claim: ClaimDetail | null): UseClaimPermissi
     canApproveClaim: canApproveClaim(),
     canRejectClaim: canRejectClaim(),
     canViewClaim: canViewClaim(),
+    canAddAttachments: canAddAttachments(),
   }
 }
 

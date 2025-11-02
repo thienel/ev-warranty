@@ -4,6 +4,7 @@ import { Button, Space, Typography, Divider, message } from 'antd'
 import { ArrowLeftOutlined } from '@ant-design/icons'
 import AppLayout from '@components/Layout/Layout'
 import AddClaimItemModal from '@/components/AddClaimItemModal/AddClaimItemModal'
+import AddAttachmentModal from '@/components/AddAttachmentModal/AddAttachmentModal'
 import CustomerInfo from '@/components/ClaimDetail/CustomerInfo'
 import VehicleInfo from '@/components/ClaimDetail/VehicleInfo'
 import ClaimInfo from '@/components/ClaimDetail/ClaimInfo'
@@ -21,6 +22,7 @@ const ClaimDetail: React.FC = () => {
 
   // Modal state
   const [addItemModalVisible, setAddItemModalVisible] = useState(false)
+  const [addAttachmentModalVisible, setAddAttachmentModalVisible] = useState(false)
 
   // Custom hooks
   const {
@@ -38,9 +40,10 @@ const ClaimDetail: React.FC = () => {
     attachmentsLoading,
     refetchClaim,
     refetchClaimItems,
+    refetchAttachments,
   } = useClaimData(id)
 
-  const { canAddItems } = useClaimPermissions(claim)
+  const { canAddItems, canAddAttachments } = useClaimPermissions(claim)
 
   // Navigation handler
   const handleBack = () => {
@@ -65,6 +68,21 @@ const ClaimDetail: React.FC = () => {
     setAddItemModalVisible(false)
   }
 
+  const handleOpenAddAttachmentModal = () => {
+    setAddAttachmentModalVisible(true)
+  }
+
+  const handleCloseAddAttachmentModal = () => {
+    setAddAttachmentModalVisible(false)
+  }
+
+  const handleAddAttachmentSuccess = () => {
+    // Refresh attachments
+    refetchAttachments()
+    message.success('Attachments uploaded successfully')
+    setAddAttachmentModalVisible(false)
+  }
+
   if (!id) {
     return (
       <AppLayout>
@@ -83,11 +101,7 @@ const ClaimDetail: React.FC = () => {
       <div style={{ padding: '24px' }}>
         {/* Header */}
         <Space style={{ marginBottom: '24px' }}>
-          <Button
-            icon={<ArrowLeftOutlined />}
-            onClick={handleBack}
-            type="default"
-          >
+          <Button icon={<ArrowLeftOutlined />} onClick={handleBack} type="default">
             Back to Claims
           </Button>
           <Title level={2} style={{ margin: 0 }}>
@@ -121,6 +135,8 @@ const ClaimDetail: React.FC = () => {
           <ClaimAttachments
             attachments={attachments}
             loading={attachmentsLoading}
+            canAddAttachments={canAddAttachments}
+            onAddAttachment={handleOpenAddAttachmentModal}
           />
         </Space>
 
@@ -132,6 +148,16 @@ const ClaimDetail: React.FC = () => {
             onSuccess={handleAddItemSuccess}
             claimId={id}
             partCategories={partCategories}
+          />
+        )}
+
+        {/* Add Attachment Modal */}
+        {addAttachmentModalVisible && id && (
+          <AddAttachmentModal
+            visible={addAttachmentModalVisible}
+            onCancel={handleCloseAddAttachmentModal}
+            onSuccess={handleAddAttachmentSuccess}
+            claimId={id}
           />
         )}
       </div>
