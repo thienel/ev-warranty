@@ -73,7 +73,7 @@ const PartCategoryManagement: React.FC = () => {
         onOpenModal={handleOpenModal}
         loading={loading}
         searchPlaceholder="Search by category name, description or parent..."
-        addButtonText="Add Part Category"
+        addButtonText="Add Category"
         allowCreate={true}
       />
 
