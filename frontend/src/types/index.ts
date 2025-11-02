@@ -191,7 +191,7 @@ export interface ClaimItemListResponse {
 
 export interface ClaimAttachment {
   id: string
-  claimID: string
+  claim_id: string
   url: string
   type: AttachmentType
   created_at?: string

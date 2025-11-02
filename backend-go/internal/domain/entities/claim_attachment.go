@@ -16,7 +16,7 @@ const (
 
 type ClaimAttachment struct {
 	ID        uuid.UUID       `gorm:"primaryKey;type:uuid;default:uuid_generate_v4()" json:"id"`
-	ClaimID   uuid.UUID       `gorm:"not null;type:uuid" json:"claimID"`
+	ClaimID   uuid.UUID       `gorm:"not null;type:uuid" json:"claim_id"`
 	Claim     Claim           `gorm:"foreignKey:ClaimID;references:ID;constraint:OnDelete:CASCADE" json:"-"`
 	Type      string          `gorm:"not null" json:"type"`
 	URL       string          `gorm:"not null;type:text" json:"url"`

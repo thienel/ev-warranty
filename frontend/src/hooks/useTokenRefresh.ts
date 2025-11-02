@@ -22,7 +22,7 @@ export const useTokenRefresh = () => {
         { withCredentials: true },
       )
 
-      const newToken = response.data.data?.access_token
+      const newToken = response.data.data?.token
       if (newToken) {
         dispatch(setToken(newToken))
         return true
