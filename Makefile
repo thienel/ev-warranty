@@ -14,8 +14,8 @@ ci-go:
 .PHONY: ci-dotnet
 ci-dotnet:
 	cd backend-dotnet && dotnet restore
-	cd backend-dotnet && dotnet build --no-restore --configuration Release
-	cd backend-dotnet && dotnet test --no-build --verbosity normal
+	cd backend-dotnet && dotnet build --no-restore --configuration Debug
+	cd backend-dotnet && dotnet test --no-build --configuration Debug --verbosity normal
 	@echo ".NET CI completed"
 
 .PHONY: seed-check
