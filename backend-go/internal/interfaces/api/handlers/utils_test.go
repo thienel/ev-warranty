@@ -3,7 +3,7 @@ package handlers_test
 import (
 	"bytes"
 	"encoding/json"
-	"ev-warranty-go/internal/interfaces/api/dtos"
+	"ev-warranty-go/internal/interfaces/api/dto"
 	"ev-warranty-go/pkg/mocks"
 	"net/http"
 	"net/http/httptest"
@@ -59,7 +59,7 @@ func ExpectResponseNotNil(w *httptest.ResponseRecorder, httpStatus int) {
 		return
 	}
 
-	var response dtos.SuccessResponse
+	var response dto.SuccessResponse
 	err := json.Unmarshal(w.Body.Bytes(), &response)
 	Expect(err).NotTo(HaveOccurred())
 	Expect(response.Data).NotTo(BeNil())
@@ -68,7 +68,7 @@ func ExpectResponseNotNil(w *httptest.ResponseRecorder, httpStatus int) {
 func ExpectErrorCode(w *httptest.ResponseRecorder, httpStatus int, errorCode string) {
 	GinkgoHelper()
 	Expect(w.Code).To(Equal(httpStatus))
-	var response dtos.ErrorResponse
+	var response dto.ErrorResponse
 	err := json.Unmarshal(w.Body.Bytes(), &response)
 	Expect(err).NotTo(HaveOccurred())
 	Expect(response.Error).To(Equal(errorCode))

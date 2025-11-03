@@ -1,4 +1,4 @@
-package dtos
+package dto
 
 type CreateOfficeRequest struct {
 	OfficeName string `json:"office_name" binding:"required"`

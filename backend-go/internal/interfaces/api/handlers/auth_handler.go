@@ -4,7 +4,7 @@ import (
 	"context"
 	"ev-warranty-go/internal/apperrors"
 	"ev-warranty-go/internal/application/services"
-	"ev-warranty-go/internal/interfaces/api/dtos"
+	"ev-warranty-go/internal/interfaces/api/dto"
 	"ev-warranty-go/pkg/logger"
 	"net/http"
 	"strings"
@@ -44,11 +44,11 @@ func NewAuthHandler(log logger.Logger, authService services.AuthService, tokenSe
 // @Tags auth
 // @Accept json
 // @Produce json
-// @Param loginRequest body dtos.LoginRequest true "Login credentials"
-// @Success 200 {object} dtos.SuccessResponse{data=dtos.LoginResponse} "Login successful"
-// @Failure 400 {object} dtos.ErrorResponse "Bad request"
-// @Failure 401 {object} dtos.ErrorResponse "Unauthorized"
-// @Failure 500 {object} dtos.ErrorResponse "Internal server error"
+// @Param loginRequest body dto.LoginRequest true "Login credentials"
+// @Success 200 {object} dto.SuccessResponse{data=dto.LoginResponse} "Login successful"
+// @Failure 400 {object} dto.ErrorResponse "Bad request"
+// @Failure 401 {object} dto.ErrorResponse "Unauthorized"
+// @Failure 500 {object} dto.ErrorResponse "Internal server error"
 // @Router /auth/login [post]
 func (h *authHandler) Login(c *gin.Context) {
 	ctx, cancel := context.WithTimeout(c.Request.Context(), requestTimeout)
@@ -56,7 +56,7 @@ func (h *authHandler) Login(c *gin.Context) {
 
 	h.log.Info("login request", "remote_addr", c.ClientIP())
 
-	var req dtos.LoginRequest
+	var req dto.LoginRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		handleError(h.log, c, apperrors.NewInvalidJsonRequest())
 		return
@@ -84,9 +84,9 @@ func (h *authHandler) Login(c *gin.Context) {
 
 	c.SetCookie("refreshToken", refreshToken, 60*60*24*7, "/", "localhost", false, true)
 
-	response := dtos.LoginResponse{
+	response := dto.LoginResponse{
 		Token: accessToken,
-		User:  *dtos.GenerateUserDTO(user),
+		User:  *dto.GenerateUserDTO(user),
 	}
 
 	h.log.Info("login successful", "user_id", userID, "email", user.Email)
@@ -100,8 +100,8 @@ func (h *authHandler) Login(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Success 204 "Logout successful"
-// @Failure 400 {object} dtos.ErrorResponse "Bad request"
-// @Failure 500 {object} dtos.ErrorResponse "Internal server error"
+// @Failure 400 {object} dto.ErrorResponse "Bad request"
+// @Failure 500 {object} dto.ErrorResponse "Internal server error"
 // @Router /auth/logout [post]
 func (h *authHandler) Logout(c *gin.Context) {
 	ctx, cancel := context.WithTimeout(c.Request.Context(), requestTimeout)
@@ -133,10 +133,10 @@ func (h *authHandler) Logout(c *gin.Context) {
 // @Tags auth
 // @Accept json
 // @Produce json
-// @Success 200 {object} dtos.SuccessResponse{data=dtos.RefreshTokenResponse} "New access token"
-// @Failure 400 {object} dtos.ErrorResponse "Bad request"
-// @Failure 401 {object} dtos.ErrorResponse "Unauthorized"
-// @Failure 500 {object} dtos.ErrorResponse "Internal server error"
+// @Success 200 {object} dto.SuccessResponse{data=dto.RefreshTokenResponse} "New access token"
+// @Failure 400 {object} dto.ErrorResponse "Bad request"
+// @Failure 401 {object} dto.ErrorResponse "Unauthorized"
+// @Failure 500 {object} dto.ErrorResponse "Internal server error"
 // @Router /auth/token [post]
 func (h *authHandler) RefreshToken(c *gin.Context) {
 	ctx, cancel := context.WithTimeout(c.Request.Context(), requestTimeout)
@@ -158,7 +158,7 @@ func (h *authHandler) RefreshToken(c *gin.Context) {
 	}
 
 	h.log.Info("token refresh successful")
-	writeSuccessResponse(c, http.StatusOK, dtos.RefreshTokenResponse{
+	writeSuccessResponse(c, http.StatusOK, dto.RefreshTokenResponse{
 		Token: newAccessToken,
 	})
 }
@@ -170,10 +170,10 @@ func (h *authHandler) RefreshToken(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Security Bearer
-// @Success 200 {object} dtos.SuccessResponse{data=dtos.ValidateTokenResponse} "Token is valid"
-// @Failure 400 {object} dtos.ErrorResponse "Bad request"
-// @Failure 401 {object} dtos.ErrorResponse "Unauthorized"
-// @Failure 500 {object} dtos.ErrorResponse "Internal server error"
+// @Success 200 {object} dto.SuccessResponse{data=dto.ValidateTokenResponse} "Token is valid"
+// @Failure 400 {object} dto.ErrorResponse "Bad request"
+// @Failure 401 {object} dto.ErrorResponse "Unauthorized"
+// @Failure 500 {object} dto.ErrorResponse "Internal server error"
 // @Router /auth/token [get]
 func (h *authHandler) ValidateToken(c *gin.Context) {
 	ctx, cancel := context.WithTimeout(c.Request.Context(), requestTimeout)
@@ -210,9 +210,9 @@ func (h *authHandler) ValidateToken(c *gin.Context) {
 
 	h.log.Info("token validation successful", "user_id", userID, "role", user.Role)
 	writeSuccessResponse(c, http.StatusOK,
-		&dtos.ValidateTokenResponse{
+		&dto.ValidateTokenResponse{
 			Valid: true,
-			User:  *dtos.GenerateUserDTO(user),
+			User:  *dto.GenerateUserDTO(user),
 		})
 }
 

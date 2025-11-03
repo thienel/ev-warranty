@@ -43,11 +43,11 @@ func NewClaimAttachmentHandler(log logger.Logger, txManager application.TxManage
 // @Security Bearer
 // @Param id path string true "Claim ID"
 // @Param attachmentID path string true "Attachment ID"
-// @Success 200 {object} dtos.SuccessResponse{data=entities.ClaimAttachment} "Claim attachment retrieved successfully"
-// @Failure 400 {object} dtos.ErrorResponse "Bad request"
-// @Failure 401 {object} dtos.ErrorResponse "Unauthorized"
-// @Failure 404 {object} dtos.ErrorResponse "Claim attachment not found"
-// @Failure 500 {object} dtos.ErrorResponse "Internal server error"
+// @Success 200 {object} dto.SuccessResponse{data=entities.ClaimAttachment} "Claim attachment retrieved successfully"
+// @Failure 400 {object} dto.ErrorResponse "Bad request"
+// @Failure 401 {object} dto.ErrorResponse "Unauthorized"
+// @Failure 404 {object} dto.ErrorResponse "Claim attachment not found"
+// @Failure 500 {object} dto.ErrorResponse "Internal server error"
 // @Router /claims/{id}/attachments/{attachmentID} [get]
 func (h *claimAttachmentHandler) GetByID(c *gin.Context) {
 	ctx, cancel := context.WithTimeout(c.Request.Context(), requestTimeout)
@@ -76,11 +76,11 @@ func (h *claimAttachmentHandler) GetByID(c *gin.Context) {
 // @Produce json
 // @Security Bearer
 // @Param id path string true "Claim ID"
-// @Success 200 {object} dtos.SuccessResponse{data=dtos.ClaimAttachmentListResponse} "Claim attachments retrieved successfully"
-// @Failure 400 {object} dtos.ErrorResponse "Bad request"
-// @Failure 401 {object} dtos.ErrorResponse "Unauthorized"
-// @Failure 404 {object} dtos.ErrorResponse "Claim not found"
-// @Failure 500 {object} dtos.ErrorResponse "Internal server error"
+// @Success 200 {object} dto.SuccessResponse{data=dto.ClaimAttachmentListResponse} "Claim attachments retrieved successfully"
+// @Failure 400 {object} dto.ErrorResponse "Bad request"
+// @Failure 401 {object} dto.ErrorResponse "Unauthorized"
+// @Failure 404 {object} dto.ErrorResponse "Claim not found"
+// @Failure 500 {object} dto.ErrorResponse "Internal server error"
 // @Router /claims/{id}/attachments [get]
 func (h *claimAttachmentHandler) GetByClaimID(c *gin.Context) {
 	ctx, cancel := context.WithTimeout(c.Request.Context(), requestTimeout)
@@ -110,12 +110,12 @@ func (h *claimAttachmentHandler) GetByClaimID(c *gin.Context) {
 // @Security Bearer
 // @Param id path string true "Claim ID"
 // @Param files formData file true "Files to upload"
-// @Success 201 {object} dtos.SuccessResponse{data=[]entities.ClaimAttachment} "Claim attachments uploaded successfully"
-// @Failure 400 {object} dtos.ErrorResponse "Bad request"
-// @Failure 401 {object} dtos.ErrorResponse "Unauthorized"
-// @Failure 403 {object} dtos.ErrorResponse "Forbidden"
-// @Failure 404 {object} dtos.ErrorResponse "Claim not found"
-// @Failure 500 {object} dtos.ErrorResponse "Internal server error"
+// @Success 201 {object} dto.SuccessResponse{data=[]entities.ClaimAttachment} "Claim attachments uploaded successfully"
+// @Failure 400 {object} dto.ErrorResponse "Bad request"
+// @Failure 401 {object} dto.ErrorResponse "Unauthorized"
+// @Failure 403 {object} dto.ErrorResponse "Forbidden"
+// @Failure 404 {object} dto.ErrorResponse "Claim not found"
+// @Failure 500 {object} dto.ErrorResponse "Internal server error"
 // @Router /claims/{id}/attachments [post]
 func (h *claimAttachmentHandler) Create(c *gin.Context) {
 	if err := allowedRoles(c, entities.UserRoleScTechnician); err != nil {
@@ -177,12 +177,12 @@ func (h *claimAttachmentHandler) Create(c *gin.Context) {
 // @Security Bearer
 // @Param id path string true "Claim ID"
 // @Param attachmentID path string true "Attachment ID"
-// @Success 204 {object} dtos.ErrorResponse "Claim attachment deleted successfully"
-// @Failure 400 {object} dtos.ErrorResponse "Bad request"
-// @Failure 401 {object} dtos.ErrorResponse "Unauthorized"
-// @Failure 403 {object} dtos.ErrorResponse "Forbidden"
-// @Failure 404 {object} dtos.ErrorResponse "Claim attachment not found"
-// @Failure 500 {object} dtos.ErrorResponse "Internal server error"
+// @Success 204 {object} dto.ErrorResponse "Claim attachment deleted successfully"
+// @Failure 400 {object} dto.ErrorResponse "Bad request"
+// @Failure 401 {object} dto.ErrorResponse "Unauthorized"
+// @Failure 403 {object} dto.ErrorResponse "Forbidden"
+// @Failure 404 {object} dto.ErrorResponse "Claim attachment not found"
+// @Failure 500 {object} dto.ErrorResponse "Internal server error"
 // @Router /claims/{id}/attachments/{attachmentID} [delete]
 func (h *claimAttachmentHandler) Delete(c *gin.Context) {
 	if err := allowedRoles(c, entities.UserRoleScTechnician); err != nil {

@@ -6,7 +6,7 @@ import (
 	"ev-warranty-go/internal/application"
 	"ev-warranty-go/internal/application/services"
 	"ev-warranty-go/internal/domain/entities"
-	"ev-warranty-go/internal/interfaces/api/dtos"
+	"ev-warranty-go/internal/interfaces/api/dto"
 	"ev-warranty-go/pkg/logger"
 	"net/http"
 
@@ -53,11 +53,11 @@ func NewClaimHandler(log logger.Logger, txManager application.TxManager, claimSe
 // @Produce json
 // @Security Bearer
 // @Param id path string true "Claim ID"
-// @Success 200 {object} dtos.SuccessResponse{data=entities.Claim} "Claim retrieved successfully"
-// @Failure 400 {object} dtos.ErrorResponse "Bad request"
-// @Failure 401 {object} dtos.ErrorResponse "Unauthorized"
-// @Failure 404 {object} dtos.ErrorResponse "Claim not found"
-// @Failure 500 {object} dtos.ErrorResponse "Internal server error"
+// @Success 200 {object} dto.SuccessResponse{data=entities.Claim} "Claim retrieved successfully"
+// @Failure 400 {object} dto.ErrorResponse "Bad request"
+// @Failure 401 {object} dto.ErrorResponse "Unauthorized"
+// @Failure 404 {object} dto.ErrorResponse "Claim not found"
+// @Failure 500 {object} dto.ErrorResponse "Internal server error"
 // @Router /claims/{id} [get]
 func (h *claimHandler) GetByID(c *gin.Context) {
 	ctx, cancel := context.WithTimeout(c.Request.Context(), requestTimeout)
@@ -86,9 +86,9 @@ func (h *claimHandler) GetByID(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Security Bearer
-// @Success 200 {object} dtos.SuccessResponse{data=[]entities.Claim} "Claims retrieved successfully"
-// @Failure 401 {object} dtos.ErrorResponse "Unauthorized"
-// @Failure 500 {object} dtos.ErrorResponse "Internal server error"
+// @Success 200 {object} dto.SuccessResponse{data=[]entities.Claim} "Claims retrieved successfully"
+// @Failure 401 {object} dto.ErrorResponse "Unauthorized"
+// @Failure 500 {object} dto.ErrorResponse "Internal server error"
 // @Router /claims [get]
 func (h *claimHandler) GetAll(c *gin.Context) {
 	ctx, cancel := context.WithTimeout(c.Request.Context(), requestTimeout)
@@ -110,12 +110,12 @@ func (h *claimHandler) GetAll(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Security Bearer
-// @Param createClaimRequest body dtos.CreateClaimRequest true "Claim creation data"
-// @Success 201 {object} dtos.SuccessResponse{data=entities.Claim} "Claim created successfully"
-// @Failure 400 {object} dtos.ErrorResponse "Bad request"
-// @Failure 401 {object} dtos.ErrorResponse "Unauthorized"
-// @Failure 403 {object} dtos.ErrorResponse "Forbidden"
-// @Failure 500 {object} dtos.ErrorResponse "Internal server error"
+// @Param createClaimRequest body dto.CreateClaimRequest true "Claim creation data"
+// @Success 201 {object} dto.SuccessResponse{data=entities.Claim} "Claim created successfully"
+// @Failure 400 {object} dto.ErrorResponse "Bad request"
+// @Failure 401 {object} dto.ErrorResponse "Unauthorized"
+// @Failure 403 {object} dto.ErrorResponse "Forbidden"
+// @Failure 500 {object} dto.ErrorResponse "Internal server error"
 // @Router /claims [post]
 func (h *claimHandler) Create(c *gin.Context) {
 	if err := allowedRoles(c, entities.UserRoleScTechnician, entities.UserRoleScStaff); err != nil {
@@ -123,7 +123,7 @@ func (h *claimHandler) Create(c *gin.Context) {
 		return
 	}
 
-	var req dtos.CreateClaimRequest
+	var req dto.CreateClaimRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		handleError(h.log, c, apperrors.NewInvalidJsonRequest())
 		return
@@ -165,13 +165,13 @@ func (h *claimHandler) Create(c *gin.Context) {
 // @Produce json
 // @Security Bearer
 // @Param id path string true "Claim ID"
-// @Param updateClaimRequest body dtos.UpdateClaimRequest true "Claim update data"
+// @Param updateClaimRequest body dto.UpdateClaimRequest true "Claim update data"
 // @Success 204 "Claim updated successfully"
-// @Failure 400 {object} dtos.ErrorResponse "Bad request"
-// @Failure 401 {object} dtos.ErrorResponse "Unauthorized"
-// @Failure 403 {object} dtos.ErrorResponse "Forbidden"
-// @Failure 404 {object} dtos.ErrorResponse "Claim not found"
-// @Failure 500 {object} dtos.ErrorResponse "Internal server error"
+// @Failure 400 {object} dto.ErrorResponse "Bad request"
+// @Failure 401 {object} dto.ErrorResponse "Unauthorized"
+// @Failure 403 {object} dto.ErrorResponse "Forbidden"
+// @Failure 404 {object} dto.ErrorResponse "Claim not found"
+// @Failure 500 {object} dto.ErrorResponse "Internal server error"
 // @Router /claims/{id} [put]
 func (h *claimHandler) Update(c *gin.Context) {
 	if err := allowedRoles(c, entities.UserRoleScStaff); err != nil {
@@ -186,7 +186,7 @@ func (h *claimHandler) Update(c *gin.Context) {
 		return
 	}
 
-	var req dtos.UpdateClaimRequest
+	var req dto.UpdateClaimRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		handleError(h.log, c, apperrors.NewInvalidJsonRequest())
 		return
@@ -217,11 +217,11 @@ func (h *claimHandler) Update(c *gin.Context) {
 // @Security Bearer
 // @Param id path string true "Claim ID"
 // @Success 204 "Claim deleted successfully"
-// @Failure 400 {object} dtos.ErrorResponse "Bad request"
-// @Failure 401 {object} dtos.ErrorResponse "Unauthorized"
-// @Failure 403 {object} dtos.ErrorResponse "Forbidden"
-// @Failure 404 {object} dtos.ErrorResponse "Claim not found"
-// @Failure 500 {object} dtos.ErrorResponse "Internal server error"
+// @Failure 400 {object} dto.ErrorResponse "Bad request"
+// @Failure 401 {object} dto.ErrorResponse "Unauthorized"
+// @Failure 403 {object} dto.ErrorResponse "Forbidden"
+// @Failure 404 {object} dto.ErrorResponse "Claim not found"
+// @Failure 500 {object} dto.ErrorResponse "Internal server error"
 // @Router /claims/{id} [delete]
 func (h *claimHandler) Delete(c *gin.Context) {
 	if err := allowedRoles(c, entities.UserRoleScStaff, entities.UserRoleEvmStaff); err != nil {
@@ -261,11 +261,11 @@ func (h *claimHandler) Delete(c *gin.Context) {
 // @Security Bearer
 // @Param id path string true "Claim ID"
 // @Success 204 "Claim submitted successfully"
-// @Failure 400 {object} dtos.ErrorResponse "Bad request"
-// @Failure 401 {object} dtos.ErrorResponse "Unauthorized"
-// @Failure 403 {object} dtos.ErrorResponse "Forbidden"
-// @Failure 404 {object} dtos.ErrorResponse "Claim not found"
-// @Failure 500 {object} dtos.ErrorResponse "Internal server error"
+// @Failure 400 {object} dto.ErrorResponse "Bad request"
+// @Failure 401 {object} dto.ErrorResponse "Unauthorized"
+// @Failure 403 {object} dto.ErrorResponse "Forbidden"
+// @Failure 404 {object} dto.ErrorResponse "Claim not found"
+// @Failure 500 {object} dto.ErrorResponse "Internal server error"
 // @Router /claims/{id}/submit [post]
 func (h *claimHandler) Submit(c *gin.Context) {
 	if err := allowedRoles(c, entities.UserRoleScStaff); err != nil {
@@ -307,11 +307,11 @@ func (h *claimHandler) Submit(c *gin.Context) {
 // @Security Bearer
 // @Param id path string true "Claim ID"
 // @Success 204 "Claim reviewed successfully"
-// @Failure 400 {object} dtos.ErrorResponse "Bad request"
-// @Failure 401 {object} dtos.ErrorResponse "Unauthorized"
-// @Failure 403 {object} dtos.ErrorResponse "Forbidden"
-// @Failure 404 {object} dtos.ErrorResponse "Claim not found"
-// @Failure 500 {object} dtos.ErrorResponse "Internal server error"
+// @Failure 400 {object} dto.ErrorResponse "Bad request"
+// @Failure 401 {object} dto.ErrorResponse "Unauthorized"
+// @Failure 403 {object} dto.ErrorResponse "Forbidden"
+// @Failure 404 {object} dto.ErrorResponse "Claim not found"
+// @Failure 500 {object} dto.ErrorResponse "Internal server error"
 // @Router /claims/{id}/review [post]
 func (h *claimHandler) Review(c *gin.Context) {
 	if err := allowedRoles(c, entities.UserRoleEvmStaff); err != nil {
@@ -353,11 +353,11 @@ func (h *claimHandler) Review(c *gin.Context) {
 // @Security Bearer
 // @Param id path string true "Claim ID"
 // @Success 204 "Information request sent successfully"
-// @Failure 400 {object} dtos.ErrorResponse "Bad request"
-// @Failure 401 {object} dtos.ErrorResponse "Unauthorized"
-// @Failure 403 {object} dtos.ErrorResponse "Forbidden"
-// @Failure 404 {object} dtos.ErrorResponse "Claim not found"
-// @Failure 500 {object} dtos.ErrorResponse "Internal server error"
+// @Failure 400 {object} dto.ErrorResponse "Bad request"
+// @Failure 401 {object} dto.ErrorResponse "Unauthorized"
+// @Failure 403 {object} dto.ErrorResponse "Forbidden"
+// @Failure 404 {object} dto.ErrorResponse "Claim not found"
+// @Failure 500 {object} dto.ErrorResponse "Internal server error"
 // @Router /claims/{id}/request-information [post]
 func (h *claimHandler) RequestInformation(c *gin.Context) {
 	if err := allowedRoles(c, entities.UserRoleEvmStaff); err != nil {
@@ -399,11 +399,11 @@ func (h *claimHandler) RequestInformation(c *gin.Context) {
 // @Security Bearer
 // @Param id path string true "Claim ID"
 // @Success 204 "Claim cancelled successfully"
-// @Failure 400 {object} dtos.ErrorResponse "Bad request"
-// @Failure 401 {object} dtos.ErrorResponse "Unauthorized"
-// @Failure 403 {object} dtos.ErrorResponse "Forbidden"
-// @Failure 404 {object} dtos.ErrorResponse "Claim not found"
-// @Failure 500 {object} dtos.ErrorResponse "Internal server error"
+// @Failure 400 {object} dto.ErrorResponse "Bad request"
+// @Failure 401 {object} dto.ErrorResponse "Unauthorized"
+// @Failure 403 {object} dto.ErrorResponse "Forbidden"
+// @Failure 404 {object} dto.ErrorResponse "Claim not found"
+// @Failure 500 {object} dto.ErrorResponse "Internal server error"
 // @Router /claims/{id}/cancel [post]
 func (h *claimHandler) Cancel(c *gin.Context) {
 	if err := allowedRoles(c, entities.UserRoleScStaff); err != nil {
@@ -445,11 +445,11 @@ func (h *claimHandler) Cancel(c *gin.Context) {
 // @Security Bearer
 // @Param id path string true "Claim ID"
 // @Success 204 "Claim completed successfully"
-// @Failure 400 {object} dtos.ErrorResponse "Bad request"
-// @Failure 401 {object} dtos.ErrorResponse "Unauthorized"
-// @Failure 403 {object} dtos.ErrorResponse "Forbidden"
-// @Failure 404 {object} dtos.ErrorResponse "Claim not found"
-// @Failure 500 {object} dtos.ErrorResponse "Internal server error"
+// @Failure 400 {object} dto.ErrorResponse "Bad request"
+// @Failure 401 {object} dto.ErrorResponse "Unauthorized"
+// @Failure 403 {object} dto.ErrorResponse "Forbidden"
+// @Failure 404 {object} dto.ErrorResponse "Claim not found"
+// @Failure 500 {object} dto.ErrorResponse "Internal server error"
 // @Router /claims/{id}/complete [post]
 func (h *claimHandler) Complete(c *gin.Context) {
 	if err := allowedRoles(c, entities.UserRoleEvmStaff); err != nil {
@@ -490,11 +490,11 @@ func (h *claimHandler) Complete(c *gin.Context) {
 // @Produce json
 // @Security Bearer
 // @Param id path string true "Claim ID"
-// @Success 200 {object} dtos.SuccessResponse{data=[]entities.ClaimHistory} "Claim history retrieved successfully"
-// @Failure 400 {object} dtos.ErrorResponse "Bad request"
-// @Failure 401 {object} dtos.ErrorResponse "Unauthorized"
-// @Failure 404 {object} dtos.ErrorResponse "Claim not found"
-// @Failure 500 {object} dtos.ErrorResponse "Internal server error"
+// @Success 200 {object} dto.SuccessResponse{data=[]entities.ClaimHistory} "Claim history retrieved successfully"
+// @Failure 400 {object} dto.ErrorResponse "Bad request"
+// @Failure 401 {object} dto.ErrorResponse "Unauthorized"
+// @Failure 404 {object} dto.ErrorResponse "Claim not found"
+// @Failure 500 {object} dto.ErrorResponse "Internal server error"
 // @Router /claims/{id}/history [get]
 func (h *claimHandler) History(c *gin.Context) {
 	ctx, cancel := context.WithTimeout(c.Request.Context(), requestTimeout)

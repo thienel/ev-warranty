@@ -7,7 +7,7 @@ import (
 	"ev-warranty-go/internal/application"
 	"ev-warranty-go/internal/application/services"
 	"ev-warranty-go/internal/domain/entities"
-	"ev-warranty-go/internal/interfaces/api/dtos"
+	"ev-warranty-go/internal/interfaces/api/dto"
 	"ev-warranty-go/internal/interfaces/api/handlers"
 	"ev-warranty-go/pkg/mocks"
 	"net/http"
@@ -32,7 +32,7 @@ var _ = Describe("ClaimItemHandler", func() {
 		claimID         uuid.UUID
 		itemID          uuid.UUID
 		sampleClaimItem *entities.ClaimItem
-		validReq        dtos.CreateClaimItemRequest
+		validReq        dto.CreateClaimItemRequest
 	)
 
 	setupTxMock := func(serviceMockFn func()) {
@@ -62,7 +62,7 @@ var _ = Describe("ClaimItemHandler", func() {
 
 		claimID = uuid.New()
 		itemID = uuid.New()
-		validReq = dtos.CreateClaimItemRequest{
+		validReq = dto.CreateClaimItemRequest{
 			PartCategoryID:    uuid.New(),
 			FaultyPartID:      uuid.New(),
 			ReplacementPartID: func() *uuid.UUID { id := uuid.New(); return &id }(),

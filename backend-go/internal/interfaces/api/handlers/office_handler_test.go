@@ -5,7 +5,7 @@ import (
 	"ev-warranty-go/internal/apperrors"
 	"ev-warranty-go/internal/application/services"
 	"ev-warranty-go/internal/domain/entities"
-	"ev-warranty-go/internal/interfaces/api/dtos"
+	"ev-warranty-go/internal/interfaces/api/dto"
 	"ev-warranty-go/internal/interfaces/api/handlers"
 	"ev-warranty-go/pkg/mocks"
 	"net/http"
@@ -25,7 +25,7 @@ var _ = Describe("OfficeHandler", func() {
 		handler      handlers.OfficeHandler
 		r            *gin.Engine
 		w            *httptest.ResponseRecorder
-		validReq     dtos.CreateOfficeRequest
+		validReq     dto.CreateOfficeRequest
 		sampleOffice *entities.Office
 	)
 
@@ -44,7 +44,7 @@ var _ = Describe("OfficeHandler", func() {
 		mockService = mocks.NewOfficeService(GinkgoT())
 		handler = handlers.NewOfficeHandler(mockLogger, mockService)
 
-		validReq = dtos.CreateOfficeRequest{
+		validReq = dto.CreateOfficeRequest{
 			OfficeName: "Test Office",
 			OfficeType: entities.OfficeTypeEVM,
 			Address:    "123 Test Street",
@@ -69,7 +69,7 @@ var _ = Describe("OfficeHandler", func() {
 			})
 
 			DescribeTable("should handle validation errors",
-				func(modifyReq func(*dtos.CreateOfficeRequest), expectedError string) {
+				func(modifyReq func(*dto.CreateOfficeRequest), expectedError string) {
 					req := validReq
 					if modifyReq != nil {
 						modifyReq(&req)
@@ -78,7 +78,7 @@ var _ = Describe("OfficeHandler", func() {
 					ExpectErrorCode(w, http.StatusBadRequest, expectedError)
 				},
 				Entry("invalid office type",
-					func(req *dtos.CreateOfficeRequest) {
+					func(req *dto.CreateOfficeRequest) {
 						req.OfficeType = "INVALID_TYPE"
 					},
 					apperrors.ErrorCodeInvalidOfficeType),
@@ -180,7 +180,7 @@ var _ = Describe("OfficeHandler", func() {
 
 	Describe("Update", func() {
 		officeID := uuid.New()
-		updateReq := dtos.UpdateOfficeRequest{
+		updateReq := dto.UpdateOfficeRequest{
 			OfficeName: "Updated Office",
 			Address:    "456 Updated Street",
 			IsActive:   false,
@@ -279,6 +279,6 @@ var _ = Describe("OfficeHandler", func() {
 	})
 })
 
-func CreateOfficeFromRequest(req dtos.CreateOfficeRequest) *entities.Office {
+func CreateOfficeFromRequest(req dto.CreateOfficeRequest) *entities.Office {
 	return entities.NewOffice(req.OfficeName, req.OfficeType, req.Address, req.IsActive)
 }

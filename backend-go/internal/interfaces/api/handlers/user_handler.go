@@ -5,7 +5,7 @@ import (
 	"ev-warranty-go/internal/apperrors"
 	"ev-warranty-go/internal/application/services"
 	"ev-warranty-go/internal/domain/entities"
-	"ev-warranty-go/internal/interfaces/api/dtos"
+	"ev-warranty-go/internal/interfaces/api/dto"
 	"ev-warranty-go/pkg/logger"
 	"net/http"
 	"strings"
@@ -41,12 +41,12 @@ func NewUserHandler(log logger.Logger, userService services.UserService) UserHan
 // @Accept json
 // @Produce json
 // @Security Bearer
-// @Param createUserRequest body dtos.CreateUserRequest true "User creation data"
-// @Success 201 {object} dtos.SuccessResponse{data=dtos.UserDTO} "User created successfully"
-// @Failure 400 {object} dtos.ErrorResponse "Bad request"
-// @Failure 401 {object} dtos.ErrorResponse "Unauthorized"
-// @Failure 403 {object} dtos.ErrorResponse "Forbidden"
-// @Failure 500 {object} dtos.ErrorResponse "Internal server error"
+// @Param createUserRequest body dto.CreateUserRequest true "User creation data"
+// @Success 201 {object} dto.SuccessResponse{data=dto.UserDTO} "User created successfully"
+// @Failure 400 {object} dto.ErrorResponse "Bad request"
+// @Failure 401 {object} dto.ErrorResponse "Unauthorized"
+// @Failure 403 {object} dto.ErrorResponse "Forbidden"
+// @Failure 500 {object} dto.ErrorResponse "Internal server error"
 // @Router /users [post]
 func (h userHandler) Create(c *gin.Context) {
 	if err := allowedRoles(c, entities.UserRoleAdmin); err != nil {
@@ -59,7 +59,7 @@ func (h userHandler) Create(c *gin.Context) {
 
 	h.log.Info("create user request", "remote_addr", c.ClientIP())
 
-	var req dtos.CreateUserRequest
+	var req dto.CreateUserRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		handleError(h.log, c, apperrors.NewInvalidJsonRequest())
 		return
@@ -82,7 +82,7 @@ func (h userHandler) Create(c *gin.Context) {
 		return
 	}
 
-	response := *dtos.GenerateUserDTO(user)
+	response := *dto.GenerateUserDTO(user)
 	h.log.Info("user created", "user_id", user.ID, "email", user.Email)
 	writeSuccessResponse(c, http.StatusCreated, response)
 }
@@ -95,13 +95,13 @@ func (h userHandler) Create(c *gin.Context) {
 // @Produce json
 // @Security Bearer
 // @Param id path string true "User ID"
-// @Param updateUserRequest body dtos.UpdateUserRequest true "User update data"
+// @Param updateUserRequest body dto.UpdateUserRequest true "User update data"
 // @Success 204 "User updated successfully"
-// @Failure 400 {object} dtos.ErrorResponse "Bad request"
-// @Failure 401 {object} dtos.ErrorResponse "Unauthorized"
-// @Failure 403 {object} dtos.ErrorResponse "Forbidden"
-// @Failure 404 {object} dtos.ErrorResponse "User not found"
-// @Failure 500 {object} dtos.ErrorResponse "Internal server error"
+// @Failure 400 {object} dto.ErrorResponse "Bad request"
+// @Failure 401 {object} dto.ErrorResponse "Unauthorized"
+// @Failure 403 {object} dto.ErrorResponse "Forbidden"
+// @Failure 404 {object} dto.ErrorResponse "User not found"
+// @Failure 500 {object} dto.ErrorResponse "Internal server error"
 // @Router /users/{id} [put]
 func (h userHandler) Update(c *gin.Context) {
 	if err := allowedRoles(c, entities.UserRoleAdmin); err != nil {
@@ -121,7 +121,7 @@ func (h userHandler) Update(c *gin.Context) {
 		return
 	}
 
-	var req dtos.UpdateUserRequest
+	var req dto.UpdateUserRequest
 	if err = c.ShouldBindJSON(&req); err != nil {
 		handleError(h.log, c, apperrors.NewInvalidJsonRequest())
 		return
@@ -154,11 +154,11 @@ func (h userHandler) Update(c *gin.Context) {
 // @Produce json
 // @Security Bearer
 // @Param id path string true "User ID"
-// @Success 200 {object} dtos.SuccessResponse{data=dtos.UserDTO} "User retrieved successfully"
-// @Failure 400 {object} dtos.ErrorResponse "Bad request"
-// @Failure 401 {object} dtos.ErrorResponse "Unauthorized"
-// @Failure 404 {object} dtos.ErrorResponse "User not found"
-// @Failure 500 {object} dtos.ErrorResponse "Internal server error"
+// @Success 200 {object} dto.SuccessResponse{data=dto.UserDTO} "User retrieved successfully"
+// @Failure 400 {object} dto.ErrorResponse "Bad request"
+// @Failure 401 {object} dto.ErrorResponse "Unauthorized"
+// @Failure 404 {object} dto.ErrorResponse "User not found"
+// @Failure 500 {object} dto.ErrorResponse "Internal server error"
 // @Router /users/{id} [get]
 func (h userHandler) GetByID(c *gin.Context) {
 	ctx, cancel := context.WithTimeout(c.Request.Context(), requestTimeout)
@@ -190,9 +190,9 @@ func (h userHandler) GetByID(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Security Bearer
-// @Success 200 {object} dtos.SuccessResponse{data=[]dtos.UserDTO} "Users retrieved successfully"
-// @Failure 401 {object} dtos.ErrorResponse "Unauthorized"
-// @Failure 500 {object} dtos.ErrorResponse "Internal server error"
+// @Success 200 {object} dto.SuccessResponse{data=[]dto.UserDTO} "Users retrieved successfully"
+// @Failure 401 {object} dto.ErrorResponse "Unauthorized"
+// @Failure 500 {object} dto.ErrorResponse "Internal server error"
 // @Router /users [get]
 func (h userHandler) GetAll(c *gin.Context) {
 	ctx, cancel := context.WithTimeout(c.Request.Context(), requestTimeout)
@@ -206,7 +206,7 @@ func (h userHandler) GetAll(c *gin.Context) {
 		return
 	}
 
-	usersDto := dtos.GenerateUserDTOList(users)
+	usersDto := dto.GenerateUserDTOList(users)
 	h.log.Info("users retrieved", "count", len(usersDto))
 	writeSuccessResponse(c, http.StatusOK, usersDto)
 }
@@ -220,11 +220,11 @@ func (h userHandler) GetAll(c *gin.Context) {
 // @Security Bearer
 // @Param id path string true "User ID"
 // @Success 204 "User deleted successfully"
-// @Failure 400 {object} dtos.ErrorResponse "Bad request"
-// @Failure 401 {object} dtos.ErrorResponse "Unauthorized"
-// @Failure 403 {object} dtos.ErrorResponse "Forbidden"
-// @Failure 404 {object} dtos.ErrorResponse "User not found"
-// @Failure 500 {object} dtos.ErrorResponse "Internal server error"
+// @Failure 400 {object} dto.ErrorResponse "Bad request"
+// @Failure 401 {object} dto.ErrorResponse "Unauthorized"
+// @Failure 403 {object} dto.ErrorResponse "Forbidden"
+// @Failure 404 {object} dto.ErrorResponse "User not found"
+// @Failure 500 {object} dto.ErrorResponse "Internal server error"
 // @Router /users/{id} [delete]
 func (h userHandler) Delete(c *gin.Context) {
 	if err := allowedRoles(c, entities.UserRoleAdmin); err != nil {

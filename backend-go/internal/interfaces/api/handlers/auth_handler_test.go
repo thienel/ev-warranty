@@ -4,7 +4,7 @@ import (
 	"ev-warranty-go/internal/apperrors"
 	"ev-warranty-go/internal/application/services"
 	"ev-warranty-go/internal/domain/entities"
-	"ev-warranty-go/internal/interfaces/api/dtos"
+	"ev-warranty-go/internal/interfaces/api/dto"
 	"ev-warranty-go/internal/interfaces/api/handlers"
 	"ev-warranty-go/pkg/mocks"
 	"net/http"
@@ -38,7 +38,7 @@ var _ = Describe("AuthHandler", func() {
 
 	Describe("Login", func() {
 		var (
-			loginRequest = dtos.LoginRequest{Email: "test@example.com", Password: "password123"}
+			loginRequest = dto.LoginRequest{Email: "test@example.com", Password: "password123"}
 			userID       = uuid.New()
 			accessToken  = "access-token-123"
 			refreshToken = "refresh-token-456"

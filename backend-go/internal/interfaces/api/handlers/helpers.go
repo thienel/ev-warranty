@@ -3,7 +3,7 @@ package handlers
 import (
 	"errors"
 	"ev-warranty-go/internal/apperrors"
-	"ev-warranty-go/internal/interfaces/api/dtos"
+	"ev-warranty-go/internal/interfaces/api/dto"
 	"ev-warranty-go/pkg/logger"
 	"time"
 
@@ -25,13 +25,13 @@ func handleError(log logger.Logger, c *gin.Context, err error) {
 	}
 
 	log.Error(appErr.ErrorCode, "error", appErr.Error())
-	c.JSON(appErr.HttpCode, dtos.ErrorResponse{
+	c.JSON(appErr.HttpCode, dto.ErrorResponse{
 		Error: appErr.ErrorCode,
 	})
 }
 
 func writeSuccessResponse(c *gin.Context, statusCode int, data any) {
-	c.JSON(statusCode, dtos.SuccessResponse{
+	c.JSON(statusCode, dto.SuccessResponse{
 		Data: data,
 	})
 }

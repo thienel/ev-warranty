@@ -7,7 +7,7 @@ import (
 	"ev-warranty-go/internal/application"
 	"ev-warranty-go/internal/application/services"
 	"ev-warranty-go/internal/domain/entities"
-	"ev-warranty-go/internal/interfaces/api/dtos"
+	"ev-warranty-go/internal/interfaces/api/dto"
 	"ev-warranty-go/internal/interfaces/api/handlers"
 	"ev-warranty-go/pkg/mocks"
 	"net/http"
@@ -31,8 +31,8 @@ var _ = Describe("ClaimHandler", func() {
 		userID         uuid.UUID
 		claimID        uuid.UUID
 		sampleClaim    *entities.Claim
-		validCreateReq dtos.CreateClaimRequest
-		validUpdateReq dtos.UpdateClaimRequest
+		validCreateReq dto.CreateClaimRequest
+		validUpdateReq dto.UpdateClaimRequest
 	)
 
 	setupRoute := func(method, path string, role string, handlerFunc gin.HandlerFunc) {
@@ -74,13 +74,13 @@ var _ = Describe("ClaimHandler", func() {
 		vehicleID := uuid.New()
 		customerID := uuid.New()
 
-		validCreateReq = dtos.CreateClaimRequest{
+		validCreateReq = dto.CreateClaimRequest{
 			VehicleID:   vehicleID,
 			CustomerID:  customerID,
 			Description: "Test claim description for warranty issue",
 		}
 
-		validUpdateReq = dtos.UpdateClaimRequest{
+		validUpdateReq = dto.UpdateClaimRequest{
 			Description: "Updated claim description for warranty issue",
 		}
 
@@ -191,17 +191,17 @@ var _ = Describe("ClaimHandler", func() {
 			})
 
 			DescribeTable("should handle validation errors",
-				func(modifyReq func(*dtos.CreateClaimRequest), expectedError string) {
+				func(modifyReq func(*dto.CreateClaimRequest), expectedError string) {
 					req := validCreateReq
 					modifyReq(&req)
 
 					SendRequest(r, http.MethodPost, "/claims", w, req)
 					ExpectErrorCode(w, http.StatusBadRequest, expectedError)
 				},
-				Entry("empty description", func(req *dtos.CreateClaimRequest) {
+				Entry("empty description", func(req *dto.CreateClaimRequest) {
 					req.Description = ""
 				}, apperrors.ErrorCodeInvalidJsonRequest),
-				Entry("description too short", func(req *dtos.CreateClaimRequest) {
+				Entry("description too short", func(req *dto.CreateClaimRequest) {
 					req.Description = "short"
 				}, apperrors.ErrorCodeInvalidJsonRequest),
 			)

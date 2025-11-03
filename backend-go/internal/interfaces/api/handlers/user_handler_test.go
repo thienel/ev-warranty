@@ -5,7 +5,7 @@ import (
 	"ev-warranty-go/internal/apperrors"
 	"ev-warranty-go/internal/application/services"
 	"ev-warranty-go/internal/domain/entities"
-	"ev-warranty-go/internal/interfaces/api/dtos"
+	"ev-warranty-go/internal/interfaces/api/dto"
 	"ev-warranty-go/internal/interfaces/api/handlers"
 	"ev-warranty-go/pkg/mocks"
 	"net/http"
@@ -25,7 +25,7 @@ var _ = Describe("UserHandler", func() {
 		handler     handlers.UserHandler
 		r           *gin.Engine
 		w           *httptest.ResponseRecorder
-		validReq    dtos.CreateUserRequest
+		validReq    dto.CreateUserRequest
 		sampleUser  *entities.User
 	)
 
@@ -45,7 +45,7 @@ var _ = Describe("UserHandler", func() {
 		handler = handlers.NewUserHandler(mockLogger, mockService)
 
 		officeID := uuid.New()
-		validReq = dtos.CreateUserRequest{
+		validReq = dto.CreateUserRequest{
 			Name:     "John Doe",
 			Email:    "john.doe@example.com",
 			Role:     entities.UserRoleAdmin,
@@ -72,13 +72,13 @@ var _ = Describe("UserHandler", func() {
 			})
 
 			DescribeTable("should handle validation errors",
-				func(modifyReq func(*dtos.CreateUserRequest), expectedError string) {
+				func(modifyReq func(*dto.CreateUserRequest), expectedError string) {
 					req := validReq
 					modifyReq(&req)
 					SendRequest(r, http.MethodPost, "/users", w, req)
 					ExpectErrorCode(w, http.StatusBadRequest, expectedError)
 				},
-				Entry("invalid role", func(req *dtos.CreateUserRequest) {
+				Entry("invalid role", func(req *dto.CreateUserRequest) {
 					req.Role = "INVALID_ROLE"
 					mockService.EXPECT().Create(mock.Anything, mock.Anything).
 						Return(nil, apperrors.NewInvalidUserInput()).Once()
@@ -197,7 +197,7 @@ var _ = Describe("UserHandler", func() {
 
 	Describe("Update", func() {
 		userID := uuid.New()
-		updateReq := dtos.UpdateUserRequest{
+		updateReq := dto.UpdateUserRequest{
 			Name:     "Updated Name",
 			Role:     entities.UserRoleEvmStaff,
 			IsActive: true,
@@ -309,6 +309,6 @@ var _ = Describe("UserHandler", func() {
 	})
 })
 
-func CreateUserFromRequest(req dtos.CreateUserRequest) *entities.User {
+func CreateUserFromRequest(req dto.CreateUserRequest) *entities.User {
 	return entities.NewUser(req.Name, req.Email, req.Role, "hashed_password", req.IsActive, req.OfficeID)
 }

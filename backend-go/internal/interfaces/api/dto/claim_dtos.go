@@ -1,4 +1,4 @@
-package dtos
+package dto
 
 import (
 	"ev-warranty-go/internal/domain/entities"
