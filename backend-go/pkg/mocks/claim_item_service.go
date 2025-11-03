@@ -6,7 +6,7 @@ import (
 	context "context"
 	application "ev-warranty-go/internal/application"
 
-	entities "ev-warranty-go/internal/domain/entities"
+	entities "ev-warranty-go/internal/domain/entity"
 
 	mock "github.com/stretchr/testify/mock"
 

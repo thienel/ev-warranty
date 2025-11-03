@@ -5,7 +5,7 @@ import (
 	"errors"
 	"ev-warranty-go/internal/application"
 	"ev-warranty-go/internal/application/services"
-	"ev-warranty-go/internal/domain/entities"
+	"ev-warranty-go/internal/domain/entity"
 	"ev-warranty-go/internal/interface/api/dto"
 	"ev-warranty-go/internal/interface/api/handler"
 	apperrors2 "ev-warranty-go/pkg/apperror"
@@ -30,7 +30,7 @@ var _ = Describe("ClaimHandler", func() {
 		w              *httptest.ResponseRecorder
 		userID         uuid.UUID
 		claimID        uuid.UUID
-		sampleClaim    *entities.Claim
+		sampleClaim    *entity.Claim
 		validCreateReq dto.CreateClaimRequest
 		validUpdateReq dto.UpdateClaimRequest
 	)
@@ -84,7 +84,7 @@ var _ = Describe("ClaimHandler", func() {
 			Description: "Updated claim description for warranty issue",
 		}
 
-		sampleClaim = entities.NewClaim(vehicleID, customerID, validCreateReq.Description, entities.ClaimStatusDraft, nil)
+		sampleClaim = entity.NewClaim(vehicleID, customerID, validCreateReq.Description, entity.ClaimStatusDraft, nil)
 		sampleClaim.ID = claimID
 	})
 
@@ -136,7 +136,7 @@ var _ = Describe("ClaimHandler", func() {
 		})
 
 		It("should retrieve all claims successfully", func() {
-			expectedClaims := []*entities.Claim{sampleClaim}
+			expectedClaims := []*entity.Claim{sampleClaim}
 			mockService.EXPECT().GetAll(mock.Anything).Return(expectedClaims, nil).Once()
 
 			req, _ := http.NewRequest(http.MethodGet, "/claims", nil)
@@ -146,7 +146,7 @@ var _ = Describe("ClaimHandler", func() {
 		})
 
 		It("should handle empty claims list", func() {
-			mockService.EXPECT().GetAll(mock.Anything).Return([]*entities.Claim{}, nil).Once()
+			mockService.EXPECT().GetAll(mock.Anything).Return([]*entity.Claim{}, nil).Once()
 
 			req, _ := http.NewRequest(http.MethodGet, "/claims", nil)
 			r.ServeHTTP(w, req)
@@ -168,7 +168,7 @@ var _ = Describe("ClaimHandler", func() {
 	Describe("Create", func() {
 		Context("when authorized as SC_TECHNICIAN", func() {
 			BeforeEach(func() {
-				setupRoute("POST", "/claims", entities.UserRoleScTechnician, claimHandler.Create)
+				setupRoute("POST", "/claims", entity.UserRoleScTechnician, claimHandler.Create)
 			})
 
 			It("should create claim successfully", func() {
@@ -228,7 +228,7 @@ var _ = Describe("ClaimHandler", func() {
 
 		Context("when authorized as SC_STAFF", func() {
 			BeforeEach(func() {
-				setupRoute("POST", "/claims", entities.UserRoleScStaff, claimHandler.Create)
+				setupRoute("POST", "/claims", entity.UserRoleScStaff, claimHandler.Create)
 			})
 
 			It("should create claim successfully", func() {
@@ -242,14 +242,14 @@ var _ = Describe("ClaimHandler", func() {
 		})
 
 		It("should deny access for unauthorized roles", func() {
-			setupRoute("POST", "/claims", entities.UserRoleEvmStaff, claimHandler.Create)
+			setupRoute("POST", "/claims", entity.UserRoleEvmStaff, claimHandler.Create)
 			SendRequest(r, http.MethodPost, "/claims", w, validCreateReq)
 			ExpectErrorCode(w, http.StatusForbidden, apperrors2.ErrorCodeUnauthorizedRole)
 		})
 
 		It("should handle missing user ID header", func() {
 			r.POST("/claims", func(c *gin.Context) {
-				SetHeaderRole(c, entities.UserRoleScTechnician)
+				SetHeaderRole(c, entity.UserRoleScTechnician)
 				SetContentTypeJSON(c)
 				claimHandler.Create(c)
 			})
@@ -260,7 +260,7 @@ var _ = Describe("ClaimHandler", func() {
 
 		It("should handle invalid user ID header", func() {
 			r.POST("/claims", func(c *gin.Context) {
-				SetHeaderRole(c, entities.UserRoleScTechnician)
+				SetHeaderRole(c, entity.UserRoleScTechnician)
 				c.Request.Header.Set("X-User-ID", "invalid-uuid")
 				SetContentTypeJSON(c)
 				claimHandler.Create(c)
@@ -274,7 +274,7 @@ var _ = Describe("ClaimHandler", func() {
 	Describe("Update", func() {
 		Context("when authorized as SC_STAFF", func() {
 			BeforeEach(func() {
-				setupRoute("PUT", "/claims/:id", entities.UserRoleScStaff, claimHandler.Update)
+				setupRoute("PUT", "/claims/:id", entity.UserRoleScStaff, claimHandler.Update)
 			})
 
 			It("should update claim successfully", func() {
@@ -311,7 +311,7 @@ var _ = Describe("ClaimHandler", func() {
 		})
 
 		It("should deny access for unauthorized roles", func() {
-			setupRoute("PUT", "/claims/:id", entities.UserRoleScTechnician, claimHandler.Update)
+			setupRoute("PUT", "/claims/:id", entity.UserRoleScTechnician, claimHandler.Update)
 			SendRequest(r, http.MethodPut, "/claims/"+claimID.String(), w, validUpdateReq)
 			ExpectErrorCode(w, http.StatusForbidden, apperrors2.ErrorCodeUnauthorizedRole)
 		})
@@ -320,7 +320,7 @@ var _ = Describe("ClaimHandler", func() {
 	Describe("Delete", func() {
 		Context("when authorized as SC_STAFF", func() {
 			BeforeEach(func() {
-				setupRoute("DELETE", "/claims/:id", entities.UserRoleScStaff, claimHandler.Delete)
+				setupRoute("DELETE", "/claims/:id", entity.UserRoleScStaff, claimHandler.Delete)
 			})
 
 			It("should perform hard delete successfully", func() {
@@ -351,7 +351,7 @@ var _ = Describe("ClaimHandler", func() {
 
 		Context("when authorized as EVM_STAFF", func() {
 			BeforeEach(func() {
-				setupRoute("DELETE", "/claims/:id", entities.UserRoleEvmStaff, claimHandler.Delete)
+				setupRoute("DELETE", "/claims/:id", entity.UserRoleEvmStaff, claimHandler.Delete)
 			})
 
 			It("should perform soft delete successfully", func() {
@@ -365,7 +365,7 @@ var _ = Describe("ClaimHandler", func() {
 		})
 
 		It("should deny access for unauthorized roles", func() {
-			setupRoute("DELETE", "/claims/:id", entities.UserRoleScTechnician, claimHandler.Delete)
+			setupRoute("DELETE", "/claims/:id", entity.UserRoleScTechnician, claimHandler.Delete)
 			SendRequest(r, http.MethodDelete, "/claims/"+claimID.String(), w, nil)
 			ExpectErrorCode(w, http.StatusForbidden, apperrors2.ErrorCodeUnauthorizedRole)
 		})
@@ -374,7 +374,7 @@ var _ = Describe("ClaimHandler", func() {
 	Describe("Submit", func() {
 		Context("when authorized as SC_STAFF", func() {
 			BeforeEach(func() {
-				setupRoute("POST", "/claims/:id/submit", entities.UserRoleScStaff, claimHandler.Submit)
+				setupRoute("POST", "/claims/:id/submit", entity.UserRoleScStaff, claimHandler.Submit)
 			})
 
 			It("should submit claim successfully", func() {
@@ -404,14 +404,14 @@ var _ = Describe("ClaimHandler", func() {
 		})
 
 		It("should deny access for unauthorized roles", func() {
-			setupRoute("POST", "/claims/:id/submit", entities.UserRoleScTechnician, claimHandler.Submit)
+			setupRoute("POST", "/claims/:id/submit", entity.UserRoleScTechnician, claimHandler.Submit)
 			SendRequest(r, http.MethodPost, "/claims/"+claimID.String()+"/submit", w, nil)
 			ExpectErrorCode(w, http.StatusForbidden, apperrors2.ErrorCodeUnauthorizedRole)
 		})
 
 		It("should handle missing user ID header", func() {
 			r.POST("/claims/:id/submit", func(c *gin.Context) {
-				SetHeaderRole(c, entities.UserRoleScStaff)
+				SetHeaderRole(c, entity.UserRoleScStaff)
 				SetContentTypeJSON(c)
 				claimHandler.Submit(c)
 			})
@@ -422,7 +422,7 @@ var _ = Describe("ClaimHandler", func() {
 
 		It("should handle invalid user ID header", func() {
 			r.POST("/claims/:id/submit", func(c *gin.Context) {
-				SetHeaderRole(c, entities.UserRoleScStaff)
+				SetHeaderRole(c, entity.UserRoleScStaff)
 				c.Request.Header.Set("X-User-ID", "invalid-uuid")
 				SetContentTypeJSON(c)
 				claimHandler.Submit(c)
@@ -436,12 +436,12 @@ var _ = Describe("ClaimHandler", func() {
 	Describe("Review", func() {
 		Context("when authorized as EVM_STAFF", func() {
 			BeforeEach(func() {
-				setupRoute("POST", "/claims/:id/review", entities.UserRoleEvmStaff, claimHandler.Review)
+				setupRoute("POST", "/claims/:id/review", entity.UserRoleEvmStaff, claimHandler.Review)
 			})
 
 			It("should start review successfully", func() {
 				setupTxMock(func() {
-					mockService.EXPECT().UpdateStatus(mockTx, claimID, entities.ClaimStatusReviewing, userID).Return(nil).Once()
+					mockService.EXPECT().UpdateStatus(mockTx, claimID, entity.ClaimStatusReviewing, userID).Return(nil).Once()
 				})
 
 				SendRequest(r, http.MethodPost, "/claims/"+claimID.String()+"/review", w, nil)
@@ -456,7 +456,7 @@ var _ = Describe("ClaimHandler", func() {
 			It("should handle service errors", func() {
 				invalidActionError := apperrors2.NewInvalidClaimAction()
 				setupTxMockWithError(func() {
-					mockService.EXPECT().UpdateStatus(mockTx, claimID, entities.ClaimStatusReviewing, userID).
+					mockService.EXPECT().UpdateStatus(mockTx, claimID, entity.ClaimStatusReviewing, userID).
 						Return(invalidActionError).Once()
 				}, invalidActionError)
 
@@ -466,14 +466,14 @@ var _ = Describe("ClaimHandler", func() {
 		})
 
 		It("should deny access for unauthorized roles", func() {
-			setupRoute("POST", "/claims/:id/review", entities.UserRoleScStaff, claimHandler.Review)
+			setupRoute("POST", "/claims/:id/review", entity.UserRoleScStaff, claimHandler.Review)
 			SendRequest(r, http.MethodPost, "/claims/"+claimID.String()+"/review", w, nil)
 			ExpectErrorCode(w, http.StatusForbidden, apperrors2.ErrorCodeUnauthorizedRole)
 		})
 
 		It("should handle missing user ID header", func() {
 			r.POST("/claims/:id/review", func(c *gin.Context) {
-				SetHeaderRole(c, entities.UserRoleEvmStaff)
+				SetHeaderRole(c, entity.UserRoleEvmStaff)
 				SetContentTypeJSON(c)
 				claimHandler.Review(c)
 			})
@@ -484,7 +484,7 @@ var _ = Describe("ClaimHandler", func() {
 
 		It("should handle invalid user ID header", func() {
 			r.POST("/claims/:id/review", func(c *gin.Context) {
-				SetHeaderRole(c, entities.UserRoleEvmStaff)
+				SetHeaderRole(c, entity.UserRoleEvmStaff)
 				c.Request.Header.Set("X-User-ID", "invalid-uuid")
 				SetContentTypeJSON(c)
 				claimHandler.Review(c)
@@ -498,12 +498,12 @@ var _ = Describe("ClaimHandler", func() {
 	Describe("RequestInformation", func() {
 		Context("when authorized as EVM_STAFF", func() {
 			BeforeEach(func() {
-				setupRoute("POST", "/claims/:id/request-information", entities.UserRoleEvmStaff, claimHandler.RequestInformation)
+				setupRoute("POST", "/claims/:id/request-information", entity.UserRoleEvmStaff, claimHandler.RequestInformation)
 			})
 
 			It("should request info successfully", func() {
 				setupTxMock(func() {
-					mockService.EXPECT().UpdateStatus(mockTx, claimID, entities.ClaimStatusRequestInfo, userID).Return(nil).Once()
+					mockService.EXPECT().UpdateStatus(mockTx, claimID, entity.ClaimStatusRequestInfo, userID).Return(nil).Once()
 				})
 
 				SendRequest(r, http.MethodPost, "/claims/"+claimID.String()+"/request-information", w, nil)
@@ -518,7 +518,7 @@ var _ = Describe("ClaimHandler", func() {
 			It("should handle service errors", func() {
 				invalidActionError := apperrors2.NewInvalidClaimAction()
 				setupTxMockWithError(func() {
-					mockService.EXPECT().UpdateStatus(mockTx, claimID, entities.ClaimStatusRequestInfo, userID).
+					mockService.EXPECT().UpdateStatus(mockTx, claimID, entity.ClaimStatusRequestInfo, userID).
 						Return(invalidActionError).Once()
 				}, invalidActionError)
 
@@ -528,14 +528,14 @@ var _ = Describe("ClaimHandler", func() {
 		})
 
 		It("should deny access for unauthorized roles", func() {
-			setupRoute("POST", "/claims/:id/request-information", entities.UserRoleScStaff, claimHandler.RequestInformation)
+			setupRoute("POST", "/claims/:id/request-information", entity.UserRoleScStaff, claimHandler.RequestInformation)
 			SendRequest(r, http.MethodPost, "/claims/"+claimID.String()+"/request-information", w, nil)
 			ExpectErrorCode(w, http.StatusForbidden, apperrors2.ErrorCodeUnauthorizedRole)
 		})
 
 		It("should handle missing user ID header", func() {
 			r.POST("/claims/:id/request-information", func(c *gin.Context) {
-				SetHeaderRole(c, entities.UserRoleEvmStaff)
+				SetHeaderRole(c, entity.UserRoleEvmStaff)
 				SetContentTypeJSON(c)
 				claimHandler.RequestInformation(c)
 			})
@@ -546,7 +546,7 @@ var _ = Describe("ClaimHandler", func() {
 
 		It("should handle invalid user ID header", func() {
 			r.POST("/claims/:id/request-information", func(c *gin.Context) {
-				SetHeaderRole(c, entities.UserRoleEvmStaff)
+				SetHeaderRole(c, entity.UserRoleEvmStaff)
 				c.Request.Header.Set("X-User-ID", "invalid-uuid")
 				SetContentTypeJSON(c)
 				claimHandler.RequestInformation(c)
@@ -560,12 +560,12 @@ var _ = Describe("ClaimHandler", func() {
 	Describe("Cancel", func() {
 		Context("when authorized as SC_STAFF", func() {
 			BeforeEach(func() {
-				setupRoute("POST", "/claims/:id/cancel", entities.UserRoleScStaff, claimHandler.Cancel)
+				setupRoute("POST", "/claims/:id/cancel", entity.UserRoleScStaff, claimHandler.Cancel)
 			})
 
 			It("should cancel claim successfully", func() {
 				setupTxMock(func() {
-					mockService.EXPECT().UpdateStatus(mockTx, claimID, entities.ClaimStatusCancelled, userID).Return(nil).Once()
+					mockService.EXPECT().UpdateStatus(mockTx, claimID, entity.ClaimStatusCancelled, userID).Return(nil).Once()
 				})
 
 				SendRequest(r, http.MethodPost, "/claims/"+claimID.String()+"/cancel", w, nil)
@@ -580,7 +580,7 @@ var _ = Describe("ClaimHandler", func() {
 			It("should handle service errors", func() {
 				invalidActionError := apperrors2.NewInvalidClaimAction()
 				setupTxMockWithError(func() {
-					mockService.EXPECT().UpdateStatus(mockTx, claimID, entities.ClaimStatusCancelled, userID).
+					mockService.EXPECT().UpdateStatus(mockTx, claimID, entity.ClaimStatusCancelled, userID).
 						Return(invalidActionError).Once()
 				}, invalidActionError)
 
@@ -590,14 +590,14 @@ var _ = Describe("ClaimHandler", func() {
 		})
 
 		It("should deny access for unauthorized roles", func() {
-			setupRoute("POST", "/claims/:id/cancel", entities.UserRoleEvmStaff, claimHandler.Cancel)
+			setupRoute("POST", "/claims/:id/cancel", entity.UserRoleEvmStaff, claimHandler.Cancel)
 			SendRequest(r, http.MethodPost, "/claims/"+claimID.String()+"/cancel", w, nil)
 			ExpectErrorCode(w, http.StatusForbidden, apperrors2.ErrorCodeUnauthorizedRole)
 		})
 
 		It("should handle missing user ID header", func() {
 			r.POST("/claims/:id/cancel", func(c *gin.Context) {
-				SetHeaderRole(c, entities.UserRoleScStaff)
+				SetHeaderRole(c, entity.UserRoleScStaff)
 				SetContentTypeJSON(c)
 				claimHandler.Cancel(c)
 			})
@@ -608,7 +608,7 @@ var _ = Describe("ClaimHandler", func() {
 
 		It("should handle invalid user ID header", func() {
 			r.POST("/claims/:id/cancel", func(c *gin.Context) {
-				SetHeaderRole(c, entities.UserRoleScStaff)
+				SetHeaderRole(c, entity.UserRoleScStaff)
 				c.Request.Header.Set("X-User-ID", "invalid-uuid")
 				SetContentTypeJSON(c)
 				claimHandler.Cancel(c)
@@ -622,7 +622,7 @@ var _ = Describe("ClaimHandler", func() {
 	Describe("Complete", func() {
 		Context("when authorized as EVM_STAFF", func() {
 			BeforeEach(func() {
-				setupRoute("POST", "/claims/:id/complete", entities.UserRoleEvmStaff, claimHandler.Complete)
+				setupRoute("POST", "/claims/:id/complete", entity.UserRoleEvmStaff, claimHandler.Complete)
 			})
 
 			It("should complete claim successfully", func() {
@@ -652,14 +652,14 @@ var _ = Describe("ClaimHandler", func() {
 		})
 
 		It("should deny access for unauthorized roles", func() {
-			setupRoute("POST", "/claims/:id/complete", entities.UserRoleScStaff, claimHandler.Complete)
+			setupRoute("POST", "/claims/:id/complete", entity.UserRoleScStaff, claimHandler.Complete)
 			SendRequest(r, http.MethodPost, "/claims/"+claimID.String()+"/complete", w, nil)
 			ExpectErrorCode(w, http.StatusForbidden, apperrors2.ErrorCodeUnauthorizedRole)
 		})
 
 		It("should handle missing user ID header", func() {
 			r.POST("/claims/:id/complete", func(c *gin.Context) {
-				SetHeaderRole(c, entities.UserRoleEvmStaff)
+				SetHeaderRole(c, entity.UserRoleEvmStaff)
 				SetContentTypeJSON(c)
 				claimHandler.Complete(c)
 			})
@@ -670,7 +670,7 @@ var _ = Describe("ClaimHandler", func() {
 
 		It("should handle invalid user ID header", func() {
 			r.POST("/claims/:id/complete", func(c *gin.Context) {
-				SetHeaderRole(c, entities.UserRoleEvmStaff)
+				SetHeaderRole(c, entity.UserRoleEvmStaff)
 				c.Request.Header.Set("X-User-ID", "invalid-uuid")
 				SetContentTypeJSON(c)
 				claimHandler.Complete(c)
@@ -687,8 +687,8 @@ var _ = Describe("ClaimHandler", func() {
 		})
 
 		It("should get claim history successfully", func() {
-			sampleHistory := []*entities.ClaimHistory{
-				entities.NewClaimHistory(claimID, entities.ClaimStatusSubmitted, uuid.New()),
+			sampleHistory := []*entity.ClaimHistory{
+				entity.NewClaimHistory(claimID, entity.ClaimStatusSubmitted, uuid.New()),
 			}
 			mockService.EXPECT().GetHistory(mock.Anything, claimID).Return(sampleHistory, nil).Once()
 

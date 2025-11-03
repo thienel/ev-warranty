@@ -4,7 +4,7 @@ import (
 	"context"
 	"ev-warranty-go/internal/application"
 	"ev-warranty-go/internal/application/services"
-	"ev-warranty-go/internal/domain/entities"
+	"ev-warranty-go/internal/domain/entity"
 	"ev-warranty-go/internal/interface/api/dto"
 	"ev-warranty-go/pkg/apperror"
 	"ev-warranty-go/pkg/logger"
@@ -46,7 +46,7 @@ func NewClaimItemHandler(log logger.Logger, txManager application.TxManager, ser
 // @Security Bearer
 // @Param id path string true "Claim ID"
 // @Param itemID path string true "Claim Item ID"
-// @Success 200 {object} dto.SuccessResponse{data=entities.ClaimItem} "Claim item retrieved successfully"
+// @Success 200 {object} dto.SuccessResponse{data=entity.ClaimItem} "Claim item retrieved successfully"
 // @Failure 400 {object} dto.ErrorResponse "Bad request"
 // @Failure 401 {object} dto.ErrorResponse "Unauthorized"
 // @Failure 404 {object} dto.ErrorResponse "Claim item not found"
@@ -113,7 +113,7 @@ func (h *claimItemHandler) GetByClaimID(c *gin.Context) {
 // @Security Bearer
 // @Param id path string true "Claim ID"
 // @Param createClaimItemRequest body dto.CreateClaimItemRequest true "Claim item creation data"
-// @Success 201 {object} dto.SuccessResponse{data=entities.ClaimItem} "Claim item created successfully"
+// @Success 201 {object} dto.SuccessResponse{data=entity.ClaimItem} "Claim item created successfully"
 // @Failure 400 {object} dto.ErrorResponse "Bad request"
 // @Failure 401 {object} dto.ErrorResponse "Unauthorized"
 // @Failure 403 {object} dto.ErrorResponse "Forbidden"
@@ -121,7 +121,7 @@ func (h *claimItemHandler) GetByClaimID(c *gin.Context) {
 // @Failure 500 {object} dto.ErrorResponse "Internal server error"
 // @Router /claims/{id}/items [post]
 func (h *claimItemHandler) Create(c *gin.Context) {
-	if err := allowedRoles(c, entities.UserRoleScStaff); err != nil {
+	if err := allowedRoles(c, entity.UserRoleScStaff); err != nil {
 		handleError(h.log, c, err)
 		return
 	}
@@ -138,7 +138,7 @@ func (h *claimItemHandler) Create(c *gin.Context) {
 		return
 	}
 
-	if !entities.IsValidClaimItemType(req.Type) {
+	if !entity.IsValidClaimItemType(req.Type) {
 		handleError(h.log, c, apperror.NewInvalidClaimItemType())
 		return
 	}
@@ -148,12 +148,12 @@ func (h *claimItemHandler) Create(c *gin.Context) {
 		FaultyPartID:      req.FaultyPartID,
 		ReplacementPartID: req.ReplacementPartID,
 		IssueDescription:  req.IssueDescription,
-		Status:            entities.ClaimItemStatusPending,
+		Status:            entity.ClaimItemStatusPending,
 		Type:              req.Type,
 		Cost:              req.Cost,
 	}
 
-	var item *entities.ClaimItem
+	var item *entity.ClaimItem
 	err = h.txManager.Do(c.Request.Context(), func(tx application.Tx) error {
 		var txErr error
 		item, txErr = h.service.Create(tx, claimID, cmd)
@@ -185,7 +185,7 @@ func (h *claimItemHandler) Create(c *gin.Context) {
 // @Failure 500 {object} dto.ErrorResponse "Internal server error"
 // @Router /claims/{id}/items/{itemID} [delete]
 func (h *claimItemHandler) Delete(c *gin.Context) {
-	if err := allowedRoles(c, entities.UserRoleScStaff); err != nil {
+	if err := allowedRoles(c, entity.UserRoleScStaff); err != nil {
 		handleError(h.log, c, err)
 		return
 	}
@@ -231,7 +231,7 @@ func (h *claimItemHandler) Delete(c *gin.Context) {
 // @Failure 500 {object} dto.ErrorResponse "Internal server error"
 // @Router /claims/{id}/items/{itemID}/approve [post]
 func (h *claimItemHandler) Approve(c *gin.Context) {
-	if err := allowedRoles(c, entities.UserRoleEvmStaff); err != nil {
+	if err := allowedRoles(c, entity.UserRoleEvmStaff); err != nil {
 		handleError(h.log, c, err)
 		return
 	}
@@ -277,7 +277,7 @@ func (h *claimItemHandler) Approve(c *gin.Context) {
 // @Failure 500 {object} dto.ErrorResponse "Internal server error"
 // @Router /claims/{id}/items/{itemID}/reject [post]
 func (h *claimItemHandler) Reject(c *gin.Context) {
-	if err := allowedRoles(c, entities.UserRoleEvmStaff); err != nil {
+	if err := allowedRoles(c, entity.UserRoleEvmStaff); err != nil {
 		handleError(h.log, c, err)
 		return
 	}

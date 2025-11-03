@@ -3,7 +3,7 @@ package handler_test
 import (
 	"errors"
 	"ev-warranty-go/internal/application/services"
-	"ev-warranty-go/internal/domain/entities"
+	"ev-warranty-go/internal/domain/entity"
 	"ev-warranty-go/internal/interface/api/dto"
 	"ev-warranty-go/internal/interface/api/handler"
 	apperrors2 "ev-warranty-go/pkg/apperror"
@@ -26,7 +26,7 @@ var _ = Describe("UserHandler", func() {
 		r           *gin.Engine
 		w           *httptest.ResponseRecorder
 		validReq    dto.CreateUserRequest
-		sampleUser  *entities.User
+		sampleUser  *entity.User
 	)
 
 	setupRoute := func(method, path string, role string, handlerFunc gin.HandlerFunc) {
@@ -48,7 +48,7 @@ var _ = Describe("UserHandler", func() {
 		validReq = dto.CreateUserRequest{
 			Name:     "John Doe",
 			Email:    "john.doe@example.com",
-			Role:     entities.UserRoleAdmin,
+			Role:     entity.UserRoleAdmin,
 			Password: "Password123!",
 			IsActive: true,
 			OfficeID: officeID,
@@ -59,7 +59,7 @@ var _ = Describe("UserHandler", func() {
 	Describe("Create", func() {
 		Context("when authorized as ADMIN", func() {
 			BeforeEach(func() {
-				setupRoute("POST", "/users", entities.UserRoleAdmin, userHandler.Create)
+				setupRoute("POST", "/users", entity.UserRoleAdmin, userHandler.Create)
 			})
 
 			It("should create user successfully", func() {
@@ -116,7 +116,7 @@ var _ = Describe("UserHandler", func() {
 		})
 
 		It("should deny access for non-admin users", func() {
-			setupRoute("POST", "/users", entities.UserRoleScStaff, userHandler.Create)
+			setupRoute("POST", "/users", entity.UserRoleScStaff, userHandler.Create)
 			SendRequest(r, http.MethodPost, "/users", w, validReq)
 			ExpectErrorCode(w, http.StatusForbidden, apperrors2.ErrorCodeUnauthorizedRole)
 		})
@@ -124,7 +124,7 @@ var _ = Describe("UserHandler", func() {
 
 	Describe("GetAll", func() {
 		BeforeEach(func() {
-			setupRoute("GET", "/users", entities.UserRoleAdmin, userHandler.GetAll)
+			setupRoute("GET", "/users", entity.UserRoleAdmin, userHandler.GetAll)
 		})
 
 		DescribeTable("should handle different scenarios",
@@ -140,13 +140,13 @@ var _ = Describe("UserHandler", func() {
 			},
 			Entry("successful retrieval",
 				func() {
-					users := []*entities.User{sampleUser}
+					users := []*entity.User{sampleUser}
 					mockService.EXPECT().GetAll(mock.Anything).Return(users, nil).Once()
 				},
 				http.StatusOK, ""),
 			Entry("empty results",
 				func() {
-					mockService.EXPECT().GetAll(mock.Anything).Return([]*entities.User{}, nil).Once()
+					mockService.EXPECT().GetAll(mock.Anything).Return([]*entity.User{}, nil).Once()
 				},
 				http.StatusOK, ""),
 			Entry("service error",
@@ -162,7 +162,7 @@ var _ = Describe("UserHandler", func() {
 		userID := uuid.New()
 
 		BeforeEach(func() {
-			setupRoute("GET", "/users/:id", entities.UserRoleAdmin, userHandler.GetByID)
+			setupRoute("GET", "/users/:id", entity.UserRoleAdmin, userHandler.GetByID)
 		})
 
 		DescribeTable("should handle different scenarios",
@@ -199,13 +199,13 @@ var _ = Describe("UserHandler", func() {
 		userID := uuid.New()
 		updateReq := dto.UpdateUserRequest{
 			Name:     "Updated Name",
-			Role:     entities.UserRoleEvmStaff,
+			Role:     entity.UserRoleEvmStaff,
 			IsActive: true,
 		}
 
 		Context("when authorized as ADMIN", func() {
 			BeforeEach(func() {
-				setupRoute("PUT", "/users/:id", entities.UserRoleAdmin, userHandler.Update)
+				setupRoute("PUT", "/users/:id", entity.UserRoleAdmin, userHandler.Update)
 			})
 
 			It("should update user successfully", func() {
@@ -252,7 +252,7 @@ var _ = Describe("UserHandler", func() {
 
 		Context("when not authorized", func() {
 			It("should deny access for non-admin users", func() {
-				setupRoute("PUT", "/users/:id", entities.UserRoleScStaff, userHandler.Update)
+				setupRoute("PUT", "/users/:id", entity.UserRoleScStaff, userHandler.Update)
 				SendRequest(r, http.MethodPut, "/users/"+userID.String(), w, updateReq)
 				ExpectErrorCode(w, http.StatusForbidden, apperrors2.ErrorCodeUnauthorizedRole)
 			})
@@ -264,7 +264,7 @@ var _ = Describe("UserHandler", func() {
 
 		Context("when performed by ADMIN", func() {
 			BeforeEach(func() {
-				setupRoute("DELETE", "/users/:id", entities.UserRoleAdmin, userHandler.Delete)
+				setupRoute("DELETE", "/users/:id", entity.UserRoleAdmin, userHandler.Delete)
 			})
 
 			It("should delete user successfully", func() {
@@ -301,7 +301,7 @@ var _ = Describe("UserHandler", func() {
 
 		Context("when not authorized", func() {
 			It("should deny access for non-admin users", func() {
-				setupRoute("DELETE", "/users/:id", entities.UserRoleScStaff, userHandler.Delete)
+				setupRoute("DELETE", "/users/:id", entity.UserRoleScStaff, userHandler.Delete)
 				SendRequest(r, http.MethodDelete, "/users/"+userID.String(), w, nil)
 				ExpectErrorCode(w, http.StatusForbidden, apperrors2.ErrorCodeUnauthorizedRole)
 			})
@@ -309,6 +309,6 @@ var _ = Describe("UserHandler", func() {
 	})
 })
 
-func CreateUserFromRequest(req dto.CreateUserRequest) *entities.User {
-	return entities.NewUser(req.Name, req.Email, req.Role, "hashed_password", req.IsActive, req.OfficeID)
+func CreateUserFromRequest(req dto.CreateUserRequest) *entity.User {
+	return entity.NewUser(req.Name, req.Email, req.Role, "hashed_password", req.IsActive, req.OfficeID)
 }

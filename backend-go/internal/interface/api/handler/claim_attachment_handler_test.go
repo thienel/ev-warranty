@@ -5,7 +5,7 @@ import (
 	"context"
 	"errors"
 	"ev-warranty-go/internal/application"
-	"ev-warranty-go/internal/domain/entities"
+	"ev-warranty-go/internal/domain/entity"
 	"ev-warranty-go/internal/interface/api/handler"
 	apperrors2 "ev-warranty-go/pkg/apperror"
 	"ev-warranty-go/pkg/mocks"
@@ -32,7 +32,7 @@ var _ = Describe("ClaimAttachmentHandler", func() {
 		w                 *httptest.ResponseRecorder
 		claimID           uuid.UUID
 		attachmentID      uuid.UUID
-		sampleAttachment  *entities.ClaimAttachment
+		sampleAttachment  *entity.ClaimAttachment
 	)
 
 	createMultipartForm := func(filenames ...string) (*bytes.Buffer, string) {
@@ -61,10 +61,10 @@ var _ = Describe("ClaimAttachmentHandler", func() {
 
 		claimID = uuid.New()
 		attachmentID = uuid.New()
-		sampleAttachment = &entities.ClaimAttachment{
+		sampleAttachment = &entity.ClaimAttachment{
 			ID:      attachmentID,
 			ClaimID: claimID,
-			Type:    entities.AttachmentTypeImage,
+			Type:    entity.AttachmentTypeImage,
 			URL:     "https://example.com/image.jpg",
 		}
 	})
@@ -131,13 +131,13 @@ var _ = Describe("ClaimAttachmentHandler", func() {
 			},
 			Entry("successful retrieval with data",
 				func() {
-					attachments := []*entities.ClaimAttachment{sampleAttachment}
+					attachments := []*entity.ClaimAttachment{sampleAttachment}
 					mockService.EXPECT().GetByClaimID(mock.Anything, claimID).Return(attachments, nil).Once()
 				},
 				http.StatusOK, ""),
 			Entry("empty results",
 				func() {
-					mockService.EXPECT().GetByClaimID(mock.Anything, claimID).Return([]*entities.ClaimAttachment{}, nil).Once()
+					mockService.EXPECT().GetByClaimID(mock.Anything, claimID).Return([]*entity.ClaimAttachment{}, nil).Once()
 				},
 				http.StatusOK, ""),
 			Entry("service error",
@@ -161,7 +161,7 @@ var _ = Describe("ClaimAttachmentHandler", func() {
 		Context("when authorized as SC_TECHNICIAN", func() {
 			BeforeEach(func() {
 				r.POST("/claims/:id/attachments", func(c *gin.Context) {
-					SetHeaderRole(c, entities.UserRoleScTechnician)
+					SetHeaderRole(c, entity.UserRoleScTechnician)
 					attachmentHandler.Create(c)
 				})
 			})
@@ -183,8 +183,8 @@ var _ = Describe("ClaimAttachmentHandler", func() {
 			})
 
 			It("should create multiple attachments successfully", func() {
-				attachment2 := &entities.ClaimAttachment{
-					ID: uuid.New(), ClaimID: claimID, Type: entities.AttachmentTypeImage, URL: "https://example.com/image2.jpg"}
+				attachment2 := &entity.ClaimAttachment{
+					ID: uuid.New(), ClaimID: claimID, Type: entity.AttachmentTypeImage, URL: "https://example.com/image2.jpg"}
 
 				mockTxManager.EXPECT().Do(mock.Anything, mock.AnythingOfType("func(application.Tx) error")).
 					Run(func(ctx context.Context, fn func(application.Tx) error) {
@@ -266,7 +266,7 @@ var _ = Describe("ClaimAttachmentHandler", func() {
 
 		It("should deny access for unauthorized roles", func() {
 			r.POST("/claims/:id/attachments", func(c *gin.Context) {
-				SetHeaderRole(c, entities.UserRoleEvmStaff)
+				SetHeaderRole(c, entity.UserRoleEvmStaff)
 				attachmentHandler.Create(c)
 			})
 
@@ -283,7 +283,7 @@ var _ = Describe("ClaimAttachmentHandler", func() {
 		Context("when authorized as SC_TECHNICIAN", func() {
 			BeforeEach(func() {
 				r.DELETE("/claims/:id/attachments/:attachmentID", func(c *gin.Context) {
-					SetHeaderRole(c, entities.UserRoleScTechnician)
+					SetHeaderRole(c, entity.UserRoleScTechnician)
 					attachmentHandler.Delete(c)
 				})
 			})
@@ -346,7 +346,7 @@ var _ = Describe("ClaimAttachmentHandler", func() {
 
 		It("should deny access for unauthorized roles", func() {
 			r.DELETE("/claims/:id/attachments/:attachmentID", func(c *gin.Context) {
-				SetHeaderRole(c, entities.UserRoleEvmStaff)
+				SetHeaderRole(c, entity.UserRoleEvmStaff)
 				attachmentHandler.Delete(c)
 			})
 

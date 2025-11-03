@@ -6,7 +6,7 @@ import (
 	context "context"
 	application "ev-warranty-go/internal/application"
 
-	entities "ev-warranty-go/internal/domain/entities"
+	entities "ev-warranty-go/internal/domain/entity"
 
 	mock "github.com/stretchr/testify/mock"
 
@@ -53,7 +53,7 @@ type ClaimHistoryRepository_Create_Call struct {
 
 // Create is a helper method to define mock.On call
 //   - tx application.Tx
-//   - history *entities.ClaimHistory
+//   - history *entity.ClaimHistory
 func (_e *ClaimHistoryRepository_Expecter) Create(tx interface{}, history interface{}) *ClaimHistoryRepository_Create_Call {
 	return &ClaimHistoryRepository_Create_Call{Call: _e.mock.On("Create", tx, history)}
 }

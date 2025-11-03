@@ -4,7 +4,7 @@ import (
 	"context"
 	"ev-warranty-go/internal/application"
 	"ev-warranty-go/internal/application/services"
-	"ev-warranty-go/internal/domain/entities"
+	"ev-warranty-go/internal/domain/entity"
 	"ev-warranty-go/internal/interface/api/dto"
 	"ev-warranty-go/pkg/apperror"
 	"ev-warranty-go/pkg/logger"
@@ -53,7 +53,7 @@ func NewClaimHandler(log logger.Logger, txManager application.TxManager, claimSe
 // @Produce json
 // @Security Bearer
 // @Param id path string true "Claim ID"
-// @Success 200 {object} dto.SuccessResponse{data=entities.Claim} "Claim retrieved successfully"
+// @Success 200 {object} dto.SuccessResponse{data=entity.Claim} "Claim retrieved successfully"
 // @Failure 400 {object} dto.ErrorResponse "Bad request"
 // @Failure 401 {object} dto.ErrorResponse "Unauthorized"
 // @Failure 404 {object} dto.ErrorResponse "Claim not found"
@@ -86,7 +86,7 @@ func (h *claimHandler) GetByID(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Security Bearer
-// @Success 200 {object} dto.SuccessResponse{data=[]entities.Claim} "Claims retrieved successfully"
+// @Success 200 {object} dto.SuccessResponse{data=[]entity.Claim} "Claims retrieved successfully"
 // @Failure 401 {object} dto.ErrorResponse "Unauthorized"
 // @Failure 500 {object} dto.ErrorResponse "Internal server error"
 // @Router /claims [get]
@@ -111,14 +111,14 @@ func (h *claimHandler) GetAll(c *gin.Context) {
 // @Produce json
 // @Security Bearer
 // @Param createClaimRequest body dto.CreateClaimRequest true "Claim creation data"
-// @Success 201 {object} dto.SuccessResponse{data=entities.Claim} "Claim created successfully"
+// @Success 201 {object} dto.SuccessResponse{data=entity.Claim} "Claim created successfully"
 // @Failure 400 {object} dto.ErrorResponse "Bad request"
 // @Failure 401 {object} dto.ErrorResponse "Unauthorized"
 // @Failure 403 {object} dto.ErrorResponse "Forbidden"
 // @Failure 500 {object} dto.ErrorResponse "Internal server error"
 // @Router /claims [post]
 func (h *claimHandler) Create(c *gin.Context) {
-	if err := allowedRoles(c, entities.UserRoleScTechnician, entities.UserRoleScStaff); err != nil {
+	if err := allowedRoles(c, entity.UserRoleScTechnician, entity.UserRoleScStaff); err != nil {
 		handleError(h.log, c, err)
 		return
 	}
@@ -142,7 +142,7 @@ func (h *claimHandler) Create(c *gin.Context) {
 		Description: req.Description,
 	}
 
-	var claim *entities.Claim
+	var claim *entity.Claim
 	err = h.txManager.Do(c.Request.Context(), func(tx application.Tx) error {
 		var txErr error
 		claim, txErr = h.service.Create(tx, cmd)
@@ -174,7 +174,7 @@ func (h *claimHandler) Create(c *gin.Context) {
 // @Failure 500 {object} dto.ErrorResponse "Internal server error"
 // @Router /claims/{id} [put]
 func (h *claimHandler) Update(c *gin.Context) {
-	if err := allowedRoles(c, entities.UserRoleScStaff); err != nil {
+	if err := allowedRoles(c, entity.UserRoleScStaff); err != nil {
 		handleError(h.log, c, err)
 		return
 	}
@@ -224,7 +224,7 @@ func (h *claimHandler) Update(c *gin.Context) {
 // @Failure 500 {object} dto.ErrorResponse "Internal server error"
 // @Router /claims/{id} [delete]
 func (h *claimHandler) Delete(c *gin.Context) {
-	if err := allowedRoles(c, entities.UserRoleScStaff, entities.UserRoleEvmStaff); err != nil {
+	if err := allowedRoles(c, entity.UserRoleScStaff, entity.UserRoleEvmStaff); err != nil {
 		handleError(h.log, c, err)
 		return
 	}
@@ -238,7 +238,7 @@ func (h *claimHandler) Delete(c *gin.Context) {
 
 	err = h.txManager.Do(c.Request.Context(), func(tx application.Tx) error {
 		role, _ := getUserRoleFromHeader(c)
-		if role == entities.UserRoleScStaff {
+		if role == entity.UserRoleScStaff {
 			return h.service.HardDelete(tx, id)
 		}
 		return h.service.SoftDelete(tx, id)
@@ -268,7 +268,7 @@ func (h *claimHandler) Delete(c *gin.Context) {
 // @Failure 500 {object} dto.ErrorResponse "Internal server error"
 // @Router /claims/{id}/submit [post]
 func (h *claimHandler) Submit(c *gin.Context) {
-	if err := allowedRoles(c, entities.UserRoleScStaff); err != nil {
+	if err := allowedRoles(c, entity.UserRoleScStaff); err != nil {
 		handleError(h.log, c, err)
 		return
 	}
@@ -314,7 +314,7 @@ func (h *claimHandler) Submit(c *gin.Context) {
 // @Failure 500 {object} dto.ErrorResponse "Internal server error"
 // @Router /claims/{id}/review [post]
 func (h *claimHandler) Review(c *gin.Context) {
-	if err := allowedRoles(c, entities.UserRoleEvmStaff); err != nil {
+	if err := allowedRoles(c, entity.UserRoleEvmStaff); err != nil {
 		handleError(h.log, c, err)
 		return
 	}
@@ -333,7 +333,7 @@ func (h *claimHandler) Review(c *gin.Context) {
 	}
 
 	err = h.txManager.Do(c.Request.Context(), func(tx application.Tx) error {
-		return h.service.UpdateStatus(tx, id, entities.ClaimStatusReviewing, userID)
+		return h.service.UpdateStatus(tx, id, entity.ClaimStatusReviewing, userID)
 	})
 
 	if err != nil {
@@ -360,7 +360,7 @@ func (h *claimHandler) Review(c *gin.Context) {
 // @Failure 500 {object} dto.ErrorResponse "Internal server error"
 // @Router /claims/{id}/request-information [post]
 func (h *claimHandler) RequestInformation(c *gin.Context) {
-	if err := allowedRoles(c, entities.UserRoleEvmStaff); err != nil {
+	if err := allowedRoles(c, entity.UserRoleEvmStaff); err != nil {
 		handleError(h.log, c, err)
 		return
 	}
@@ -379,7 +379,7 @@ func (h *claimHandler) RequestInformation(c *gin.Context) {
 	}
 
 	err = h.txManager.Do(c.Request.Context(), func(tx application.Tx) error {
-		return h.service.UpdateStatus(tx, id, entities.ClaimStatusRequestInfo, userID)
+		return h.service.UpdateStatus(tx, id, entity.ClaimStatusRequestInfo, userID)
 	})
 
 	if err != nil {
@@ -406,7 +406,7 @@ func (h *claimHandler) RequestInformation(c *gin.Context) {
 // @Failure 500 {object} dto.ErrorResponse "Internal server error"
 // @Router /claims/{id}/cancel [post]
 func (h *claimHandler) Cancel(c *gin.Context) {
-	if err := allowedRoles(c, entities.UserRoleScStaff); err != nil {
+	if err := allowedRoles(c, entity.UserRoleScStaff); err != nil {
 		handleError(h.log, c, err)
 		return
 	}
@@ -425,7 +425,7 @@ func (h *claimHandler) Cancel(c *gin.Context) {
 	}
 
 	err = h.txManager.Do(c.Request.Context(), func(tx application.Tx) error {
-		return h.service.UpdateStatus(tx, id, entities.ClaimStatusCancelled, userID)
+		return h.service.UpdateStatus(tx, id, entity.ClaimStatusCancelled, userID)
 	})
 
 	if err != nil {
@@ -452,7 +452,7 @@ func (h *claimHandler) Cancel(c *gin.Context) {
 // @Failure 500 {object} dto.ErrorResponse "Internal server error"
 // @Router /claims/{id}/complete [post]
 func (h *claimHandler) Complete(c *gin.Context) {
-	if err := allowedRoles(c, entities.UserRoleEvmStaff); err != nil {
+	if err := allowedRoles(c, entity.UserRoleEvmStaff); err != nil {
 		handleError(h.log, c, err)
 		return
 	}
@@ -490,7 +490,7 @@ func (h *claimHandler) Complete(c *gin.Context) {
 // @Produce json
 // @Security Bearer
 // @Param id path string true "Claim ID"
-// @Success 200 {object} dto.SuccessResponse{data=[]entities.ClaimHistory} "Claim history retrieved successfully"
+// @Success 200 {object} dto.SuccessResponse{data=[]entity.ClaimHistory} "Claim history retrieved successfully"
 // @Failure 400 {object} dto.ErrorResponse "Bad request"
 // @Failure 401 {object} dto.ErrorResponse "Unauthorized"
 // @Failure 404 {object} dto.ErrorResponse "Claim not found"

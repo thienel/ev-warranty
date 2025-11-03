@@ -9,7 +9,7 @@ import (
 	"encoding/hex"
 	"errors"
 	"ev-warranty-go/internal/application/repositories"
-	"ev-warranty-go/internal/domain/entities"
+	"ev-warranty-go/internal/domain/entity"
 	"ev-warranty-go/pkg/apperror"
 	"time"
 
@@ -21,7 +21,7 @@ type TokenService interface {
 	GenerateAccessToken(userID uuid.UUID) (string, error)
 	GenerateRefreshToken(ctx context.Context, userID uuid.UUID) (string, error)
 	ValidateAccessToken(ctx context.Context, token string) (*CustomClaims, error)
-	ValidateRefreshToken(ctx context.Context, token string) (*entities.RefreshToken, error)
+	ValidateRefreshToken(ctx context.Context, token string) (*entity.RefreshToken, error)
 	RevokeRefreshToken(ctx context.Context, token string) error
 	RefreshAccessToken(ctx context.Context, refreshToken string) (string, error)
 }
@@ -81,7 +81,7 @@ func (t *tokenService) GenerateRefreshToken(ctx context.Context, userID uuid.UUI
 		return "", apperror.NewFailedGenerateRefreshToken(err)
 	}
 
-	rfToken := &entities.RefreshToken{
+	rfToken := &entity.RefreshToken{
 		UserID:    userID,
 		Token:     hashedToken,
 		ExpiresAt: time.Now().UTC().Add(t.refreshTTL),
@@ -136,7 +136,7 @@ func (t *tokenService) ValidateAccessToken(ctx context.Context, tokenStr string)
 	return claims, nil
 }
 
-func (t *tokenService) ValidateRefreshToken(ctx context.Context, token string) (*entities.RefreshToken, error) {
+func (t *tokenService) ValidateRefreshToken(ctx context.Context, token string) (*entity.RefreshToken, error) {
 	hashedToken, err := hashToken(token)
 	if err != nil {
 		return nil, apperror.NewFailedHashToken()

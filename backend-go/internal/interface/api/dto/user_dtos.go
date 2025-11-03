@@ -1,7 +1,7 @@
 package dto
 
 import (
-	"ev-warranty-go/internal/domain/entities"
+	"ev-warranty-go/internal/domain/entity"
 
 	"github.com/google/uuid"
 )
@@ -31,7 +31,7 @@ type UserDTO struct {
 	OfficeID uuid.UUID `json:"office_id" binding:"required"`
 }
 
-func GenerateUserDTO(user *entities.User) *UserDTO {
+func GenerateUserDTO(user *entity.User) *UserDTO {
 	return &UserDTO{
 		ID:       user.ID,
 		Name:     user.Name,
@@ -42,7 +42,7 @@ func GenerateUserDTO(user *entities.User) *UserDTO {
 	}
 }
 
-func GenerateUserDTOList(user []*entities.User) []*UserDTO {
+func GenerateUserDTOList(user []*entity.User) []*UserDTO {
 	users := make([]*UserDTO, len(user))
 	for i, u := range user {
 		users[i] = GenerateUserDTO(u)

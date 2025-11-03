@@ -12,7 +12,7 @@ import (
 	"github.com/stretchr/testify/mock"
 
 	"ev-warranty-go/internal/application/services"
-	"ev-warranty-go/internal/domain/entities"
+	"ev-warranty-go/internal/domain/entity"
 	"ev-warranty-go/internal/infrastructure/oauth/providers"
 	"ev-warranty-go/pkg/mocks"
 )
@@ -46,7 +46,7 @@ var _ = Describe("AuthService", func() {
 		Context("when login is successful", func() {
 			It("should return access and refresh tokens", func() {
 				passwordHash, _ := security.HashPassword(password)
-				user := entities.NewUser("Test User", email, entities.UserRoleAdmin, passwordHash, true, uuid.New())
+				user := entity.NewUser("Test User", email, entity.UserRoleAdmin, passwordHash, true, uuid.New())
 
 				accessToken := "access.token.jwt"
 				refreshToken := "refresh_token_string"
@@ -67,7 +67,7 @@ var _ = Describe("AuthService", func() {
 			It("should trim spaces and login successfully", func() {
 				emailWithSpaces := "  user@example.com  "
 				passwordHash, _ := security.HashPassword(password)
-				user := entities.NewUser("Test User", email, entities.UserRoleAdmin, passwordHash, true, uuid.New())
+				user := entity.NewUser("Test User", email, entity.UserRoleAdmin, passwordHash, true, uuid.New())
 
 				accessToken := "access.token.jwt"
 				refreshToken := "refresh_token_string"
@@ -100,7 +100,7 @@ var _ = Describe("AuthService", func() {
 		Context("when user is inactive", func() {
 			It("should return UserInactive error", func() {
 				passwordHash, _ := security.HashPassword(password)
-				user := entities.NewUser("Test User", email, entities.UserRoleAdmin, passwordHash, false, uuid.New())
+				user := entity.NewUser("Test User", email, entity.UserRoleAdmin, passwordHash, false, uuid.New())
 
 				mockUserRepo.EXPECT().FindByEmail(ctx, email).Return(user, nil).Once()
 
@@ -115,7 +115,7 @@ var _ = Describe("AuthService", func() {
 		Context("when password is incorrect", func() {
 			It("should return UserPasswordInvalid error", func() {
 				passwordHash, _ := security.HashPassword("DifferentPassword123!")
-				user := entities.NewUser("Test User", email, entities.UserRoleAdmin, passwordHash, true, uuid.New())
+				user := entity.NewUser("Test User", email, entity.UserRoleAdmin, passwordHash, true, uuid.New())
 
 				mockUserRepo.EXPECT().FindByEmail(ctx, email).Return(user, nil).Once()
 
@@ -144,7 +144,7 @@ var _ = Describe("AuthService", func() {
 		Context("when GenerateAccessToken fails", func() {
 			It("should return the error", func() {
 				passwordHash, _ := security.HashPassword(password)
-				user := &entities.User{
+				user := &entity.User{
 					ID:           uuid.New(),
 					Email:        email,
 					PasswordHash: passwordHash,
@@ -167,7 +167,7 @@ var _ = Describe("AuthService", func() {
 		Context("when GenerateRefreshToken fails", func() {
 			It("should return the error", func() {
 				passwordHash, _ := security.HashPassword(password)
-				user := &entities.User{
+				user := &entity.User{
 					ID:           uuid.New(),
 					Email:        email,
 					PasswordHash: passwordHash,
@@ -235,7 +235,7 @@ var _ = Describe("AuthService", func() {
 
 		Context("when OAuth user exists", func() {
 			It("should return access and refresh tokens", func() {
-				user := &entities.User{
+				user := &entity.User{
 					ID:            uuid.New(),
 					Email:         userInfo.Email,
 					OAuthProvider: &userInfo.Provider,
@@ -275,7 +275,7 @@ var _ = Describe("AuthService", func() {
 
 		Context("when OAuth user not found but email exists", func() {
 			It("should link OAuth and return tokens", func() {
-				user := &entities.User{
+				user := &entity.User{
 					ID:       uuid.New(),
 					Email:    userInfo.Email,
 					IsActive: true,
@@ -287,7 +287,7 @@ var _ = Describe("AuthService", func() {
 				mockUserRepo.EXPECT().FindByOAuth(ctx, userInfo.Provider, userInfo.ProviderID).
 					Return(nil, apperrors2.NewUserNotFound()).Once()
 				mockUserRepo.EXPECT().FindByEmail(ctx, userInfo.Email).Return(user, nil).Once()
-				mockUserRepo.EXPECT().Update(ctx, mock.MatchedBy(func(u *entities.User) bool {
+				mockUserRepo.EXPECT().Update(ctx, mock.MatchedBy(func(u *entity.User) bool {
 					return u.ID == user.ID &&
 						u.OAuthProvider != nil &&
 						*u.OAuthProvider == userInfo.Provider &&
@@ -324,7 +324,7 @@ var _ = Describe("AuthService", func() {
 
 		Context("when Update fails after linking OAuth", func() {
 			It("should return the error", func() {
-				user := &entities.User{
+				user := &entity.User{
 					ID:       uuid.New(),
 					Email:    userInfo.Email,
 					IsActive: true,
@@ -335,7 +335,7 @@ var _ = Describe("AuthService", func() {
 				mockUserRepo.EXPECT().FindByOAuth(ctx, userInfo.Provider, userInfo.ProviderID).
 					Return(nil, apperrors2.NewUserNotFound()).Once()
 				mockUserRepo.EXPECT().FindByEmail(ctx, userInfo.Email).Return(user, nil).Once()
-				mockUserRepo.EXPECT().Update(ctx, mock.AnythingOfType("*entities.User")).Return(updateErr).Once()
+				mockUserRepo.EXPECT().Update(ctx, mock.AnythingOfType("*entity.User")).Return(updateErr).Once()
 
 				at, rt, err := service.HandleOAuthUser(ctx, userInfo)
 
@@ -348,7 +348,7 @@ var _ = Describe("AuthService", func() {
 
 		Context("when GenerateAccessToken fails", func() {
 			It("should return the error", func() {
-				user := &entities.User{
+				user := &entity.User{
 					ID:            uuid.New(),
 					Email:         userInfo.Email,
 					OAuthProvider: &userInfo.Provider,
@@ -372,7 +372,7 @@ var _ = Describe("AuthService", func() {
 
 		Context("when GenerateRefreshToken fails", func() {
 			It("should return the error", func() {
-				user := &entities.User{
+				user := &entity.User{
 					ID:            uuid.New(),
 					Email:         userInfo.Email,
 					OAuthProvider: &userInfo.Provider,

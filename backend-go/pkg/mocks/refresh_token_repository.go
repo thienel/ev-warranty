@@ -4,7 +4,7 @@ package mocks
 
 import (
 	context "context"
-	entities "ev-warranty-go/internal/domain/entities"
+	entities "ev-warranty-go/internal/domain/entity"
 
 	mock "github.com/stretchr/testify/mock"
 )
@@ -47,7 +47,7 @@ type RefreshTokenRepository_Create_Call struct {
 
 // Create is a helper method to define mock.On call
 //   - ctx context.Context
-//   - token *entities.RefreshToken
+//   - token *entity.RefreshToken
 func (_e *RefreshTokenRepository_Expecter) Create(ctx interface{}, token interface{}) *RefreshTokenRepository_Create_Call {
 	return &RefreshTokenRepository_Create_Call{Call: _e.mock.On("Create", ctx, token)}
 }
@@ -200,7 +200,7 @@ type RefreshTokenRepository_Update_Call struct {
 
 // Update is a helper method to define mock.On call
 //   - ctx context.Context
-//   - token *entities.RefreshToken
+//   - token *entity.RefreshToken
 func (_e *RefreshTokenRepository_Expecter) Update(ctx interface{}, token interface{}) *RefreshTokenRepository_Update_Call {
 	return &RefreshTokenRepository_Update_Call{Call: _e.mock.On("Update", ctx, token)}
 }

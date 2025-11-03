@@ -5,7 +5,7 @@ import (
 	"context"
 	"errors"
 	"ev-warranty-go/internal/application/services"
-	"ev-warranty-go/internal/domain/entities"
+	"ev-warranty-go/internal/domain/entity"
 	apperrors2 "ev-warranty-go/pkg/apperror"
 	"ev-warranty-go/pkg/mocks"
 	"io"
@@ -47,7 +47,7 @@ var _ = Describe("ClaimAttachmentService", func() {
 
 		Context("when attachment is found", func() {
 			It("should return the attachment", func() {
-				expectedAttachment := &entities.ClaimAttachment{
+				expectedAttachment := &entity.ClaimAttachment{
 					ID:      attachmentID,
 					ClaimID: uuid.New(),
 					Type:    "image",
@@ -87,7 +87,7 @@ var _ = Describe("ClaimAttachmentService", func() {
 
 		Context("when attachments are found", func() {
 			It("should return all attachments for the claim", func() {
-				expectedAttachments := []*entities.ClaimAttachment{
+				expectedAttachments := []*entity.ClaimAttachment{
 					{
 						ID:      uuid.New(),
 						ClaimID: claimID,
@@ -116,7 +116,7 @@ var _ = Describe("ClaimAttachmentService", func() {
 
 		Context("when no attachments are found", func() {
 			It("should return an empty slice", func() {
-				mockAttachRepo.EXPECT().FindByClaimID(ctx, claimID).Return([]*entities.ClaimAttachment{}, nil).Once()
+				mockAttachRepo.EXPECT().FindByClaimID(ctx, claimID).Return([]*entity.ClaimAttachment{}, nil).Once()
 
 				attachments, err := service.GetByClaimID(ctx, claimID)
 
@@ -157,14 +157,14 @@ var _ = Describe("ClaimAttachmentService", func() {
 				fileContent := append(jpegHeader, make([]byte, 509)...)
 				file = &mockFile{Reader: bytes.NewReader(fileContent)}
 
-				claim := &entities.Claim{
+				claim := &entity.Claim{
 					ID:     claimID,
-					Status: entities.ClaimStatusDraft,
+					Status: entity.ClaimStatusDraft,
 				}
 
 				mockClaimRepo.EXPECT().FindByID(ctx, claimID).Return(claim, nil).Once()
 				mockCloudServ.EXPECT().UploadFile(ctx, file, "image").Return("https://example.com/image.jpg", nil).Once()
-				mockAttachRepo.EXPECT().Create(mockTx, mock.MatchedBy(func(a *entities.ClaimAttachment) bool {
+				mockAttachRepo.EXPECT().Create(mockTx, mock.MatchedBy(func(a *entity.ClaimAttachment) bool {
 					return a.ClaimID == claimID &&
 						a.Type == "image" &&
 						a.URL == "https://example.com/image.jpg"
@@ -185,14 +185,14 @@ var _ = Describe("ClaimAttachmentService", func() {
 				fileContent := append(pngHeader, make([]byte, 504)...)
 				file = &mockFile{Reader: bytes.NewReader(fileContent)}
 
-				claim := &entities.Claim{
+				claim := &entity.Claim{
 					ID:     claimID,
-					Status: entities.ClaimStatusDraft,
+					Status: entity.ClaimStatusDraft,
 				}
 
 				mockClaimRepo.EXPECT().FindByID(ctx, claimID).Return(claim, nil).Once()
 				mockCloudServ.EXPECT().UploadFile(ctx, file, "image").Return("https://example.com/image.png", nil).Once()
-				mockAttachRepo.EXPECT().Create(mockTx, mock.AnythingOfType("*entities.ClaimAttachment")).Return(nil).Once()
+				mockAttachRepo.EXPECT().Create(mockTx, mock.AnythingOfType("*entity.ClaimAttachment")).Return(nil).Once()
 
 				attachment, err := service.Create(mockTx, claimID, file)
 
@@ -218,9 +218,9 @@ var _ = Describe("ClaimAttachmentService", func() {
 		Context("when file read fails", func() {
 			It("should return error", func() {
 				file = &mockFile{Reader: &errorReader{}}
-				claim := &entities.Claim{
+				claim := &entity.Claim{
 					ID:     claimID,
-					Status: entities.ClaimStatusDraft,
+					Status: entity.ClaimStatusDraft,
 				}
 
 				mockClaimRepo.EXPECT().FindByID(ctx, claimID).Return(claim, nil).Once()
@@ -235,9 +235,9 @@ var _ = Describe("ClaimAttachmentService", func() {
 		Context("when file seek fails", func() {
 			It("should return error", func() {
 				file = &mockFile{Reader: bytes.NewReader([]byte("test")), seekError: true}
-				claim := &entities.Claim{
+				claim := &entity.Claim{
 					ID:     claimID,
-					Status: entities.ClaimStatusDraft,
+					Status: entity.ClaimStatusDraft,
 				}
 
 				mockClaimRepo.EXPECT().FindByID(ctx, claimID).Return(claim, nil).Once()
@@ -255,9 +255,9 @@ var _ = Describe("ClaimAttachmentService", func() {
 				fileContent := append(textContent, make([]byte, 497)...)
 				file = &mockFile{Reader: bytes.NewReader(fileContent)}
 
-				claim := &entities.Claim{
+				claim := &entity.Claim{
 					ID:     claimID,
-					Status: entities.ClaimStatusDraft,
+					Status: entity.ClaimStatusDraft,
 				}
 
 				mockClaimRepo.EXPECT().FindByID(ctx, claimID).Return(claim, nil).Once()
@@ -275,9 +275,9 @@ var _ = Describe("ClaimAttachmentService", func() {
 				fileContent := append(jpegHeader, make([]byte, 509)...)
 				file = &mockFile{Reader: bytes.NewReader(fileContent)}
 
-				claim := &entities.Claim{
+				claim := &entity.Claim{
 					ID:     claimID,
-					Status: entities.ClaimStatusDraft,
+					Status: entity.ClaimStatusDraft,
 				}
 				cloudErr := errors.New("cloud upload failed")
 
@@ -298,15 +298,15 @@ var _ = Describe("ClaimAttachmentService", func() {
 				fileContent := append(jpegHeader, make([]byte, 509)...)
 				file = &mockFile{Reader: bytes.NewReader(fileContent)}
 
-				claim := &entities.Claim{
+				claim := &entity.Claim{
 					ID:     claimID,
-					Status: entities.ClaimStatusDraft,
+					Status: entity.ClaimStatusDraft,
 				}
 				dbErr := apperrors2.New(500, apperrors2.ErrorCodeDBOperation, errors.New("database error"))
 
 				mockClaimRepo.EXPECT().FindByID(ctx, claimID).Return(claim, nil).Once()
 				mockCloudServ.EXPECT().UploadFile(ctx, file, "image").Return("https://example.com/image.jpg", nil).Once()
-				mockAttachRepo.EXPECT().Create(mockTx, mock.AnythingOfType("*entities.ClaimAttachment")).Return(dbErr).Once()
+				mockAttachRepo.EXPECT().Create(mockTx, mock.AnythingOfType("*entity.ClaimAttachment")).Return(dbErr).Once()
 
 				attachment, err := service.Create(mockTx, claimID, file)
 
@@ -331,11 +331,11 @@ var _ = Describe("ClaimAttachmentService", func() {
 
 		Context("when attachment is deleted successfully", func() {
 			It("should delete from repository and cloud storage", func() {
-				claim := &entities.Claim{
+				claim := &entity.Claim{
 					ID:     claimID,
-					Status: entities.ClaimStatusDraft,
+					Status: entity.ClaimStatusDraft,
 				}
-				attachment := &entities.ClaimAttachment{
+				attachment := &entity.ClaimAttachment{
 					ID:      attachmentID,
 					ClaimID: claimID,
 					URL:     "https://example.com/image.jpg",
@@ -355,9 +355,9 @@ var _ = Describe("ClaimAttachmentService", func() {
 
 		Context("when claim status is not draft", func() {
 			It("should return NotAllowDeleteClaim error", func() {
-				claim := &entities.Claim{
+				claim := &entity.Claim{
 					ID:     claimID,
-					Status: entities.ClaimStatusSubmitted,
+					Status: entity.ClaimStatusSubmitted,
 				}
 
 				mockClaimRepo.EXPECT().FindByID(ctx, claimID).Return(claim, nil).Once()
@@ -370,9 +370,9 @@ var _ = Describe("ClaimAttachmentService", func() {
 
 		Context("when attachment is not found", func() {
 			It("should return ClaimAttachmentNotFound error", func() {
-				claim := &entities.Claim{
+				claim := &entity.Claim{
 					ID:     claimID,
-					Status: entities.ClaimStatusDraft,
+					Status: entity.ClaimStatusDraft,
 				}
 				notFoundErr := apperrors2.New(404, apperrors2.ErrorCodeClaimAttachmentNotFound, errors.New("attachment not found"))
 
@@ -388,11 +388,11 @@ var _ = Describe("ClaimAttachmentService", func() {
 
 		Context("when repository delete fails", func() {
 			It("should return the error", func() {
-				claim := &entities.Claim{
+				claim := &entity.Claim{
 					ID:     claimID,
-					Status: entities.ClaimStatusDraft,
+					Status: entity.ClaimStatusDraft,
 				}
-				attachment := &entities.ClaimAttachment{
+				attachment := &entity.ClaimAttachment{
 					ID:      attachmentID,
 					ClaimID: claimID,
 					URL:     "https://example.com/image.jpg",
@@ -412,11 +412,11 @@ var _ = Describe("ClaimAttachmentService", func() {
 
 		Context("when cloud delete fails", func() {
 			It("should log error but still return nil", func() {
-				claim := &entities.Claim{
+				claim := &entity.Claim{
 					ID:     claimID,
-					Status: entities.ClaimStatusDraft,
+					Status: entity.ClaimStatusDraft,
 				}
-				attachment := &entities.ClaimAttachment{
+				attachment := &entity.ClaimAttachment{
 					ID:      attachmentID,
 					ClaimID: claimID,
 					URL:     "https://example.com/image.jpg",

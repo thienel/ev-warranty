@@ -4,7 +4,7 @@ import (
 	"context"
 	"ev-warranty-go/internal/application"
 	"ev-warranty-go/internal/application/repositories"
-	"ev-warranty-go/internal/domain/entities"
+	"ev-warranty-go/internal/domain/entity"
 	"ev-warranty-go/internal/infrastructure/cloudinary"
 	"ev-warranty-go/pkg/apperror"
 	"ev-warranty-go/pkg/logger"
@@ -15,10 +15,10 @@ import (
 )
 
 type ClaimAttachmentService interface {
-	GetByID(ctx context.Context, id uuid.UUID) (*entities.ClaimAttachment, error)
-	GetByClaimID(ctx context.Context, claimID uuid.UUID) ([]*entities.ClaimAttachment, error)
+	GetByID(ctx context.Context, id uuid.UUID) (*entity.ClaimAttachment, error)
+	GetByClaimID(ctx context.Context, claimID uuid.UUID) ([]*entity.ClaimAttachment, error)
 
-	Create(tx application.Tx, claimID uuid.UUID, file multipart.File) (*entities.ClaimAttachment, error)
+	Create(tx application.Tx, claimID uuid.UUID, file multipart.File) (*entity.ClaimAttachment, error)
 	HardDelete(tx application.Tx, claimID, attachmentID uuid.UUID) error
 }
 
@@ -39,7 +39,7 @@ func NewClaimAttachmentService(log logger.Logger, claimRepo repositories.ClaimRe
 	}
 }
 
-func (s *claimAttachmentService) GetByID(ctx context.Context, id uuid.UUID) (*entities.ClaimAttachment, error) {
+func (s *claimAttachmentService) GetByID(ctx context.Context, id uuid.UUID) (*entity.ClaimAttachment, error) {
 	claimAttachment, err := s.attachRepo.FindByID(ctx, id)
 	if err != nil {
 		return nil, err
@@ -48,7 +48,7 @@ func (s *claimAttachmentService) GetByID(ctx context.Context, id uuid.UUID) (*en
 	return claimAttachment, nil
 }
 
-func (s *claimAttachmentService) GetByClaimID(ctx context.Context, claimID uuid.UUID) ([]*entities.ClaimAttachment, error) {
+func (s *claimAttachmentService) GetByClaimID(ctx context.Context, claimID uuid.UUID) ([]*entity.ClaimAttachment, error) {
 	claimAttachments, err := s.attachRepo.FindByClaimID(ctx, claimID)
 	if err != nil {
 		return nil, err
@@ -57,7 +57,7 @@ func (s *claimAttachmentService) GetByClaimID(ctx context.Context, claimID uuid.
 	return claimAttachments, nil
 }
 
-func (s *claimAttachmentService) Create(tx application.Tx, claimID uuid.UUID, file multipart.File) (*entities.ClaimAttachment, error) {
+func (s *claimAttachmentService) Create(tx application.Tx, claimID uuid.UUID, file multipart.File) (*entity.ClaimAttachment, error) {
 	_, err := s.claimRepo.FindByID(tx.GetCtx(), claimID)
 	if err != nil {
 		return nil, err
@@ -69,7 +69,7 @@ func (s *claimAttachmentService) Create(tx application.Tx, claimID uuid.UUID, fi
 	}
 
 	attachType := cloudinary.DetermineResourceType(mimeType)
-	if !entities.IsValidAttachmentType(attachType) {
+	if !entity.IsValidAttachmentType(attachType) {
 		return nil, apperror.NewInvalidAttachmentType()
 	}
 	attachURL, err := s.cloudService.UploadFile(tx.GetCtx(), file, attachType)
@@ -77,7 +77,7 @@ func (s *claimAttachmentService) Create(tx application.Tx, claimID uuid.UUID, fi
 		return nil, err
 	}
 
-	attachment := entities.NewClaimAttachment(claimID, attachType, attachURL)
+	attachment := entity.NewClaimAttachment(claimID, attachType, attachURL)
 	err = s.attachRepo.Create(tx, attachment)
 	if err != nil {
 		return nil, err
@@ -92,7 +92,7 @@ func (s *claimAttachmentService) HardDelete(tx application.Tx, claimID, attachme
 		return err
 	}
 
-	if claim.Status != entities.ClaimStatusDraft {
+	if claim.Status != entity.ClaimStatusDraft {
 		return apperror.NewNotAllowDeleteClaim()
 	}
 	attach, err := s.attachRepo.FindByID(tx.GetCtx(), attachmentID)

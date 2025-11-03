@@ -15,7 +15,7 @@ import (
 	"gorm.io/gorm"
 
 	"ev-warranty-go/internal/application/repositories"
-	"ev-warranty-go/internal/domain/entities"
+	"ev-warranty-go/internal/domain/entity"
 	"ev-warranty-go/internal/infrastructure/persistence"
 )
 
@@ -38,7 +38,7 @@ var _ = Describe("ClaimRepository", func() {
 	})
 
 	Describe("Create", func() {
-		var claim *entities.Claim
+		var claim *entity.Claim
 
 		BeforeEach(func() {
 			claim = newClaim()
@@ -82,12 +82,12 @@ var _ = Describe("ClaimRepository", func() {
 	})
 
 	Describe("Update", func() {
-		var claim *entities.Claim
+		var claim *entity.Claim
 
 		BeforeEach(func() {
 			claim = newClaim()
 			claim.Description = "Updated description"
-			claim.Status = entities.ClaimStatusApproved
+			claim.Status = entity.ClaimStatusApproved
 		})
 
 		Context("when claim is updated successfully", func() {
@@ -193,7 +193,7 @@ var _ = Describe("ClaimRepository", func() {
 
 		BeforeEach(func() {
 			claimID = uuid.New()
-			status = entities.ClaimStatusApproved
+			status = entity.ClaimStatusApproved
 		})
 
 		Context("when status is updated successfully", func() {
@@ -231,12 +231,12 @@ var _ = Describe("ClaimRepository", func() {
 		Context("boundary cases for status", func() {
 			It("should handle all valid status values", func() {
 				statuses := []string{
-					entities.ClaimStatusDraft,
-					entities.ClaimStatusSubmitted,
-					entities.ClaimStatusReviewing,
-					entities.ClaimStatusApproved,
-					entities.ClaimStatusRejected,
-					entities.ClaimStatusCancelled,
+					entity.ClaimStatusDraft,
+					entity.ClaimStatusSubmitted,
+					entity.ClaimStatusReviewing,
+					entity.ClaimStatusApproved,
+					entity.ClaimStatusRejected,
+					entity.ClaimStatusCancelled,
 				}
 
 				for _, s := range statuses {
@@ -324,10 +324,10 @@ var _ = Describe("ClaimRepository", func() {
 					"id", "vehicle_id", "customer_id", "description", "status",
 					"total_cost", "approved_by", "created_at", "updated_at", "deleted_at",
 				}).AddRow(
-					claimID1, vehicleID, customerID, "Claim 1", entities.ClaimStatusDraft,
+					claimID1, vehicleID, customerID, "Claim 1", entity.ClaimStatusDraft,
 					1000.0, nil, time.Now(), time.Now(), nil,
 				).AddRow(
-					claimID2, vehicleID, customerID, "Claim 2", entities.ClaimStatusSubmitted,
+					claimID2, vehicleID, customerID, "Claim 2", entity.ClaimStatusSubmitted,
 					2000.0, nil, time.Now(), time.Now(), nil,
 				)
 
@@ -387,10 +387,10 @@ var _ = Describe("ClaimRepository", func() {
 					"id", "vehicle_id", "customer_id", "description", "status",
 					"total_cost", "approved_by", "created_at", "updated_at", "deleted_at",
 				}).AddRow(
-					claimID1, vehicleID, customerID, "Claim 1", entities.ClaimStatusDraft,
+					claimID1, vehicleID, customerID, "Claim 1", entity.ClaimStatusDraft,
 					1000.0, nil, time.Now(), time.Now(), nil,
 				).AddRow(
-					claimID2, vehicleID, customerID, "Claim 2", entities.ClaimStatusSubmitted,
+					claimID2, vehicleID, customerID, "Claim 2", entity.ClaimStatusSubmitted,
 					2000.0, nil, time.Now(), time.Now(), nil,
 				)
 
@@ -455,10 +455,10 @@ var _ = Describe("ClaimRepository", func() {
 					"id", "vehicle_id", "customer_id", "description", "status",
 					"total_cost", "approved_by", "created_at", "updated_at", "deleted_at",
 				}).AddRow(
-					claimID1, vehicleID, customerID, "Claim 1", entities.ClaimStatusDraft,
+					claimID1, vehicleID, customerID, "Claim 1", entity.ClaimStatusDraft,
 					1000.0, nil, time.Now(), time.Now(), nil,
 				).AddRow(
-					claimID2, vehicleID, customerID, "Claim 2", entities.ClaimStatusSubmitted,
+					claimID2, vehicleID, customerID, "Claim 2", entity.ClaimStatusSubmitted,
 					2000.0, nil, time.Now(), time.Now(), nil,
 				)
 
@@ -508,13 +508,13 @@ var _ = Describe("ClaimRepository", func() {
 	})
 })
 
-func newClaim() *entities.Claim {
-	return &entities.Claim{
+func newClaim() *entity.Claim {
+	return &entity.Claim{
 		ID:          uuid.New(),
 		VehicleID:   uuid.New(),
 		CustomerID:  uuid.New(),
 		Description: "Test claim description",
-		Status:      entities.ClaimStatusDraft,
+		Status:      entity.ClaimStatusDraft,
 		TotalCost:   1000.0,
 		ApprovedBy:  nil,
 		CreatedAt:   time.Now(),

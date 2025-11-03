@@ -14,7 +14,7 @@ import (
 	"gorm.io/gorm"
 
 	"ev-warranty-go/internal/application/repositories"
-	"ev-warranty-go/internal/domain/entities"
+	"ev-warranty-go/internal/domain/entity"
 	"ev-warranty-go/internal/infrastructure/persistence"
 )
 
@@ -37,7 +37,7 @@ var _ = Describe("RefreshTokenRepository", func() {
 	})
 
 	Describe("Create", func() {
-		var token *entities.RefreshToken
+		var token *entity.RefreshToken
 
 		BeforeEach(func() {
 			token = newRefreshToken()
@@ -115,7 +115,7 @@ var _ = Describe("RefreshTokenRepository", func() {
 	})
 
 	Describe("Update", func() {
-		var token *entities.RefreshToken
+		var token *entity.RefreshToken
 
 		BeforeEach(func() {
 			token = newRefreshToken()
@@ -419,8 +419,8 @@ var _ = Describe("RefreshTokenRepository", func() {
 	})
 })
 
-func newRefreshToken() *entities.RefreshToken {
-	return &entities.RefreshToken{
+func newRefreshToken() *entity.RefreshToken {
+	return &entity.RefreshToken{
 		ID:        uuid.New(),
 		UserID:    uuid.New(),
 		Token:     "test-refresh-token-" + uuid.New().String(),

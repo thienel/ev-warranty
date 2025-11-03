@@ -2,12 +2,12 @@ package repositories
 
 import (
 	"context"
-	"ev-warranty-go/internal/domain/entities"
+	"ev-warranty-go/internal/domain/entity"
 )
 
 type RefreshTokenRepository interface {
-	Create(ctx context.Context, token *entities.RefreshToken) error
-	Update(ctx context.Context, token *entities.RefreshToken) error
-	Find(ctx context.Context, tokenStr string) (*entities.RefreshToken, error)
+	Create(ctx context.Context, token *entity.RefreshToken) error
+	Update(ctx context.Context, token *entity.RefreshToken) error
+	Find(ctx context.Context, tokenStr string) (*entity.RefreshToken, error)
 	Revoke(ctx context.Context, tokenStr string) error
 }

@@ -4,7 +4,7 @@ import (
 	"context"
 	"ev-warranty-go/internal/application"
 	"ev-warranty-go/internal/application/repositories"
-	"ev-warranty-go/internal/domain/entities"
+	"ev-warranty-go/internal/domain/entity"
 	"ev-warranty-go/pkg/apperror"
 
 	"github.com/google/uuid"
@@ -30,10 +30,10 @@ type UpdateClaimItemStatusCommand struct {
 }
 
 type ClaimItemService interface {
-	GetByID(ctx context.Context, id uuid.UUID) (*entities.ClaimItem, error)
-	GetByClaimID(ctx context.Context, claimID uuid.UUID) ([]*entities.ClaimItem, error)
+	GetByID(ctx context.Context, id uuid.UUID) (*entity.ClaimItem, error)
+	GetByClaimID(ctx context.Context, claimID uuid.UUID) ([]*entity.ClaimItem, error)
 
-	Create(tx application.Tx, claimID uuid.UUID, cmd *CreateClaimItemCommand) (*entities.ClaimItem, error)
+	Create(tx application.Tx, claimID uuid.UUID, cmd *CreateClaimItemCommand) (*entity.ClaimItem, error)
 	Update(tx application.Tx, claimID, itemID uuid.UUID, cmd *UpdateClaimItemCommand) error
 	HardDelete(tx application.Tx, claimID, itemID uuid.UUID) error
 
@@ -53,7 +53,7 @@ func NewClaimItemService(claimRepo repositories.ClaimRepository, itemRepo reposi
 	}
 }
 
-func (s *claimItemService) GetByID(ctx context.Context, id uuid.UUID) (*entities.ClaimItem, error) {
+func (s *claimItemService) GetByID(ctx context.Context, id uuid.UUID) (*entity.ClaimItem, error) {
 	item, err := s.itemRepo.FindByID(ctx, id)
 	if err != nil {
 		return nil, err
@@ -62,7 +62,7 @@ func (s *claimItemService) GetByID(ctx context.Context, id uuid.UUID) (*entities
 	return item, nil
 }
 
-func (s *claimItemService) GetByClaimID(ctx context.Context, claimID uuid.UUID) ([]*entities.ClaimItem, error) {
+func (s *claimItemService) GetByClaimID(ctx context.Context, claimID uuid.UUID) ([]*entity.ClaimItem, error) {
 	items, err := s.itemRepo.FindByClaimID(ctx, claimID)
 	if err != nil {
 		return nil, err
@@ -72,20 +72,20 @@ func (s *claimItemService) GetByClaimID(ctx context.Context, claimID uuid.UUID) 
 }
 
 func (s *claimItemService) Create(tx application.Tx, claimID uuid.UUID,
-	cmd *CreateClaimItemCommand) (*entities.ClaimItem, error) {
+	cmd *CreateClaimItemCommand) (*entity.ClaimItem, error) {
 	_, err := s.claimRepo.FindByID(tx.GetCtx(), claimID)
 	if err != nil {
 		return nil, err
 	}
 
-	if !entities.IsValidClaimItemStatus(cmd.Status) {
+	if !entity.IsValidClaimItemStatus(cmd.Status) {
 		return nil, apperror.NewInvalidClaimItemStatus()
 	}
-	if !entities.IsValidClaimItemType(cmd.Type) {
+	if !entity.IsValidClaimItemType(cmd.Type) {
 		return nil, apperror.NewInvalidClaimItemType()
 	}
 
-	item := entities.NewClaimItem(claimID, cmd.PartCategoryID, cmd.FaultyPartID, cmd.ReplacementPartID,
+	item := entity.NewClaimItem(claimID, cmd.PartCategoryID, cmd.FaultyPartID, cmd.ReplacementPartID,
 		cmd.IssueDescription, cmd.Status, cmd.Type, cmd.Cost)
 	err = s.itemRepo.Create(tx, item)
 	if err != nil {
@@ -102,7 +102,7 @@ func (s *claimItemService) Update(tx application.Tx, claimID, itemID uuid.UUID, 
 	}
 
 	switch claim.Status {
-	case entities.ClaimStatusDraft, entities.ClaimStatusRequestInfo:
+	case entity.ClaimStatusDraft, entity.ClaimStatusRequestInfo:
 	default:
 		return apperror.NewNotAllowUpdateClaim()
 	}
@@ -113,12 +113,12 @@ func (s *claimItemService) Update(tx application.Tx, claimID, itemID uuid.UUID, 
 	}
 
 	switch item.Status {
-	case entities.ClaimItemStatusPending:
+	case entity.ClaimItemStatusPending:
 	default:
 		return apperror.NewNotAllowUpdateClaim()
 	}
 
-	if !entities.IsValidClaimItemType(cmd.Type) {
+	if !entity.IsValidClaimItemType(cmd.Type) {
 		return apperror.NewInvalidClaimItemType()
 	}
 	item.IssueDescription = cmd.IssueDescription
@@ -149,7 +149,7 @@ func (s *claimItemService) HardDelete(tx application.Tx, claimID, itemID uuid.UU
 		return err
 	}
 
-	if claim.Status != entities.ClaimStatusDraft {
+	if claim.Status != entity.ClaimStatusDraft {
 		return apperror.NewNotAllowDeleteClaim()
 	}
 
@@ -177,11 +177,11 @@ func (s *claimItemService) Approve(tx application.Tx, claimID, itemID uuid.UUID)
 		return err
 	}
 
-	if claim.Status != entities.ClaimStatusReviewing {
+	if claim.Status != entity.ClaimStatusReviewing {
 		return apperror.NewNotAllowUpdateClaim()
 	}
 
-	err = s.itemRepo.UpdateStatus(tx, itemID, entities.ClaimItemStatusApproved)
+	err = s.itemRepo.UpdateStatus(tx, itemID, entity.ClaimItemStatusApproved)
 	if err != nil {
 		return err
 	}
@@ -205,11 +205,11 @@ func (s *claimItemService) Reject(tx application.Tx, claimID, itemID uuid.UUID) 
 		return err
 	}
 
-	if claim.Status != entities.ClaimStatusReviewing {
+	if claim.Status != entity.ClaimStatusReviewing {
 		return apperror.NewNotAllowUpdateClaim()
 	}
 
-	err = s.itemRepo.UpdateStatus(tx, itemID, entities.ClaimItemStatusRejected)
+	err = s.itemRepo.UpdateStatus(tx, itemID, entity.ClaimItemStatusRejected)
 	if err != nil {
 		return err
 	}

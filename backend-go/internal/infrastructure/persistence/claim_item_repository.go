@@ -5,7 +5,7 @@ import (
 	"errors"
 	"ev-warranty-go/internal/application"
 	"ev-warranty-go/internal/application/repositories"
-	"ev-warranty-go/internal/domain/entities"
+	"ev-warranty-go/internal/domain/entity"
 	"ev-warranty-go/pkg/apperror"
 
 	"github.com/google/uuid"
@@ -20,7 +20,7 @@ func NewClaimItemRepository(db *gorm.DB) repositories.ClaimItemRepository {
 	return &claimItemRepository{db: db}
 }
 
-func (c *claimItemRepository) Create(tx application.Tx, item *entities.ClaimItem) error {
+func (c *claimItemRepository) Create(tx application.Tx, item *entity.ClaimItem) error {
 	db := tx.GetTx().(*gorm.DB)
 	if err := db.Create(item).Error; err != nil {
 		if dup := getDuplicateKeyConstraint(err); dup != "" {
@@ -31,7 +31,7 @@ func (c *claimItemRepository) Create(tx application.Tx, item *entities.ClaimItem
 	return nil
 }
 
-func (c *claimItemRepository) Update(tx application.Tx, item *entities.ClaimItem) error {
+func (c *claimItemRepository) Update(tx application.Tx, item *entity.ClaimItem) error {
 	db := tx.GetTx().(*gorm.DB)
 	if err := db.Model(item).
 		Select("part_category_id", "faulty_part_id", "replacement_part_id",
@@ -44,7 +44,7 @@ func (c *claimItemRepository) Update(tx application.Tx, item *entities.ClaimItem
 
 func (c *claimItemRepository) HardDelete(tx application.Tx, id uuid.UUID) error {
 	db := tx.GetTx().(*gorm.DB)
-	if err := db.Unscoped().Delete(&entities.ClaimItem{}, "id = ?", id).Error; err != nil {
+	if err := db.Unscoped().Delete(&entity.ClaimItem{}, "id = ?", id).Error; err != nil {
 		return apperror.NewDBOperationError(err)
 	}
 	return nil
@@ -52,7 +52,7 @@ func (c *claimItemRepository) HardDelete(tx application.Tx, id uuid.UUID) error 
 
 func (c *claimItemRepository) SoftDeleteByClaimID(tx application.Tx, claimID uuid.UUID) error {
 	db := tx.GetTx().(*gorm.DB)
-	if err := db.Delete(&entities.ClaimItem{}, "claim_id = ?", claimID).Error; err != nil {
+	if err := db.Delete(&entity.ClaimItem{}, "claim_id = ?", claimID).Error; err != nil {
 		return apperror.NewDBOperationError(err)
 	}
 	return nil
@@ -60,7 +60,7 @@ func (c *claimItemRepository) SoftDeleteByClaimID(tx application.Tx, claimID uui
 
 func (c *claimItemRepository) UpdateStatus(tx application.Tx, id uuid.UUID, status string) error {
 	db := tx.GetTx().(*gorm.DB)
-	if err := db.Model(&entities.ClaimItem{}).Where("id = ?", id).
+	if err := db.Model(&entity.ClaimItem{}).Where("id = ?", id).
 		Update("status", status).Error; err != nil {
 
 		return apperror.NewDBOperationError(err)
@@ -71,7 +71,7 @@ func (c *claimItemRepository) UpdateStatus(tx application.Tx, id uuid.UUID, stat
 func (c *claimItemRepository) SumCostByClaimID(tx application.Tx, claimID uuid.UUID) (float64, error) {
 	db := tx.GetTx().(*gorm.DB)
 	var totalCost float64
-	if err := db.Model(&entities.ClaimItem{}).Where("claim_id = ? AND status = 'APPROVED'", claimID).
+	if err := db.Model(&entity.ClaimItem{}).Where("claim_id = ? AND status = 'APPROVED'", claimID).
 		Select("COALESCE(SUM(cost), 0)").Scan(&totalCost).Error; err != nil {
 
 		return 0, apperror.NewDBOperationError(err)
@@ -79,8 +79,8 @@ func (c *claimItemRepository) SumCostByClaimID(tx application.Tx, claimID uuid.U
 	return totalCost, nil
 }
 
-func (c *claimItemRepository) FindByID(ctx context.Context, id uuid.UUID) (*entities.ClaimItem, error) {
-	var item entities.ClaimItem
+func (c *claimItemRepository) FindByID(ctx context.Context, id uuid.UUID) (*entity.ClaimItem, error) {
+	var item entity.ClaimItem
 	if err := c.db.WithContext(ctx).Where("id = ?", id).First(&item).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, apperror.NewClaimItemNotFound()
@@ -90,8 +90,8 @@ func (c *claimItemRepository) FindByID(ctx context.Context, id uuid.UUID) (*enti
 	return &item, nil
 }
 
-func (c *claimItemRepository) FindByClaimID(ctx context.Context, claimID uuid.UUID) ([]*entities.ClaimItem, error) {
-	var items []*entities.ClaimItem
+func (c *claimItemRepository) FindByClaimID(ctx context.Context, claimID uuid.UUID) ([]*entity.ClaimItem, error) {
+	var items []*entity.ClaimItem
 	if err := c.db.WithContext(ctx).
 		Where("claim_id = ?", claimID).
 		Order("created_at ASC").
@@ -104,7 +104,7 @@ func (c *claimItemRepository) FindByClaimID(ctx context.Context, claimID uuid.UU
 func (c *claimItemRepository) CountByClaimID(ctx context.Context, claimID uuid.UUID) (int64, error) {
 	var count int64
 	if err := c.db.WithContext(ctx).
-		Model(&entities.ClaimItem{}).
+		Model(&entity.ClaimItem{}).
 		Where("claim_id = ?", claimID).
 		Count(&count).Error; err != nil {
 		return 0, apperror.NewDBOperationError(err)
@@ -112,8 +112,8 @@ func (c *claimItemRepository) CountByClaimID(ctx context.Context, claimID uuid.U
 	return count, nil
 }
 
-func (c *claimItemRepository) FindByStatus(ctx context.Context, claimID uuid.UUID, status string) ([]*entities.ClaimItem, error) {
-	var items []*entities.ClaimItem
+func (c *claimItemRepository) FindByStatus(ctx context.Context, claimID uuid.UUID, status string) ([]*entity.ClaimItem, error) {
+	var items []*entity.ClaimItem
 	if err := c.db.WithContext(ctx).
 		Where("claim_id = ? AND status = ?", claimID, status).
 		Order("created_at ASC").

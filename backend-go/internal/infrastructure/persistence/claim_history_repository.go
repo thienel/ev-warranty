@@ -5,7 +5,7 @@ import (
 	"errors"
 	"ev-warranty-go/internal/application"
 	"ev-warranty-go/internal/application/repositories"
-	"ev-warranty-go/internal/domain/entities"
+	"ev-warranty-go/internal/domain/entity"
 	"ev-warranty-go/pkg/apperror"
 	"time"
 
@@ -21,7 +21,7 @@ func NewClaimHistoryRepository(db *gorm.DB) repositories.ClaimHistoryRepository 
 	return &claimHistoryRepository{db: db}
 }
 
-func (c *claimHistoryRepository) Create(tx application.Tx, history *entities.ClaimHistory) error {
+func (c *claimHistoryRepository) Create(tx application.Tx, history *entity.ClaimHistory) error {
 	db := tx.GetTx().(*gorm.DB)
 	if err := db.Create(history).Error; err != nil {
 		if dup := getDuplicateKeyConstraint(err); dup != "" {
@@ -34,14 +34,14 @@ func (c *claimHistoryRepository) Create(tx application.Tx, history *entities.Cla
 
 func (c *claimHistoryRepository) SoftDeleteByClaimID(tx application.Tx, claimID uuid.UUID) error {
 	db := tx.GetTx().(*gorm.DB)
-	if err := db.Delete(&entities.ClaimHistory{}, "claim_id = ?", claimID).Error; err != nil {
+	if err := db.Delete(&entity.ClaimHistory{}, "claim_id = ?", claimID).Error; err != nil {
 		return apperror.NewDBOperationError(err)
 	}
 	return nil
 }
 
-func (c *claimHistoryRepository) FindByClaimID(ctx context.Context, claimID uuid.UUID) ([]*entities.ClaimHistory, error) {
-	var histories []*entities.ClaimHistory
+func (c *claimHistoryRepository) FindByClaimID(ctx context.Context, claimID uuid.UUID) ([]*entity.ClaimHistory, error) {
+	var histories []*entity.ClaimHistory
 	if err := c.db.WithContext(ctx).
 		Where("claim_id = ?", claimID).
 		Order("changed_at DESC").
@@ -51,8 +51,8 @@ func (c *claimHistoryRepository) FindByClaimID(ctx context.Context, claimID uuid
 	return histories, nil
 }
 
-func (c *claimHistoryRepository) FindLatestByClaimID(ctx context.Context, claimID uuid.UUID) (*entities.ClaimHistory, error) {
-	var history entities.ClaimHistory
+func (c *claimHistoryRepository) FindLatestByClaimID(ctx context.Context, claimID uuid.UUID) (*entity.ClaimHistory, error) {
+	var history entity.ClaimHistory
 	if err := c.db.WithContext(ctx).
 		Where("claim_id = ?", claimID).
 		Order("changed_at DESC").
@@ -65,8 +65,8 @@ func (c *claimHistoryRepository) FindLatestByClaimID(ctx context.Context, claimI
 	return &history, nil
 }
 
-func (c *claimHistoryRepository) FindByDateRange(ctx context.Context, claimID uuid.UUID, startDate, endDate time.Time) ([]*entities.ClaimHistory, error) {
-	var histories []*entities.ClaimHistory
+func (c *claimHistoryRepository) FindByDateRange(ctx context.Context, claimID uuid.UUID, startDate, endDate time.Time) ([]*entity.ClaimHistory, error) {
+	var histories []*entity.ClaimHistory
 	if err := c.db.WithContext(ctx).
 		Where("claim_id = ? AND changed_at BETWEEN ? AND ?", claimID, startDate, endDate).
 		Order("changed_at DESC").

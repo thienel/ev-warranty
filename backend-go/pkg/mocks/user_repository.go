@@ -4,7 +4,7 @@ package mocks
 
 import (
 	context "context"
-	entities "ev-warranty-go/internal/domain/entities"
+	entities "ev-warranty-go/internal/domain/entity"
 
 	mock "github.com/stretchr/testify/mock"
 
@@ -49,7 +49,7 @@ type UserRepository_Create_Call struct {
 
 // Create is a helper method to define mock.On call
 //   - ctx context.Context
-//   - user *entities.User
+//   - user *entity.User
 func (_e *UserRepository_Expecter) Create(ctx interface{}, user interface{}) *UserRepository_Create_Call {
 	return &UserRepository_Create_Call{Call: _e.mock.On("Create", ctx, user)}
 }
@@ -379,7 +379,7 @@ type UserRepository_Update_Call struct {
 
 // Update is a helper method to define mock.On call
 //   - ctx context.Context
-//   - user *entities.User
+//   - user *entity.User
 func (_e *UserRepository_Expecter) Update(ctx interface{}, user interface{}) *UserRepository_Update_Call {
 	return &UserRepository_Update_Call{Call: _e.mock.On("Update", ctx, user)}
 }

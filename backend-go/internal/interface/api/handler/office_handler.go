@@ -3,7 +3,7 @@ package handler
 import (
 	"context"
 	"ev-warranty-go/internal/application/services"
-	"ev-warranty-go/internal/domain/entities"
+	"ev-warranty-go/internal/domain/entity"
 	"ev-warranty-go/internal/interface/api/dto"
 	"ev-warranty-go/pkg/apperror"
 	"ev-warranty-go/pkg/logger"
@@ -42,14 +42,14 @@ func NewOfficeHandler(log logger.Logger, service services.OfficeService) OfficeH
 // @Produce json
 // @Security Bearer
 // @Param createOfficeRequest body dto.CreateOfficeRequest true "Office creation data"
-// @Success 201 {object} dto.SuccessResponse{data=entities.Office} "Office created successfully"
+// @Success 201 {object} dto.SuccessResponse{data=entity.Office} "Office created successfully"
 // @Failure 400 {object} dto.ErrorResponse "Bad request"
 // @Failure 401 {object} dto.ErrorResponse "Unauthorized"
 // @Failure 403 {object} dto.ErrorResponse "Forbidden"
 // @Failure 500 {object} dto.ErrorResponse "Internal server error"
 // @Router /offices [post]
 func (h *officeHandler) Create(c *gin.Context) {
-	if err := allowedRoles(c, entities.UserRoleAdmin); err != nil {
+	if err := allowedRoles(c, entity.UserRoleAdmin); err != nil {
 		handleError(h.log, c, err)
 		return
 	}
@@ -65,7 +65,7 @@ func (h *officeHandler) Create(c *gin.Context) {
 		return
 	}
 
-	if !entities.IsValidOfficeType(req.OfficeType) {
+	if !entity.IsValidOfficeType(req.OfficeType) {
 		handleError(h.log, c, apperror.NewInvalidOfficeType())
 		return
 	}
@@ -97,7 +97,7 @@ func (h *officeHandler) Create(c *gin.Context) {
 // @Produce json
 // @Security Bearer
 // @Param id path string true "Office ID"
-// @Success 200 {object} dto.SuccessResponse{data=entities.Office} "Office retrieved successfully"
+// @Success 200 {object} dto.SuccessResponse{data=entity.Office} "Office retrieved successfully"
 // @Failure 400 {object} dto.ErrorResponse "Bad request"
 // @Failure 401 {object} dto.ErrorResponse "Unauthorized"
 // @Failure 404 {object} dto.ErrorResponse "Office not found"
@@ -133,7 +133,7 @@ func (h *officeHandler) GetByID(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Security Bearer
-// @Success 200 {object} dto.SuccessResponse{data=[]entities.Office} "Offices retrieved successfully"
+// @Success 200 {object} dto.SuccessResponse{data=[]entity.Office} "Offices retrieved successfully"
 // @Failure 401 {object} dto.ErrorResponse "Unauthorized"
 // @Failure 500 {object} dto.ErrorResponse "Internal server error"
 // @Router /offices [get]
@@ -170,7 +170,7 @@ func (h *officeHandler) GetAll(c *gin.Context) {
 // @Failure 500 {object} dto.ErrorResponse "Internal server error"
 // @Router /offices/{id} [put]
 func (h *officeHandler) Update(c *gin.Context) {
-	if err := allowedRoles(c, entities.UserRoleAdmin); err != nil {
+	if err := allowedRoles(c, entity.UserRoleAdmin); err != nil {
 		handleError(h.log, c, err)
 		return
 	}
@@ -228,7 +228,7 @@ func (h *officeHandler) Update(c *gin.Context) {
 // @Failure 500 {object} dto.ErrorResponse "Internal server error"
 // @Router /offices/{id} [delete]
 func (h *officeHandler) Delete(c *gin.Context) {
-	if err := allowedRoles(c, entities.UserRoleAdmin); err != nil {
+	if err := allowedRoles(c, entity.UserRoleAdmin); err != nil {
 		handleError(h.log, c, err)
 		return
 	}

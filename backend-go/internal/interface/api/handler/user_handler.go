@@ -3,7 +3,7 @@ package handler
 import (
 	"context"
 	"ev-warranty-go/internal/application/services"
-	"ev-warranty-go/internal/domain/entities"
+	"ev-warranty-go/internal/domain/entity"
 	"ev-warranty-go/internal/interface/api/dto"
 	"ev-warranty-go/pkg/apperror"
 	"ev-warranty-go/pkg/logger"
@@ -49,7 +49,7 @@ func NewUserHandler(log logger.Logger, userService services.UserService) UserHan
 // @Failure 500 {object} dto.ErrorResponse "Internal server error"
 // @Router /users [post]
 func (h userHandler) Create(c *gin.Context) {
-	if err := allowedRoles(c, entities.UserRoleAdmin); err != nil {
+	if err := allowedRoles(c, entity.UserRoleAdmin); err != nil {
 		handleError(h.log, c, err)
 		return
 	}
@@ -104,7 +104,7 @@ func (h userHandler) Create(c *gin.Context) {
 // @Failure 500 {object} dto.ErrorResponse "Internal server error"
 // @Router /users/{id} [put]
 func (h userHandler) Update(c *gin.Context) {
-	if err := allowedRoles(c, entities.UserRoleAdmin); err != nil {
+	if err := allowedRoles(c, entity.UserRoleAdmin); err != nil {
 		handleError(h.log, c, err)
 		return
 	}
@@ -227,7 +227,7 @@ func (h userHandler) GetAll(c *gin.Context) {
 // @Failure 500 {object} dto.ErrorResponse "Internal server error"
 // @Router /users/{id} [delete]
 func (h userHandler) Delete(c *gin.Context) {
-	if err := allowedRoles(c, entities.UserRoleAdmin); err != nil {
+	if err := allowedRoles(c, entity.UserRoleAdmin); err != nil {
 		handleError(h.log, c, err)
 		return
 	}

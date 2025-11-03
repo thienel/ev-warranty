@@ -334,7 +334,7 @@ const docTemplate = `{
                                         "data": {
                                             "type": "array",
                                             "items": {
-                                                "$ref": "#/definitions/entities.Claim"
+                                                "$ref": "#/definitions/entity.Claim"
                                             }
                                         }
                                     }
@@ -396,7 +396,7 @@ const docTemplate = `{
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/entities.Claim"
+                                            "$ref": "#/definitions/entity.Claim"
                                         }
                                     }
                                 }
@@ -469,7 +469,7 @@ const docTemplate = `{
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/entities.Claim"
+                                            "$ref": "#/definitions/entity.Claim"
                                         }
                                     }
                                 }
@@ -755,7 +755,7 @@ const docTemplate = `{
                                         "data": {
                                             "type": "array",
                                             "items": {
-                                                "$ref": "#/definitions/entities.ClaimAttachment"
+                                                "$ref": "#/definitions/entity.ClaimAttachment"
                                             }
                                         }
                                     }
@@ -842,7 +842,7 @@ const docTemplate = `{
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/entities.ClaimAttachment"
+                                            "$ref": "#/definitions/entity.ClaimAttachment"
                                         }
                                     }
                                 }
@@ -1117,7 +1117,7 @@ const docTemplate = `{
                                         "data": {
                                             "type": "array",
                                             "items": {
-                                                "$ref": "#/definitions/entities.ClaimHistory"
+                                                "$ref": "#/definitions/entity.ClaimHistory"
                                             }
                                         }
                                     }
@@ -1271,7 +1271,7 @@ const docTemplate = `{
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/entities.ClaimItem"
+                                            "$ref": "#/definitions/entity.ClaimItem"
                                         }
                                     }
                                 }
@@ -1357,7 +1357,7 @@ const docTemplate = `{
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/entities.ClaimItem"
+                                            "$ref": "#/definitions/entity.ClaimItem"
                                         }
                                     }
                                 }
@@ -1826,7 +1826,7 @@ const docTemplate = `{
                                         "data": {
                                             "type": "array",
                                             "items": {
-                                                "$ref": "#/definitions/entities.Office"
+                                                "$ref": "#/definitions/entity.Office"
                                             }
                                         }
                                     }
@@ -1888,7 +1888,7 @@ const docTemplate = `{
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/entities.Office"
+                                            "$ref": "#/definitions/entity.Office"
                                         }
                                     }
                                 }
@@ -1961,7 +1961,7 @@ const docTemplate = `{
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/entities.Office"
+                                            "$ref": "#/definitions/entity.Office"
                                         }
                                     }
                                 }
@@ -2470,7 +2470,7 @@ const docTemplate = `{
                 "attachments": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/entities.ClaimAttachment"
+                        "$ref": "#/definitions/entity.ClaimAttachment"
                     }
                 },
                 "total": {
@@ -2484,7 +2484,7 @@ const docTemplate = `{
                 "items": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/entities.ClaimItem"
+                        "$ref": "#/definitions/entity.ClaimItem"
                     }
                 },
                 "total": {
@@ -2738,7 +2738,7 @@ const docTemplate = `{
                 }
             }
         },
-        "entities.Claim": {
+        "entity.Claim": {
             "type": "object",
             "properties": {
                 "approved_by": {
@@ -2770,7 +2770,7 @@ const docTemplate = `{
                 }
             }
         },
-        "entities.ClaimAttachment": {
+        "entity.ClaimAttachment": {
             "type": "object",
             "properties": {
                 "claim_id": {
@@ -2790,7 +2790,7 @@ const docTemplate = `{
                 }
             }
         },
-        "entities.ClaimHistory": {
+        "entity.ClaimHistory": {
             "type": "object",
             "properties": {
                 "changed_at": {
@@ -2810,7 +2810,7 @@ const docTemplate = `{
                 }
             }
         },
-        "entities.ClaimItem": {
+        "entity.ClaimItem": {
             "type": "object",
             "properties": {
                 "claim_id": {
@@ -2848,7 +2848,7 @@ const docTemplate = `{
                 }
             }
         },
-        "entities.Office": {
+        "entity.Office": {
             "type": "object",
             "properties": {
                 "address": {

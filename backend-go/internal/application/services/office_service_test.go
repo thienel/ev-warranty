@@ -11,7 +11,7 @@ import (
 	"github.com/stretchr/testify/mock"
 
 	"ev-warranty-go/internal/application/services"
-	"ev-warranty-go/internal/domain/entities"
+	"ev-warranty-go/internal/domain/entity"
 	"ev-warranty-go/pkg/mocks"
 )
 
@@ -35,7 +35,7 @@ var _ = Describe("OfficeService", func() {
 			BeforeEach(func() {
 				cmd = &services.CreateOfficeCommand{
 					OfficeName: "Test Office",
-					OfficeType: entities.OfficeTypeEVM,
+					OfficeType: entity.OfficeTypeEVM,
 					Address:    "123 Test St",
 					IsActive:   true,
 				}
@@ -60,7 +60,7 @@ var _ = Describe("OfficeService", func() {
 			BeforeEach(func() {
 				cmd = &services.CreateOfficeCommand{
 					OfficeName: "Service Center",
-					OfficeType: entities.OfficeTypeSC,
+					OfficeType: entity.OfficeTypeSC,
 					Address:    "456 Main St",
 					IsActive:   false,
 				}
@@ -102,7 +102,7 @@ var _ = Describe("OfficeService", func() {
 			BeforeEach(func() {
 				cmd = &services.CreateOfficeCommand{
 					OfficeName: "Test Office",
-					OfficeType: entities.OfficeTypeEVM,
+					OfficeType: entity.OfficeTypeEVM,
 					Address:    "123 Test St",
 					IsActive:   true,
 				}
@@ -130,10 +130,10 @@ var _ = Describe("OfficeService", func() {
 
 		Context("when office is found", func() {
 			It("should return the office", func() {
-				expectedOffice := &entities.Office{
+				expectedOffice := &entity.Office{
 					ID:         officeID,
 					OfficeName: "Test Office",
-					OfficeType: entities.OfficeTypeEVM,
+					OfficeType: entity.OfficeTypeEVM,
 					Address:    "123 Test St",
 					IsActive:   true,
 				}
@@ -181,18 +181,18 @@ var _ = Describe("OfficeService", func() {
 	Describe("GetAll", func() {
 		Context("when offices are found", func() {
 			It("should return all offices", func() {
-				expectedOffices := []*entities.Office{
+				expectedOffices := []*entity.Office{
 					{
 						ID:         uuid.New(),
 						OfficeName: "Office 1",
-						OfficeType: entities.OfficeTypeEVM,
+						OfficeType: entity.OfficeTypeEVM,
 						Address:    "123 Test St",
 						IsActive:   true,
 					},
 					{
 						ID:         uuid.New(),
 						OfficeName: "Office 2",
-						OfficeType: entities.OfficeTypeSC,
+						OfficeType: entity.OfficeTypeSC,
 						Address:    "456 Main St",
 						IsActive:   false,
 					},
@@ -214,7 +214,7 @@ var _ = Describe("OfficeService", func() {
 
 		Context("when no offices are found", func() {
 			It("should return an empty slice", func() {
-				mockRepo.EXPECT().FindAll(ctx).Return([]*entities.Office{}, nil).Once()
+				mockRepo.EXPECT().FindAll(ctx).Return([]*entity.Office{}, nil).Once()
 
 				offices, err := service.GetAll(ctx)
 
@@ -241,16 +241,16 @@ var _ = Describe("OfficeService", func() {
 	Describe("Update", func() {
 		var (
 			officeID       uuid.UUID
-			existingOffice *entities.Office
+			existingOffice *entity.Office
 			cmd            *services.UpdateOfficeCommand
 		)
 
 		BeforeEach(func() {
 			officeID = uuid.New()
-			existingOffice = &entities.Office{
+			existingOffice = &entity.Office{
 				ID:         officeID,
 				OfficeName: "Old Office Name",
-				OfficeType: entities.OfficeTypeEVM,
+				OfficeType: entity.OfficeTypeEVM,
 				Address:    "Old Address",
 				IsActive:   true,
 			}
@@ -260,7 +260,7 @@ var _ = Describe("OfficeService", func() {
 			BeforeEach(func() {
 				cmd = &services.UpdateOfficeCommand{
 					OfficeName: "Updated Office Name",
-					OfficeType: entities.OfficeTypeSC,
+					OfficeType: entity.OfficeTypeSC,
 					Address:    "Updated Address",
 					IsActive:   false,
 				}
@@ -280,7 +280,7 @@ var _ = Describe("OfficeService", func() {
 			BeforeEach(func() {
 				cmd = &services.UpdateOfficeCommand{
 					OfficeName: "Updated Office Name",
-					OfficeType: entities.OfficeTypeEVM,
+					OfficeType: entity.OfficeTypeEVM,
 					Address:    "Updated Address",
 					IsActive:   true,
 				}
@@ -319,7 +319,7 @@ var _ = Describe("OfficeService", func() {
 			BeforeEach(func() {
 				cmd = &services.UpdateOfficeCommand{
 					OfficeName: "Updated Office Name",
-					OfficeType: entities.OfficeTypeEVM,
+					OfficeType: entity.OfficeTypeEVM,
 					Address:    "Updated Address",
 					IsActive:   false,
 				}
@@ -381,7 +381,7 @@ var _ = Describe("OfficeService", func() {
 })
 
 func MatchOffice(cmd *services.CreateOfficeCommand) interface{} {
-	return mock.MatchedBy(func(o *entities.Office) bool {
+	return mock.MatchedBy(func(o *entity.Office) bool {
 		return o.OfficeName == cmd.OfficeName &&
 			o.OfficeType == cmd.OfficeType &&
 			o.Address == cmd.Address &&
@@ -390,7 +390,7 @@ func MatchOffice(cmd *services.CreateOfficeCommand) interface{} {
 }
 
 func MatchUpdatedOffice(id uuid.UUID, cmd *services.UpdateOfficeCommand) interface{} {
-	return mock.MatchedBy(func(o *entities.Office) bool {
+	return mock.MatchedBy(func(o *entity.Office) bool {
 		return o.ID == id &&
 			o.OfficeName == cmd.OfficeName &&
 			o.OfficeType == cmd.OfficeType &&

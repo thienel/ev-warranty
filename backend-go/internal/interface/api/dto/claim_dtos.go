@@ -1,7 +1,7 @@
 package dto
 
 import (
-	"ev-warranty-go/internal/domain/entities"
+	"ev-warranty-go/internal/domain/entity"
 
 	"github.com/google/uuid"
 )
@@ -26,11 +26,11 @@ type CreateClaimItemRequest struct {
 }
 
 type ClaimItemListResponse struct {
-	Items []entities.ClaimItem `json:"items"`
-	Total int                  `json:"total"`
+	Items []entity.ClaimItem `json:"items"`
+	Total int                `json:"total"`
 }
 
 type ClaimAttachmentListResponse struct {
-	Attachments []entities.ClaimAttachment `json:"attachments"`
-	Total       int                        `json:"total"`
+	Attachments []entity.ClaimAttachment `json:"attachments"`
+	Total       int                      `json:"total"`
 }

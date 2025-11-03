@@ -3,7 +3,7 @@ package services
 import (
 	"context"
 	"ev-warranty-go/internal/application/repositories"
-	"ev-warranty-go/internal/domain/entities"
+	"ev-warranty-go/internal/domain/entity"
 	"ev-warranty-go/pkg/apperror"
 	"ev-warranty-go/pkg/security"
 
@@ -27,9 +27,9 @@ type UserUpdateCommand struct {
 }
 
 type UserService interface {
-	Create(ctx context.Context, cmd *UserCreateCommand) (*entities.User, error)
-	GetByID(ctx context.Context, id uuid.UUID) (*entities.User, error)
-	GetAll(ctx context.Context) ([]*entities.User, error)
+	Create(ctx context.Context, cmd *UserCreateCommand) (*entity.User, error)
+	GetByID(ctx context.Context, id uuid.UUID) (*entity.User, error)
+	GetAll(ctx context.Context) ([]*entity.User, error)
 	Update(ctx context.Context, id uuid.UUID, cmd *UserUpdateCommand) error
 	Delete(ctx context.Context, id uuid.UUID) error
 }
@@ -43,9 +43,9 @@ func NewUserService(userRepo repositories.UserRepository, officeRepo repositorie
 	return &userService{userRepo, officeRepo}
 }
 
-func (s *userService) Create(ctx context.Context, cmd *UserCreateCommand) (*entities.User, error) {
-	if !entities.IsValidName(cmd.Name) || !entities.IsValidEmail(cmd.Email) ||
-		!entities.IsValidPassword(cmd.Password) || !entities.IsValidUserRole(cmd.Role) {
+func (s *userService) Create(ctx context.Context, cmd *UserCreateCommand) (*entity.User, error) {
+	if !entity.IsValidName(cmd.Name) || !entity.IsValidEmail(cmd.Email) ||
+		!entity.IsValidPassword(cmd.Password) || !entity.IsValidUserRole(cmd.Role) {
 		return nil, apperror.NewInvalidUserInput()
 	}
 
@@ -59,7 +59,7 @@ func (s *userService) Create(ctx context.Context, cmd *UserCreateCommand) (*enti
 		return nil, apperror.NewHashPasswordError(err)
 	}
 
-	user := entities.NewUser(cmd.Name, cmd.Email, cmd.Role, passwordHash, cmd.IsActive, cmd.OfficeID)
+	user := entity.NewUser(cmd.Name, cmd.Email, cmd.Role, passwordHash, cmd.IsActive, cmd.OfficeID)
 	if !user.IsValidOfficeByRole(office.OfficeType) {
 		return nil, apperror.NewInvalidOfficeType()
 	}
@@ -71,11 +71,11 @@ func (s *userService) Create(ctx context.Context, cmd *UserCreateCommand) (*enti
 	return user, nil
 }
 
-func (s *userService) GetByID(ctx context.Context, id uuid.UUID) (*entities.User, error) {
+func (s *userService) GetByID(ctx context.Context, id uuid.UUID) (*entity.User, error) {
 	return s.userRepo.FindByID(ctx, id)
 }
 
-func (s *userService) GetAll(ctx context.Context) ([]*entities.User, error) {
+func (s *userService) GetAll(ctx context.Context) ([]*entity.User, error) {
 	users, err := s.userRepo.FindAll(ctx)
 	if err != nil {
 		return nil, err
@@ -90,7 +90,7 @@ func (s *userService) Update(ctx context.Context, id uuid.UUID, cmd *UserUpdateC
 		return err
 	}
 
-	if !entities.IsValidName(cmd.Name) || !entities.IsValidUserRole(cmd.Role) {
+	if !entity.IsValidName(cmd.Name) || !entity.IsValidUserRole(cmd.Role) {
 		return apperror.NewInvalidUserInput()
 	}
 	user.Role = cmd.Role

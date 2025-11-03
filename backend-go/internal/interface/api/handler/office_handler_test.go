@@ -3,7 +3,7 @@ package handler_test
 import (
 	"errors"
 	"ev-warranty-go/internal/application/services"
-	"ev-warranty-go/internal/domain/entities"
+	"ev-warranty-go/internal/domain/entity"
 	"ev-warranty-go/internal/interface/api/dto"
 	"ev-warranty-go/internal/interface/api/handler"
 	apperrors2 "ev-warranty-go/pkg/apperror"
@@ -26,7 +26,7 @@ var _ = Describe("OfficeHandler", func() {
 		r             *gin.Engine
 		w             *httptest.ResponseRecorder
 		validReq      dto.CreateOfficeRequest
-		sampleOffice  *entities.Office
+		sampleOffice  *entity.Office
 	)
 
 	setupRoute := func(method, path string, role string, handlerFunc gin.HandlerFunc) {
@@ -46,7 +46,7 @@ var _ = Describe("OfficeHandler", func() {
 
 		validReq = dto.CreateOfficeRequest{
 			OfficeName: "Test Office",
-			OfficeType: entities.OfficeTypeEVM,
+			OfficeType: entity.OfficeTypeEVM,
 			Address:    "123 Test Street",
 			IsActive:   true,
 		}
@@ -56,7 +56,7 @@ var _ = Describe("OfficeHandler", func() {
 	Describe("Create", func() {
 		Context("when authorized as ADMIN", func() {
 			BeforeEach(func() {
-				setupRoute("POST", "/offices", entities.UserRoleAdmin, officeHandler.Create)
+				setupRoute("POST", "/offices", entity.UserRoleAdmin, officeHandler.Create)
 			})
 
 			It("should create office successfully", func() {
@@ -99,7 +99,7 @@ var _ = Describe("OfficeHandler", func() {
 		})
 
 		It("should deny access for non-admin users", func() {
-			setupRoute("POST", "/offices", entities.UserRoleScStaff, officeHandler.Create)
+			setupRoute("POST", "/offices", entity.UserRoleScStaff, officeHandler.Create)
 			SendRequest(r, http.MethodPost, "/offices", w, validReq)
 			ExpectErrorCode(w, http.StatusForbidden, apperrors2.ErrorCodeUnauthorizedRole)
 		})
@@ -123,13 +123,13 @@ var _ = Describe("OfficeHandler", func() {
 			},
 			Entry("successful retrieval",
 				func() {
-					offices := []*entities.Office{sampleOffice}
+					offices := []*entity.Office{sampleOffice}
 					mockService.EXPECT().GetAll(mock.Anything).Return(offices, nil).Once()
 				},
 				http.StatusOK, ""),
 			Entry("empty results",
 				func() {
-					mockService.EXPECT().GetAll(mock.Anything).Return([]*entities.Office{}, nil).Once()
+					mockService.EXPECT().GetAll(mock.Anything).Return([]*entity.Office{}, nil).Once()
 				},
 				http.StatusOK, ""),
 			Entry("service error",
@@ -188,7 +188,7 @@ var _ = Describe("OfficeHandler", func() {
 
 		Context("when authorized as ADMIN", func() {
 			BeforeEach(func() {
-				setupRoute("PUT", "/offices/:id", entities.UserRoleAdmin, officeHandler.Update)
+				setupRoute("PUT", "/offices/:id", entity.UserRoleAdmin, officeHandler.Update)
 			})
 
 			It("should update office successfully", func() {
@@ -228,7 +228,7 @@ var _ = Describe("OfficeHandler", func() {
 
 		Context("when not authorized as ADMIN", func() {
 			It("should deny access", func() {
-				setupRoute("PUT", "/offices/:id", entities.UserRoleScStaff, officeHandler.Update)
+				setupRoute("PUT", "/offices/:id", entity.UserRoleScStaff, officeHandler.Update)
 				SendRequest(r, http.MethodPut, "/offices/"+officeID.String(), w, updateReq)
 				ExpectErrorCode(w, http.StatusForbidden, apperrors2.ErrorCodeUnauthorizedRole)
 			})
@@ -240,7 +240,7 @@ var _ = Describe("OfficeHandler", func() {
 
 		Context("when authorized as ADMIN", func() {
 			BeforeEach(func() {
-				setupRoute("DELETE", "/offices/:id", entities.UserRoleAdmin, officeHandler.Delete)
+				setupRoute("DELETE", "/offices/:id", entity.UserRoleAdmin, officeHandler.Delete)
 			})
 
 			It("should delete office successfully", func() {
@@ -271,7 +271,7 @@ var _ = Describe("OfficeHandler", func() {
 
 		Context("when not authorized as ADMIN", func() {
 			It("should deny access", func() {
-				setupRoute("DELETE", "/offices/:id", entities.UserRoleScStaff, officeHandler.Delete)
+				setupRoute("DELETE", "/offices/:id", entity.UserRoleScStaff, officeHandler.Delete)
 				SendRequest(r, http.MethodDelete, "/offices/"+officeID.String(), w, nil)
 				ExpectErrorCode(w, http.StatusForbidden, apperrors2.ErrorCodeUnauthorizedRole)
 			})
@@ -279,6 +279,6 @@ var _ = Describe("OfficeHandler", func() {
 	})
 })
 
-func CreateOfficeFromRequest(req dto.CreateOfficeRequest) *entities.Office {
-	return entities.NewOffice(req.OfficeName, req.OfficeType, req.Address, req.IsActive)
+func CreateOfficeFromRequest(req dto.CreateOfficeRequest) *entity.Office {
+	return entity.NewOffice(req.OfficeName, req.OfficeType, req.Address, req.IsActive)
 }

@@ -3,7 +3,7 @@ package services
 import (
 	"context"
 	"ev-warranty-go/internal/application/repositories"
-	"ev-warranty-go/internal/domain/entities"
+	"ev-warranty-go/internal/domain/entity"
 	"ev-warranty-go/pkg/apperror"
 
 	"github.com/google/uuid"
@@ -24,9 +24,9 @@ type UpdateOfficeCommand struct {
 }
 
 type OfficeService interface {
-	Create(ctx context.Context, cmd *CreateOfficeCommand) (*entities.Office, error)
-	GetByID(ctx context.Context, id uuid.UUID) (*entities.Office, error)
-	GetAll(ctx context.Context) ([]*entities.Office, error)
+	Create(ctx context.Context, cmd *CreateOfficeCommand) (*entity.Office, error)
+	GetByID(ctx context.Context, id uuid.UUID) (*entity.Office, error)
+	GetAll(ctx context.Context) ([]*entity.Office, error)
 	Update(ctx context.Context, id uuid.UUID, cmd *UpdateOfficeCommand) error
 	DeleteByID(ctx context.Context, id uuid.UUID) error
 }
@@ -39,12 +39,12 @@ func NewOfficeService(repo repositories.OfficeRepository) OfficeService {
 	return &officeService{repo}
 }
 
-func (s *officeService) Create(ctx context.Context, cmd *CreateOfficeCommand) (*entities.Office, error) {
-	if !entities.IsValidOfficeType(cmd.OfficeType) {
+func (s *officeService) Create(ctx context.Context, cmd *CreateOfficeCommand) (*entity.Office, error) {
+	if !entity.IsValidOfficeType(cmd.OfficeType) {
 		return nil, apperror.NewInvalidOfficeType()
 	}
 
-	office := entities.NewOffice(cmd.OfficeName, cmd.OfficeType, cmd.Address, cmd.IsActive)
+	office := entity.NewOffice(cmd.OfficeName, cmd.OfficeType, cmd.Address, cmd.IsActive)
 	if err := s.repo.Create(ctx, office); err != nil {
 		return nil, err
 	}
@@ -52,11 +52,11 @@ func (s *officeService) Create(ctx context.Context, cmd *CreateOfficeCommand) (*
 	return office, nil
 }
 
-func (s *officeService) GetByID(ctx context.Context, id uuid.UUID) (*entities.Office, error) {
+func (s *officeService) GetByID(ctx context.Context, id uuid.UUID) (*entity.Office, error) {
 	return s.repo.FindByID(ctx, id)
 }
 
-func (s *officeService) GetAll(ctx context.Context) ([]*entities.Office, error) {
+func (s *officeService) GetAll(ctx context.Context) ([]*entity.Office, error) {
 	return s.repo.FindAll(ctx)
 }
 
@@ -66,7 +66,7 @@ func (s *officeService) Update(ctx context.Context, id uuid.UUID, cmd *UpdateOff
 		return err
 	}
 
-	if !entities.IsValidOfficeType(cmd.OfficeType) {
+	if !entity.IsValidOfficeType(cmd.OfficeType) {
 		return apperror.NewInvalidOfficeType()
 	}
 	office.OfficeName = cmd.OfficeName

@@ -2,7 +2,7 @@ package handler_test
 
 import (
 	"ev-warranty-go/internal/application/services"
-	"ev-warranty-go/internal/domain/entities"
+	"ev-warranty-go/internal/domain/entity"
 	"ev-warranty-go/internal/interface/api/dto"
 	"ev-warranty-go/internal/interface/api/handler"
 	apperrors2 "ev-warranty-go/pkg/apperror"
@@ -42,12 +42,12 @@ var _ = Describe("AuthHandler", func() {
 			userID       = uuid.New()
 			accessToken  = "access-token-123"
 			refreshToken = "refresh-token-456"
-			user         *entities.User
+			user         *entity.User
 		)
 
 		BeforeEach(func() {
 			r.POST("/auth/login", authHandler.Login)
-			user = entities.NewUser("Test User", "test@example.com", entities.UserRoleAdmin, "password_hash", true, uuid.New())
+			user = entity.NewUser("Test User", "test@example.com", entity.UserRoleAdmin, "password_hash", true, uuid.New())
 			user.ID = userID
 		})
 
@@ -184,14 +184,14 @@ var _ = Describe("AuthHandler", func() {
 		var (
 			accessToken = "valid-access-token"
 			userID      = uuid.New()
-			user        *entities.User
+			user        *entity.User
 		)
 
 		BeforeEach(func() {
 			r.POST("/auth/validate", authHandler.ValidateToken)
-			user = &entities.User{
+			user = &entity.User{
 				ID: userID, Name: "Test User", Email: "test@example.com",
-				Role: entities.UserRoleAdmin, IsActive: true, OfficeID: uuid.New(),
+				Role: entity.UserRoleAdmin, IsActive: true, OfficeID: uuid.New(),
 			}
 		})
 

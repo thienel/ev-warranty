@@ -4,7 +4,7 @@ import (
 	"context"
 	"ev-warranty-go/internal/application"
 	"ev-warranty-go/internal/application/repositories"
-	"ev-warranty-go/internal/domain/entities"
+	"ev-warranty-go/internal/domain/entity"
 	"ev-warranty-go/internal/infrastructure/cloudinary"
 	"ev-warranty-go/pkg/apperror"
 	"ev-warranty-go/pkg/logger"
@@ -24,10 +24,10 @@ type UpdateClaimCommand struct {
 }
 
 type ClaimService interface {
-	GetByID(ctx context.Context, id uuid.UUID) (*entities.Claim, error)
-	GetAll(ctx context.Context) ([]*entities.Claim, error)
+	GetByID(ctx context.Context, id uuid.UUID) (*entity.Claim, error)
+	GetAll(ctx context.Context) ([]*entity.Claim, error)
 
-	Create(tx application.Tx, cmd *CreateClaimCommand) (*entities.Claim, error)
+	Create(tx application.Tx, cmd *CreateClaimCommand) (*entity.Claim, error)
 	Update(tx application.Tx, id uuid.UUID, cmd *UpdateClaimCommand) error
 	HardDelete(tx application.Tx, id uuid.UUID) error
 	SoftDelete(tx application.Tx, id uuid.UUID) error
@@ -36,7 +36,7 @@ type ClaimService interface {
 	Submit(tx application.Tx, id uuid.UUID, changedBy uuid.UUID) error
 	Complete(tx application.Tx, id uuid.UUID, changedBy uuid.UUID) error
 
-	GetHistory(ctx context.Context, claimID uuid.UUID) ([]*entities.ClaimHistory, error)
+	GetHistory(ctx context.Context, claimID uuid.UUID) ([]*entity.ClaimHistory, error)
 }
 
 type claimService struct {
@@ -66,11 +66,11 @@ func NewClaimService(
 	}
 }
 
-func (s *claimService) GetByID(ctx context.Context, id uuid.UUID) (*entities.Claim, error) {
+func (s *claimService) GetByID(ctx context.Context, id uuid.UUID) (*entity.Claim, error) {
 	return s.claimRepo.FindByID(ctx, id)
 }
 
-func (s *claimService) GetAll(ctx context.Context) ([]*entities.Claim, error) {
+func (s *claimService) GetAll(ctx context.Context) ([]*entity.Claim, error) {
 	claims, err := s.claimRepo.FindAll(ctx)
 	if err != nil {
 		return nil, err
@@ -79,14 +79,14 @@ func (s *claimService) GetAll(ctx context.Context) ([]*entities.Claim, error) {
 	return claims, err
 }
 
-func (s *claimService) Create(tx application.Tx, cmd *CreateClaimCommand) (*entities.Claim, error) {
-	claim := entities.NewClaim(cmd.VehicleID, cmd.CustomerID, cmd.Description, entities.ClaimStatusDraft, nil)
+func (s *claimService) Create(tx application.Tx, cmd *CreateClaimCommand) (*entity.Claim, error) {
+	claim := entity.NewClaim(cmd.VehicleID, cmd.CustomerID, cmd.Description, entity.ClaimStatusDraft, nil)
 
 	if err := s.claimRepo.Create(tx, claim); err != nil {
 		return nil, err
 	}
 
-	history := entities.NewClaimHistory(claim.ID, entities.ClaimStatusDraft, cmd.CreatorID)
+	history := entity.NewClaimHistory(claim.ID, entity.ClaimStatusDraft, cmd.CreatorID)
 	if err := s.historyRepo.Create(tx, history); err != nil {
 		return nil, err
 	}
@@ -100,7 +100,7 @@ func (s *claimService) Update(tx application.Tx, id uuid.UUID, cmd *UpdateClaimC
 		return err
 	}
 
-	if claim.Status != entities.ClaimStatusDraft && claim.Status != entities.ClaimStatusRequestInfo {
+	if claim.Status != entity.ClaimStatusDraft && claim.Status != entity.ClaimStatusRequestInfo {
 		return apperror.NewNotAllowUpdateClaim()
 	}
 
@@ -119,7 +119,7 @@ func (s *claimService) HardDelete(tx application.Tx, id uuid.UUID) error {
 		return err
 	}
 
-	if claim.Status != entities.ClaimStatusDraft {
+	if claim.Status != entity.ClaimStatusDraft {
 		return apperror.NewNotAllowDeleteClaim()
 	}
 
@@ -146,7 +146,7 @@ func (s *claimService) SoftDelete(tx application.Tx, id uuid.UUID) error {
 		return err
 	}
 
-	if claim.Status != entities.ClaimStatusCancelled {
+	if claim.Status != entity.ClaimStatusCancelled {
 		return apperror.NewNotAllowDeleteClaim()
 	}
 
@@ -167,7 +167,7 @@ func (s *claimService) SoftDelete(tx application.Tx, id uuid.UUID) error {
 }
 
 func (s *claimService) UpdateStatus(tx application.Tx, id uuid.UUID, status string, changedBy uuid.UUID) error {
-	if !entities.IsValidClaimStatus(status) {
+	if !entity.IsValidClaimStatus(status) {
 		return apperror.NewInvalidClaimStatus()
 	}
 
@@ -176,7 +176,7 @@ func (s *claimService) UpdateStatus(tx application.Tx, id uuid.UUID, status stri
 		return err
 	}
 
-	if !entities.IsValidClaimStatusTransition(claim.Status, status) {
+	if !entity.IsValidClaimStatusTransition(claim.Status, status) {
 		return apperror.NewInvalidClaimAction()
 	}
 
@@ -185,7 +185,7 @@ func (s *claimService) UpdateStatus(tx application.Tx, id uuid.UUID, status stri
 		return err
 	}
 
-	history := entities.NewClaimHistory(claim.ID, status, changedBy)
+	history := entity.NewClaimHistory(claim.ID, status, changedBy)
 	if err = s.historyRepo.Create(tx, history); err != nil {
 		return err
 	}
@@ -199,7 +199,7 @@ func (s *claimService) Submit(tx application.Tx, id uuid.UUID, changedBy uuid.UU
 		return err
 	}
 
-	if !entities.IsValidClaimStatusTransition(claim.Status, entities.ClaimStatusSubmitted) {
+	if !entity.IsValidClaimStatusTransition(claim.Status, entity.ClaimStatusSubmitted) {
 		return apperror.NewInvalidClaimAction()
 	}
 
@@ -212,16 +212,16 @@ func (s *claimService) Submit(tx application.Tx, id uuid.UUID, changedBy uuid.UU
 		return err
 	}
 
-	if len(items) < entities.ClaimItemRequirePerClaim || len(attachments) < entities.AttachmentRequirePerClaim {
+	if len(items) < entity.ClaimItemRequirePerClaim || len(attachments) < entity.AttachmentRequirePerClaim {
 		return apperror.NewMissingInformationClaim()
 	}
 
-	err = s.claimRepo.UpdateStatus(tx, id, entities.ClaimStatusSubmitted)
+	err = s.claimRepo.UpdateStatus(tx, id, entity.ClaimStatusSubmitted)
 	if err != nil {
 		return err
 	}
 
-	history := entities.NewClaimHistory(claim.ID, entities.ClaimStatusSubmitted, changedBy)
+	history := entity.NewClaimHistory(claim.ID, entity.ClaimStatusSubmitted, changedBy)
 	if err = s.historyRepo.Create(tx, history); err != nil {
 		return err
 	}
@@ -243,22 +243,22 @@ func (s *claimService) Complete(tx application.Tx, id uuid.UUID, changedBy uuid.
 	approvedCount := 0
 	for _, item := range items {
 		switch item.Status {
-		case entities.ClaimItemStatusApproved:
+		case entity.ClaimItemStatusApproved:
 			approvedCount++
-		case entities.ClaimItemStatusRejected:
+		case entity.ClaimItemStatusRejected:
 		default:
 			return apperror.NewInvalidClaimAction()
 		}
 	}
 
-	newStatus := entities.ClaimStatusPartiallyApproved
+	newStatus := entity.ClaimStatusPartiallyApproved
 	if approvedCount == len(items) {
-		newStatus = entities.ClaimStatusApproved
+		newStatus = entity.ClaimStatusApproved
 	} else if approvedCount == 0 {
-		newStatus = entities.ClaimStatusRejected
+		newStatus = entity.ClaimStatusRejected
 	}
 
-	if !entities.IsValidClaimStatusTransition(claim.Status, newStatus) {
+	if !entity.IsValidClaimStatusTransition(claim.Status, newStatus) {
 		return apperror.NewInvalidClaimAction()
 	}
 
@@ -267,7 +267,7 @@ func (s *claimService) Complete(tx application.Tx, id uuid.UUID, changedBy uuid.
 		return err
 	}
 
-	history := entities.NewClaimHistory(claim.ID, newStatus, changedBy)
+	history := entity.NewClaimHistory(claim.ID, newStatus, changedBy)
 	if err = s.historyRepo.Create(tx, history); err != nil {
 		return err
 	}
@@ -275,7 +275,7 @@ func (s *claimService) Complete(tx application.Tx, id uuid.UUID, changedBy uuid.
 	return nil
 }
 
-func (s *claimService) GetHistory(ctx context.Context, claimID uuid.UUID) ([]*entities.ClaimHistory, error) {
+func (s *claimService) GetHistory(ctx context.Context, claimID uuid.UUID) ([]*entity.ClaimHistory, error) {
 	histories, err := s.historyRepo.FindByClaimID(ctx, claimID)
 	if err != nil {
 		return nil, err

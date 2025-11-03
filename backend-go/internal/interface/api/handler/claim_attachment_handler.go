@@ -4,7 +4,7 @@ import (
 	"context"
 	"ev-warranty-go/internal/application"
 	"ev-warranty-go/internal/application/services"
-	"ev-warranty-go/internal/domain/entities"
+	"ev-warranty-go/internal/domain/entity"
 	"ev-warranty-go/pkg/apperror"
 	"ev-warranty-go/pkg/logger"
 	"net/http"
@@ -43,7 +43,7 @@ func NewClaimAttachmentHandler(log logger.Logger, txManager application.TxManage
 // @Security Bearer
 // @Param id path string true "Claim ID"
 // @Param attachmentID path string true "Attachment ID"
-// @Success 200 {object} dto.SuccessResponse{data=entities.ClaimAttachment} "Claim attachment retrieved successfully"
+// @Success 200 {object} dto.SuccessResponse{data=entity.ClaimAttachment} "Claim attachment retrieved successfully"
 // @Failure 400 {object} dto.ErrorResponse "Bad request"
 // @Failure 401 {object} dto.ErrorResponse "Unauthorized"
 // @Failure 404 {object} dto.ErrorResponse "Claim attachment not found"
@@ -110,7 +110,7 @@ func (h *claimAttachmentHandler) GetByClaimID(c *gin.Context) {
 // @Security Bearer
 // @Param id path string true "Claim ID"
 // @Param files formData file true "Files to upload"
-// @Success 201 {object} dto.SuccessResponse{data=[]entities.ClaimAttachment} "Claim attachments uploaded successfully"
+// @Success 201 {object} dto.SuccessResponse{data=[]entity.ClaimAttachment} "Claim attachments uploaded successfully"
 // @Failure 400 {object} dto.ErrorResponse "Bad request"
 // @Failure 401 {object} dto.ErrorResponse "Unauthorized"
 // @Failure 403 {object} dto.ErrorResponse "Forbidden"
@@ -118,7 +118,7 @@ func (h *claimAttachmentHandler) GetByClaimID(c *gin.Context) {
 // @Failure 500 {object} dto.ErrorResponse "Internal server error"
 // @Router /claims/{id}/attachments [post]
 func (h *claimAttachmentHandler) Create(c *gin.Context) {
-	if err := allowedRoles(c, entities.UserRoleScTechnician); err != nil {
+	if err := allowedRoles(c, entity.UserRoleScTechnician); err != nil {
 		handleError(h.log, c, err)
 		return
 	}
@@ -141,7 +141,7 @@ func (h *claimAttachmentHandler) Create(c *gin.Context) {
 		return
 	}
 
-	var attachments []*entities.ClaimAttachment
+	var attachments []*entity.ClaimAttachment
 	err = h.txManager.Do(c.Request.Context(), func(tx application.Tx) error {
 		for _, fileHeader := range files {
 			file, err := fileHeader.Open()
@@ -185,7 +185,7 @@ func (h *claimAttachmentHandler) Create(c *gin.Context) {
 // @Failure 500 {object} dto.ErrorResponse "Internal server error"
 // @Router /claims/{id}/attachments/{attachmentID} [delete]
 func (h *claimAttachmentHandler) Delete(c *gin.Context) {
-	if err := allowedRoles(c, entities.UserRoleScTechnician); err != nil {
+	if err := allowedRoles(c, entity.UserRoleScTechnician); err != nil {
 		handleError(h.log, c, err)
 		return
 	}

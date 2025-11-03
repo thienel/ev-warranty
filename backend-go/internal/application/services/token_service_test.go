@@ -15,7 +15,7 @@ import (
 	"github.com/stretchr/testify/mock"
 
 	"ev-warranty-go/internal/application/services"
-	"ev-warranty-go/internal/domain/entities"
+	"ev-warranty-go/internal/domain/entity"
 	"ev-warranty-go/pkg/mocks"
 )
 
@@ -222,7 +222,7 @@ var _ = Describe("TokenService", func() {
 
 		Context("when refresh token is valid", func() {
 			It("should return the refresh token entity", func() {
-				expectedToken := &entities.RefreshToken{
+				expectedToken := &entity.RefreshToken{
 					ID:        uuid.New(),
 					UserID:    userID,
 					Token:     "hashed_token",
@@ -254,7 +254,7 @@ var _ = Describe("TokenService", func() {
 
 		Context("when refresh token is expired", func() {
 			It("should return ExpiredRefreshToken error", func() {
-				expiredToken := &entities.RefreshToken{
+				expiredToken := &entity.RefreshToken{
 					ID:        uuid.New(),
 					UserID:    userID,
 					Token:     "hashed_token",
@@ -273,7 +273,7 @@ var _ = Describe("TokenService", func() {
 
 		Context("when refresh token is revoked", func() {
 			It("should return RevokedRefreshToken error", func() {
-				revokedToken := &entities.RefreshToken{
+				revokedToken := &entity.RefreshToken{
 					ID:        uuid.New(),
 					UserID:    userID,
 					Token:     "hashed_token",
@@ -334,7 +334,7 @@ var _ = Describe("TokenService", func() {
 
 		Context("when refresh is successful", func() {
 			It("should return a new access token", func() {
-				validToken := &entities.RefreshToken{
+				validToken := &entity.RefreshToken{
 					ID:        uuid.New(),
 					UserID:    userID,
 					Token:     "hashed_token",
@@ -369,7 +369,7 @@ var _ = Describe("TokenService", func() {
 
 		Context("when refresh token is expired", func() {
 			It("should return ExpiredRefreshToken error", func() {
-				expiredToken := &entities.RefreshToken{
+				expiredToken := &entity.RefreshToken{
 					ID:        uuid.New(),
 					UserID:    userID,
 					Token:     "hashed_token",
@@ -389,7 +389,7 @@ var _ = Describe("TokenService", func() {
 })
 
 func MatchRefreshToken(userID uuid.UUID) interface{} {
-	return mock.MatchedBy(func(rt *entities.RefreshToken) bool {
+	return mock.MatchedBy(func(rt *entity.RefreshToken) bool {
 		return rt.UserID == userID
 	})
 }

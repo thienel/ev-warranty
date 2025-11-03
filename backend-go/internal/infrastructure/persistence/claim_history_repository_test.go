@@ -15,7 +15,7 @@ import (
 	"gorm.io/gorm"
 
 	"ev-warranty-go/internal/application/repositories"
-	"ev-warranty-go/internal/domain/entities"
+	"ev-warranty-go/internal/domain/entity"
 	"ev-warranty-go/internal/infrastructure/persistence"
 )
 
@@ -38,7 +38,7 @@ var _ = Describe("ClaimHistoryRepository", func() {
 	})
 
 	Describe("Create", func() {
-		var history *entities.ClaimHistory
+		var history *entity.ClaimHistory
 
 		BeforeEach(func() {
 			history = newClaimHistory()
@@ -83,12 +83,12 @@ var _ = Describe("ClaimHistoryRepository", func() {
 		Context("boundary cases for status", func() {
 			It("should handle all valid status values", func() {
 				statuses := []string{
-					entities.ClaimStatusDraft,
-					entities.ClaimStatusSubmitted,
-					entities.ClaimStatusReviewing,
-					entities.ClaimStatusApproved,
-					entities.ClaimStatusRejected,
-					entities.ClaimStatusCancelled,
+					entity.ClaimStatusDraft,
+					entity.ClaimStatusSubmitted,
+					entity.ClaimStatusReviewing,
+					entity.ClaimStatusApproved,
+					entity.ClaimStatusRejected,
+					entity.ClaimStatusCancelled,
 				}
 
 				for _, s := range statuses {
@@ -161,9 +161,9 @@ var _ = Describe("ClaimHistoryRepository", func() {
 				rows := sqlmock.NewRows([]string{
 					"id", "claim_id", "status", "changed_by", "changed_at", "deleted_at",
 				}).AddRow(
-					historyID1, claimID, entities.ClaimStatusDraft, changedBy, now, nil,
+					historyID1, claimID, entity.ClaimStatusDraft, changedBy, now, nil,
 				).AddRow(
-					historyID2, claimID, entities.ClaimStatusSubmitted, changedBy, now.Add(-1*time.Hour), nil,
+					historyID2, claimID, entity.ClaimStatusSubmitted, changedBy, now.Add(-1*time.Hour), nil,
 				)
 
 				mock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "claim_histories" WHERE claim_id = $1 AND "claim_histories"."deleted_at" IS NULL ORDER BY changed_at DESC`)).
@@ -217,7 +217,7 @@ var _ = Describe("ClaimHistoryRepository", func() {
 				rows := sqlmock.NewRows([]string{
 					"id", "claim_id", "status", "changed_by", "changed_at", "deleted_at",
 				}).AddRow(
-					historyID, claimID, entities.ClaimStatusDraft, changedBy, time.Now(), nil,
+					historyID, claimID, entity.ClaimStatusDraft, changedBy, time.Now(), nil,
 				)
 
 				mock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "claim_histories" WHERE claim_id = $1 AND "claim_histories"."deleted_at" IS NULL ORDER BY changed_at DESC`)).
@@ -238,7 +238,7 @@ var _ = Describe("ClaimHistoryRepository", func() {
 
 				for i := 0; i < 100; i++ {
 					rows.AddRow(
-						uuid.New(), claimID, entities.ClaimStatusDraft, changedBy, time.Now(), nil,
+						uuid.New(), claimID, entity.ClaimStatusDraft, changedBy, time.Now(), nil,
 					)
 				}
 
@@ -270,7 +270,7 @@ var _ = Describe("ClaimHistoryRepository", func() {
 				rows := sqlmock.NewRows([]string{
 					"id", "claim_id", "status", "changed_by", "changed_at", "deleted_at",
 				}).AddRow(
-					historyID, claimID, entities.ClaimStatusApproved, changedBy, now, nil,
+					historyID, claimID, entity.ClaimStatusApproved, changedBy, now, nil,
 				)
 
 				mock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "claim_histories" WHERE claim_id = $1 AND "claim_histories"."deleted_at" IS NULL ORDER BY changed_at DESC,"claim_histories"."id" LIMIT $2`)).
@@ -283,7 +283,7 @@ var _ = Describe("ClaimHistoryRepository", func() {
 				Expect(history).NotTo(BeNil())
 				Expect(history.ID).To(Equal(historyID))
 				Expect(history.ClaimID).To(Equal(claimID))
-				Expect(history.Status).To(Equal(entities.ClaimStatusApproved))
+				Expect(history.Status).To(Equal(entity.ClaimStatusApproved))
 			})
 		})
 
@@ -335,9 +335,9 @@ var _ = Describe("ClaimHistoryRepository", func() {
 				rows := sqlmock.NewRows([]string{
 					"id", "claim_id", "status", "changed_by", "changed_at", "deleted_at",
 				}).AddRow(
-					historyID1, claimID, entities.ClaimStatusDraft, changedBy, date1, nil,
+					historyID1, claimID, entity.ClaimStatusDraft, changedBy, date1, nil,
 				).AddRow(
-					historyID2, claimID, entities.ClaimStatusSubmitted, changedBy, date2, nil,
+					historyID2, claimID, entity.ClaimStatusSubmitted, changedBy, date2, nil,
 				)
 
 				mock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "claim_histories" WHERE (claim_id = $1 AND changed_at BETWEEN $2 AND $3) AND "claim_histories"."deleted_at" IS NULL ORDER BY changed_at DESC`)).
@@ -392,7 +392,7 @@ var _ = Describe("ClaimHistoryRepository", func() {
 				rows := sqlmock.NewRows([]string{
 					"id", "claim_id", "status", "changed_by", "changed_at", "deleted_at",
 				}).AddRow(
-					historyID, claimID, entities.ClaimStatusDraft, changedBy, sameDate, nil,
+					historyID, claimID, entity.ClaimStatusDraft, changedBy, sameDate, nil,
 				)
 
 				mock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "claim_histories" WHERE (claim_id = $1 AND changed_at BETWEEN $2 AND $3) AND "claim_histories"."deleted_at" IS NULL ORDER BY changed_at DESC`)).
@@ -462,11 +462,11 @@ var _ = Describe("ClaimHistoryRepository", func() {
 	})
 })
 
-func newClaimHistory() *entities.ClaimHistory {
-	return &entities.ClaimHistory{
+func newClaimHistory() *entity.ClaimHistory {
+	return &entity.ClaimHistory{
 		ID:        uuid.New(),
 		ClaimID:   uuid.New(),
-		Status:    entities.ClaimStatusDraft,
+		Status:    entity.ClaimStatusDraft,
 		ChangedBy: uuid.New(),
 		ChangedAt: time.Now(),
 		DeletedAt: nil,

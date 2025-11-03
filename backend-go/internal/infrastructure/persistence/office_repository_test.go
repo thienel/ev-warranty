@@ -12,7 +12,7 @@ import (
 	"gorm.io/gorm"
 
 	"ev-warranty-go/internal/application/repositories"
-	"ev-warranty-go/internal/domain/entities"
+	"ev-warranty-go/internal/domain/entity"
 	"ev-warranty-go/internal/infrastructure/persistence"
 )
 
@@ -35,7 +35,7 @@ var _ = Describe("OfficeRepository", func() {
 	})
 
 	Describe("Create", func() {
-		var office *entities.Office
+		var office *entity.Office
 
 		BeforeEach(func() {
 			office = newOffice()
@@ -138,10 +138,10 @@ var _ = Describe("OfficeRepository", func() {
 					"id", "office_name", "office_type", "address", "is_active",
 					"created_at", "updated_at", "deleted_at",
 				}).AddRow(
-					officeID1, "Office 1", entities.OfficeTypeEVM, "123 Test St",
+					officeID1, "Office 1", entity.OfficeTypeEVM, "123 Test St",
 					true, time.Now(), time.Now(), nil,
 				).AddRow(
-					officeID2, "Office 2", entities.OfficeTypeSC, "456 Main St",
+					officeID2, "Office 2", entity.OfficeTypeSC, "456 Main St",
 					false, time.Now(), time.Now(), nil,
 				)
 
@@ -187,10 +187,10 @@ var _ = Describe("OfficeRepository", func() {
 	})
 
 	Describe("Update", func() {
-		var office *entities.Office
+		var office *entity.Office
 
 		BeforeEach(func() {
-			office = entities.NewOffice("Updated Office", entities.OfficeTypeSC, "789 New St", false)
+			office = entity.NewOffice("Updated Office", entity.OfficeTypeSC, "789 New St", false)
 		})
 
 		Context("when office is updated successfully", func() {
@@ -243,11 +243,11 @@ var _ = Describe("OfficeRepository", func() {
 	})
 })
 
-func newOffice() *entities.Office {
-	return &entities.Office{
+func newOffice() *entity.Office {
+	return &entity.Office{
 		ID:         uuid.New(),
 		OfficeName: "Test Office",
-		OfficeType: entities.OfficeTypeEVM,
+		OfficeType: entity.OfficeTypeEVM,
 		Address:    "123 Test St",
 		IsActive:   true,
 		CreatedAt:  time.Now(),

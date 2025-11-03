@@ -4,7 +4,7 @@ package mocks
 
 import (
 	context "context"
-	entities "ev-warranty-go/internal/domain/entities"
+	entities "ev-warranty-go/internal/domain/entity"
 
 	mock "github.com/stretchr/testify/mock"
 
