@@ -1,5 +1,7 @@
-﻿using Backend.Dotnet.Application.DTOs;
+﻿using Backend.Dotnet.Application.Constants;
+using Backend.Dotnet.Application.DTOs;
 using Backend.Dotnet.Application.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using static Backend.Dotnet.Application.DTOs.WarrantyPolicyDto;
@@ -9,6 +11,7 @@ namespace Backend.Dotnet.API.Controllers
     [ApiController]
     [Route("warranty-policies")]
     [Produces("application/json")]
+    [Authorize(Roles = SystemRoles.UserRoleAdmin + "," + SystemRoles.UserRoleEvmStaff)]
     public class WarrantyPoliciesController : ControllerBase
     {
         private readonly IWarrantyPolicyService _warrantyPolicyService;
