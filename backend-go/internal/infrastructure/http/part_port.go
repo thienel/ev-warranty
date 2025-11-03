@@ -20,7 +20,7 @@ func NewPartHTTPAdapter() port.PartPort {
 }
 
 func (a *partHTTPAdapter) FindByOfficeIDAndCategoryID(office, category uuid.UUID) (*entity.Part, error) {
-	resp, _ := a.client.Get(fmt.Sprintf("%s/parts/%s", a.baseURL, office, category))
+	resp, _ := a.client.Get(fmt.Sprintf("%s/parts/%s%s", a.baseURL, office, category))
 	var dto struct {
 		IsSuccess bool        `json:"is_success"`
 		Message   string      `json:"message"`
