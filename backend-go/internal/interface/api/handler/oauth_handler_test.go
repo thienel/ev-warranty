@@ -3,7 +3,7 @@ package handler_test
 import (
 	"errors"
 	"ev-warranty-go/internal/infrastructure/oauth/providers"
-	"ev-warranty-go/internal/interfaces/api/handler"
+	"ev-warranty-go/internal/interface/api/handler"
 	"ev-warranty-go/pkg/mocks"
 	"fmt"
 	"net/http"

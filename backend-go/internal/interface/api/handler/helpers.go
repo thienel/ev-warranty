@@ -3,7 +3,7 @@ package handler
 import (
 	"errors"
 	"ev-warranty-go/internal/apperrors"
-	"ev-warranty-go/internal/interfaces/api/dto"
+	"ev-warranty-go/internal/interface/api/dto"
 	"ev-warranty-go/pkg/logger"
 	"time"
 

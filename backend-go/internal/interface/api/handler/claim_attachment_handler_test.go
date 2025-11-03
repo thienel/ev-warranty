@@ -7,7 +7,7 @@ import (
 	"ev-warranty-go/internal/apperrors"
 	"ev-warranty-go/internal/application"
 	"ev-warranty-go/internal/domain/entities"
-	"ev-warranty-go/internal/interfaces/api/handler"
+	"ev-warranty-go/internal/interface/api/handler"
 	"ev-warranty-go/pkg/mocks"
 	"mime/multipart"
 	"net/http"

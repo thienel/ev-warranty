@@ -3,7 +3,7 @@ package handler_test
 import (
 	"bytes"
 	"encoding/json"
-	"ev-warranty-go/internal/interfaces/api/dto"
+	"ev-warranty-go/internal/interface/api/dto"
 	"ev-warranty-go/pkg/mocks"
 	"net/http"
 	"net/http/httptest"

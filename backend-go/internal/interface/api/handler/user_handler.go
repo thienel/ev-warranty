@@ -5,7 +5,7 @@ import (
 	"ev-warranty-go/internal/apperrors"
 	"ev-warranty-go/internal/application/services"
 	"ev-warranty-go/internal/domain/entities"
-	"ev-warranty-go/internal/interfaces/api/dto"
+	"ev-warranty-go/internal/interface/api/dto"
 	"ev-warranty-go/pkg/logger"
 	"net/http"
 	"strings"

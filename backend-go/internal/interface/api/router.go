@@ -2,7 +2,7 @@ package api
 
 import (
 	"ev-warranty-go/internal/infrastructure/database"
-	"ev-warranty-go/internal/interfaces/api/handler"
+	"ev-warranty-go/internal/interface/api/handler"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
