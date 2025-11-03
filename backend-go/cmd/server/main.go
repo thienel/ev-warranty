@@ -11,7 +11,7 @@ import (
 	"ev-warranty-go/internal/infrastructure/oauth/providers"
 	"ev-warranty-go/internal/infrastructure/persistence"
 	"ev-warranty-go/internal/interfaces/api"
-	"ev-warranty-go/internal/interfaces/api/handlers"
+	"ev-warranty-go/internal/interfaces/api/handler"
 	"ev-warranty-go/internal/security"
 	"ev-warranty-go/pkg/logger"
 	"net/http"
@@ -110,13 +110,13 @@ func main() {
 	claimItemService := services.NewClaimItemService(claimRepo, claimItemRepo)
 	claimAttachmentService := services.NewClaimAttachmentService(log, claimRepo, claimAttachmentRepo, cloudinaryService)
 
-	officeHandler := handlers.NewOfficeHandler(log, officeService)
-	authHandler := handlers.NewAuthHandler(log, authService, tokenService, userService)
-	oauthHandler := handlers.NewOAuthHandler(log, cfg.OAuth.FrontendBaseURL, oauthService, authService)
-	userHandler := handlers.NewUserHandler(log, userService)
-	claimHandler := handlers.NewClaimHandler(log, txManager, claimService)
-	claimItemHandler := handlers.NewClaimItemHandler(log, txManager, claimItemService)
-	claimAttachmentHandler := handlers.NewClaimAttachmentHandler(log, txManager, claimAttachmentService)
+	officeHandler := handler.NewOfficeHandler(log, officeService)
+	authHandler := handler.NewAuthHandler(log, authService, tokenService, userService)
+	oauthHandler := handler.NewOAuthHandler(log, cfg.OAuth.FrontendBaseURL, oauthService, authService)
+	userHandler := handler.NewUserHandler(log, userService)
+	claimHandler := handler.NewClaimHandler(log, txManager, claimService)
+	claimItemHandler := handler.NewClaimItemHandler(log, txManager, claimItemService)
+	claimAttachmentHandler := handler.NewClaimAttachmentHandler(log, txManager, claimAttachmentService)
 
 	r := api.NewRouter(app.DB, authHandler, oauthHandler, officeHandler,
 		userHandler, claimHandler, claimItemHandler, claimAttachmentHandler)

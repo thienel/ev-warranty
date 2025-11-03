@@ -1,9 +1,9 @@
-package handlers_test
+package handler_test
 
 import (
 	"errors"
 	"ev-warranty-go/internal/infrastructure/oauth/providers"
-	"ev-warranty-go/internal/interfaces/api/handlers"
+	"ev-warranty-go/internal/interfaces/api/handler"
 	"ev-warranty-go/pkg/mocks"
 	"fmt"
 	"net/http"
@@ -20,7 +20,7 @@ var _ = Describe("OAuthHandler", func() {
 		mockLogger      *mocks.Logger
 		mockOAuthSvc    *mocks.OAuthService
 		mockAuthSvc     *mocks.AuthService
-		handler         handlers.OAuthHandler
+		oauthHandler    handler.OAuthHandler
 		r               *gin.Engine
 		w               *httptest.ResponseRecorder
 		frontendBaseURL = "http://localhost:3000"
@@ -31,12 +31,12 @@ var _ = Describe("OAuthHandler", func() {
 		mockLogger, r, w = SetupMock(GinkgoT())
 		mockOAuthSvc = mocks.NewOAuthService(GinkgoT())
 		mockAuthSvc = mocks.NewAuthService(GinkgoT())
-		handler = handlers.NewOAuthHandler(mockLogger, frontendBaseURL, mockOAuthSvc, mockAuthSvc)
+		oauthHandler = handler.NewOAuthHandler(mockLogger, frontendBaseURL, mockOAuthSvc, mockAuthSvc)
 	})
 
 	Describe("InitiateOAuth", func() {
 		BeforeEach(func() {
-			r.GET("/oauth/login", handler.InitiateOAuth)
+			r.GET("/oauth/login", oauthHandler.InitiateOAuth)
 		})
 
 		It("should redirect to OAuth provider on success", func() {
@@ -71,7 +71,7 @@ var _ = Describe("OAuthHandler", func() {
 		)
 
 		BeforeEach(func() {
-			r.GET("/oauth/callback", handler.HandleCallback)
+			r.GET("/oauth/callback", oauthHandler.HandleCallback)
 			userInfo = &providers.UserInfo{
 				Provider:   "google",
 				ProviderID: "123456789",

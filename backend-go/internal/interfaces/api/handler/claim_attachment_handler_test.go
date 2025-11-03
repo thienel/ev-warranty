@@ -1,4 +1,4 @@
-package handlers_test
+package handler_test
 
 import (
 	"bytes"
@@ -7,7 +7,7 @@ import (
 	"ev-warranty-go/internal/apperrors"
 	"ev-warranty-go/internal/application"
 	"ev-warranty-go/internal/domain/entities"
-	"ev-warranty-go/internal/interfaces/api/handlers"
+	"ev-warranty-go/internal/interfaces/api/handler"
 	"ev-warranty-go/pkg/mocks"
 	"mime/multipart"
 	"net/http"
@@ -23,16 +23,16 @@ import (
 
 var _ = Describe("ClaimAttachmentHandler", func() {
 	var (
-		mockLogger       *mocks.Logger
-		mockTxManager    *mocks.TxManager
-		mockService      *mocks.ClaimAttachmentService
-		mockTx           *mocks.Tx
-		handler          handlers.ClaimAttachmentHandler
-		r                *gin.Engine
-		w                *httptest.ResponseRecorder
-		claimID          uuid.UUID
-		attachmentID     uuid.UUID
-		sampleAttachment *entities.ClaimAttachment
+		mockLogger        *mocks.Logger
+		mockTxManager     *mocks.TxManager
+		mockService       *mocks.ClaimAttachmentService
+		mockTx            *mocks.Tx
+		attachmentHandler handler.ClaimAttachmentHandler
+		r                 *gin.Engine
+		w                 *httptest.ResponseRecorder
+		claimID           uuid.UUID
+		attachmentID      uuid.UUID
+		sampleAttachment  *entities.ClaimAttachment
 	)
 
 	createMultipartForm := func(filenames ...string) (*bytes.Buffer, string) {
@@ -57,7 +57,7 @@ var _ = Describe("ClaimAttachmentHandler", func() {
 		mockTxManager = mocks.NewTxManager(GinkgoT())
 		mockService = mocks.NewClaimAttachmentService(GinkgoT())
 		mockTx = mocks.NewTx(GinkgoT())
-		handler = handlers.NewClaimAttachmentHandler(mockLogger, mockTxManager, mockService)
+		attachmentHandler = handler.NewClaimAttachmentHandler(mockLogger, mockTxManager, mockService)
 
 		claimID = uuid.New()
 		attachmentID = uuid.New()
@@ -74,7 +74,7 @@ var _ = Describe("ClaimAttachmentHandler", func() {
 			func(setupMock func(), expectedStatus int, expectedError string) {
 				setupMock()
 
-				r.GET("/claims/:id/attachments/:attachmentID", handler.GetByID)
+				r.GET("/claims/:id/attachments/:attachmentID", attachmentHandler.GetByID)
 				req, _ := http.NewRequest(http.MethodGet, "/claims/"+claimID.String()+"/attachments/"+attachmentID.String(), nil)
 				r.ServeHTTP(w, req)
 
@@ -105,7 +105,7 @@ var _ = Describe("ClaimAttachmentHandler", func() {
 		)
 
 		It("should return error for invalid attachment ID", func() {
-			r.GET("/claims/:id/attachments/:attachmentID", handler.GetByID)
+			r.GET("/claims/:id/attachments/:attachmentID", attachmentHandler.GetByID)
 			req, _ := http.NewRequest(http.MethodGet, "/claims/"+claimID.String()+"/attachments/invalid-uuid", nil)
 			r.ServeHTTP(w, req)
 
@@ -118,7 +118,7 @@ var _ = Describe("ClaimAttachmentHandler", func() {
 			func(setupMock func(), expectedStatus int, expectedError string) {
 				setupMock()
 
-				r.GET("/claims/:id/attachments", handler.GetByClaimID)
+				r.GET("/claims/:id/attachments", attachmentHandler.GetByClaimID)
 				req, _ := http.NewRequest(http.MethodGet, "/claims/"+claimID.String()+"/attachments", nil)
 				r.ServeHTTP(w, req)
 
@@ -149,7 +149,7 @@ var _ = Describe("ClaimAttachmentHandler", func() {
 		)
 
 		It("should return error for invalid claim ID", func() {
-			r.GET("/claims/:id/attachments", handler.GetByClaimID)
+			r.GET("/claims/:id/attachments", attachmentHandler.GetByClaimID)
 			req, _ := http.NewRequest(http.MethodGet, "/claims/invalid-uuid/attachments", nil)
 			r.ServeHTTP(w, req)
 
@@ -162,7 +162,7 @@ var _ = Describe("ClaimAttachmentHandler", func() {
 			BeforeEach(func() {
 				r.POST("/claims/:id/attachments", func(c *gin.Context) {
 					SetHeaderRole(c, entities.UserRoleScTechnician)
-					handler.Create(c)
+					attachmentHandler.Create(c)
 				})
 			})
 
@@ -267,7 +267,7 @@ var _ = Describe("ClaimAttachmentHandler", func() {
 		It("should deny access for unauthorized roles", func() {
 			r.POST("/claims/:id/attachments", func(c *gin.Context) {
 				SetHeaderRole(c, entities.UserRoleEvmStaff)
-				handler.Create(c)
+				attachmentHandler.Create(c)
 			})
 
 			body, contentType := createMultipartForm()
@@ -284,7 +284,7 @@ var _ = Describe("ClaimAttachmentHandler", func() {
 			BeforeEach(func() {
 				r.DELETE("/claims/:id/attachments/:attachmentID", func(c *gin.Context) {
 					SetHeaderRole(c, entities.UserRoleScTechnician)
-					handler.Delete(c)
+					attachmentHandler.Delete(c)
 				})
 			})
 
@@ -347,7 +347,7 @@ var _ = Describe("ClaimAttachmentHandler", func() {
 		It("should deny access for unauthorized roles", func() {
 			r.DELETE("/claims/:id/attachments/:attachmentID", func(c *gin.Context) {
 				SetHeaderRole(c, entities.UserRoleEvmStaff)
-				handler.Delete(c)
+				attachmentHandler.Delete(c)
 			})
 
 			req, _ := http.NewRequest(http.MethodDelete, "/claims/"+claimID.String()+"/attachments/"+attachmentID.String(), nil)

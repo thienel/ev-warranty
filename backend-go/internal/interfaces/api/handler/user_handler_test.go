@@ -1,4 +1,4 @@
-package handlers_test
+package handler_test
 
 import (
 	"errors"
@@ -6,7 +6,7 @@ import (
 	"ev-warranty-go/internal/application/services"
 	"ev-warranty-go/internal/domain/entities"
 	"ev-warranty-go/internal/interfaces/api/dto"
-	"ev-warranty-go/internal/interfaces/api/handlers"
+	"ev-warranty-go/internal/interfaces/api/handler"
 	"ev-warranty-go/pkg/mocks"
 	"net/http"
 	"net/http/httptest"
@@ -22,7 +22,7 @@ var _ = Describe("UserHandler", func() {
 	var (
 		mockLogger  *mocks.Logger
 		mockService *mocks.UserService
-		handler     handlers.UserHandler
+		userHandler handler.UserHandler
 		r           *gin.Engine
 		w           *httptest.ResponseRecorder
 		validReq    dto.CreateUserRequest
@@ -42,7 +42,7 @@ var _ = Describe("UserHandler", func() {
 	BeforeEach(func() {
 		mockLogger, r, w = SetupMock(GinkgoT())
 		mockService = mocks.NewUserService(GinkgoT())
-		handler = handlers.NewUserHandler(mockLogger, mockService)
+		userHandler = handler.NewUserHandler(mockLogger, mockService)
 
 		officeID := uuid.New()
 		validReq = dto.CreateUserRequest{
@@ -59,7 +59,7 @@ var _ = Describe("UserHandler", func() {
 	Describe("Create", func() {
 		Context("when authorized as ADMIN", func() {
 			BeforeEach(func() {
-				setupRoute("POST", "/users", entities.UserRoleAdmin, handler.Create)
+				setupRoute("POST", "/users", entities.UserRoleAdmin, userHandler.Create)
 			})
 
 			It("should create user successfully", func() {
@@ -116,7 +116,7 @@ var _ = Describe("UserHandler", func() {
 		})
 
 		It("should deny access for non-admin users", func() {
-			setupRoute("POST", "/users", entities.UserRoleScStaff, handler.Create)
+			setupRoute("POST", "/users", entities.UserRoleScStaff, userHandler.Create)
 			SendRequest(r, http.MethodPost, "/users", w, validReq)
 			ExpectErrorCode(w, http.StatusForbidden, apperrors.ErrorCodeUnauthorizedRole)
 		})
@@ -124,7 +124,7 @@ var _ = Describe("UserHandler", func() {
 
 	Describe("GetAll", func() {
 		BeforeEach(func() {
-			setupRoute("GET", "/users", entities.UserRoleAdmin, handler.GetAll)
+			setupRoute("GET", "/users", entities.UserRoleAdmin, userHandler.GetAll)
 		})
 
 		DescribeTable("should handle different scenarios",
@@ -162,7 +162,7 @@ var _ = Describe("UserHandler", func() {
 		userID := uuid.New()
 
 		BeforeEach(func() {
-			setupRoute("GET", "/users/:id", entities.UserRoleAdmin, handler.GetByID)
+			setupRoute("GET", "/users/:id", entities.UserRoleAdmin, userHandler.GetByID)
 		})
 
 		DescribeTable("should handle different scenarios",
@@ -205,7 +205,7 @@ var _ = Describe("UserHandler", func() {
 
 		Context("when authorized as ADMIN", func() {
 			BeforeEach(func() {
-				setupRoute("PUT", "/users/:id", entities.UserRoleAdmin, handler.Update)
+				setupRoute("PUT", "/users/:id", entities.UserRoleAdmin, userHandler.Update)
 			})
 
 			It("should update user successfully", func() {
@@ -252,7 +252,7 @@ var _ = Describe("UserHandler", func() {
 
 		Context("when not authorized", func() {
 			It("should deny access for non-admin users", func() {
-				setupRoute("PUT", "/users/:id", entities.UserRoleScStaff, handler.Update)
+				setupRoute("PUT", "/users/:id", entities.UserRoleScStaff, userHandler.Update)
 				SendRequest(r, http.MethodPut, "/users/"+userID.String(), w, updateReq)
 				ExpectErrorCode(w, http.StatusForbidden, apperrors.ErrorCodeUnauthorizedRole)
 			})
@@ -264,7 +264,7 @@ var _ = Describe("UserHandler", func() {
 
 		Context("when performed by ADMIN", func() {
 			BeforeEach(func() {
-				setupRoute("DELETE", "/users/:id", entities.UserRoleAdmin, handler.Delete)
+				setupRoute("DELETE", "/users/:id", entities.UserRoleAdmin, userHandler.Delete)
 			})
 
 			It("should delete user successfully", func() {
@@ -301,7 +301,7 @@ var _ = Describe("UserHandler", func() {
 
 		Context("when not authorized", func() {
 			It("should deny access for non-admin users", func() {
-				setupRoute("DELETE", "/users/:id", entities.UserRoleScStaff, handler.Delete)
+				setupRoute("DELETE", "/users/:id", entities.UserRoleScStaff, userHandler.Delete)
 				SendRequest(r, http.MethodDelete, "/users/"+userID.String(), w, nil)
 				ExpectErrorCode(w, http.StatusForbidden, apperrors.ErrorCodeUnauthorizedRole)
 			})

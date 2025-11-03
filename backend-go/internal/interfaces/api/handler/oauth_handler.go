@@ -1,4 +1,4 @@
-package handlers
+package handler
 
 import (
 	"ev-warranty-go/internal/application/services"

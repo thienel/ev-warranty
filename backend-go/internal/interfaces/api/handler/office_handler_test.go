@@ -1,4 +1,4 @@
-package handlers_test
+package handler_test
 
 import (
 	"errors"
@@ -6,7 +6,7 @@ import (
 	"ev-warranty-go/internal/application/services"
 	"ev-warranty-go/internal/domain/entities"
 	"ev-warranty-go/internal/interfaces/api/dto"
-	"ev-warranty-go/internal/interfaces/api/handlers"
+	"ev-warranty-go/internal/interfaces/api/handler"
 	"ev-warranty-go/pkg/mocks"
 	"net/http"
 	"net/http/httptest"
@@ -20,13 +20,13 @@ import (
 
 var _ = Describe("OfficeHandler", func() {
 	var (
-		mockLogger   *mocks.Logger
-		mockService  *mocks.OfficeService
-		handler      handlers.OfficeHandler
-		r            *gin.Engine
-		w            *httptest.ResponseRecorder
-		validReq     dto.CreateOfficeRequest
-		sampleOffice *entities.Office
+		mockLogger    *mocks.Logger
+		mockService   *mocks.OfficeService
+		officeHandler handler.OfficeHandler
+		r             *gin.Engine
+		w             *httptest.ResponseRecorder
+		validReq      dto.CreateOfficeRequest
+		sampleOffice  *entities.Office
 	)
 
 	setupRoute := func(method, path string, role string, handlerFunc gin.HandlerFunc) {
@@ -42,7 +42,7 @@ var _ = Describe("OfficeHandler", func() {
 	BeforeEach(func() {
 		mockLogger, r, w = SetupMock(GinkgoT())
 		mockService = mocks.NewOfficeService(GinkgoT())
-		handler = handlers.NewOfficeHandler(mockLogger, mockService)
+		officeHandler = handler.NewOfficeHandler(mockLogger, mockService)
 
 		validReq = dto.CreateOfficeRequest{
 			OfficeName: "Test Office",
@@ -56,7 +56,7 @@ var _ = Describe("OfficeHandler", func() {
 	Describe("Create", func() {
 		Context("when authorized as ADMIN", func() {
 			BeforeEach(func() {
-				setupRoute("POST", "/offices", entities.UserRoleAdmin, handler.Create)
+				setupRoute("POST", "/offices", entities.UserRoleAdmin, officeHandler.Create)
 			})
 
 			It("should create office successfully", func() {
@@ -99,7 +99,7 @@ var _ = Describe("OfficeHandler", func() {
 		})
 
 		It("should deny access for non-admin users", func() {
-			setupRoute("POST", "/offices", entities.UserRoleScStaff, handler.Create)
+			setupRoute("POST", "/offices", entities.UserRoleScStaff, officeHandler.Create)
 			SendRequest(r, http.MethodPost, "/offices", w, validReq)
 			ExpectErrorCode(w, http.StatusForbidden, apperrors.ErrorCodeUnauthorizedRole)
 		})
@@ -107,7 +107,7 @@ var _ = Describe("OfficeHandler", func() {
 
 	Describe("GetAll", func() {
 		BeforeEach(func() {
-			setupRoute("GET", "/offices", "", handler.GetAll)
+			setupRoute("GET", "/offices", "", officeHandler.GetAll)
 		})
 
 		DescribeTable("should handle different scenarios",
@@ -145,7 +145,7 @@ var _ = Describe("OfficeHandler", func() {
 		officeID := uuid.New()
 
 		BeforeEach(func() {
-			setupRoute("GET", "/offices/:id", "", handler.GetByID)
+			setupRoute("GET", "/offices/:id", "", officeHandler.GetByID)
 		})
 
 		DescribeTable("should handle different scenarios",
@@ -188,7 +188,7 @@ var _ = Describe("OfficeHandler", func() {
 
 		Context("when authorized as ADMIN", func() {
 			BeforeEach(func() {
-				setupRoute("PUT", "/offices/:id", entities.UserRoleAdmin, handler.Update)
+				setupRoute("PUT", "/offices/:id", entities.UserRoleAdmin, officeHandler.Update)
 			})
 
 			It("should update office successfully", func() {
@@ -228,7 +228,7 @@ var _ = Describe("OfficeHandler", func() {
 
 		Context("when not authorized as ADMIN", func() {
 			It("should deny access", func() {
-				setupRoute("PUT", "/offices/:id", entities.UserRoleScStaff, handler.Update)
+				setupRoute("PUT", "/offices/:id", entities.UserRoleScStaff, officeHandler.Update)
 				SendRequest(r, http.MethodPut, "/offices/"+officeID.String(), w, updateReq)
 				ExpectErrorCode(w, http.StatusForbidden, apperrors.ErrorCodeUnauthorizedRole)
 			})
@@ -240,7 +240,7 @@ var _ = Describe("OfficeHandler", func() {
 
 		Context("when authorized as ADMIN", func() {
 			BeforeEach(func() {
-				setupRoute("DELETE", "/offices/:id", entities.UserRoleAdmin, handler.Delete)
+				setupRoute("DELETE", "/offices/:id", entities.UserRoleAdmin, officeHandler.Delete)
 			})
 
 			It("should delete office successfully", func() {
@@ -271,7 +271,7 @@ var _ = Describe("OfficeHandler", func() {
 
 		Context("when not authorized as ADMIN", func() {
 			It("should deny access", func() {
-				setupRoute("DELETE", "/offices/:id", entities.UserRoleScStaff, handler.Delete)
+				setupRoute("DELETE", "/offices/:id", entities.UserRoleScStaff, officeHandler.Delete)
 				SendRequest(r, http.MethodDelete, "/offices/"+officeID.String(), w, nil)
 				ExpectErrorCode(w, http.StatusForbidden, apperrors.ErrorCodeUnauthorizedRole)
 			})

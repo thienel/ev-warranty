@@ -1,4 +1,4 @@
-package handlers_test
+package handler_test
 
 import (
 	"context"
@@ -8,7 +8,7 @@ import (
 	"ev-warranty-go/internal/application/services"
 	"ev-warranty-go/internal/domain/entities"
 	"ev-warranty-go/internal/interfaces/api/dto"
-	"ev-warranty-go/internal/interfaces/api/handlers"
+	"ev-warranty-go/internal/interfaces/api/handler"
 	"ev-warranty-go/pkg/mocks"
 	"net/http"
 	"net/http/httptest"
@@ -26,7 +26,7 @@ var _ = Describe("ClaimItemHandler", func() {
 		mockTxManager   *mocks.TxManager
 		mockService     *mocks.ClaimItemService
 		mockTx          *mocks.Tx
-		handler         handlers.ClaimItemHandler
+		itemHandler     handler.ClaimItemHandler
 		r               *gin.Engine
 		w               *httptest.ResponseRecorder
 		claimID         uuid.UUID
@@ -58,7 +58,7 @@ var _ = Describe("ClaimItemHandler", func() {
 		mockTxManager = mocks.NewTxManager(GinkgoT())
 		mockService = mocks.NewClaimItemService(GinkgoT())
 		mockTx = mocks.NewTx(GinkgoT())
-		handler = handlers.NewClaimItemHandler(mockLogger, mockTxManager, mockService)
+		itemHandler = handler.NewClaimItemHandler(mockLogger, mockTxManager, mockService)
 
 		claimID = uuid.New()
 		itemID = uuid.New()
@@ -85,7 +85,7 @@ var _ = Describe("ClaimItemHandler", func() {
 
 	Describe("GetByID", func() {
 		BeforeEach(func() {
-			r.GET("/claims/:id/items/:itemID", handler.GetByID)
+			r.GET("/claims/:id/items/:itemID", itemHandler.GetByID)
 		})
 
 		It("should handle successful retrieval", func() {
@@ -120,7 +120,7 @@ var _ = Describe("ClaimItemHandler", func() {
 
 	Describe("GetByClaimID", func() {
 		BeforeEach(func() {
-			r.GET("/claims/:id/items", handler.GetByClaimID)
+			r.GET("/claims/:id/items", itemHandler.GetByClaimID)
 		})
 
 		It("should handle successful retrieval with items", func() {
@@ -156,7 +156,7 @@ var _ = Describe("ClaimItemHandler", func() {
 	Describe("Create", func() {
 		Context("when authorized as SC_STAFF", func() {
 			BeforeEach(func() {
-				setupRoute("POST", "/claims/:id/items", entities.UserRoleScStaff, handler.Create)
+				setupRoute("POST", "/claims/:id/items", entities.UserRoleScStaff, itemHandler.Create)
 			})
 
 			It("should create claim item successfully", func() {
@@ -206,7 +206,7 @@ var _ = Describe("ClaimItemHandler", func() {
 		})
 
 		It("should deny access for unauthorized roles", func() {
-			setupRoute("POST", "/claims/:id/items", entities.UserRoleEvmStaff, handler.Create)
+			setupRoute("POST", "/claims/:id/items", entities.UserRoleEvmStaff, itemHandler.Create)
 			SendRequest(r, http.MethodPost, "/claims/"+claimID.String()+"/items", w, validReq)
 			ExpectErrorCode(w, http.StatusForbidden, apperrors.ErrorCodeUnauthorizedRole)
 		})
@@ -215,7 +215,7 @@ var _ = Describe("ClaimItemHandler", func() {
 	Describe("Delete", func() {
 		Context("when authorized as SC_STAFF", func() {
 			BeforeEach(func() {
-				setupRoute("DELETE", "/claims/:id/items/:itemID", entities.UserRoleScStaff, handler.Delete)
+				setupRoute("DELETE", "/claims/:id/items/:itemID", entities.UserRoleScStaff, itemHandler.Delete)
 			})
 
 			It("should delete claim item successfully", func() {
@@ -269,7 +269,7 @@ var _ = Describe("ClaimItemHandler", func() {
 		})
 
 		It("should deny access for unauthorized roles", func() {
-			setupRoute("DELETE", "/claims/:id/items/:itemID", entities.UserRoleScTechnician, handler.Delete)
+			setupRoute("DELETE", "/claims/:id/items/:itemID", entities.UserRoleScTechnician, itemHandler.Delete)
 			req, _ := http.NewRequest(http.MethodDelete, "/claims/"+claimID.String()+"/items/"+itemID.String(), nil)
 			r.ServeHTTP(w, req)
 			ExpectErrorCode(w, http.StatusForbidden, apperrors.ErrorCodeUnauthorizedRole)
@@ -279,7 +279,7 @@ var _ = Describe("ClaimItemHandler", func() {
 	Describe("Approve", func() {
 		Context("when authorized as EVM_STAFF", func() {
 			BeforeEach(func() {
-				setupRoute("POST", "/claims/:id/items/:itemID/approve", entities.UserRoleEvmStaff, handler.Approve)
+				setupRoute("POST", "/claims/:id/items/:itemID/approve", entities.UserRoleEvmStaff, itemHandler.Approve)
 			})
 
 			It("should approve claim item successfully", func() {
@@ -332,7 +332,7 @@ var _ = Describe("ClaimItemHandler", func() {
 		})
 
 		It("should deny access for unauthorized roles", func() {
-			setupRoute("POST", "/claims/:id/items/:itemID/approve", entities.UserRoleScStaff, handler.Approve)
+			setupRoute("POST", "/claims/:id/items/:itemID/approve", entities.UserRoleScStaff, itemHandler.Approve)
 			req, _ := http.NewRequest(http.MethodPost, "/claims/"+claimID.String()+"/items/"+itemID.String()+"/approve", nil)
 			r.ServeHTTP(w, req)
 			ExpectErrorCode(w, http.StatusForbidden, apperrors.ErrorCodeUnauthorizedRole)
@@ -342,7 +342,7 @@ var _ = Describe("ClaimItemHandler", func() {
 	Describe("Reject", func() {
 		Context("when authorized as EVM_STAFF", func() {
 			BeforeEach(func() {
-				setupRoute("POST", "/claims/:id/items/:itemID/reject", entities.UserRoleEvmStaff, handler.Reject)
+				setupRoute("POST", "/claims/:id/items/:itemID/reject", entities.UserRoleEvmStaff, itemHandler.Reject)
 			})
 
 			It("should reject claim item successfully", func() {
@@ -395,7 +395,7 @@ var _ = Describe("ClaimItemHandler", func() {
 		})
 
 		It("should deny access for unauthorized roles", func() {
-			setupRoute("POST", "/claims/:id/items/:itemID/reject", entities.UserRoleScStaff, handler.Reject)
+			setupRoute("POST", "/claims/:id/items/:itemID/reject", entities.UserRoleScStaff, itemHandler.Reject)
 			req, _ := http.NewRequest(http.MethodPost, "/claims/"+claimID.String()+"/items/"+itemID.String()+"/reject", nil)
 			r.ServeHTTP(w, req)
 			ExpectErrorCode(w, http.StatusForbidden, apperrors.ErrorCodeUnauthorizedRole)

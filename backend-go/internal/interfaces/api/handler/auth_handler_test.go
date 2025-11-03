@@ -1,11 +1,11 @@
-package handlers_test
+package handler_test
 
 import (
 	"ev-warranty-go/internal/apperrors"
 	"ev-warranty-go/internal/application/services"
 	"ev-warranty-go/internal/domain/entities"
 	"ev-warranty-go/internal/interfaces/api/dto"
-	"ev-warranty-go/internal/interfaces/api/handlers"
+	"ev-warranty-go/internal/interfaces/api/handler"
 	"ev-warranty-go/pkg/mocks"
 	"net/http"
 	"net/http/httptest"
@@ -23,7 +23,7 @@ var _ = Describe("AuthHandler", func() {
 		mockAuthSvc  *mocks.AuthService
 		mockTokenSvc *mocks.TokenService
 		mockUserSvc  *mocks.UserService
-		handler      handlers.AuthHandler
+		authHandler  handler.AuthHandler
 		r            *gin.Engine
 		w            *httptest.ResponseRecorder
 	)
@@ -33,7 +33,7 @@ var _ = Describe("AuthHandler", func() {
 		mockAuthSvc = mocks.NewAuthService(GinkgoT())
 		mockTokenSvc = mocks.NewTokenService(GinkgoT())
 		mockUserSvc = mocks.NewUserService(GinkgoT())
-		handler = handlers.NewAuthHandler(mockLogger, mockAuthSvc, mockTokenSvc, mockUserSvc)
+		authHandler = handler.NewAuthHandler(mockLogger, mockAuthSvc, mockTokenSvc, mockUserSvc)
 	})
 
 	Describe("Login", func() {
@@ -46,7 +46,7 @@ var _ = Describe("AuthHandler", func() {
 		)
 
 		BeforeEach(func() {
-			r.POST("/auth/login", handler.Login)
+			r.POST("/auth/login", authHandler.Login)
 			user = entities.NewUser("Test User", "test@example.com", entities.UserRoleAdmin, "password_hash", true, uuid.New())
 			user.ID = userID
 		})
@@ -102,7 +102,7 @@ var _ = Describe("AuthHandler", func() {
 		var refreshToken = "refresh-token-456"
 
 		BeforeEach(func() {
-			r.POST("/auth/logout", handler.Logout)
+			r.POST("/auth/logout", authHandler.Logout)
 		})
 
 		It("should logout user and return success", func() {
@@ -146,7 +146,7 @@ var _ = Describe("AuthHandler", func() {
 		)
 
 		BeforeEach(func() {
-			r.POST("/auth/refresh", handler.RefreshToken)
+			r.POST("/auth/refresh", authHandler.RefreshToken)
 		})
 
 		It("should return new access token", func() {
@@ -188,7 +188,7 @@ var _ = Describe("AuthHandler", func() {
 		)
 
 		BeforeEach(func() {
-			r.POST("/auth/validate", handler.ValidateToken)
+			r.POST("/auth/validate", authHandler.ValidateToken)
 			user = &entities.User{
 				ID: userID, Name: "Test User", Email: "test@example.com",
 				Role: entities.UserRoleAdmin, IsActive: true, OfficeID: uuid.New(),
