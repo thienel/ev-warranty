@@ -1,9 +1,10 @@
 package http
 
 import (
-	"encoding/json"
 	"ev-warranty-go/internal/application/port"
 	"ev-warranty-go/internal/domain/entity"
+	"ev-warranty-go/pkg/apperror"
+	"ev-warranty-go/pkg/utils"
 	"fmt"
 	"net/http"
 
@@ -15,34 +16,58 @@ type partHTTPAdapter struct {
 	client  *http.Client
 }
 
-func NewPartHTTPAdapter() port.PartPort {
-	return &partHTTPAdapter{}
+func NewPartHTTPAdapter(baseURL string, client *http.Client) port.PartPort {
+	return &partHTTPAdapter{
+		baseURL: baseURL,
+		client:  client,
+	}
 }
 
-func (a *partHTTPAdapter) FindByOfficeIDAndCategoryID(office, category uuid.UUID) (*entity.Part, error) {
-	resp, _ := a.client.Get(fmt.Sprintf("%s/parts/%s%s", a.baseURL, office, category))
-	var dto struct {
+func (a *partHTTPAdapter) ReserveByOfficeIDAndCategoryID(officeID, categoryID uuid.UUID) (*entity.Part, error) {
+	request := struct {
+		OfficeLocationID uuid.UUID `json:"office_location_id"`
+		CategoryID       uuid.UUID `json:"category_id"`
+	}{
+		OfficeLocationID: officeID,
+		CategoryID:       categoryID,
+	}
+
+	var respDto struct {
 		IsSuccess bool        `json:"is_success"`
 		Message   string      `json:"message"`
 		Error     string      `json:"error"`
 		Data      entity.Part `json:"data"`
 	}
 
-	err := json.NewDecoder(resp.Body).Decode(&dto)
+	err := utils.PostJSON(a.client, fmt.Sprintf("%s/parts/reserve", a.baseURL), request, &respDto)
 	if err != nil {
 		return nil, err
 	}
 
-	return &dto.Data, nil
+	if !respDto.IsSuccess {
+		return nil, apperror.NewInternalServerError(fmt.Errorf("reserve failed: %s", respDto.Message))
+	}
+
+	return &respDto.Data, nil
 }
 
-func (a *partHTTPAdapter) UpdateStatus(id uuid.UUID, status string) error {
-	resp, _ := a.client.Get(fmt.Sprintf("%s/users/%s", a.baseURL, id))
-	var dto struct {
-		ID        string `json:"id"`
-		Username  string `json:"username"`
-		AvatarURL string `json:"avatar_url"`
+func (a *partHTTPAdapter) UnReserveByID(id uuid.UUID) error {
+	request := struct{}{}
+	var respDto struct {
+		IsSuccess bool   `json:"is_success"`
+		Message   string `json:"message"`
+		Error     string `json:"error"`
 	}
-	_ = json.NewDecoder(resp.Body).Decode(&dto)
+
+	err := utils.PostJSON(a.client, fmt.Sprintf("%s/parts/%s/unreserve",
+		a.baseURL, id.String()), request, &respDto)
+	if err != nil {
+		return err
+	}
+
+	if !respDto.IsSuccess {
+		return apperror.NewInternalServerError(fmt.Errorf("reserve failed: %s", respDto.Message))
+	}
+
 	return nil
 }

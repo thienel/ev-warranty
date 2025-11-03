@@ -7,6 +7,6 @@ import (
 )
 
 type PartPort interface {
-	FindByOfficeIDAndCategoryID(office, categoryID uuid.UUID) (*entity.Part, error)
-	UpdateStatus(id uuid.UUID, status string) error
+	ReserveByOfficeIDAndCategoryID(office, categoryID uuid.UUID) (*entity.Part, error)
+	UnReserveByID(id uuid.UUID) error
 }
