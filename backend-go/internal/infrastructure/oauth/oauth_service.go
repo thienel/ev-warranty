@@ -4,7 +4,7 @@ import (
 	"context"
 	"crypto/rand"
 	"encoding/base64"
-	"ev-warranty-go/internal/application/repositories"
+	"ev-warranty-go/internal/application/repository"
 	"ev-warranty-go/internal/infrastructure/oauth/providers"
 	"ev-warranty-go/pkg/apperror"
 )
@@ -16,11 +16,11 @@ type OAuthService interface {
 
 type oauthService struct {
 	provider providers.Provider
-	userRepo repositories.UserRepository
+	userRepo repository.UserRepository
 	states   map[string]bool
 }
 
-func NewOAuthService(provider providers.Provider, userRepo repositories.UserRepository) OAuthService {
+func NewOAuthService(provider providers.Provider, userRepo repository.UserRepository) OAuthService {
 	return &oauthService{
 		provider: provider,
 		userRepo: userRepo,

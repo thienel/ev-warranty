@@ -3,7 +3,7 @@ package service
 import (
 	"context"
 	"ev-warranty-go/internal/application"
-	"ev-warranty-go/internal/application/repositories"
+	"ev-warranty-go/internal/application/repository"
 	"ev-warranty-go/internal/domain/entity"
 	"ev-warranty-go/internal/infrastructure/cloudinary"
 	"ev-warranty-go/pkg/apperror"
@@ -24,13 +24,13 @@ type ClaimAttachmentService interface {
 
 type claimAttachmentService struct {
 	log          logger.Logger
-	claimRepo    repositories.ClaimRepository
-	attachRepo   repositories.ClaimAttachmentRepository
+	claimRepo    repository.ClaimRepository
+	attachRepo   repository.ClaimAttachmentRepository
 	cloudService cloudinary.CloudinaryService
 }
 
-func NewClaimAttachmentService(log logger.Logger, claimRepo repositories.ClaimRepository,
-	attachRepo repositories.ClaimAttachmentRepository, cloudService cloudinary.CloudinaryService) ClaimAttachmentService {
+func NewClaimAttachmentService(log logger.Logger, claimRepo repository.ClaimRepository,
+	attachRepo repository.ClaimAttachmentRepository, cloudService cloudinary.CloudinaryService) ClaimAttachmentService {
 	return &claimAttachmentService{
 		log:          log,
 		claimRepo:    claimRepo,

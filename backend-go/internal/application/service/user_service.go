@@ -2,7 +2,7 @@ package service
 
 import (
 	"context"
-	"ev-warranty-go/internal/application/repositories"
+	"ev-warranty-go/internal/application/repository"
 	"ev-warranty-go/internal/domain/entity"
 	"ev-warranty-go/pkg/apperror"
 	"ev-warranty-go/pkg/security"
@@ -35,11 +35,11 @@ type UserService interface {
 }
 
 type userService struct {
-	userRepo   repositories.UserRepository
-	officeRepo repositories.OfficeRepository
+	userRepo   repository.UserRepository
+	officeRepo repository.OfficeRepository
 }
 
-func NewUserService(userRepo repositories.UserRepository, officeRepo repositories.OfficeRepository) UserService {
+func NewUserService(userRepo repository.UserRepository, officeRepo repository.OfficeRepository) UserService {
 	return &userService{userRepo, officeRepo}
 }
 

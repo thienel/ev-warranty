@@ -3,7 +3,7 @@ package persistence
 import (
 	"context"
 	"errors"
-	"ev-warranty-go/internal/application/repositories"
+	"ev-warranty-go/internal/application/repository"
 	"ev-warranty-go/internal/domain/entity"
 	"ev-warranty-go/pkg/apperror"
 
@@ -14,7 +14,7 @@ type refreshTokenRepository struct {
 	db *gorm.DB
 }
 
-func NewTokenRepository(db *gorm.DB) repositories.RefreshTokenRepository {
+func NewTokenRepository(db *gorm.DB) repository.RefreshTokenRepository {
 	return &refreshTokenRepository{db}
 }
 

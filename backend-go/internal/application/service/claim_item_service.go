@@ -3,7 +3,7 @@ package service
 import (
 	"context"
 	"ev-warranty-go/internal/application"
-	"ev-warranty-go/internal/application/repositories"
+	"ev-warranty-go/internal/application/repository"
 	"ev-warranty-go/internal/domain/entity"
 	"ev-warranty-go/pkg/apperror"
 
@@ -42,11 +42,11 @@ type ClaimItemService interface {
 }
 
 type claimItemService struct {
-	claimRepo repositories.ClaimRepository
-	itemRepo  repositories.ClaimItemRepository
+	claimRepo repository.ClaimRepository
+	itemRepo  repository.ClaimItemRepository
 }
 
-func NewClaimItemService(claimRepo repositories.ClaimRepository, itemRepo repositories.ClaimItemRepository) ClaimItemService {
+func NewClaimItemService(claimRepo repository.ClaimRepository, itemRepo repository.ClaimItemRepository) ClaimItemService {
 	return &claimItemService{
 		claimRepo: claimRepo,
 		itemRepo:  itemRepo,

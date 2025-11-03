@@ -13,7 +13,7 @@ import (
 	. "github.com/onsi/gomega"
 	"gorm.io/gorm"
 
-	"ev-warranty-go/internal/application/repositories"
+	"ev-warranty-go/internal/application/repository"
 	"ev-warranty-go/internal/domain/entity"
 	"ev-warranty-go/internal/infrastructure/persistence"
 )
@@ -22,7 +22,7 @@ var _ = Describe("RefreshTokenRepository", func() {
 	var (
 		mock       sqlmock.Sqlmock
 		db         *gorm.DB
-		repository repositories.RefreshTokenRepository
+		repository repository.RefreshTokenRepository
 		ctx        context.Context
 	)
 

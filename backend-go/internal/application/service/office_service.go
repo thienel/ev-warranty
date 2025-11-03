@@ -2,7 +2,7 @@ package service
 
 import (
 	"context"
-	"ev-warranty-go/internal/application/repositories"
+	"ev-warranty-go/internal/application/repository"
 	"ev-warranty-go/internal/domain/entity"
 	"ev-warranty-go/pkg/apperror"
 
@@ -32,10 +32,10 @@ type OfficeService interface {
 }
 
 type officeService struct {
-	repo repositories.OfficeRepository
+	repo repository.OfficeRepository
 }
 
-func NewOfficeService(repo repositories.OfficeRepository) OfficeService {
+func NewOfficeService(repo repository.OfficeRepository) OfficeService {
 	return &officeService{repo}
 }
 

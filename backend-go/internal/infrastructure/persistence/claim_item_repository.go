@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 	"ev-warranty-go/internal/application"
-	"ev-warranty-go/internal/application/repositories"
+	"ev-warranty-go/internal/application/repository"
 	"ev-warranty-go/internal/domain/entity"
 	"ev-warranty-go/pkg/apperror"
 
@@ -16,7 +16,7 @@ type claimItemRepository struct {
 	db *gorm.DB
 }
 
-func NewClaimItemRepository(db *gorm.DB) repositories.ClaimItemRepository {
+func NewClaimItemRepository(db *gorm.DB) repository.ClaimItemRepository {
 	return &claimItemRepository{db: db}
 }
 

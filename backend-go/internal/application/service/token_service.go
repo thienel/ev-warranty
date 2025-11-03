@@ -8,7 +8,7 @@ import (
 	"encoding/base64"
 	"encoding/hex"
 	"errors"
-	"ev-warranty-go/internal/application/repositories"
+	"ev-warranty-go/internal/application/repository"
 	"ev-warranty-go/internal/domain/entity"
 	"ev-warranty-go/pkg/apperror"
 	"time"
@@ -27,14 +27,14 @@ type TokenService interface {
 }
 
 type tokenService struct {
-	repoRefreshToken repositories.RefreshTokenRepository
+	repoRefreshToken repository.RefreshTokenRepository
 	accessTTL        time.Duration
 	refreshTTL       time.Duration
 	privateKey       *rsa.PrivateKey
 	publicKey        *rsa.PublicKey
 }
 
-func NewTokenService(repoRefreshToken repositories.RefreshTokenRepository, accessTokenTTL, refreshTokenTTL time.Duration, pri *rsa.PrivateKey, pub *rsa.PublicKey) TokenService {
+func NewTokenService(repoRefreshToken repository.RefreshTokenRepository, accessTokenTTL, refreshTokenTTL time.Duration, pri *rsa.PrivateKey, pub *rsa.PublicKey) TokenService {
 	return &tokenService{
 		repoRefreshToken: repoRefreshToken,
 		accessTTL:        accessTokenTTL,

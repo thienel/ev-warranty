@@ -3,7 +3,7 @@ package persistence
 import (
 	"context"
 	"errors"
-	"ev-warranty-go/internal/application/repositories"
+	"ev-warranty-go/internal/application/repository"
 	"ev-warranty-go/internal/domain/entity"
 	"ev-warranty-go/pkg/apperror"
 
@@ -15,7 +15,7 @@ type officeRepository struct {
 	db *gorm.DB
 }
 
-func NewOfficeRepository(db *gorm.DB) repositories.OfficeRepository {
+func NewOfficeRepository(db *gorm.DB) repository.OfficeRepository {
 	return &officeRepository{db}
 }
 

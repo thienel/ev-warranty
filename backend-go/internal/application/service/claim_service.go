@@ -3,7 +3,7 @@ package service
 import (
 	"context"
 	"ev-warranty-go/internal/application"
-	"ev-warranty-go/internal/application/repositories"
+	"ev-warranty-go/internal/application/repository"
 	"ev-warranty-go/internal/domain/entity"
 	"ev-warranty-go/internal/infrastructure/cloudinary"
 	"ev-warranty-go/pkg/apperror"
@@ -41,19 +41,19 @@ type ClaimService interface {
 
 type claimService struct {
 	log            logger.Logger
-	claimRepo      repositories.ClaimRepository
-	itemRepo       repositories.ClaimItemRepository
-	attachmentRepo repositories.ClaimAttachmentRepository
-	historyRepo    repositories.ClaimHistoryRepository
+	claimRepo      repository.ClaimRepository
+	itemRepo       repository.ClaimItemRepository
+	attachmentRepo repository.ClaimAttachmentRepository
+	historyRepo    repository.ClaimHistoryRepository
 	cloudService   cloudinary.CloudinaryService
 }
 
 func NewClaimService(
 	log logger.Logger,
-	claimRepo repositories.ClaimRepository,
-	itemRepo repositories.ClaimItemRepository,
-	attachmentRepo repositories.ClaimAttachmentRepository,
-	historyRepo repositories.ClaimHistoryRepository,
+	claimRepo repository.ClaimRepository,
+	itemRepo repository.ClaimItemRepository,
+	attachmentRepo repository.ClaimAttachmentRepository,
+	historyRepo repository.ClaimHistoryRepository,
 	cloudService cloudinary.CloudinaryService,
 ) ClaimService {
 	return &claimService{

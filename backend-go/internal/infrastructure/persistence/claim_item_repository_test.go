@@ -14,7 +14,7 @@ import (
 	. "github.com/onsi/gomega"
 	"gorm.io/gorm"
 
-	"ev-warranty-go/internal/application/repositories"
+	"ev-warranty-go/internal/application/repository"
 	"ev-warranty-go/internal/domain/entity"
 	"ev-warranty-go/internal/infrastructure/persistence"
 )
@@ -23,7 +23,7 @@ var _ = Describe("ClaimItemRepository", func() {
 	var (
 		mock       sqlmock.Sqlmock
 		db         *gorm.DB
-		repository repositories.ClaimItemRepository
+		repository repository.ClaimItemRepository
 		ctx        context.Context
 	)
 

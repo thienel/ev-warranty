@@ -3,7 +3,7 @@ package service
 import (
 	"context"
 	"errors"
-	"ev-warranty-go/internal/application/repositories"
+	"ev-warranty-go/internal/application/repository"
 	"ev-warranty-go/internal/infrastructure/oauth/providers"
 	apperrors2 "ev-warranty-go/pkg/apperror"
 	"ev-warranty-go/pkg/security"
@@ -17,11 +17,11 @@ type AuthService interface {
 }
 
 type authService struct {
-	userRepo     repositories.UserRepository
+	userRepo     repository.UserRepository
 	tokenService TokenService
 }
 
-func NewAuthService(userRepo repositories.UserRepository, tokenService TokenService) AuthService {
+func NewAuthService(userRepo repository.UserRepository, tokenService TokenService) AuthService {
 	return &authService{userRepo, tokenService}
 }
 
