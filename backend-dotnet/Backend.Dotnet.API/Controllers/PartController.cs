@@ -84,16 +84,29 @@ namespace Backend.Dotnet.API.Controllers
         }
         
         
-        [HttpGet]
+        [HttpPost("reserve")]
         [ProducesResponseType(typeof(BaseResponseDto<PartResponse>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BaseResponseDto), StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> ReserveByOfficeIdAndCategoryId(Guid officeId, Guid categoryId)
+        public async Task<IActionResult> ReserveByOfficeIdAndCategoryId([FromBody] ReservePartRequest request)
         {
-            var result = await _partService.ReserveByOfficeIdAndCategoryIdAsync(officeId, categoryId);
+            var result = await _partService.
+                ReserveByOfficeIdAndCategoryIdAsync(request.OfficeLocationId, request.CategoryId);
             if (!result.IsSuccess)
                 return NotFound(result);
 
             return Ok(result);
+        }
+        
+        [HttpPost("{id}/unreserve")]
+        [ProducesResponseType(typeof(BaseResponseDto<PartResponse>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(BaseResponseDto), StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> Unreserve(Guid id)
+        {
+            var result = await _partService.Unreserve(id);
+            if (!result.IsSuccess)
+                return BadRequest(result);
+
+            return NoContent();
         }
 
         [HttpGet("{id}/details")]

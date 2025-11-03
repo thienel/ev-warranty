@@ -149,6 +149,45 @@ namespace Backend.Dotnet.Application.Services
             }
         }
         
+        public async Task<BaseResponseDto> Unreserve(Guid id)
+        {
+            try
+            {
+                var part = await _unitOfWork.Parts.GetByIdAsync(id);
+                if (part == null)
+                {
+                    return new BaseResponseDto
+                    {
+                        IsSuccess = false,
+                        Message = $"Part with id '{id}' not found",
+                        ErrorCode = "NOT_FOUND"
+                    };
+                }
+
+                if (part.Status == PartStatus.Reserved)
+                {
+                    part.ChangeStatus(PartStatus.Available);
+                    _unitOfWork.Parts.Update(part);
+                }
+                
+                return new BaseResponseDto
+                {
+                    IsSuccess = true,
+                    Message = "Part unreserved successfully",
+                };
+            }
+            catch (Exception)
+            {
+                return new BaseResponseDto
+                {
+                    IsSuccess = false,
+                    Message = "An error occurred while retrieving part",
+                    ErrorCode = "INTERNAL_ERROR"
+                };
+            }
+        }
+        
+        
         public async Task<BaseResponseDto<IEnumerable<PartResponse>>> GetAllAsync()
         {
             try
