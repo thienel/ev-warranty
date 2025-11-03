@@ -13,6 +13,8 @@ namespace Backend.Dotnet.Application.Interfaces
         Task<BaseResponseDto<PartResponse>> CreateAsync(CreatePartRequest request);
 
         Task<BaseResponseDto<PartResponse>> GetByIdAsync(Guid id);
+        Task<BaseResponseDto<PartResponse>> ReserveByOfficeIdAndCategoryIdAsync(Guid officeId, Guid categoryId);
+        Task<BaseResponseDto> Unreserve(Guid id);
         Task<BaseResponseDto<IEnumerable<PartResponse>>> GetAllAsync();
         Task<BaseResponseDto<PartWithDetailsResponse>> GetWithDetailsAsync(Guid id);
 

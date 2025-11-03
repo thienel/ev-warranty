@@ -35,6 +35,16 @@ namespace Backend.Dotnet.Application.DTOs
             [JsonPropertyName("office_location_id")]
             public Guid? OfficeLocationId { get; set; }
         }
+        
+        public class ReservePartRequest
+        {
+            [JsonPropertyName("office_location_id")]
+            [Required(ErrorMessage = "Serial number is required")]
+            public Guid OfficeLocationId { get; set; }
+            [JsonPropertyName("category_id")]
+            [Required(ErrorMessage = "Serial number is required")]
+            public Guid CategoryId { get; set; } 
+        }
 
         public class UpdatePartRequest
         {

@@ -66,12 +66,19 @@ namespace Backend.Dotnet.Infrastructure.Data.Repositories
                 .ToListAsync();
         }
 
+        public async Task<Part?> GetByOfficeIdAndCategoryId(Guid officeId, Guid categoryId)
+        {
+            return await _dbSet
+                .FirstOrDefaultAsync(p => p.OfficeLocationId == officeId && p.CategoryId == categoryId);
+        }
+
         public async Task<Part?> GetWithDetailsAsync(Guid partId)
         {
             return await _dbSet
                 .Include(p => p.Category)
                 .FirstOrDefaultAsync(p => p.Id == partId);
         }
+        
 
         public async Task<IEnumerable<Part>> GetAllWithDetailsAsync()
         {
