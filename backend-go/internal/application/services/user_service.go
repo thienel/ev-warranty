@@ -2,10 +2,10 @@ package services
 
 import (
 	"context"
-	"ev-warranty-go/internal/apperrors"
 	"ev-warranty-go/internal/application/repositories"
 	"ev-warranty-go/internal/domain/entities"
-	"ev-warranty-go/internal/security"
+	"ev-warranty-go/pkg/apperror"
+	"ev-warranty-go/pkg/security"
 
 	"github.com/google/uuid"
 )
@@ -46,7 +46,7 @@ func NewUserService(userRepo repositories.UserRepository, officeRepo repositorie
 func (s *userService) Create(ctx context.Context, cmd *UserCreateCommand) (*entities.User, error) {
 	if !entities.IsValidName(cmd.Name) || !entities.IsValidEmail(cmd.Email) ||
 		!entities.IsValidPassword(cmd.Password) || !entities.IsValidUserRole(cmd.Role) {
-		return nil, apperrors.NewInvalidUserInput()
+		return nil, apperror.NewInvalidUserInput()
 	}
 
 	office, err := s.officeRepo.FindByID(ctx, cmd.OfficeID)
@@ -56,12 +56,12 @@ func (s *userService) Create(ctx context.Context, cmd *UserCreateCommand) (*enti
 
 	passwordHash, err := security.HashPassword(cmd.Password)
 	if err != nil {
-		return nil, apperrors.NewHashPasswordError(err)
+		return nil, apperror.NewHashPasswordError(err)
 	}
 
 	user := entities.NewUser(cmd.Name, cmd.Email, cmd.Role, passwordHash, cmd.IsActive, cmd.OfficeID)
 	if !user.IsValidOfficeByRole(office.OfficeType) {
-		return nil, apperrors.NewInvalidOfficeType()
+		return nil, apperror.NewInvalidOfficeType()
 	}
 
 	if err = s.userRepo.Create(ctx, user); err != nil {
@@ -91,7 +91,7 @@ func (s *userService) Update(ctx context.Context, id uuid.UUID, cmd *UserUpdateC
 	}
 
 	if !entities.IsValidName(cmd.Name) || !entities.IsValidUserRole(cmd.Role) {
-		return apperrors.NewInvalidUserInput()
+		return apperror.NewInvalidUserInput()
 	}
 	user.Role = cmd.Role
 	user.Name = cmd.Name
@@ -102,7 +102,7 @@ func (s *userService) Update(ctx context.Context, id uuid.UUID, cmd *UserUpdateC
 		return err
 	}
 	if !user.IsValidOfficeByRole(office.OfficeType) {
-		return apperrors.NewInvalidOfficeType()
+		return apperror.NewInvalidOfficeType()
 	}
 	user.OfficeID = cmd.OfficeID
 

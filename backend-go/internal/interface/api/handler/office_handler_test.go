@@ -2,11 +2,11 @@ package handler_test
 
 import (
 	"errors"
-	"ev-warranty-go/internal/apperrors"
 	"ev-warranty-go/internal/application/services"
 	"ev-warranty-go/internal/domain/entities"
 	"ev-warranty-go/internal/interface/api/dto"
 	"ev-warranty-go/internal/interface/api/handler"
+	apperrors2 "ev-warranty-go/pkg/apperror"
 	"ev-warranty-go/pkg/mocks"
 	"net/http"
 	"net/http/httptest"
@@ -81,27 +81,27 @@ var _ = Describe("OfficeHandler", func() {
 					func(req *dto.CreateOfficeRequest) {
 						req.OfficeType = "INVALID_TYPE"
 					},
-					apperrors.ErrorCodeInvalidOfficeType),
+					apperrors2.ErrorCodeInvalidOfficeType),
 			)
 
 			It("should handle invalid JSON", func() {
 				SendRequest(r, http.MethodPost, "/offices", w, "invalid json")
-				ExpectErrorCode(w, http.StatusBadRequest, apperrors.ErrorCodeInvalidJsonRequest)
+				ExpectErrorCode(w, http.StatusBadRequest, apperrors2.ErrorCodeInvalidJsonRequest)
 			})
 
 			It("should handle service errors", func() {
 				mockService.EXPECT().Create(mock.Anything, mock.Anything).
-					Return(nil, apperrors.NewDBOperationError(errors.New("database error"))).Once()
+					Return(nil, apperrors2.NewDBOperationError(errors.New("database error"))).Once()
 
 				SendRequest(r, http.MethodPost, "/offices", w, validReq)
-				ExpectErrorCode(w, http.StatusInternalServerError, apperrors.ErrorCodeDBOperation)
+				ExpectErrorCode(w, http.StatusInternalServerError, apperrors2.ErrorCodeDBOperation)
 			})
 		})
 
 		It("should deny access for non-admin users", func() {
 			setupRoute("POST", "/offices", entities.UserRoleScStaff, officeHandler.Create)
 			SendRequest(r, http.MethodPost, "/offices", w, validReq)
-			ExpectErrorCode(w, http.StatusForbidden, apperrors.ErrorCodeUnauthorizedRole)
+			ExpectErrorCode(w, http.StatusForbidden, apperrors2.ErrorCodeUnauthorizedRole)
 		})
 	})
 
@@ -137,7 +137,7 @@ var _ = Describe("OfficeHandler", func() {
 					mockService.EXPECT().GetAll(mock.Anything).
 						Return(nil, errors.New("database error")).Once()
 				},
-				http.StatusInternalServerError, apperrors.ErrorCodeInternalServerError),
+				http.StatusInternalServerError, apperrors2.ErrorCodeInternalServerError),
 		)
 	})
 
@@ -168,13 +168,13 @@ var _ = Describe("OfficeHandler", func() {
 				"/offices/"+officeID.String(), http.StatusOK, ""),
 			Entry("invalid UUID",
 				nil,
-				"/offices/invalid-uuid", http.StatusBadRequest, apperrors.ErrorCodeInvalidUUID),
+				"/offices/invalid-uuid", http.StatusBadRequest, apperrors2.ErrorCodeInvalidUUID),
 			Entry("office not found",
 				func() {
 					mockService.EXPECT().GetByID(mock.Anything, officeID).
-						Return(nil, apperrors.NewOfficeNotFound()).Once()
+						Return(nil, apperrors2.NewOfficeNotFound()).Once()
 				},
-				"/offices/"+officeID.String(), http.StatusNotFound, apperrors.ErrorCodeOfficeNotFound),
+				"/offices/"+officeID.String(), http.StatusNotFound, apperrors2.ErrorCodeOfficeNotFound),
 		)
 	})
 
@@ -213,16 +213,16 @@ var _ = Describe("OfficeHandler", func() {
 				},
 				Entry("invalid UUID",
 					nil,
-					"/offices/invalid-uuid", updateReq, http.StatusBadRequest, apperrors.ErrorCodeInvalidUUID),
+					"/offices/invalid-uuid", updateReq, http.StatusBadRequest, apperrors2.ErrorCodeInvalidUUID),
 				Entry("invalid JSON",
 					nil,
-					"/offices/"+officeID.String(), "invalid json", http.StatusBadRequest, apperrors.ErrorCodeInvalidJsonRequest),
+					"/offices/"+officeID.String(), "invalid json", http.StatusBadRequest, apperrors2.ErrorCodeInvalidJsonRequest),
 				Entry("office not found",
 					func() {
 						mockService.EXPECT().Update(mock.Anything, officeID, mock.Anything).
-							Return(apperrors.NewOfficeNotFound()).Once()
+							Return(apperrors2.NewOfficeNotFound()).Once()
 					},
-					"/offices/"+officeID.String(), updateReq, http.StatusNotFound, apperrors.ErrorCodeOfficeNotFound),
+					"/offices/"+officeID.String(), updateReq, http.StatusNotFound, apperrors2.ErrorCodeOfficeNotFound),
 			)
 		})
 
@@ -230,7 +230,7 @@ var _ = Describe("OfficeHandler", func() {
 			It("should deny access", func() {
 				setupRoute("PUT", "/offices/:id", entities.UserRoleScStaff, officeHandler.Update)
 				SendRequest(r, http.MethodPut, "/offices/"+officeID.String(), w, updateReq)
-				ExpectErrorCode(w, http.StatusForbidden, apperrors.ErrorCodeUnauthorizedRole)
+				ExpectErrorCode(w, http.StatusForbidden, apperrors2.ErrorCodeUnauthorizedRole)
 			})
 		})
 	})
@@ -259,13 +259,13 @@ var _ = Describe("OfficeHandler", func() {
 				},
 				Entry("invalid UUID",
 					nil,
-					"/offices/invalid-uuid", http.StatusBadRequest, apperrors.ErrorCodeInvalidUUID),
+					"/offices/invalid-uuid", http.StatusBadRequest, apperrors2.ErrorCodeInvalidUUID),
 				Entry("office not found",
 					func() {
 						mockService.EXPECT().DeleteByID(mock.Anything, officeID).
-							Return(apperrors.NewOfficeNotFound()).Once()
+							Return(apperrors2.NewOfficeNotFound()).Once()
 					},
-					"/offices/"+officeID.String(), http.StatusNotFound, apperrors.ErrorCodeOfficeNotFound),
+					"/offices/"+officeID.String(), http.StatusNotFound, apperrors2.ErrorCodeOfficeNotFound),
 			)
 		})
 
@@ -273,7 +273,7 @@ var _ = Describe("OfficeHandler", func() {
 			It("should deny access", func() {
 				setupRoute("DELETE", "/offices/:id", entities.UserRoleScStaff, officeHandler.Delete)
 				SendRequest(r, http.MethodDelete, "/offices/"+officeID.String(), w, nil)
-				ExpectErrorCode(w, http.StatusForbidden, apperrors.ErrorCodeUnauthorizedRole)
+				ExpectErrorCode(w, http.StatusForbidden, apperrors2.ErrorCodeUnauthorizedRole)
 			})
 		})
 	})

@@ -4,10 +4,10 @@ import (
 	"bytes"
 	"context"
 	"errors"
-	"ev-warranty-go/internal/apperrors"
 	"ev-warranty-go/internal/application"
 	"ev-warranty-go/internal/domain/entities"
 	"ev-warranty-go/internal/interface/api/handler"
+	apperrors2 "ev-warranty-go/pkg/apperror"
 	"ev-warranty-go/pkg/mocks"
 	"mime/multipart"
 	"net/http"
@@ -93,15 +93,15 @@ var _ = Describe("ClaimAttachmentHandler", func() {
 			Entry("attachment not found",
 				func() {
 					mockService.EXPECT().GetByID(mock.Anything, attachmentID).
-						Return(nil, apperrors.NewClaimAttachmentNotFound()).Once()
+						Return(nil, apperrors2.NewClaimAttachmentNotFound()).Once()
 				},
-				http.StatusNotFound, apperrors.ErrorCodeClaimAttachmentNotFound),
+				http.StatusNotFound, apperrors2.ErrorCodeClaimAttachmentNotFound),
 			Entry("service error",
 				func() {
 					mockService.EXPECT().GetByID(mock.Anything, attachmentID).
 						Return(nil, errors.New("database error")).Once()
 				},
-				http.StatusInternalServerError, apperrors.ErrorCodeInternalServerError),
+				http.StatusInternalServerError, apperrors2.ErrorCodeInternalServerError),
 		)
 
 		It("should return error for invalid attachment ID", func() {
@@ -109,7 +109,7 @@ var _ = Describe("ClaimAttachmentHandler", func() {
 			req, _ := http.NewRequest(http.MethodGet, "/claims/"+claimID.String()+"/attachments/invalid-uuid", nil)
 			r.ServeHTTP(w, req)
 
-			ExpectErrorCode(w, http.StatusBadRequest, apperrors.ErrorCodeInvalidUUID)
+			ExpectErrorCode(w, http.StatusBadRequest, apperrors2.ErrorCodeInvalidUUID)
 		})
 	})
 
@@ -145,7 +145,7 @@ var _ = Describe("ClaimAttachmentHandler", func() {
 					mockService.EXPECT().GetByClaimID(mock.Anything, claimID).
 						Return(nil, errors.New("database error")).Once()
 				},
-				http.StatusInternalServerError, apperrors.ErrorCodeInternalServerError),
+				http.StatusInternalServerError, apperrors2.ErrorCodeInternalServerError),
 		)
 
 		It("should return error for invalid claim ID", func() {
@@ -153,7 +153,7 @@ var _ = Describe("ClaimAttachmentHandler", func() {
 			req, _ := http.NewRequest(http.MethodGet, "/claims/invalid-uuid/attachments", nil)
 			r.ServeHTTP(w, req)
 
-			ExpectErrorCode(w, http.StatusBadRequest, apperrors.ErrorCodeInvalidUUID)
+			ExpectErrorCode(w, http.StatusBadRequest, apperrors2.ErrorCodeInvalidUUID)
 		})
 	})
 
@@ -214,14 +214,14 @@ var _ = Describe("ClaimAttachmentHandler", func() {
 						req.Header.Set("Content-Type", contentType)
 						return req
 					},
-					apperrors.ErrorCodeInvalidUUID),
+					apperrors2.ErrorCodeInvalidUUID),
 				Entry("non-multipart request",
 					func() *http.Request {
 						req, _ := http.NewRequest(http.MethodPost, "/claims/"+claimID.String()+"/attachments", strings.NewReader("not multipart"))
 						req.Header.Set("Content-Type", "application/json")
 						return req
 					},
-					apperrors.ErrorCodeInvalidMultipartFormRequest),
+					apperrors2.ErrorCodeInvalidMultipartFormRequest),
 				Entry("no files provided",
 					func() *http.Request {
 						body := &bytes.Buffer{}
@@ -232,23 +232,23 @@ var _ = Describe("ClaimAttachmentHandler", func() {
 						req.Header.Set("Content-Type", writer.FormDataContentType())
 						return req
 					},
-					apperrors.ErrorCodeInvalidMultipartFormRequest),
+					apperrors2.ErrorCodeInvalidMultipartFormRequest),
 			)
 
 			It("should handle service error during creation", func() {
 				mockTxManager.EXPECT().Do(mock.Anything, mock.AnythingOfType("func(application.Tx) error")).
 					Run(func(ctx context.Context, fn func(application.Tx) error) {
 						mockService.EXPECT().Create(mockTx, claimID, mock.Anything).
-							Return(nil, apperrors.NewClaimNotFound()).Once()
+							Return(nil, apperrors2.NewClaimNotFound()).Once()
 						_ = fn(mockTx)
-					}).Return(apperrors.NewClaimNotFound()).Once()
+					}).Return(apperrors2.NewClaimNotFound()).Once()
 
 				body, contentType := createMultipartForm()
 				req, _ := http.NewRequest(http.MethodPost, "/claims/"+claimID.String()+"/attachments", body)
 				req.Header.Set("Content-Type", contentType)
 				r.ServeHTTP(w, req)
 
-				ExpectErrorCode(w, http.StatusNotFound, apperrors.ErrorCodeClaimNotFound)
+				ExpectErrorCode(w, http.StatusNotFound, apperrors2.ErrorCodeClaimNotFound)
 			})
 
 			It("should handle transaction failure", func() {
@@ -260,7 +260,7 @@ var _ = Describe("ClaimAttachmentHandler", func() {
 				req.Header.Set("Content-Type", contentType)
 				r.ServeHTTP(w, req)
 
-				ExpectErrorCode(w, http.StatusInternalServerError, apperrors.ErrorCodeInternalServerError)
+				ExpectErrorCode(w, http.StatusInternalServerError, apperrors2.ErrorCodeInternalServerError)
 			})
 		})
 
@@ -275,7 +275,7 @@ var _ = Describe("ClaimAttachmentHandler", func() {
 			req.Header.Set("Content-Type", contentType)
 			r.ServeHTTP(w, req)
 
-			ExpectErrorCode(w, http.StatusForbidden, apperrors.ErrorCodeUnauthorizedRole)
+			ExpectErrorCode(w, http.StatusForbidden, apperrors2.ErrorCodeUnauthorizedRole)
 		})
 	})
 
@@ -305,28 +305,28 @@ var _ = Describe("ClaimAttachmentHandler", func() {
 				req, _ := http.NewRequest(http.MethodDelete, "/claims/invalid-uuid/attachments/"+attachmentID.String(), nil)
 				r.ServeHTTP(w, req)
 
-				ExpectErrorCode(w, http.StatusBadRequest, apperrors.ErrorCodeInvalidUUID)
+				ExpectErrorCode(w, http.StatusBadRequest, apperrors2.ErrorCodeInvalidUUID)
 			})
 
 			It("should return error for invalid attachment ID", func() {
 				req, _ := http.NewRequest(http.MethodDelete, "/claims/"+claimID.String()+"/attachments/invalid-uuid", nil)
 				r.ServeHTTP(w, req)
 
-				ExpectErrorCode(w, http.StatusBadRequest, apperrors.ErrorCodeInvalidUUID)
+				ExpectErrorCode(w, http.StatusBadRequest, apperrors2.ErrorCodeInvalidUUID)
 			})
 
 			It("should handle attachment not found error", func() {
 				mockTxManager.EXPECT().Do(mock.Anything, mock.AnythingOfType("func(application.Tx) error")).
 					Run(func(ctx context.Context, fn func(application.Tx) error) {
 						mockService.EXPECT().HardDelete(mockTx, claimID, attachmentID).
-							Return(apperrors.NewClaimAttachmentNotFound()).Once()
+							Return(apperrors2.NewClaimAttachmentNotFound()).Once()
 						_ = fn(mockTx)
-					}).Return(apperrors.NewClaimAttachmentNotFound()).Once()
+					}).Return(apperrors2.NewClaimAttachmentNotFound()).Once()
 
 				req, _ := http.NewRequest(http.MethodDelete, "/claims/"+claimID.String()+"/attachments/"+attachmentID.String(), nil)
 				r.ServeHTTP(w, req)
 
-				ExpectErrorCode(w, http.StatusNotFound, apperrors.ErrorCodeClaimAttachmentNotFound)
+				ExpectErrorCode(w, http.StatusNotFound, apperrors2.ErrorCodeClaimAttachmentNotFound)
 			})
 
 			It("should handle service error", func() {
@@ -340,7 +340,7 @@ var _ = Describe("ClaimAttachmentHandler", func() {
 				req, _ := http.NewRequest(http.MethodDelete, "/claims/"+claimID.String()+"/attachments/"+attachmentID.String(), nil)
 				r.ServeHTTP(w, req)
 
-				ExpectErrorCode(w, http.StatusInternalServerError, apperrors.ErrorCodeInternalServerError)
+				ExpectErrorCode(w, http.StatusInternalServerError, apperrors2.ErrorCodeInternalServerError)
 			})
 		})
 
@@ -353,7 +353,7 @@ var _ = Describe("ClaimAttachmentHandler", func() {
 			req, _ := http.NewRequest(http.MethodDelete, "/claims/"+claimID.String()+"/attachments/"+attachmentID.String(), nil)
 			r.ServeHTTP(w, req)
 
-			ExpectErrorCode(w, http.StatusForbidden, apperrors.ErrorCodeUnauthorizedRole)
+			ExpectErrorCode(w, http.StatusForbidden, apperrors2.ErrorCodeUnauthorizedRole)
 		})
 	})
 })

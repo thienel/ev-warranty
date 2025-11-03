@@ -2,11 +2,11 @@ package services
 
 import (
 	"context"
-	"ev-warranty-go/internal/apperrors"
 	"ev-warranty-go/internal/application"
 	"ev-warranty-go/internal/application/repositories"
 	"ev-warranty-go/internal/domain/entities"
 	"ev-warranty-go/internal/infrastructure/cloudinary"
+	"ev-warranty-go/pkg/apperror"
 	"ev-warranty-go/pkg/logger"
 
 	"github.com/google/uuid"
@@ -101,7 +101,7 @@ func (s *claimService) Update(tx application.Tx, id uuid.UUID, cmd *UpdateClaimC
 	}
 
 	if claim.Status != entities.ClaimStatusDraft && claim.Status != entities.ClaimStatusRequestInfo {
-		return apperrors.NewNotAllowUpdateClaim()
+		return apperror.NewNotAllowUpdateClaim()
 	}
 
 	claim.Description = cmd.Description
@@ -120,7 +120,7 @@ func (s *claimService) HardDelete(tx application.Tx, id uuid.UUID) error {
 	}
 
 	if claim.Status != entities.ClaimStatusDraft {
-		return apperrors.NewNotAllowDeleteClaim()
+		return apperror.NewNotAllowDeleteClaim()
 	}
 
 	attachments, err := s.attachmentRepo.FindByClaimID(tx.GetCtx(), id)
@@ -147,7 +147,7 @@ func (s *claimService) SoftDelete(tx application.Tx, id uuid.UUID) error {
 	}
 
 	if claim.Status != entities.ClaimStatusCancelled {
-		return apperrors.NewNotAllowDeleteClaim()
+		return apperror.NewNotAllowDeleteClaim()
 	}
 
 	softDeleters := []func(application.Tx, uuid.UUID) error{
@@ -168,7 +168,7 @@ func (s *claimService) SoftDelete(tx application.Tx, id uuid.UUID) error {
 
 func (s *claimService) UpdateStatus(tx application.Tx, id uuid.UUID, status string, changedBy uuid.UUID) error {
 	if !entities.IsValidClaimStatus(status) {
-		return apperrors.NewInvalidClaimStatus()
+		return apperror.NewInvalidClaimStatus()
 	}
 
 	claim, err := s.claimRepo.FindByID(tx.GetCtx(), id)
@@ -177,7 +177,7 @@ func (s *claimService) UpdateStatus(tx application.Tx, id uuid.UUID, status stri
 	}
 
 	if !entities.IsValidClaimStatusTransition(claim.Status, status) {
-		return apperrors.NewInvalidClaimAction()
+		return apperror.NewInvalidClaimAction()
 	}
 
 	err = s.claimRepo.UpdateStatus(tx, id, status)
@@ -200,7 +200,7 @@ func (s *claimService) Submit(tx application.Tx, id uuid.UUID, changedBy uuid.UU
 	}
 
 	if !entities.IsValidClaimStatusTransition(claim.Status, entities.ClaimStatusSubmitted) {
-		return apperrors.NewInvalidClaimAction()
+		return apperror.NewInvalidClaimAction()
 	}
 
 	items, err := s.itemRepo.FindByClaimID(tx.GetCtx(), id)
@@ -213,7 +213,7 @@ func (s *claimService) Submit(tx application.Tx, id uuid.UUID, changedBy uuid.UU
 	}
 
 	if len(items) < entities.ClaimItemRequirePerClaim || len(attachments) < entities.AttachmentRequirePerClaim {
-		return apperrors.NewMissingInformationClaim()
+		return apperror.NewMissingInformationClaim()
 	}
 
 	err = s.claimRepo.UpdateStatus(tx, id, entities.ClaimStatusSubmitted)
@@ -247,7 +247,7 @@ func (s *claimService) Complete(tx application.Tx, id uuid.UUID, changedBy uuid.
 			approvedCount++
 		case entities.ClaimItemStatusRejected:
 		default:
-			return apperrors.NewInvalidClaimAction()
+			return apperror.NewInvalidClaimAction()
 		}
 	}
 
@@ -259,7 +259,7 @@ func (s *claimService) Complete(tx application.Tx, id uuid.UUID, changedBy uuid.
 	}
 
 	if !entities.IsValidClaimStatusTransition(claim.Status, newStatus) {
-		return apperrors.NewInvalidClaimAction()
+		return apperror.NewInvalidClaimAction()
 	}
 
 	err = s.claimRepo.UpdateStatus(tx, id, newStatus)

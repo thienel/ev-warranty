@@ -3,10 +3,10 @@ package persistence
 import (
 	"context"
 	"errors"
-	"ev-warranty-go/internal/apperrors"
 	"ev-warranty-go/internal/application"
 	"ev-warranty-go/internal/application/repositories"
 	"ev-warranty-go/internal/domain/entities"
+	"ev-warranty-go/pkg/apperror"
 
 	"github.com/google/uuid"
 	"gorm.io/gorm"
@@ -24,9 +24,9 @@ func (c *claimItemRepository) Create(tx application.Tx, item *entities.ClaimItem
 	db := tx.GetTx().(*gorm.DB)
 	if err := db.Create(item).Error; err != nil {
 		if dup := getDuplicateKeyConstraint(err); dup != "" {
-			return apperrors.NewDBDuplicateKeyError(dup)
+			return apperror.NewDBDuplicateKeyError(dup)
 		}
-		return apperrors.NewDBOperationError(err)
+		return apperror.NewDBOperationError(err)
 	}
 	return nil
 }
@@ -37,7 +37,7 @@ func (c *claimItemRepository) Update(tx application.Tx, item *entities.ClaimItem
 		Select("part_category_id", "faulty_part_id", "replacement_part_id",
 			"issue_description", "status", "type", "cost").
 		Updates(item).Error; err != nil {
-		return apperrors.NewDBOperationError(err)
+		return apperror.NewDBOperationError(err)
 	}
 	return nil
 }
@@ -45,7 +45,7 @@ func (c *claimItemRepository) Update(tx application.Tx, item *entities.ClaimItem
 func (c *claimItemRepository) HardDelete(tx application.Tx, id uuid.UUID) error {
 	db := tx.GetTx().(*gorm.DB)
 	if err := db.Unscoped().Delete(&entities.ClaimItem{}, "id = ?", id).Error; err != nil {
-		return apperrors.NewDBOperationError(err)
+		return apperror.NewDBOperationError(err)
 	}
 	return nil
 }
@@ -53,7 +53,7 @@ func (c *claimItemRepository) HardDelete(tx application.Tx, id uuid.UUID) error 
 func (c *claimItemRepository) SoftDeleteByClaimID(tx application.Tx, claimID uuid.UUID) error {
 	db := tx.GetTx().(*gorm.DB)
 	if err := db.Delete(&entities.ClaimItem{}, "claim_id = ?", claimID).Error; err != nil {
-		return apperrors.NewDBOperationError(err)
+		return apperror.NewDBOperationError(err)
 	}
 	return nil
 }
@@ -63,7 +63,7 @@ func (c *claimItemRepository) UpdateStatus(tx application.Tx, id uuid.UUID, stat
 	if err := db.Model(&entities.ClaimItem{}).Where("id = ?", id).
 		Update("status", status).Error; err != nil {
 
-		return apperrors.NewDBOperationError(err)
+		return apperror.NewDBOperationError(err)
 	}
 	return nil
 }
@@ -74,7 +74,7 @@ func (c *claimItemRepository) SumCostByClaimID(tx application.Tx, claimID uuid.U
 	if err := db.Model(&entities.ClaimItem{}).Where("claim_id = ? AND status = 'APPROVED'", claimID).
 		Select("COALESCE(SUM(cost), 0)").Scan(&totalCost).Error; err != nil {
 
-		return 0, apperrors.NewDBOperationError(err)
+		return 0, apperror.NewDBOperationError(err)
 	}
 	return totalCost, nil
 }
@@ -83,9 +83,9 @@ func (c *claimItemRepository) FindByID(ctx context.Context, id uuid.UUID) (*enti
 	var item entities.ClaimItem
 	if err := c.db.WithContext(ctx).Where("id = ?", id).First(&item).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, apperrors.NewClaimItemNotFound()
+			return nil, apperror.NewClaimItemNotFound()
 		}
-		return nil, apperrors.NewDBOperationError(err)
+		return nil, apperror.NewDBOperationError(err)
 	}
 	return &item, nil
 }
@@ -96,7 +96,7 @@ func (c *claimItemRepository) FindByClaimID(ctx context.Context, claimID uuid.UU
 		Where("claim_id = ?", claimID).
 		Order("created_at ASC").
 		Find(&items).Error; err != nil {
-		return nil, apperrors.NewDBOperationError(err)
+		return nil, apperror.NewDBOperationError(err)
 	}
 	return items, nil
 }
@@ -107,7 +107,7 @@ func (c *claimItemRepository) CountByClaimID(ctx context.Context, claimID uuid.U
 		Model(&entities.ClaimItem{}).
 		Where("claim_id = ?", claimID).
 		Count(&count).Error; err != nil {
-		return 0, apperrors.NewDBOperationError(err)
+		return 0, apperror.NewDBOperationError(err)
 	}
 	return count, nil
 }
@@ -118,7 +118,7 @@ func (c *claimItemRepository) FindByStatus(ctx context.Context, claimID uuid.UUI
 		Where("claim_id = ? AND status = ?", claimID, status).
 		Order("created_at ASC").
 		Find(&items).Error; err != nil {
-		return nil, apperrors.NewDBOperationError(err)
+		return nil, apperror.NewDBOperationError(err)
 	}
 	return items, nil
 }

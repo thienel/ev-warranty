@@ -1,4 +1,4 @@
-package apperrors
+package apperror
 
 const (
 	ErrorCodeInternalServerError = "COMMON_INTERNAL_ERROR"

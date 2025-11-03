@@ -2,10 +2,10 @@ package handler
 
 import (
 	"context"
-	"ev-warranty-go/internal/apperrors"
 	"ev-warranty-go/internal/application/services"
 	"ev-warranty-go/internal/domain/entities"
 	"ev-warranty-go/internal/interface/api/dto"
+	"ev-warranty-go/pkg/apperror"
 	"ev-warranty-go/pkg/logger"
 	"net/http"
 	"strings"
@@ -61,12 +61,12 @@ func (h *officeHandler) Create(c *gin.Context) {
 
 	var req dto.CreateOfficeRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		handleError(h.log, c, apperrors.NewInvalidJsonRequest())
+		handleError(h.log, c, apperror.NewInvalidJsonRequest())
 		return
 	}
 
 	if !entities.IsValidOfficeType(req.OfficeType) {
-		handleError(h.log, c, apperrors.NewInvalidOfficeType())
+		handleError(h.log, c, apperror.NewInvalidOfficeType())
 		return
 	}
 
@@ -112,7 +112,7 @@ func (h *officeHandler) GetByID(c *gin.Context) {
 	officeIDStr := c.Param("id")
 	officeID, err := uuid.Parse(officeIDStr)
 	if err != nil {
-		handleError(h.log, c, apperrors.NewInvalidUUID())
+		handleError(h.log, c, apperror.NewInvalidUUID())
 		return
 	}
 
@@ -183,13 +183,13 @@ func (h *officeHandler) Update(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := uuid.Parse(idStr)
 	if err != nil {
-		handleError(h.log, c, apperrors.NewInvalidUUID())
+		handleError(h.log, c, apperror.NewInvalidUUID())
 		return
 	}
 
 	var req dto.UpdateOfficeRequest
 	if err = c.ShouldBindJSON(&req); err != nil {
-		handleError(h.log, c, apperrors.NewInvalidJsonRequest())
+		handleError(h.log, c, apperror.NewInvalidJsonRequest())
 		return
 	}
 
@@ -241,7 +241,7 @@ func (h *officeHandler) Delete(c *gin.Context) {
 	officeIDStr := c.Param("id")
 	officeID, err := uuid.Parse(officeIDStr)
 	if err != nil {
-		handleError(h.log, c, apperrors.NewInvalidUUID())
+		handleError(h.log, c, apperror.NewInvalidUUID())
 		return
 	}
 

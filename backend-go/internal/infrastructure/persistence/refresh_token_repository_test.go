@@ -3,6 +3,7 @@ package persistence_test
 import (
 	"context"
 	"errors"
+	"ev-warranty-go/pkg/apperror"
 	"regexp"
 	"time"
 
@@ -12,7 +13,6 @@ import (
 	. "github.com/onsi/gomega"
 	"gorm.io/gorm"
 
-	"ev-warranty-go/internal/apperrors"
 	"ev-warranty-go/internal/application/repositories"
 	"ev-warranty-go/internal/domain/entities"
 	"ev-warranty-go/internal/infrastructure/persistence"
@@ -59,7 +59,7 @@ var _ = Describe("RefreshTokenRepository", func() {
 
 				err := repository.Create(ctx, token)
 
-				ExpectAppError(err, apperrors.ErrorCodeDuplicateKey)
+				ExpectAppError(err, apperror.ErrorCodeDuplicateKey)
 			})
 		})
 
@@ -69,7 +69,7 @@ var _ = Describe("RefreshTokenRepository", func() {
 
 				err := repository.Create(ctx, token)
 
-				ExpectAppError(err, apperrors.ErrorCodeDBOperation)
+				ExpectAppError(err, apperror.ErrorCodeDBOperation)
 			})
 		})
 
@@ -138,7 +138,7 @@ var _ = Describe("RefreshTokenRepository", func() {
 
 				err := repository.Update(ctx, token)
 
-				ExpectAppError(err, apperrors.ErrorCodeDBOperation)
+				ExpectAppError(err, apperror.ErrorCodeDBOperation)
 			})
 		})
 
@@ -203,7 +203,7 @@ var _ = Describe("RefreshTokenRepository", func() {
 				token, err := repository.Find(ctx, tokenStr)
 
 				Expect(token).To(BeNil())
-				ExpectAppError(err, apperrors.ErrorCodeRefreshTokenNotFound)
+				ExpectAppError(err, apperror.ErrorCodeRefreshTokenNotFound)
 			})
 		})
 
@@ -216,7 +216,7 @@ var _ = Describe("RefreshTokenRepository", func() {
 				token, err := repository.Find(ctx, tokenStr)
 
 				Expect(token).To(BeNil())
-				ExpectAppError(err, apperrors.ErrorCodeDBOperation)
+				ExpectAppError(err, apperror.ErrorCodeDBOperation)
 			})
 		})
 
@@ -375,7 +375,7 @@ var _ = Describe("RefreshTokenRepository", func() {
 
 				err := repository.Revoke(ctx, tokenStr)
 
-				ExpectAppError(err, apperrors.ErrorCodeDBOperation)
+				ExpectAppError(err, apperror.ErrorCodeDBOperation)
 			})
 		})
 

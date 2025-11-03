@@ -2,10 +2,10 @@ package handler
 
 import (
 	"context"
-	"ev-warranty-go/internal/apperrors"
 	"ev-warranty-go/internal/application/services"
 	"ev-warranty-go/internal/domain/entities"
 	"ev-warranty-go/internal/interface/api/dto"
+	"ev-warranty-go/pkg/apperror"
 	"ev-warranty-go/pkg/logger"
 	"net/http"
 	"strings"
@@ -61,7 +61,7 @@ func (h userHandler) Create(c *gin.Context) {
 
 	var req dto.CreateUserRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		handleError(h.log, c, apperrors.NewInvalidJsonRequest())
+		handleError(h.log, c, apperror.NewInvalidJsonRequest())
 		return
 	}
 
@@ -117,13 +117,13 @@ func (h userHandler) Update(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := uuid.Parse(idStr)
 	if err != nil {
-		handleError(h.log, c, apperrors.NewInvalidUUID())
+		handleError(h.log, c, apperror.NewInvalidUUID())
 		return
 	}
 
 	var req dto.UpdateUserRequest
 	if err = c.ShouldBindJSON(&req); err != nil {
-		handleError(h.log, c, apperrors.NewInvalidJsonRequest())
+		handleError(h.log, c, apperror.NewInvalidJsonRequest())
 		return
 	}
 
@@ -169,7 +169,7 @@ func (h userHandler) GetByID(c *gin.Context) {
 	userIDStr := c.Param("id")
 	userID, err := uuid.Parse(userIDStr)
 	if err != nil {
-		handleError(h.log, c, apperrors.NewInvalidUUID())
+		handleError(h.log, c, apperror.NewInvalidUUID())
 		return
 	}
 
@@ -240,7 +240,7 @@ func (h userHandler) Delete(c *gin.Context) {
 	userIDStr := c.Param("id")
 	userID, err := uuid.Parse(userIDStr)
 	if err != nil {
-		handleError(h.log, c, apperrors.NewInvalidUUID())
+		handleError(h.log, c, apperror.NewInvalidUUID())
 		return
 	}
 

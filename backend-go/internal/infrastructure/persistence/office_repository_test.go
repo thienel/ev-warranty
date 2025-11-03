@@ -2,6 +2,7 @@ package persistence_test
 
 import (
 	"context"
+	"ev-warranty-go/pkg/apperror"
 	"time"
 
 	"github.com/DATA-DOG/go-sqlmock"
@@ -10,7 +11,6 @@ import (
 	. "github.com/onsi/gomega"
 	"gorm.io/gorm"
 
-	"ev-warranty-go/internal/apperrors"
 	"ev-warranty-go/internal/application/repositories"
 	"ev-warranty-go/internal/domain/entities"
 	"ev-warranty-go/internal/infrastructure/persistence"
@@ -57,7 +57,7 @@ var _ = Describe("OfficeRepository", func() {
 
 				err := repository.Create(ctx, office)
 
-				ExpectAppError(err, apperrors.ErrorCodeDuplicateKey)
+				ExpectAppError(err, apperror.ErrorCodeDuplicateKey)
 			})
 		})
 
@@ -67,7 +67,7 @@ var _ = Describe("OfficeRepository", func() {
 
 				err := repository.Create(ctx, office)
 
-				ExpectAppError(err, apperrors.ErrorCodeDBOperation)
+				ExpectAppError(err, apperror.ErrorCodeDBOperation)
 			})
 		})
 	})
@@ -113,7 +113,7 @@ var _ = Describe("OfficeRepository", func() {
 				office, err := repository.FindByID(ctx, officeID)
 
 				Expect(office).To(BeNil())
-				ExpectAppError(err, apperrors.ErrorCodeOfficeNotFound)
+				ExpectAppError(err, apperror.ErrorCodeOfficeNotFound)
 			})
 		})
 
@@ -124,7 +124,7 @@ var _ = Describe("OfficeRepository", func() {
 				office, err := repository.FindByID(ctx, officeID)
 
 				Expect(office).To(BeNil())
-				ExpectAppError(err, apperrors.ErrorCodeDBOperation)
+				ExpectAppError(err, apperror.ErrorCodeDBOperation)
 			})
 		})
 	})
@@ -181,7 +181,7 @@ var _ = Describe("OfficeRepository", func() {
 				offices, err := repository.FindAll(ctx)
 
 				Expect(offices).To(BeNil())
-				ExpectAppError(err, apperrors.ErrorCodeDBOperation)
+				ExpectAppError(err, apperror.ErrorCodeDBOperation)
 			})
 		})
 	})
@@ -209,7 +209,7 @@ var _ = Describe("OfficeRepository", func() {
 
 				err := repository.Update(ctx, office)
 
-				ExpectAppError(err, apperrors.ErrorCodeDBOperation)
+				ExpectAppError(err, apperror.ErrorCodeDBOperation)
 			})
 		})
 	})
@@ -237,7 +237,7 @@ var _ = Describe("OfficeRepository", func() {
 
 				err := repository.SoftDelete(ctx, officeID)
 
-				ExpectAppError(err, apperrors.ErrorCodeDBOperation)
+				ExpectAppError(err, apperror.ErrorCodeDBOperation)
 			})
 		})
 	})

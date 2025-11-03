@@ -2,10 +2,10 @@ package handler
 
 import (
 	"context"
-	"ev-warranty-go/internal/apperrors"
 	"ev-warranty-go/internal/application"
 	"ev-warranty-go/internal/application/services"
 	"ev-warranty-go/internal/domain/entities"
+	"ev-warranty-go/pkg/apperror"
 	"ev-warranty-go/pkg/logger"
 	"net/http"
 
@@ -131,13 +131,13 @@ func (h *claimAttachmentHandler) Create(c *gin.Context) {
 
 	form, err := c.MultipartForm()
 	if err != nil || form == nil {
-		handleError(h.log, c, apperrors.NewInvalidMultipartFormRequest())
+		handleError(h.log, c, apperror.NewInvalidMultipartFormRequest())
 		return
 	}
 
 	files := form.File["files"]
 	if len(files) == 0 {
-		handleError(h.log, c, apperrors.NewInvalidMultipartFormRequest())
+		handleError(h.log, c, apperror.NewInvalidMultipartFormRequest())
 		return
 	}
 
@@ -146,7 +146,7 @@ func (h *claimAttachmentHandler) Create(c *gin.Context) {
 		for _, fileHeader := range files {
 			file, err := fileHeader.Open()
 			if err != nil {
-				return apperrors.NewInvalidMultipartFormRequest()
+				return apperror.NewInvalidMultipartFormRequest()
 			}
 			attachment, err := h.service.Create(tx, claimID, file)
 			if err != nil {
@@ -218,7 +218,7 @@ func parseAttachmentIDParam(c *gin.Context) (uuid.UUID, error) {
 	attachmentIDStr := c.Param("attachmentID")
 	attachmentID, err := uuid.Parse(attachmentIDStr)
 	if err != nil {
-		return uuid.Nil, apperrors.NewInvalidUUID()
+		return uuid.Nil, apperror.NewInvalidUUID()
 	}
 	return attachmentID, nil
 }

@@ -2,7 +2,7 @@ package main
 
 import (
 	"ev-warranty-go/internal/domain/entities"
-	"ev-warranty-go/internal/security"
+	"ev-warranty-go/pkg/security"
 	"os"
 )
 

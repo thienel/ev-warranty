@@ -3,17 +3,17 @@ package services_test
 import (
 	"context"
 	"errors"
+	apperrors2 "ev-warranty-go/pkg/apperror"
+	"ev-warranty-go/pkg/security"
 
 	"github.com/google/uuid"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"github.com/stretchr/testify/mock"
 
-	"ev-warranty-go/internal/apperrors"
 	"ev-warranty-go/internal/application/services"
 	"ev-warranty-go/internal/domain/entities"
 	"ev-warranty-go/internal/infrastructure/oauth/providers"
-	"ev-warranty-go/internal/security"
 	"ev-warranty-go/pkg/mocks"
 )
 
@@ -86,7 +86,7 @@ var _ = Describe("AuthService", func() {
 
 		Context("when user is not found", func() {
 			It("should return UserNotFound error", func() {
-				notFoundErr := apperrors.NewUserNotFound()
+				notFoundErr := apperrors2.NewUserNotFound()
 				mockUserRepo.EXPECT().FindByEmail(ctx, email).Return(nil, notFoundErr).Once()
 
 				at, rt, err := service.Login(ctx, email, password)
@@ -108,7 +108,7 @@ var _ = Describe("AuthService", func() {
 
 				Expect(at).To(BeEmpty())
 				Expect(rt).To(BeEmpty())
-				ExpectAppError(err, apperrors.ErrorCodeUserInactive)
+				ExpectAppError(err, apperrors2.ErrorCodeUserInactive)
 			})
 		})
 
@@ -123,13 +123,13 @@ var _ = Describe("AuthService", func() {
 
 				Expect(at).To(BeEmpty())
 				Expect(rt).To(BeEmpty())
-				ExpectAppError(err, apperrors.ErrorCodeUserPasswordInvalid)
+				ExpectAppError(err, apperrors2.ErrorCodeUserPasswordInvalid)
 			})
 		})
 
 		Context("when FindByEmail returns error", func() {
 			It("should return the error", func() {
-				dbErr := apperrors.New(500, apperrors.ErrorCodeDBOperation, errors.New("database error"))
+				dbErr := apperrors2.New(500, apperrors2.ErrorCodeDBOperation, errors.New("database error"))
 				mockUserRepo.EXPECT().FindByEmail(ctx, email).Return(nil, dbErr).Once()
 
 				at, rt, err := service.Login(ctx, email, password)
@@ -151,7 +151,7 @@ var _ = Describe("AuthService", func() {
 					IsActive:     true,
 				}
 
-				tokenErr := apperrors.New(500, apperrors.ErrorCodeFailedSignAccessToken, errors.New("token error"))
+				tokenErr := apperrors2.New(500, apperrors2.ErrorCodeFailedSignAccessToken, errors.New("token error"))
 				mockUserRepo.EXPECT().FindByEmail(ctx, email).Return(user, nil).Once()
 				mockTokenServ.EXPECT().GenerateAccessToken(user.ID).Return("", tokenErr).Once()
 
@@ -175,7 +175,7 @@ var _ = Describe("AuthService", func() {
 				}
 
 				accessToken := "access.token.jwt"
-				tokenErr := apperrors.New(500, apperrors.ErrorCodeFailedGenerateRefreshToken, errors.New("token error"))
+				tokenErr := apperrors2.New(500, apperrors2.ErrorCodeFailedGenerateRefreshToken, errors.New("token error"))
 
 				mockUserRepo.EXPECT().FindByEmail(ctx, email).Return(user, nil).Once()
 				mockTokenServ.EXPECT().GenerateAccessToken(user.ID).Return(accessToken, nil).Once()
@@ -210,7 +210,7 @@ var _ = Describe("AuthService", func() {
 
 		Context("when RevokeRefreshToken fails", func() {
 			It("should return the error", func() {
-				tokenErr := apperrors.New(404, apperrors.ErrorCodeRefreshTokenNotFound, errors.New("token not found"))
+				tokenErr := apperrors2.New(404, apperrors2.ErrorCodeRefreshTokenNotFound, errors.New("token not found"))
 				mockTokenServ.EXPECT().RevokeRefreshToken(ctx, token).Return(tokenErr).Once()
 
 				err := service.Logout(ctx, token)
@@ -260,7 +260,7 @@ var _ = Describe("AuthService", func() {
 
 		Context("when DB operation error", func() {
 			It("should return DBOperationError", func() {
-				dbErr := apperrors.NewDBOperationError(errors.New("database error"))
+				dbErr := apperrors2.NewDBOperationError(errors.New("database error"))
 
 				mockUserRepo.EXPECT().FindByOAuth(ctx, userInfo.Provider, userInfo.ProviderID).Return(nil, dbErr).Once()
 
@@ -285,7 +285,7 @@ var _ = Describe("AuthService", func() {
 				refreshToken := "refresh_token_string"
 
 				mockUserRepo.EXPECT().FindByOAuth(ctx, userInfo.Provider, userInfo.ProviderID).
-					Return(nil, apperrors.NewUserNotFound()).Once()
+					Return(nil, apperrors2.NewUserNotFound()).Once()
 				mockUserRepo.EXPECT().FindByEmail(ctx, userInfo.Email).Return(user, nil).Once()
 				mockUserRepo.EXPECT().Update(ctx, mock.MatchedBy(func(u *entities.User) bool {
 					return u.ID == user.ID &&
@@ -307,10 +307,10 @@ var _ = Describe("AuthService", func() {
 
 		Context("when FindByEmail fails", func() {
 			It("should return the error", func() {
-				dbErr := apperrors.New(500, apperrors.ErrorCodeDBOperation, errors.New("database error"))
+				dbErr := apperrors2.New(500, apperrors2.ErrorCodeDBOperation, errors.New("database error"))
 
 				mockUserRepo.EXPECT().FindByOAuth(mock.Anything, userInfo.Provider, userInfo.ProviderID).
-					Return(nil, apperrors.NewUserNotFound()).Once()
+					Return(nil, apperrors2.NewUserNotFound()).Once()
 				mockUserRepo.EXPECT().FindByEmail(ctx, userInfo.Email).Return(nil, dbErr).Once()
 
 				at, rt, err := service.HandleOAuthUser(ctx, userInfo)
@@ -330,10 +330,10 @@ var _ = Describe("AuthService", func() {
 					IsActive: true,
 				}
 
-				updateErr := apperrors.New(500, apperrors.ErrorCodeDBOperation, errors.New("update error"))
+				updateErr := apperrors2.New(500, apperrors2.ErrorCodeDBOperation, errors.New("update error"))
 
 				mockUserRepo.EXPECT().FindByOAuth(ctx, userInfo.Provider, userInfo.ProviderID).
-					Return(nil, apperrors.NewUserNotFound()).Once()
+					Return(nil, apperrors2.NewUserNotFound()).Once()
 				mockUserRepo.EXPECT().FindByEmail(ctx, userInfo.Email).Return(user, nil).Once()
 				mockUserRepo.EXPECT().Update(ctx, mock.AnythingOfType("*entities.User")).Return(updateErr).Once()
 
@@ -356,7 +356,7 @@ var _ = Describe("AuthService", func() {
 					IsActive:      true,
 				}
 
-				tokenErr := apperrors.New(500, apperrors.ErrorCodeFailedSignAccessToken, errors.New("token error"))
+				tokenErr := apperrors2.New(500, apperrors2.ErrorCodeFailedSignAccessToken, errors.New("token error"))
 
 				mockUserRepo.EXPECT().FindByOAuth(ctx, userInfo.Provider, userInfo.ProviderID).Return(user, nil).Once()
 				mockTokenServ.EXPECT().GenerateAccessToken(user.ID).Return("", tokenErr).Once()
@@ -381,7 +381,7 @@ var _ = Describe("AuthService", func() {
 				}
 
 				accessToken := "access.token.jwt"
-				tokenErr := apperrors.New(500, apperrors.ErrorCodeFailedGenerateRefreshToken, errors.New("token error"))
+				tokenErr := apperrors2.New(500, apperrors2.ErrorCodeFailedGenerateRefreshToken, errors.New("token error"))
 
 				mockUserRepo.EXPECT().FindByOAuth(ctx, userInfo.Provider, userInfo.ProviderID).Return(user, nil).Once()
 				mockTokenServ.EXPECT().GenerateAccessToken(user.ID).Return(accessToken, nil).Once()

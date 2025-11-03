@@ -3,6 +3,7 @@ package persistence_test
 import (
 	"context"
 	"errors"
+	"ev-warranty-go/pkg/apperror"
 	"ev-warranty-go/pkg/mocks"
 	"regexp"
 	"time"
@@ -13,7 +14,6 @@ import (
 	. "github.com/onsi/gomega"
 	"gorm.io/gorm"
 
-	"ev-warranty-go/internal/apperrors"
 	"ev-warranty-go/internal/application/repositories"
 	"ev-warranty-go/internal/domain/entities"
 	"ev-warranty-go/internal/infrastructure/persistence"
@@ -64,7 +64,7 @@ var _ = Describe("ClaimRepository", func() {
 
 				err := repository.Create(mockTx, claim)
 
-				ExpectAppError(err, apperrors.ErrorCodeDuplicateKey)
+				ExpectAppError(err, apperror.ErrorCodeDuplicateKey)
 			})
 		})
 
@@ -76,7 +76,7 @@ var _ = Describe("ClaimRepository", func() {
 
 				err := repository.Create(mockTx, claim)
 
-				ExpectAppError(err, apperrors.ErrorCodeDBOperation)
+				ExpectAppError(err, apperror.ErrorCodeDBOperation)
 			})
 		})
 	})
@@ -110,7 +110,7 @@ var _ = Describe("ClaimRepository", func() {
 
 				err := repository.Update(mockTx, claim)
 
-				ExpectAppError(err, apperrors.ErrorCodeDBOperation)
+				ExpectAppError(err, apperror.ErrorCodeDBOperation)
 			})
 		})
 	})
@@ -150,7 +150,7 @@ var _ = Describe("ClaimRepository", func() {
 
 				err := repository.HardDelete(mockTx, claimID)
 
-				ExpectAppError(err, apperrors.ErrorCodeDBOperation)
+				ExpectAppError(err, apperror.ErrorCodeDBOperation)
 			})
 		})
 	})
@@ -182,7 +182,7 @@ var _ = Describe("ClaimRepository", func() {
 
 				err := repository.SoftDelete(mockTx, claimID)
 
-				ExpectAppError(err, apperrors.ErrorCodeDBOperation)
+				ExpectAppError(err, apperror.ErrorCodeDBOperation)
 			})
 		})
 	})
@@ -224,7 +224,7 @@ var _ = Describe("ClaimRepository", func() {
 
 				err := repository.UpdateStatus(mockTx, claimID, status)
 
-				ExpectAppError(err, apperrors.ErrorCodeDBOperation)
+				ExpectAppError(err, apperror.ErrorCodeDBOperation)
 			})
 		})
 
@@ -296,7 +296,7 @@ var _ = Describe("ClaimRepository", func() {
 				claim, err := repository.FindByID(ctx, claimID)
 
 				Expect(claim).To(BeNil())
-				ExpectAppError(err, apperrors.ErrorCodeClaimNotFound)
+				ExpectAppError(err, apperror.ErrorCodeClaimNotFound)
 			})
 		})
 
@@ -307,7 +307,7 @@ var _ = Describe("ClaimRepository", func() {
 				claim, err := repository.FindByID(ctx, claimID)
 
 				Expect(claim).To(BeNil())
-				ExpectAppError(err, apperrors.ErrorCodeDBOperation)
+				ExpectAppError(err, apperror.ErrorCodeDBOperation)
 			})
 		})
 	})
@@ -366,7 +366,7 @@ var _ = Describe("ClaimRepository", func() {
 				claims, err := repository.FindAll(ctx)
 
 				Expect(claims).To(BeNil())
-				ExpectAppError(err, apperrors.ErrorCodeDBOperation)
+				ExpectAppError(err, apperror.ErrorCodeDBOperation)
 			})
 		})
 	})
@@ -434,7 +434,7 @@ var _ = Describe("ClaimRepository", func() {
 				claims, err := repository.FindByCustomerID(ctx, customerID)
 
 				Expect(claims).To(BeNil())
-				ExpectAppError(err, apperrors.ErrorCodeDBOperation)
+				ExpectAppError(err, apperror.ErrorCodeDBOperation)
 			})
 		})
 	})
@@ -502,7 +502,7 @@ var _ = Describe("ClaimRepository", func() {
 				claims, err := repository.FindByVehicleID(ctx, vehicleID)
 
 				Expect(claims).To(BeNil())
-				ExpectAppError(err, apperrors.ErrorCodeDBOperation)
+				ExpectAppError(err, apperror.ErrorCodeDBOperation)
 			})
 		})
 	})

@@ -8,9 +8,9 @@ import (
 	"encoding/base64"
 	"encoding/hex"
 	"errors"
-	"ev-warranty-go/internal/apperrors"
 	"ev-warranty-go/internal/application/repositories"
 	"ev-warranty-go/internal/domain/entities"
+	"ev-warranty-go/pkg/apperror"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -63,7 +63,7 @@ func (t *tokenService) GenerateAccessToken(userID uuid.UUID) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodRS256, claims)
 	signedToken, err := token.SignedString(t.privateKey)
 	if err != nil {
-		return "", apperrors.NewFailedSignAccessToken(err)
+		return "", apperror.NewFailedSignAccessToken(err)
 	}
 
 	return signedToken, nil
@@ -72,13 +72,13 @@ func (t *tokenService) GenerateAccessToken(userID uuid.UUID) (string, error) {
 func (t *tokenService) GenerateRefreshToken(ctx context.Context, userID uuid.UUID) (string, error) {
 	bytes := make([]byte, 32)
 	if _, err := rand.Read(bytes); err != nil {
-		return "", apperrors.NewFailedGenerateRefreshToken(err)
+		return "", apperror.NewFailedGenerateRefreshToken(err)
 	}
 
 	rawToken := base64.URLEncoding.WithPadding(base64.NoPadding).EncodeToString(bytes)
 	hashedToken, err := hashToken(rawToken)
 	if err != nil {
-		return "", apperrors.NewFailedGenerateRefreshToken(err)
+		return "", apperror.NewFailedGenerateRefreshToken(err)
 	}
 
 	rfToken := &entities.RefreshToken{
@@ -88,7 +88,7 @@ func (t *tokenService) GenerateRefreshToken(ctx context.Context, userID uuid.UUI
 	}
 
 	if err = t.repoRefreshToken.Create(ctx, rfToken); err != nil {
-		return "", apperrors.NewFailedGenerateRefreshToken(err)
+		return "", apperror.NewFailedGenerateRefreshToken(err)
 	}
 
 	return rawToken, nil
@@ -102,7 +102,7 @@ type CustomClaims struct {
 func (t *tokenService) ValidateAccessToken(ctx context.Context, tokenStr string) (*CustomClaims, error) {
 	token, err := jwt.ParseWithClaims(tokenStr, &CustomClaims{}, func(token *jwt.Token) (any, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodRSA); !ok {
-			return nil, apperrors.NewUnexpectedSigningMethod(token.Header["alg"])
+			return nil, apperror.NewUnexpectedSigningMethod(token.Header["alg"])
 		}
 		return t.publicKey, nil
 	})
@@ -110,27 +110,27 @@ func (t *tokenService) ValidateAccessToken(ctx context.Context, tokenStr string)
 	if err != nil {
 		switch {
 		case errors.Is(err, jwt.ErrTokenExpired):
-			return nil, apperrors.NewExpiredAccessToken()
+			return nil, apperror.NewExpiredAccessToken()
 		case errors.Is(err, jwt.ErrTokenNotValidYet):
-			return nil, apperrors.NewInvalidAccessToken()
+			return nil, apperror.NewInvalidAccessToken()
 		case errors.Is(err, jwt.ErrTokenMalformed):
-			return nil, apperrors.NewInvalidAccessToken()
+			return nil, apperror.NewInvalidAccessToken()
 		default:
-			return nil, apperrors.NewInvalidAccessToken()
+			return nil, apperror.NewInvalidAccessToken()
 		}
 	}
 
 	if token == nil || !token.Valid {
-		return nil, apperrors.NewInvalidAccessToken()
+		return nil, apperror.NewInvalidAccessToken()
 	}
 
 	claims, ok := token.Claims.(*CustomClaims)
 	if !ok {
-		return nil, apperrors.NewInvalidAccessToken()
+		return nil, apperror.NewInvalidAccessToken()
 	}
 
 	if claims.UserID == "" {
-		return nil, apperrors.NewInvalidAccessToken()
+		return nil, apperror.NewInvalidAccessToken()
 	}
 
 	return claims, nil
@@ -139,20 +139,20 @@ func (t *tokenService) ValidateAccessToken(ctx context.Context, tokenStr string)
 func (t *tokenService) ValidateRefreshToken(ctx context.Context, token string) (*entities.RefreshToken, error) {
 	hashedToken, err := hashToken(token)
 	if err != nil {
-		return nil, apperrors.NewFailedHashToken()
+		return nil, apperror.NewFailedHashToken()
 	}
 
 	rfToken, err := t.repoRefreshToken.Find(ctx, hashedToken)
 	if err != nil {
-		return nil, apperrors.NewInvalidRefreshToken()
+		return nil, apperror.NewInvalidRefreshToken()
 	}
 
 	if rfToken.IsExpired() {
-		return nil, apperrors.NewExpiredRefreshToken()
+		return nil, apperror.NewExpiredRefreshToken()
 	}
 
 	if rfToken.IsRevoked {
-		return nil, apperrors.NewRevokedRefreshToken()
+		return nil, apperror.NewRevokedRefreshToken()
 	}
 
 	return rfToken, nil
@@ -161,7 +161,7 @@ func (t *tokenService) ValidateRefreshToken(ctx context.Context, token string) (
 func (t *tokenService) RevokeRefreshToken(ctx context.Context, token string) error {
 	hashedToken, err := hashToken(token)
 	if err != nil {
-		return apperrors.NewFailedHashToken()
+		return apperror.NewFailedHashToken()
 	}
 
 	return t.repoRefreshToken.Revoke(ctx, hashedToken)

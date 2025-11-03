@@ -3,6 +3,7 @@ package persistence_test
 import (
 	"context"
 	"errors"
+	"ev-warranty-go/pkg/apperror"
 	"ev-warranty-go/pkg/mocks"
 	"regexp"
 	"time"
@@ -13,7 +14,6 @@ import (
 	. "github.com/onsi/gomega"
 	"gorm.io/gorm"
 
-	"ev-warranty-go/internal/apperrors"
 	"ev-warranty-go/internal/application/repositories"
 	"ev-warranty-go/internal/domain/entities"
 	"ev-warranty-go/internal/infrastructure/persistence"
@@ -64,7 +64,7 @@ var _ = Describe("ClaimAttachmentRepository", func() {
 
 				err := repository.Create(mockTx, attachment)
 
-				ExpectAppError(err, apperrors.ErrorCodeDuplicateKey)
+				ExpectAppError(err, apperror.ErrorCodeDuplicateKey)
 			})
 		})
 
@@ -76,7 +76,7 @@ var _ = Describe("ClaimAttachmentRepository", func() {
 
 				err := repository.Create(mockTx, attachment)
 
-				ExpectAppError(err, apperrors.ErrorCodeDBOperation)
+				ExpectAppError(err, apperror.ErrorCodeDBOperation)
 			})
 		})
 
@@ -164,7 +164,7 @@ var _ = Describe("ClaimAttachmentRepository", func() {
 
 				err := repository.HardDelete(mockTx, attachmentID)
 
-				ExpectAppError(err, apperrors.ErrorCodeDBOperation)
+				ExpectAppError(err, apperror.ErrorCodeDBOperation)
 			})
 		})
 	})
@@ -204,7 +204,7 @@ var _ = Describe("ClaimAttachmentRepository", func() {
 
 				err := repository.SoftDeleteByClaimID(mockTx, claimID)
 
-				ExpectAppError(err, apperrors.ErrorCodeDBOperation)
+				ExpectAppError(err, apperror.ErrorCodeDBOperation)
 			})
 		})
 	})
@@ -247,7 +247,7 @@ var _ = Describe("ClaimAttachmentRepository", func() {
 				attachment, err := repository.FindByID(ctx, attachmentID)
 
 				Expect(attachment).To(BeNil())
-				ExpectAppError(err, apperrors.ErrorCodeClaimAttachmentNotFound)
+				ExpectAppError(err, apperror.ErrorCodeClaimAttachmentNotFound)
 			})
 		})
 
@@ -258,7 +258,7 @@ var _ = Describe("ClaimAttachmentRepository", func() {
 				attachment, err := repository.FindByID(ctx, attachmentID)
 
 				Expect(attachment).To(BeNil())
-				ExpectAppError(err, apperrors.ErrorCodeDBOperation)
+				ExpectAppError(err, apperror.ErrorCodeDBOperation)
 			})
 		})
 	})
@@ -324,7 +324,7 @@ var _ = Describe("ClaimAttachmentRepository", func() {
 				attachments, err := repository.FindByClaimID(ctx, claimID)
 
 				Expect(attachments).To(BeNil())
-				ExpectAppError(err, apperrors.ErrorCodeDBOperation)
+				ExpectAppError(err, apperror.ErrorCodeDBOperation)
 			})
 		})
 	})
@@ -375,7 +375,7 @@ var _ = Describe("ClaimAttachmentRepository", func() {
 				count, err := repository.CountByClaimID(ctx, claimID)
 
 				Expect(count).To(Equal(int64(0)))
-				ExpectAppError(err, apperrors.ErrorCodeDBOperation)
+				ExpectAppError(err, apperror.ErrorCodeDBOperation)
 			})
 		})
 
@@ -458,7 +458,7 @@ var _ = Describe("ClaimAttachmentRepository", func() {
 				attachments, err := repository.FindByType(ctx, claimID, attachmentType)
 
 				Expect(attachments).To(BeNil())
-				ExpectAppError(err, apperrors.ErrorCodeDBOperation)
+				ExpectAppError(err, apperror.ErrorCodeDBOperation)
 			})
 		})
 

@@ -2,8 +2,8 @@ package handler
 
 import (
 	"errors"
-	"ev-warranty-go/internal/apperrors"
 	"ev-warranty-go/internal/interface/api/dto"
+	"ev-warranty-go/pkg/apperror"
 	"ev-warranty-go/pkg/logger"
 	"time"
 
@@ -19,9 +19,9 @@ const (
 )
 
 func handleError(log logger.Logger, c *gin.Context, err error) {
-	var appErr *apperrors.AppError
+	var appErr *apperror.AppError
 	if !errors.As(err, &appErr) {
-		appErr = apperrors.NewInternalServerError(err)
+		appErr = apperror.NewInternalServerError(err)
 	}
 
 	log.Error(appErr.ErrorCode, "error", appErr.Error())
@@ -39,12 +39,12 @@ func writeSuccessResponse(c *gin.Context, statusCode int, data any) {
 func getUserIDFromHeader(c *gin.Context) (uuid.UUID, error) {
 	userIDStr := c.GetHeader(headerUserIDKey)
 	if userIDStr == "" {
-		return uuid.Nil, apperrors.NewMissingUserID()
+		return uuid.Nil, apperror.NewMissingUserID()
 	}
 
 	userID, err := uuid.Parse(userIDStr)
 	if err != nil {
-		return uuid.Nil, apperrors.NewInvalidUserID()
+		return uuid.Nil, apperror.NewInvalidUserID()
 	}
 
 	return userID, nil
@@ -53,7 +53,7 @@ func getUserIDFromHeader(c *gin.Context) (uuid.UUID, error) {
 func getUserRoleFromHeader(c *gin.Context) (string, error) {
 	role := c.GetHeader(headerUserRole)
 	if role == "" {
-		return "", apperrors.NewMissingUserRole()
+		return "", apperror.NewMissingUserRole()
 	}
 
 	return role, nil
@@ -71,5 +71,5 @@ func allowedRoles(c *gin.Context, allowedRoles ...string) error {
 		}
 	}
 
-	return apperrors.NewUnauthorizedRole()
+	return apperror.NewUnauthorizedRole()
 }

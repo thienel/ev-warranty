@@ -2,8 +2,8 @@ package cloudinary
 
 import (
 	"context"
-	"ev-warranty-go/internal/apperrors"
 	"ev-warranty-go/internal/infrastructure/config"
+	"ev-warranty-go/pkg/apperror"
 	"mime/multipart"
 	"net/url"
 	"path/filepath"
@@ -27,7 +27,7 @@ type cloudinaryService struct {
 func NewCloudinaryService(cfg *config.CloudinaryConfig) (CloudinaryService, error) {
 	cld, err := cloudinary.NewFromURL(cfg.URL)
 	if err != nil {
-		return nil, apperrors.NewFailedInitializeCloudinary()
+		return nil, apperror.NewFailedInitializeCloudinary()
 	}
 	cld.Config.URL.Secure = true
 
@@ -48,7 +48,7 @@ func (s *cloudinaryService) UploadFile(ctx context.Context, file multipart.File,
 
 	resp, err := s.cld.Upload.Upload(ctx, file, uploadParams)
 	if err != nil {
-		return "", apperrors.NewFailedUploadCloudinary()
+		return "", apperror.NewFailedUploadCloudinary()
 	}
 
 	return resp.SecureURL, nil
@@ -56,7 +56,7 @@ func (s *cloudinaryService) UploadFile(ctx context.Context, file multipart.File,
 
 func (s *cloudinaryService) DeleteFile(ctx context.Context, publicID string, resourceType string) error {
 	if publicID == "" {
-		return apperrors.NewEmptyCloudinaryParameter("publicID")
+		return apperror.NewEmptyCloudinaryParameter("publicID")
 	}
 
 	_, err := s.cld.Upload.Destroy(ctx, uploader.DestroyParams{
@@ -64,14 +64,14 @@ func (s *cloudinaryService) DeleteFile(ctx context.Context, publicID string, res
 		ResourceType: resourceType,
 	})
 	if err != nil {
-		return apperrors.NewFailedDeleteCloudinary()
+		return apperror.NewFailedDeleteCloudinary()
 	}
 	return nil
 }
 
 func (s *cloudinaryService) DeleteFileByURL(ctx context.Context, fileURL string) error {
 	if fileURL == "" {
-		return apperrors.NewEmptyCloudinaryParameter("fileURL")
+		return apperror.NewEmptyCloudinaryParameter("fileURL")
 	}
 
 	publicID, resourceType, err := parseCloudinaryURL(fileURL)
@@ -85,13 +85,13 @@ func (s *cloudinaryService) DeleteFileByURL(ctx context.Context, fileURL string)
 func parseCloudinaryURL(fileURL string) (publicID, resourceType string, err error) {
 	parsedURL, err := url.Parse(fileURL)
 	if err != nil {
-		return "", "", apperrors.NewInvalidCloudinaryURL()
+		return "", "", apperror.NewInvalidCloudinaryURL()
 	}
 
 	parts := strings.Split(strings.TrimPrefix(parsedURL.Path, "/"), "/")
 
 	if len(parts) < 5 {
-		return "", "", apperrors.NewInvalidCloudinaryURL()
+		return "", "", apperror.NewInvalidCloudinaryURL()
 	}
 
 	resourceType = parts[1]

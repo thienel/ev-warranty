@@ -4,9 +4,9 @@ import (
 	"context"
 	"crypto/rand"
 	"encoding/base64"
-	"ev-warranty-go/internal/apperrors"
 	"ev-warranty-go/internal/application/repositories"
 	"ev-warranty-go/internal/infrastructure/oauth/providers"
+	"ev-warranty-go/pkg/apperror"
 )
 
 type OAuthService interface {
@@ -38,7 +38,7 @@ func (s *oauthService) GenerateAuthURL() (string, error) {
 
 func (s *oauthService) HandleCallback(ctx context.Context, code, state string) (*providers.UserInfo, error) {
 	if !s.states[state] {
-		return nil, apperrors.NewInvalidAuthHeader()
+		return nil, apperror.NewInvalidAuthHeader()
 	}
 	delete(s.states, state)
 

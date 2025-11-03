@@ -2,11 +2,11 @@ package handler
 
 import (
 	"context"
-	"ev-warranty-go/internal/apperrors"
 	"ev-warranty-go/internal/application"
 	"ev-warranty-go/internal/application/services"
 	"ev-warranty-go/internal/domain/entities"
 	"ev-warranty-go/internal/interface/api/dto"
+	"ev-warranty-go/pkg/apperror"
 	"ev-warranty-go/pkg/logger"
 	"net/http"
 
@@ -134,12 +134,12 @@ func (h *claimItemHandler) Create(c *gin.Context) {
 
 	var req dto.CreateClaimItemRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		handleError(h.log, c, apperrors.NewInvalidJsonRequest())
+		handleError(h.log, c, apperror.NewInvalidJsonRequest())
 		return
 	}
 
 	if !entities.IsValidClaimItemType(req.Type) {
-		handleError(h.log, c, apperrors.NewInvalidClaimItemType())
+		handleError(h.log, c, apperror.NewInvalidClaimItemType())
 		return
 	}
 
@@ -310,7 +310,7 @@ func parseItemIDParam(c *gin.Context) (uuid.UUID, error) {
 	itemIDStr := c.Param("itemID")
 	itemID, err := uuid.Parse(itemIDStr)
 	if err != nil {
-		return uuid.Nil, apperrors.NewInvalidUUID()
+		return uuid.Nil, apperror.NewInvalidUUID()
 	}
 	return itemID, nil
 }
@@ -319,7 +319,7 @@ func parseClaimIDParam(c *gin.Context) (uuid.UUID, error) {
 	claimIDStr := c.Param("id")
 	claimID, err := uuid.Parse(claimIDStr)
 	if err != nil {
-		return uuid.Nil, apperrors.NewInvalidUUID()
+		return uuid.Nil, apperror.NewInvalidUUID()
 	}
 	return claimID, nil
 }

@@ -3,13 +3,13 @@ package services_test
 import (
 	"context"
 	"errors"
+	apperrors2 "ev-warranty-go/pkg/apperror"
 
 	"github.com/google/uuid"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"github.com/stretchr/testify/mock"
 
-	"ev-warranty-go/internal/apperrors"
 	"ev-warranty-go/internal/application/services"
 	"ev-warranty-go/internal/domain/entities"
 	"ev-warranty-go/pkg/mocks"
@@ -63,19 +63,19 @@ var _ = Describe("ClaimItemService", func() {
 
 		Context("when item is not found", func() {
 			It("should return ClaimItemNotFound error", func() {
-				notFoundErr := apperrors.New(404, apperrors.ErrorCodeClaimItemNotFound, errors.New("item not found"))
+				notFoundErr := apperrors2.New(404, apperrors2.ErrorCodeClaimItemNotFound, errors.New("item not found"))
 				mockItemRepo.EXPECT().FindByID(ctx, itemID).Return(nil, notFoundErr).Once()
 
 				item, err := service.GetByID(ctx, itemID)
 
 				Expect(item).To(BeNil())
-				ExpectAppError(err, apperrors.ErrorCodeClaimItemNotFound)
+				ExpectAppError(err, apperrors2.ErrorCodeClaimItemNotFound)
 			})
 		})
 
 		Context("when repository returns error", func() {
 			It("should return the error", func() {
-				dbErr := apperrors.New(500, apperrors.ErrorCodeDBOperation, errors.New("database error"))
+				dbErr := apperrors2.New(500, apperrors2.ErrorCodeDBOperation, errors.New("database error"))
 				mockItemRepo.EXPECT().FindByID(ctx, itemID).Return(nil, dbErr).Once()
 
 				item, err := service.GetByID(ctx, itemID)
@@ -137,7 +137,7 @@ var _ = Describe("ClaimItemService", func() {
 
 		Context("when repository returns error", func() {
 			It("should return the error", func() {
-				dbErr := apperrors.New(500, apperrors.ErrorCodeDBOperation, errors.New("database error"))
+				dbErr := apperrors2.New(500, apperrors2.ErrorCodeDBOperation, errors.New("database error"))
 				mockItemRepo.EXPECT().FindByClaimID(ctx, claimID).Return(nil, dbErr).Once()
 
 				items, err := service.GetByClaimID(ctx, claimID)
@@ -195,7 +195,7 @@ var _ = Describe("ClaimItemService", func() {
 
 		Context("when claim is not found", func() {
 			It("should return ClaimNotFound error", func() {
-				notFoundErr := apperrors.New(404, apperrors.ErrorCodeClaimNotFound, errors.New("claim not found"))
+				notFoundErr := apperrors2.New(404, apperrors2.ErrorCodeClaimNotFound, errors.New("claim not found"))
 				mockClaimRepo.EXPECT().FindByID(ctx, claimID).Return(nil, notFoundErr).Once()
 
 				item, err := service.Create(mockTx, claimID, cmd)
@@ -222,7 +222,7 @@ var _ = Describe("ClaimItemService", func() {
 				item, err := service.Create(mockTx, claimID, cmd)
 
 				Expect(item).To(BeNil())
-				ExpectAppError(err, apperrors.ErrorCodeInvalidClaimItemStatus)
+				ExpectAppError(err, apperrors2.ErrorCodeInvalidClaimItemStatus)
 			})
 		})
 
@@ -242,7 +242,7 @@ var _ = Describe("ClaimItemService", func() {
 				item, err := service.Create(mockTx, claimID, cmd)
 
 				Expect(item).To(BeNil())
-				ExpectAppError(err, apperrors.ErrorCodeInvalidClaimItemType)
+				ExpectAppError(err, apperrors2.ErrorCodeInvalidClaimItemType)
 			})
 		})
 
@@ -252,7 +252,7 @@ var _ = Describe("ClaimItemService", func() {
 					ID:     claimID,
 					Status: entities.ClaimStatusDraft,
 				}
-				dbErr := apperrors.New(500, apperrors.ErrorCodeDBOperation, errors.New("database error"))
+				dbErr := apperrors2.New(500, apperrors2.ErrorCodeDBOperation, errors.New("database error"))
 
 				mockClaimRepo.EXPECT().FindByID(ctx, claimID).Return(claim, nil).Once()
 				mockItemRepo.EXPECT().Create(mockTx, mock.AnythingOfType("*entities.ClaimItem")).Return(dbErr).Once()
@@ -324,7 +324,7 @@ var _ = Describe("ClaimItemService", func() {
 
 				err := service.Update(mockTx, claimID, itemID, cmd)
 
-				ExpectAppError(err, apperrors.ErrorCodeClaimStatusNotAllowedUpdate)
+				ExpectAppError(err, apperrors2.ErrorCodeClaimStatusNotAllowedUpdate)
 			})
 		})
 
@@ -345,7 +345,7 @@ var _ = Describe("ClaimItemService", func() {
 
 				err := service.Update(mockTx, claimID, itemID, cmd)
 
-				ExpectAppError(err, apperrors.ErrorCodeClaimStatusNotAllowedUpdate)
+				ExpectAppError(err, apperrors2.ErrorCodeClaimStatusNotAllowedUpdate)
 			})
 		})
 
@@ -375,7 +375,7 @@ var _ = Describe("ClaimItemService", func() {
 
 		Context("when claim is not found", func() {
 			It("should return error", func() {
-				notFoundErr := apperrors.New(404, apperrors.ErrorCodeClaimNotFound, errors.New("claim not found"))
+				notFoundErr := apperrors2.New(404, apperrors2.ErrorCodeClaimNotFound, errors.New("claim not found"))
 				mockClaimRepo.EXPECT().FindByID(ctx, claimID).Return(nil, notFoundErr).Once()
 
 				err := service.Update(mockTx, claimID, itemID, cmd)
@@ -391,7 +391,7 @@ var _ = Describe("ClaimItemService", func() {
 					ID:     claimID,
 					Status: entities.ClaimStatusDraft,
 				}
-				notFoundErr := apperrors.New(404, apperrors.ErrorCodeClaimItemNotFound, errors.New("item not found"))
+				notFoundErr := apperrors2.New(404, apperrors2.ErrorCodeClaimItemNotFound, errors.New("item not found"))
 
 				mockClaimRepo.EXPECT().FindByID(ctx, claimID).Return(claim, nil).Once()
 				mockItemRepo.EXPECT().FindByID(ctx, itemID).Return(nil, notFoundErr).Once()
@@ -420,7 +420,7 @@ var _ = Describe("ClaimItemService", func() {
 
 				err := service.Update(mockTx, claimID, itemID, cmd)
 
-				ExpectAppError(err, apperrors.ErrorCodeClaimStatusNotAllowedUpdate)
+				ExpectAppError(err, apperrors2.ErrorCodeClaimStatusNotAllowedUpdate)
 			})
 		})
 
@@ -445,7 +445,7 @@ var _ = Describe("ClaimItemService", func() {
 
 				err := service.Update(mockTx, claimID, itemID, cmd)
 
-				ExpectAppError(err, apperrors.ErrorCodeInvalidClaimItemType)
+				ExpectAppError(err, apperrors2.ErrorCodeInvalidClaimItemType)
 			})
 		})
 
@@ -460,7 +460,7 @@ var _ = Describe("ClaimItemService", func() {
 					ClaimID: claimID,
 					Status:  entities.ClaimItemStatusPending,
 				}
-				dbErr := apperrors.New(500, apperrors.ErrorCodeDBOperation, errors.New("database error"))
+				dbErr := apperrors2.New(500, apperrors2.ErrorCodeDBOperation, errors.New("database error"))
 
 				mockClaimRepo.EXPECT().FindByID(ctx, claimID).Return(claim, nil).Once()
 				mockItemRepo.EXPECT().FindByID(ctx, itemID).Return(item, nil).Once()
@@ -484,7 +484,7 @@ var _ = Describe("ClaimItemService", func() {
 					ClaimID: claimID,
 					Status:  entities.ClaimItemStatusPending,
 				}
-				dbErr := apperrors.New(500, apperrors.ErrorCodeDBOperation, errors.New("sum error"))
+				dbErr := apperrors2.New(500, apperrors2.ErrorCodeDBOperation, errors.New("sum error"))
 
 				mockClaimRepo.EXPECT().FindByID(ctx, claimID).Return(claim, nil).Once()
 				mockItemRepo.EXPECT().FindByID(ctx, itemID).Return(item, nil).Once()
@@ -509,7 +509,7 @@ var _ = Describe("ClaimItemService", func() {
 					ClaimID: claimID,
 					Status:  entities.ClaimItemStatusPending,
 				}
-				dbErr := apperrors.New(500, apperrors.ErrorCodeDBOperation, errors.New("database error"))
+				dbErr := apperrors2.New(500, apperrors2.ErrorCodeDBOperation, errors.New("database error"))
 
 				mockClaimRepo.EXPECT().FindByID(ctx, claimID).Return(claim, nil).Once()
 				mockItemRepo.EXPECT().FindByID(ctx, itemID).Return(item, nil).Once()
@@ -566,13 +566,13 @@ var _ = Describe("ClaimItemService", func() {
 
 				err := service.HardDelete(mockTx, claimID, itemID)
 
-				ExpectAppError(err, apperrors.ErrorCodeClaimStatusNotAllowedDelete)
+				ExpectAppError(err, apperrors2.ErrorCodeClaimStatusNotAllowedDelete)
 			})
 		})
 
 		Context("when claim is not found", func() {
 			It("should return error", func() {
-				notFoundErr := apperrors.New(404, apperrors.ErrorCodeClaimNotFound, errors.New("claim not found"))
+				notFoundErr := apperrors2.New(404, apperrors2.ErrorCodeClaimNotFound, errors.New("claim not found"))
 				mockClaimRepo.EXPECT().FindByID(ctx, claimID).Return(nil, notFoundErr).Once()
 
 				err := service.HardDelete(mockTx, claimID, itemID)
@@ -588,7 +588,7 @@ var _ = Describe("ClaimItemService", func() {
 					ID:     claimID,
 					Status: entities.ClaimStatusDraft,
 				}
-				dbErr := apperrors.New(500, apperrors.ErrorCodeDBOperation, errors.New("database error"))
+				dbErr := apperrors2.New(500, apperrors2.ErrorCodeDBOperation, errors.New("database error"))
 
 				mockClaimRepo.EXPECT().FindByID(ctx, claimID).Return(claim, nil).Once()
 				mockItemRepo.EXPECT().HardDelete(mockTx, itemID).Return(dbErr).Once()
@@ -606,7 +606,7 @@ var _ = Describe("ClaimItemService", func() {
 					ID:     claimID,
 					Status: entities.ClaimStatusDraft,
 				}
-				dbErr := apperrors.New(500, apperrors.ErrorCodeDBOperation, errors.New("sum error"))
+				dbErr := apperrors2.New(500, apperrors2.ErrorCodeDBOperation, errors.New("sum error"))
 
 				mockClaimRepo.EXPECT().FindByID(ctx, claimID).Return(claim, nil).Once()
 				mockItemRepo.EXPECT().HardDelete(mockTx, itemID).Return(nil).Once()
@@ -625,7 +625,7 @@ var _ = Describe("ClaimItemService", func() {
 					ID:     claimID,
 					Status: entities.ClaimStatusDraft,
 				}
-				dbErr := apperrors.New(500, apperrors.ErrorCodeDBOperation, errors.New("database error"))
+				dbErr := apperrors2.New(500, apperrors2.ErrorCodeDBOperation, errors.New("database error"))
 
 				mockClaimRepo.EXPECT().FindByID(ctx, claimID).Return(claim, nil).Once()
 				mockItemRepo.EXPECT().HardDelete(mockTx, itemID).Return(nil).Once()
@@ -681,13 +681,13 @@ var _ = Describe("ClaimItemService", func() {
 
 				err := service.Approve(mockTx, claimID, itemID)
 
-				ExpectAppError(err, apperrors.ErrorCodeClaimStatusNotAllowedUpdate)
+				ExpectAppError(err, apperrors2.ErrorCodeClaimStatusNotAllowedUpdate)
 			})
 		})
 
 		Context("when claim is not found", func() {
 			It("should return error", func() {
-				notFoundErr := apperrors.New(404, apperrors.ErrorCodeClaimNotFound, errors.New("claim not found"))
+				notFoundErr := apperrors2.New(404, apperrors2.ErrorCodeClaimNotFound, errors.New("claim not found"))
 				mockClaimRepo.EXPECT().FindByID(ctx, claimID).Return(nil, notFoundErr).Once()
 
 				err := service.Approve(mockTx, claimID, itemID)
@@ -703,7 +703,7 @@ var _ = Describe("ClaimItemService", func() {
 					ID:     claimID,
 					Status: entities.ClaimStatusReviewing,
 				}
-				dbErr := apperrors.New(500, apperrors.ErrorCodeDBOperation, errors.New("database error"))
+				dbErr := apperrors2.New(500, apperrors2.ErrorCodeDBOperation, errors.New("database error"))
 
 				mockClaimRepo.EXPECT().FindByID(ctx, claimID).Return(claim, nil).Once()
 				mockItemRepo.EXPECT().UpdateStatus(mockTx, itemID, entities.ClaimStatusApproved).Return(dbErr).Once()
@@ -721,7 +721,7 @@ var _ = Describe("ClaimItemService", func() {
 					ID:     claimID,
 					Status: entities.ClaimStatusReviewing,
 				}
-				dbErr := apperrors.New(500, apperrors.ErrorCodeDBOperation, errors.New("sum error"))
+				dbErr := apperrors2.New(500, apperrors2.ErrorCodeDBOperation, errors.New("sum error"))
 
 				mockClaimRepo.EXPECT().FindByID(ctx, claimID).Return(claim, nil).Once()
 				mockItemRepo.EXPECT().UpdateStatus(mockTx, itemID, entities.ClaimStatusApproved).Return(nil).Once()
@@ -740,7 +740,7 @@ var _ = Describe("ClaimItemService", func() {
 					ID:     claimID,
 					Status: entities.ClaimStatusReviewing,
 				}
-				dbErr := apperrors.New(500, apperrors.ErrorCodeDBOperation, errors.New("database error"))
+				dbErr := apperrors2.New(500, apperrors2.ErrorCodeDBOperation, errors.New("database error"))
 
 				mockClaimRepo.EXPECT().FindByID(ctx, claimID).Return(claim, nil).Once()
 				mockItemRepo.EXPECT().UpdateStatus(mockTx, itemID, entities.ClaimStatusApproved).Return(nil).Once()
@@ -796,13 +796,13 @@ var _ = Describe("ClaimItemService", func() {
 
 				err := service.Reject(mockTx, claimID, itemID)
 
-				ExpectAppError(err, apperrors.ErrorCodeClaimStatusNotAllowedUpdate)
+				ExpectAppError(err, apperrors2.ErrorCodeClaimStatusNotAllowedUpdate)
 			})
 		})
 
 		Context("when claim is not found", func() {
 			It("should return error", func() {
-				notFoundErr := apperrors.New(404, apperrors.ErrorCodeClaimNotFound, errors.New("claim not found"))
+				notFoundErr := apperrors2.New(404, apperrors2.ErrorCodeClaimNotFound, errors.New("claim not found"))
 				mockClaimRepo.EXPECT().FindByID(ctx, claimID).Return(nil, notFoundErr).Once()
 
 				err := service.Reject(mockTx, claimID, itemID)
@@ -818,7 +818,7 @@ var _ = Describe("ClaimItemService", func() {
 					ID:     claimID,
 					Status: entities.ClaimStatusReviewing,
 				}
-				dbErr := apperrors.New(500, apperrors.ErrorCodeDBOperation, errors.New("database error"))
+				dbErr := apperrors2.New(500, apperrors2.ErrorCodeDBOperation, errors.New("database error"))
 
 				mockClaimRepo.EXPECT().FindByID(ctx, claimID).Return(claim, nil).Once()
 				mockItemRepo.EXPECT().UpdateStatus(mockTx, itemID, entities.ClaimStatusRejected).Return(dbErr).Once()
@@ -836,7 +836,7 @@ var _ = Describe("ClaimItemService", func() {
 					ID:     claimID,
 					Status: entities.ClaimStatusReviewing,
 				}
-				dbErr := apperrors.New(500, apperrors.ErrorCodeDBOperation, errors.New("sum error"))
+				dbErr := apperrors2.New(500, apperrors2.ErrorCodeDBOperation, errors.New("sum error"))
 
 				mockClaimRepo.EXPECT().FindByID(ctx, claimID).Return(claim, nil).Once()
 				mockItemRepo.EXPECT().UpdateStatus(mockTx, itemID, entities.ClaimStatusRejected).Return(nil).Once()
@@ -855,7 +855,7 @@ var _ = Describe("ClaimItemService", func() {
 					ID:     claimID,
 					Status: entities.ClaimStatusReviewing,
 				}
-				dbErr := apperrors.New(500, apperrors.ErrorCodeDBOperation, errors.New("database error"))
+				dbErr := apperrors2.New(500, apperrors2.ErrorCodeDBOperation, errors.New("database error"))
 
 				mockClaimRepo.EXPECT().FindByID(ctx, claimID).Return(claim, nil).Once()
 				mockItemRepo.EXPECT().UpdateStatus(mockTx, itemID, entities.ClaimStatusRejected).Return(nil).Once()

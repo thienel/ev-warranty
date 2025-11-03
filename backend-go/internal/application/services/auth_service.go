@@ -3,10 +3,10 @@ package services
 import (
 	"context"
 	"errors"
-	"ev-warranty-go/internal/apperrors"
 	"ev-warranty-go/internal/application/repositories"
 	"ev-warranty-go/internal/infrastructure/oauth/providers"
-	"ev-warranty-go/internal/security"
+	apperrors2 "ev-warranty-go/pkg/apperror"
+	"ev-warranty-go/pkg/security"
 	"strings"
 )
 
@@ -33,10 +33,10 @@ func (s *authService) Login(ctx context.Context, email, password string) (string
 	}
 
 	if !user.IsActive {
-		return "", "", apperrors.NewUserInactive()
+		return "", "", apperrors2.NewUserInactive()
 	}
 	if !security.VerifyPassword(password, user.PasswordHash) {
-		return "", "", apperrors.NewUserPasswordInvalid()
+		return "", "", apperrors2.NewUserPasswordInvalid()
 	}
 
 	accessToken, err := s.tokenService.GenerateAccessToken(user.ID)
@@ -62,8 +62,8 @@ func (s *authService) Logout(ctx context.Context, token string) error {
 func (s *authService) HandleOAuthUser(ctx context.Context, userInfo *providers.UserInfo) (string, string, error) {
 	user, err := s.userRepo.FindByOAuth(ctx, userInfo.Provider, userInfo.ProviderID)
 	if err != nil {
-		var appErr *apperrors.AppError
-		if errors.As(err, &appErr) && appErr.ErrorCode == apperrors.ErrorCodeUserNotFound {
+		var appErr *apperrors2.AppError
+		if errors.As(err, &appErr) && appErr.ErrorCode == apperrors2.ErrorCodeUserNotFound {
 			user, err = s.userRepo.FindByEmail(ctx, userInfo.Email)
 			if err != nil {
 				return "", "", err

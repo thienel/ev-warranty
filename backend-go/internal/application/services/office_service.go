@@ -2,9 +2,9 @@ package services
 
 import (
 	"context"
-	"ev-warranty-go/internal/apperrors"
 	"ev-warranty-go/internal/application/repositories"
 	"ev-warranty-go/internal/domain/entities"
+	"ev-warranty-go/pkg/apperror"
 
 	"github.com/google/uuid"
 )
@@ -41,7 +41,7 @@ func NewOfficeService(repo repositories.OfficeRepository) OfficeService {
 
 func (s *officeService) Create(ctx context.Context, cmd *CreateOfficeCommand) (*entities.Office, error) {
 	if !entities.IsValidOfficeType(cmd.OfficeType) {
-		return nil, apperrors.NewInvalidOfficeType()
+		return nil, apperror.NewInvalidOfficeType()
 	}
 
 	office := entities.NewOffice(cmd.OfficeName, cmd.OfficeType, cmd.Address, cmd.IsActive)
@@ -67,7 +67,7 @@ func (s *officeService) Update(ctx context.Context, id uuid.UUID, cmd *UpdateOff
 	}
 
 	if !entities.IsValidOfficeType(cmd.OfficeType) {
-		return apperrors.NewInvalidOfficeType()
+		return apperror.NewInvalidOfficeType()
 	}
 	office.OfficeName = cmd.OfficeName
 	office.OfficeType = cmd.OfficeType

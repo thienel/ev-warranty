@@ -2,11 +2,11 @@ package handler
 
 import (
 	"context"
-	"ev-warranty-go/internal/apperrors"
 	"ev-warranty-go/internal/application"
 	"ev-warranty-go/internal/application/services"
 	"ev-warranty-go/internal/domain/entities"
 	"ev-warranty-go/internal/interface/api/dto"
+	"ev-warranty-go/pkg/apperror"
 	"ev-warranty-go/pkg/logger"
 	"net/http"
 
@@ -66,7 +66,7 @@ func (h *claimHandler) GetByID(c *gin.Context) {
 	idParam := c.Param("id")
 	id, err := uuid.Parse(idParam)
 	if err != nil {
-		handleError(h.log, c, apperrors.NewInvalidUUID())
+		handleError(h.log, c, apperror.NewInvalidUUID())
 		return
 	}
 
@@ -125,7 +125,7 @@ func (h *claimHandler) Create(c *gin.Context) {
 
 	var req dto.CreateClaimRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		handleError(h.log, c, apperrors.NewInvalidJsonRequest())
+		handleError(h.log, c, apperror.NewInvalidJsonRequest())
 		return
 	}
 
@@ -182,13 +182,13 @@ func (h *claimHandler) Update(c *gin.Context) {
 	idParam := c.Param("id")
 	id, err := uuid.Parse(idParam)
 	if err != nil {
-		handleError(h.log, c, apperrors.NewInvalidUUID())
+		handleError(h.log, c, apperror.NewInvalidUUID())
 		return
 	}
 
 	var req dto.UpdateClaimRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		handleError(h.log, c, apperrors.NewInvalidJsonRequest())
+		handleError(h.log, c, apperror.NewInvalidJsonRequest())
 		return
 	}
 
@@ -232,7 +232,7 @@ func (h *claimHandler) Delete(c *gin.Context) {
 	idParam := c.Param("id")
 	id, err := uuid.Parse(idParam)
 	if err != nil {
-		handleError(h.log, c, apperrors.NewInvalidUUID())
+		handleError(h.log, c, apperror.NewInvalidUUID())
 		return
 	}
 
@@ -276,7 +276,7 @@ func (h *claimHandler) Submit(c *gin.Context) {
 	idParam := c.Param("id")
 	id, err := uuid.Parse(idParam)
 	if err != nil {
-		handleError(h.log, c, apperrors.NewInvalidUUID())
+		handleError(h.log, c, apperror.NewInvalidUUID())
 		return
 	}
 
@@ -322,7 +322,7 @@ func (h *claimHandler) Review(c *gin.Context) {
 	idParam := c.Param("id")
 	id, err := uuid.Parse(idParam)
 	if err != nil {
-		handleError(h.log, c, apperrors.NewInvalidUUID())
+		handleError(h.log, c, apperror.NewInvalidUUID())
 		return
 	}
 
@@ -368,7 +368,7 @@ func (h *claimHandler) RequestInformation(c *gin.Context) {
 	idParam := c.Param("id")
 	id, err := uuid.Parse(idParam)
 	if err != nil {
-		handleError(h.log, c, apperrors.NewInvalidUUID())
+		handleError(h.log, c, apperror.NewInvalidUUID())
 		return
 	}
 
@@ -414,7 +414,7 @@ func (h *claimHandler) Cancel(c *gin.Context) {
 	idParam := c.Param("id")
 	id, err := uuid.Parse(idParam)
 	if err != nil {
-		handleError(h.log, c, apperrors.NewInvalidUUID())
+		handleError(h.log, c, apperror.NewInvalidUUID())
 		return
 	}
 
@@ -460,7 +460,7 @@ func (h *claimHandler) Complete(c *gin.Context) {
 	idParam := c.Param("id")
 	id, err := uuid.Parse(idParam)
 	if err != nil {
-		handleError(h.log, c, apperrors.NewInvalidUUID())
+		handleError(h.log, c, apperror.NewInvalidUUID())
 		return
 	}
 
@@ -503,7 +503,7 @@ func (h *claimHandler) History(c *gin.Context) {
 	idParam := c.Param("id")
 	id, err := uuid.Parse(idParam)
 	if err != nil {
-		handleError(h.log, c, apperrors.NewInvalidUUID())
+		handleError(h.log, c, apperror.NewInvalidUUID())
 		return
 	}
 

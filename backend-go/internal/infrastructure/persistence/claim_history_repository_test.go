@@ -3,6 +3,7 @@ package persistence_test
 import (
 	"context"
 	"errors"
+	"ev-warranty-go/pkg/apperror"
 	"ev-warranty-go/pkg/mocks"
 	"regexp"
 	"time"
@@ -13,7 +14,6 @@ import (
 	. "github.com/onsi/gomega"
 	"gorm.io/gorm"
 
-	"ev-warranty-go/internal/apperrors"
 	"ev-warranty-go/internal/application/repositories"
 	"ev-warranty-go/internal/domain/entities"
 	"ev-warranty-go/internal/infrastructure/persistence"
@@ -64,7 +64,7 @@ var _ = Describe("ClaimHistoryRepository", func() {
 
 				err := repository.Create(mockTx, history)
 
-				ExpectAppError(err, apperrors.ErrorCodeDuplicateKey)
+				ExpectAppError(err, apperror.ErrorCodeDuplicateKey)
 			})
 		})
 
@@ -76,7 +76,7 @@ var _ = Describe("ClaimHistoryRepository", func() {
 
 				err := repository.Create(mockTx, history)
 
-				ExpectAppError(err, apperrors.ErrorCodeDBOperation)
+				ExpectAppError(err, apperror.ErrorCodeDBOperation)
 			})
 		})
 
@@ -139,7 +139,7 @@ var _ = Describe("ClaimHistoryRepository", func() {
 
 				err := repository.SoftDeleteByClaimID(mockTx, claimID)
 
-				ExpectAppError(err, apperrors.ErrorCodeDBOperation)
+				ExpectAppError(err, apperror.ErrorCodeDBOperation)
 			})
 		})
 	})
@@ -205,7 +205,7 @@ var _ = Describe("ClaimHistoryRepository", func() {
 				histories, err := repository.FindByClaimID(ctx, claimID)
 
 				Expect(histories).To(BeNil())
-				ExpectAppError(err, apperrors.ErrorCodeDBOperation)
+				ExpectAppError(err, apperror.ErrorCodeDBOperation)
 			})
 		})
 
@@ -296,7 +296,7 @@ var _ = Describe("ClaimHistoryRepository", func() {
 				history, err := repository.FindLatestByClaimID(ctx, claimID)
 
 				Expect(history).To(BeNil())
-				ExpectAppError(err, apperrors.ErrorCodeClaimHistoryNotFound)
+				ExpectAppError(err, apperror.ErrorCodeClaimHistoryNotFound)
 			})
 		})
 
@@ -309,7 +309,7 @@ var _ = Describe("ClaimHistoryRepository", func() {
 				history, err := repository.FindLatestByClaimID(ctx, claimID)
 
 				Expect(history).To(BeNil())
-				ExpectAppError(err, apperrors.ErrorCodeDBOperation)
+				ExpectAppError(err, apperror.ErrorCodeDBOperation)
 			})
 		})
 	})
@@ -379,7 +379,7 @@ var _ = Describe("ClaimHistoryRepository", func() {
 				histories, err := repository.FindByDateRange(ctx, claimID, startDate, endDate)
 
 				Expect(histories).To(BeNil())
-				ExpectAppError(err, apperrors.ErrorCodeDBOperation)
+				ExpectAppError(err, apperror.ErrorCodeDBOperation)
 			})
 		})
 

@@ -5,6 +5,7 @@ import (
 	"crypto/rand"
 	"crypto/rsa"
 	"errors"
+	apperrors2 "ev-warranty-go/pkg/apperror"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -13,7 +14,6 @@ import (
 	. "github.com/onsi/gomega"
 	"github.com/stretchr/testify/mock"
 
-	"ev-warranty-go/internal/apperrors"
 	"ev-warranty-go/internal/application/services"
 	"ev-warranty-go/internal/domain/entities"
 	"ev-warranty-go/pkg/mocks"
@@ -94,13 +94,13 @@ var _ = Describe("TokenService", func() {
 
 		Context("when repository create fails", func() {
 			It("should return FailedGenerateRefreshToken error", func() {
-				dbErr := apperrors.New(500, apperrors.ErrorCodeDBOperation, errors.New("database error"))
+				dbErr := apperrors2.New(500, apperrors2.ErrorCodeDBOperation, errors.New("database error"))
 				mockRefreshTokenRepo.EXPECT().Create(ctx, MatchRefreshToken(userID)).Return(dbErr).Once()
 
 				token, err := service.GenerateRefreshToken(ctx, userID)
 
 				Expect(token).To(BeEmpty())
-				ExpectAppError(err, apperrors.ErrorCodeFailedGenerateRefreshToken)
+				ExpectAppError(err, apperrors2.ErrorCodeFailedGenerateRefreshToken)
 			})
 		})
 	})
@@ -130,7 +130,7 @@ var _ = Describe("TokenService", func() {
 				claims, err := service.ValidateAccessToken(ctx, "invalid.token.here")
 
 				Expect(claims).To(BeNil())
-				ExpectAppError(err, apperrors.ErrorCodeInvalidAccessToken)
+				ExpectAppError(err, apperrors2.ErrorCodeInvalidAccessToken)
 			})
 		})
 
@@ -143,7 +143,7 @@ var _ = Describe("TokenService", func() {
 				claims, err := service.ValidateAccessToken(ctx, token)
 
 				Expect(claims).To(BeNil())
-				ExpectAppError(err, apperrors.ErrorCodeExpiredAccessToken)
+				ExpectAppError(err, apperrors2.ErrorCodeExpiredAccessToken)
 			})
 		})
 
@@ -164,7 +164,7 @@ var _ = Describe("TokenService", func() {
 				validatedClaims, err := service.ValidateAccessToken(ctx, tokenString)
 
 				Expect(validatedClaims).To(BeNil())
-				ExpectAppError(err, apperrors.ErrorCodeInvalidAccessToken)
+				ExpectAppError(err, apperrors2.ErrorCodeInvalidAccessToken)
 			})
 		})
 
@@ -204,7 +204,7 @@ var _ = Describe("TokenService", func() {
 				validatedClaims, err := service.ValidateAccessToken(ctx, tokenString)
 
 				Expect(validatedClaims).To(BeNil())
-				ExpectAppError(err, apperrors.ErrorCodeInvalidAccessToken)
+				ExpectAppError(err, apperrors2.ErrorCodeInvalidAccessToken)
 			})
 		})
 	})
@@ -242,13 +242,13 @@ var _ = Describe("TokenService", func() {
 
 		Context("when refresh token is not found", func() {
 			It("should return InvalidRefreshToken error", func() {
-				dbErr := apperrors.New(404, apperrors.ErrorCodeRefreshTokenNotFound, errors.New("not found"))
+				dbErr := apperrors2.New(404, apperrors2.ErrorCodeRefreshTokenNotFound, errors.New("not found"))
 				mockRefreshTokenRepo.EXPECT().Find(ctx, MatchHashedToken()).Return(nil, dbErr).Once()
 
 				token, err := service.ValidateRefreshToken(ctx, refreshToken)
 
 				Expect(token).To(BeNil())
-				ExpectAppError(err, apperrors.ErrorCodeInvalidRefreshToken)
+				ExpectAppError(err, apperrors2.ErrorCodeInvalidRefreshToken)
 			})
 		})
 
@@ -267,7 +267,7 @@ var _ = Describe("TokenService", func() {
 				token, err := service.ValidateRefreshToken(ctx, refreshToken)
 
 				Expect(token).To(BeNil())
-				ExpectAppError(err, apperrors.ErrorCodeExpiredRefreshToken)
+				ExpectAppError(err, apperrors2.ErrorCodeExpiredRefreshToken)
 			})
 		})
 
@@ -286,7 +286,7 @@ var _ = Describe("TokenService", func() {
 				token, err := service.ValidateRefreshToken(ctx, refreshToken)
 
 				Expect(token).To(BeNil())
-				ExpectAppError(err, apperrors.ErrorCodeRevokedRefreshToken)
+				ExpectAppError(err, apperrors2.ErrorCodeRevokedRefreshToken)
 			})
 		})
 	})
@@ -310,7 +310,7 @@ var _ = Describe("TokenService", func() {
 
 		Context("when repository revoke fails", func() {
 			It("should return the error", func() {
-				dbErr := apperrors.New(500, apperrors.ErrorCodeDBOperation, errors.New("database error"))
+				dbErr := apperrors2.New(500, apperrors2.ErrorCodeDBOperation, errors.New("database error"))
 				mockRefreshTokenRepo.EXPECT().Revoke(ctx, MatchHashedToken()).Return(dbErr).Once()
 
 				err := service.RevokeRefreshToken(ctx, refreshToken)
@@ -357,13 +357,13 @@ var _ = Describe("TokenService", func() {
 
 		Context("when refresh token is invalid", func() {
 			It("should return InvalidRefreshToken error", func() {
-				dbErr := apperrors.New(404, apperrors.ErrorCodeRefreshTokenNotFound, errors.New("not found"))
+				dbErr := apperrors2.New(404, apperrors2.ErrorCodeRefreshTokenNotFound, errors.New("not found"))
 				mockRefreshTokenRepo.EXPECT().Find(ctx, MatchHashedToken()).Return(nil, dbErr).Once()
 
 				accessToken, err := service.RefreshAccessToken(ctx, refreshToken)
 
 				Expect(accessToken).To(BeEmpty())
-				ExpectAppError(err, apperrors.ErrorCodeInvalidRefreshToken)
+				ExpectAppError(err, apperrors2.ErrorCodeInvalidRefreshToken)
 			})
 		})
 
@@ -382,7 +382,7 @@ var _ = Describe("TokenService", func() {
 				accessToken, err := service.RefreshAccessToken(ctx, refreshToken)
 
 				Expect(accessToken).To(BeEmpty())
-				ExpectAppError(err, apperrors.ErrorCodeExpiredRefreshToken)
+				ExpectAppError(err, apperrors2.ErrorCodeExpiredRefreshToken)
 			})
 		})
 	})

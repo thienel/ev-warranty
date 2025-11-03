@@ -2,11 +2,11 @@ package services
 
 import (
 	"context"
-	"ev-warranty-go/internal/apperrors"
 	"ev-warranty-go/internal/application"
 	"ev-warranty-go/internal/application/repositories"
 	"ev-warranty-go/internal/domain/entities"
 	"ev-warranty-go/internal/infrastructure/cloudinary"
+	"ev-warranty-go/pkg/apperror"
 	"ev-warranty-go/pkg/logger"
 	"mime/multipart"
 	"net/http"
@@ -70,7 +70,7 @@ func (s *claimAttachmentService) Create(tx application.Tx, claimID uuid.UUID, fi
 
 	attachType := cloudinary.DetermineResourceType(mimeType)
 	if !entities.IsValidAttachmentType(attachType) {
-		return nil, apperrors.NewInvalidAttachmentType()
+		return nil, apperror.NewInvalidAttachmentType()
 	}
 	attachURL, err := s.cloudService.UploadFile(tx.GetCtx(), file, attachType)
 	if err != nil {
@@ -93,7 +93,7 @@ func (s *claimAttachmentService) HardDelete(tx application.Tx, claimID, attachme
 	}
 
 	if claim.Status != entities.ClaimStatusDraft {
-		return apperrors.NewNotAllowDeleteClaim()
+		return apperror.NewNotAllowDeleteClaim()
 	}
 	attach, err := s.attachRepo.FindByID(tx.GetCtx(), attachmentID)
 	if err != nil {
@@ -114,12 +114,12 @@ func GetMimeType(file multipart.File) (string, error) {
 	buffer := make([]byte, 512)
 	_, err := file.Read(buffer)
 	if err != nil {
-		return "", apperrors.NewInternalServerError(err)
+		return "", apperror.NewInternalServerError(err)
 	}
 
 	_, err = file.Seek(0, 0)
 	if err != nil {
-		return "", apperrors.NewInternalServerError(err)
+		return "", apperror.NewInternalServerError(err)
 	}
 
 	mimeType := http.DetectContentType(buffer)

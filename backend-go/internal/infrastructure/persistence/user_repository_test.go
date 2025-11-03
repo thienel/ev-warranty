@@ -3,6 +3,7 @@ package persistence_test
 import (
 	"context"
 	"errors"
+	"ev-warranty-go/pkg/apperror"
 	"regexp"
 	"time"
 
@@ -12,7 +13,6 @@ import (
 	. "github.com/onsi/gomega"
 	"gorm.io/gorm"
 
-	"ev-warranty-go/internal/apperrors"
 	"ev-warranty-go/internal/application/repositories"
 	"ev-warranty-go/internal/domain/entities"
 	"ev-warranty-go/internal/infrastructure/persistence"
@@ -59,7 +59,7 @@ var _ = Describe("UserRepository", func() {
 
 				err := repository.Create(ctx, user)
 
-				ExpectAppError(err, apperrors.ErrorCodeDuplicateKey)
+				ExpectAppError(err, apperror.ErrorCodeDuplicateKey)
 			})
 		})
 
@@ -69,7 +69,7 @@ var _ = Describe("UserRepository", func() {
 
 				err := repository.Create(ctx, user)
 
-				ExpectAppError(err, apperrors.ErrorCodeDBOperation)
+				ExpectAppError(err, apperror.ErrorCodeDBOperation)
 			})
 		})
 	})
@@ -116,7 +116,7 @@ var _ = Describe("UserRepository", func() {
 				user, err := repository.FindByID(ctx, userID)
 
 				Expect(user).To(BeNil())
-				ExpectAppError(err, apperrors.ErrorCodeUserNotFound)
+				ExpectAppError(err, apperror.ErrorCodeUserNotFound)
 			})
 		})
 
@@ -127,7 +127,7 @@ var _ = Describe("UserRepository", func() {
 				user, err := repository.FindByID(ctx, userID)
 
 				Expect(user).To(BeNil())
-				ExpectAppError(err, apperrors.ErrorCodeDBOperation)
+				ExpectAppError(err, apperror.ErrorCodeDBOperation)
 			})
 		})
 	})
@@ -174,7 +174,7 @@ var _ = Describe("UserRepository", func() {
 				user, err := repository.FindByEmail(ctx, email)
 
 				Expect(user).To(BeNil())
-				ExpectAppError(err, apperrors.ErrorCodeUserNotFound)
+				ExpectAppError(err, apperror.ErrorCodeUserNotFound)
 			})
 		})
 
@@ -187,7 +187,7 @@ var _ = Describe("UserRepository", func() {
 				user, err := repository.FindByEmail(ctx, email)
 
 				Expect(user).To(BeNil())
-				ExpectAppError(err, apperrors.ErrorCodeDBOperation)
+				ExpectAppError(err, apperror.ErrorCodeDBOperation)
 			})
 		})
 
@@ -270,7 +270,7 @@ var _ = Describe("UserRepository", func() {
 				users, err := repository.FindAll(ctx)
 
 				Expect(users).To(BeNil())
-				ExpectAppError(err, apperrors.ErrorCodeDBOperation)
+				ExpectAppError(err, apperror.ErrorCodeDBOperation)
 			})
 		})
 	})
@@ -300,7 +300,7 @@ var _ = Describe("UserRepository", func() {
 
 				err := repository.Update(ctx, user)
 
-				ExpectAppError(err, apperrors.ErrorCodeDBOperation)
+				ExpectAppError(err, apperror.ErrorCodeDBOperation)
 			})
 		})
 
@@ -348,7 +348,7 @@ var _ = Describe("UserRepository", func() {
 
 				err := repository.SoftDelete(ctx, userID)
 
-				ExpectAppError(err, apperrors.ErrorCodeDBOperation)
+				ExpectAppError(err, apperror.ErrorCodeDBOperation)
 			})
 		})
 	})
@@ -396,7 +396,7 @@ var _ = Describe("UserRepository", func() {
 				user, err := repository.FindByOAuth(ctx, provider, oauthID)
 
 				Expect(user).To(BeNil())
-				ExpectAppError(err, apperrors.ErrorCodeUserNotFound)
+				ExpectAppError(err, apperror.ErrorCodeUserNotFound)
 			})
 		})
 
@@ -409,7 +409,7 @@ var _ = Describe("UserRepository", func() {
 				user, err := repository.FindByOAuth(ctx, provider, oauthID)
 
 				Expect(user).To(BeNil())
-				ExpectAppError(err, apperrors.ErrorCodeDBOperation)
+				ExpectAppError(err, apperror.ErrorCodeDBOperation)
 			})
 		})
 
@@ -422,7 +422,7 @@ var _ = Describe("UserRepository", func() {
 				user, err := repository.FindByOAuth(ctx, "", oauthID)
 
 				Expect(user).To(BeNil())
-				ExpectAppError(err, apperrors.ErrorCodeUserNotFound)
+				ExpectAppError(err, apperror.ErrorCodeUserNotFound)
 			})
 
 			It("should handle empty oauth_id", func() {
@@ -433,7 +433,7 @@ var _ = Describe("UserRepository", func() {
 				user, err := repository.FindByOAuth(ctx, provider, "")
 
 				Expect(user).To(BeNil())
-				ExpectAppError(err, apperrors.ErrorCodeUserNotFound)
+				ExpectAppError(err, apperror.ErrorCodeUserNotFound)
 			})
 		})
 	})

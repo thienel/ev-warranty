@@ -2,9 +2,9 @@ package handler
 
 import (
 	"context"
-	"ev-warranty-go/internal/apperrors"
 	"ev-warranty-go/internal/application/services"
 	"ev-warranty-go/internal/interface/api/dto"
+	"ev-warranty-go/pkg/apperror"
 	"ev-warranty-go/pkg/logger"
 	"net/http"
 	"strings"
@@ -58,7 +58,7 @@ func (h *authHandler) Login(c *gin.Context) {
 
 	var req dto.LoginRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		handleError(h.log, c, apperrors.NewInvalidJsonRequest())
+		handleError(h.log, c, apperror.NewInvalidJsonRequest())
 		return
 	}
 
@@ -111,7 +111,7 @@ func (h *authHandler) Logout(c *gin.Context) {
 
 	token, err := c.Cookie("refreshToken")
 	if err != nil {
-		err = apperrors.NewRefreshTokenNotFound()
+		err = apperror.NewRefreshTokenNotFound()
 		handleError(h.log, c, err)
 		return
 	}
@@ -146,7 +146,7 @@ func (h *authHandler) RefreshToken(c *gin.Context) {
 
 	refreshToken, err := c.Cookie("refreshToken")
 	if err != nil {
-		err = apperrors.NewRefreshTokenNotFound()
+		err = apperror.NewRefreshTokenNotFound()
 		handleError(h.log, c, err)
 		return
 	}
@@ -183,7 +183,7 @@ func (h *authHandler) ValidateToken(c *gin.Context) {
 
 	token := h.extractBearerToken(c)
 	if token == "" {
-		handleError(h.log, c, apperrors.NewInvalidAuthHeader())
+		handleError(h.log, c, apperror.NewInvalidAuthHeader())
 		return
 	}
 
@@ -195,7 +195,7 @@ func (h *authHandler) ValidateToken(c *gin.Context) {
 
 	userID, err := uuid.Parse(claims.UserID)
 	if err != nil {
-		handleError(h.log, c, apperrors.NewInvalidUserID())
+		handleError(h.log, c, apperror.NewInvalidUserID())
 		return
 	}
 
@@ -232,7 +232,7 @@ func (h *authHandler) extractUserIDFromToken(ctx context.Context, accessToken st
 
 	userID, err := uuid.Parse(claims.UserID)
 	if err != nil {
-		return uuid.Nil, apperrors.NewInvalidUserID()
+		return uuid.Nil, apperror.NewInvalidUserID()
 	}
 
 	return userID, nil

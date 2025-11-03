@@ -2,8 +2,8 @@ package database
 
 import (
 	"context"
-	"ev-warranty-go/internal/apperrors"
 	"ev-warranty-go/internal/application"
+	"ev-warranty-go/pkg/apperror"
 	"ev-warranty-go/pkg/logger"
 	"log"
 
@@ -59,7 +59,7 @@ func (m *txManager) Do(ctx context.Context, fn func(tx application.Tx) error) er
 
 	if err := t.Commit(); err != nil {
 		log.Printf("[TX COMMIT FAILED] commit error: %v", err)
-		return apperrors.NewInternalServerError(err)
+		return apperror.NewInternalServerError(err)
 	}
 
 	return nil
