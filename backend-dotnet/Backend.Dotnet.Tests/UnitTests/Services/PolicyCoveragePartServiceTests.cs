@@ -1,5 +1,6 @@
 ﻿using Backend.Dotnet.Application.Interfaces.Data;
 using Backend.Dotnet.Application.Services;
+using Backend.Dotnet.Domain.Abstractions;
 using Backend.Dotnet.Domain.Entities;
 using System;
 using System.Collections.Generic;
@@ -31,13 +32,16 @@ namespace Backend.Dotnet.Tests.UnitTests.Services
             _unitOfWork.Setup(x => x.PartCategories).Returns(_categoryRepo.Object);
             _sut = new PolicyCoveragePartService(_unitOfWork.Object);
         }
-        /*
+        
         [Test]
         public async Task CreateAsync_ValidData_ReturnsSuccess()
         {
             // Arrange
-            var policyId = Guid.NewGuid();
-            var categoryId = Guid.NewGuid();
+            var policy = new WarrantyPolicy("Test Policy", 12, 10000, "Terms");
+            var category = new PartCategory("Test Category", "Description");
+
+            var policyId = policy.Id;
+            var categoryId = category.Id;
             var request = new CreatePolicyCoveragePartRequest
             {
                 PolicyId = policyId,
@@ -45,8 +49,6 @@ namespace Backend.Dotnet.Tests.UnitTests.Services
                 CoverageConditions = "Test conditions"
             };
 
-            var policy = new WarrantyPolicy("Test Policy", 12, 10000, "Terms");
-            var category = new PartCategory("Test Category", "Description");
             var coverage = new PolicyCoveragePart(policyId, categoryId, "Test conditions");
 
             _policyRepo.Setup(x => x.GetByIdAsync(policyId)).ReturnsAsync(policy);
@@ -64,7 +66,7 @@ namespace Backend.Dotnet.Tests.UnitTests.Services
             _coverageRepo.Verify(x => x.AddAsync(It.IsAny<PolicyCoveragePart>()), Times.Once);
             _unitOfWork.Verify(x => x.SaveChangesAsync(), Times.Once);
         }
-        */
+        
         [Test]
         public async Task CreateAsync_PolicyNotFound_ReturnsError()
         {
@@ -141,22 +143,22 @@ namespace Backend.Dotnet.Tests.UnitTests.Services
             _coverageRepo.Verify(x => x.AddAsync(It.IsAny<PolicyCoveragePart>()), Times.Never);
             _unitOfWork.Verify(x => x.SaveChangesAsync(), Times.Never);
         }
-        /*
+        
         [Test]
         public async Task CreateAsync_BusinessRuleViolation_ReturnsError()
         {
             // Arrange
+            var policy = new WarrantyPolicy("Test Policy", 12, 10000, "Terms");
+            var category = new PartCategory("Test Category", "Description");
+            //policy.AddCoveragePart(new PolicyCoveragePart(policy.Id, category.Id, null));
+
             var policyId = Guid.NewGuid();
-            var categoryId = Guid.NewGuid();
+            var categoryId = category.Id;
             var request = new CreatePolicyCoveragePartRequest
             {
                 PolicyId = policyId,
                 PartCategoryId = categoryId
             };
-
-            var policy = new WarrantyPolicy("Test Policy", 12, 10000, "Terms");
-            policy.Activate();
-            var category = new PartCategory("Test Category", "Description");
 
             _policyRepo.Setup(x => x.GetByIdAsync(policyId)).ReturnsAsync(policy);
             _categoryRepo.Setup(x => x.GetByIdAsync(categoryId)).ReturnsAsync(category);
@@ -170,7 +172,7 @@ namespace Backend.Dotnet.Tests.UnitTests.Services
             result.ErrorCode.Should().NotBeNullOrEmpty();
             _unitOfWork.Verify(x => x.SaveChangesAsync(), Times.Never);
         }
-        */
+        
         /*
         [Test]
         public async Task DeleteAsync_PolicyNotEditable_ReturnsError()

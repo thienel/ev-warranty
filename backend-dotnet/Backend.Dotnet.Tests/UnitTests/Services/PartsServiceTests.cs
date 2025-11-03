@@ -30,23 +30,24 @@ namespace Backend.Dotnet.Tests.UnitTests.Services
 
             _sut = new PartService(_unitOfWork.Object);
         }
-        /*
+        
         [Test]
         public async Task CreateAsync_ValidData_ReturnsSuccess()
         {
             // Arrange
+            var parentId = Guid.NewGuid();
             var request = new CreatePartRequest
             {
-                SerialNumber = "HEATC3WAYV1SVC000",
+                SerialNumber = "HEATC3WAYV1SVC0001",
                 PartName = "Heat Gird",
                 UnitPrice = 80000,
-                CategoryId = Guid.NewGuid(),
+                CategoryId = parentId,
                 OfficeLocationId = Guid.NewGuid()
             };
 
             _partRepo.Setup(x => x.SerialNumberExistsAsync(It.IsAny<string>(), null))
                 .ReturnsAsync(false);
-            _categoryRepo.Setup(x => x.GetByIdAsync(Guid.NewGuid()))
+            _categoryRepo.Setup(x => x.GetByIdAsync(parentId))
                 .ReturnsAsync(new PartCategory("Cooling"));
 
             // Act
@@ -54,10 +55,10 @@ namespace Backend.Dotnet.Tests.UnitTests.Services
 
             // Assert
             result.IsSuccess.Should().BeTrue();
-            result.Data.SerialNumber.Should().Be("BAT-001");
+            result.Data.SerialNumber.Should().Be("HEATC3WAYV1SVC0001");
             _partRepo.Verify(x => x.AddAsync(It.IsAny<Part>()), Times.Once);
         }
-        */
+
         [Test]
         public async Task CreateAsync_DuplicateSerialNumber_ReturnsError()
         {
