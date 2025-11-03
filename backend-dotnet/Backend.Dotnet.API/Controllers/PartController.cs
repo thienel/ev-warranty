@@ -82,6 +82,19 @@ namespace Backend.Dotnet.API.Controllers
 
             return Ok(result);
         }
+        
+        
+        [HttpGet]
+        [ProducesResponseType(typeof(BaseResponseDto<PartResponse>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(BaseResponseDto), StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> ReserveByOfficeIdAndCategoryId(Guid officeId, Guid categoryId)
+        {
+            var result = await _partService.ReserveByOfficeIdAndCategoryIdAsync(officeId, categoryId);
+            if (!result.IsSuccess)
+                return NotFound(result);
+
+            return Ok(result);
+        }
 
         [HttpGet("{id}/details")]
         [ProducesResponseType(typeof(BaseResponseDto<PartWithDetailsResponse>), StatusCodes.Status200OK)]
