@@ -1,4 +1,4 @@
-package services_test
+package service_test
 
 import (
 	"context"
@@ -10,30 +10,30 @@ import (
 	. "github.com/onsi/gomega"
 	"github.com/stretchr/testify/mock"
 
-	"ev-warranty-go/internal/application/services"
+	"ev-warranty-go/internal/application/service"
 	"ev-warranty-go/internal/domain/entity"
 	"ev-warranty-go/pkg/mocks"
 )
 
 var _ = Describe("OfficeService", func() {
 	var (
-		mockRepo *mocks.OfficeRepository
-		service  services.OfficeService
-		ctx      context.Context
+		mockRepo      *mocks.OfficeRepository
+		officeService service.OfficeService
+		ctx           context.Context
 	)
 
 	BeforeEach(func() {
 		mockRepo = mocks.NewOfficeRepository(GinkgoT())
-		service = services.NewOfficeService(mockRepo)
+		officeService = service.NewOfficeService(mockRepo)
 		ctx = context.Background()
 	})
 
 	Describe("Create", func() {
-		var cmd *services.CreateOfficeCommand
+		var cmd *service.CreateOfficeCommand
 
 		Context("when office is created successfully with valid office type EVM", func() {
 			BeforeEach(func() {
-				cmd = &services.CreateOfficeCommand{
+				cmd = &service.CreateOfficeCommand{
 					OfficeName: "Test Office",
 					OfficeType: entity.OfficeTypeEVM,
 					Address:    "123 Test St",
@@ -44,7 +44,7 @@ var _ = Describe("OfficeService", func() {
 			It("should return created office", func() {
 				mockRepo.EXPECT().Create(ctx, MatchOffice(cmd)).Return(nil).Once()
 
-				office, err := service.Create(ctx, cmd)
+				office, err := officeService.Create(ctx, cmd)
 
 				Expect(err).NotTo(HaveOccurred())
 				Expect(office).NotTo(BeNil())
@@ -58,7 +58,7 @@ var _ = Describe("OfficeService", func() {
 
 		Context("when office is created successfully with valid office type SC", func() {
 			BeforeEach(func() {
-				cmd = &services.CreateOfficeCommand{
+				cmd = &service.CreateOfficeCommand{
 					OfficeName: "Service Center",
 					OfficeType: entity.OfficeTypeSC,
 					Address:    "456 Main St",
@@ -69,7 +69,7 @@ var _ = Describe("OfficeService", func() {
 			It("should return created office", func() {
 				mockRepo.EXPECT().Create(ctx, MatchOffice(cmd)).Return(nil).Once()
 
-				office, err := service.Create(ctx, cmd)
+				office, err := officeService.Create(ctx, cmd)
 
 				Expect(err).NotTo(HaveOccurred())
 				Expect(office).NotTo(BeNil())
@@ -82,7 +82,7 @@ var _ = Describe("OfficeService", func() {
 
 		Context("when office type is invalid", func() {
 			BeforeEach(func() {
-				cmd = &services.CreateOfficeCommand{
+				cmd = &service.CreateOfficeCommand{
 					OfficeName: "Test Office",
 					OfficeType: "INVALID_TYPE",
 					Address:    "123 Test St",
@@ -91,7 +91,7 @@ var _ = Describe("OfficeService", func() {
 			})
 
 			It("should return InvalidOfficeType error", func() {
-				office, err := service.Create(ctx, cmd)
+				office, err := officeService.Create(ctx, cmd)
 
 				Expect(office).To(BeNil())
 				ExpectAppError(err, apperrors2.ErrorCodeInvalidOfficeType)
@@ -100,7 +100,7 @@ var _ = Describe("OfficeService", func() {
 
 		Context("when repository create fails", func() {
 			BeforeEach(func() {
-				cmd = &services.CreateOfficeCommand{
+				cmd = &service.CreateOfficeCommand{
 					OfficeName: "Test Office",
 					OfficeType: entity.OfficeTypeEVM,
 					Address:    "123 Test St",
@@ -112,7 +112,7 @@ var _ = Describe("OfficeService", func() {
 				dbErr := apperrors2.New(500, apperrors2.ErrorCodeDBOperation, errors.New("database error"))
 				mockRepo.EXPECT().Create(ctx, MatchOffice(cmd)).Return(dbErr).Once()
 
-				office, err := service.Create(ctx, cmd)
+				office, err := officeService.Create(ctx, cmd)
 
 				Expect(err).To(HaveOccurred())
 				Expect(office).To(BeNil())
@@ -140,7 +140,7 @@ var _ = Describe("OfficeService", func() {
 
 				mockRepo.EXPECT().FindByID(ctx, officeID).Return(expectedOffice, nil).Once()
 
-				office, err := service.GetByID(ctx, officeID)
+				office, err := officeService.GetByID(ctx, officeID)
 
 				Expect(err).NotTo(HaveOccurred())
 				Expect(office).NotTo(BeNil())
@@ -157,7 +157,7 @@ var _ = Describe("OfficeService", func() {
 				notFoundErr := apperrors2.New(404, apperrors2.ErrorCodeOfficeNotFound, errors.New("office not found"))
 				mockRepo.EXPECT().FindByID(ctx, officeID).Return(nil, notFoundErr).Once()
 
-				office, err := service.GetByID(ctx, officeID)
+				office, err := officeService.GetByID(ctx, officeID)
 
 				Expect(office).To(BeNil())
 				ExpectAppError(err, apperrors2.ErrorCodeOfficeNotFound)
@@ -169,7 +169,7 @@ var _ = Describe("OfficeService", func() {
 				dbErr := apperrors2.New(500, apperrors2.ErrorCodeDBOperation, errors.New("database error"))
 				mockRepo.EXPECT().FindByID(ctx, officeID).Return(nil, dbErr).Once()
 
-				office, err := service.GetByID(ctx, officeID)
+				office, err := officeService.GetByID(ctx, officeID)
 
 				Expect(err).To(HaveOccurred())
 				Expect(office).To(BeNil())
@@ -200,7 +200,7 @@ var _ = Describe("OfficeService", func() {
 
 				mockRepo.EXPECT().FindAll(ctx).Return(expectedOffices, nil).Once()
 
-				offices, err := service.GetAll(ctx)
+				offices, err := officeService.GetAll(ctx)
 
 				Expect(err).NotTo(HaveOccurred())
 				Expect(offices).NotTo(BeNil())
@@ -216,7 +216,7 @@ var _ = Describe("OfficeService", func() {
 			It("should return an empty slice", func() {
 				mockRepo.EXPECT().FindAll(ctx).Return([]*entity.Office{}, nil).Once()
 
-				offices, err := service.GetAll(ctx)
+				offices, err := officeService.GetAll(ctx)
 
 				Expect(err).NotTo(HaveOccurred())
 				Expect(offices).NotTo(BeNil())
@@ -229,7 +229,7 @@ var _ = Describe("OfficeService", func() {
 				dbErr := apperrors2.New(500, apperrors2.ErrorCodeDBOperation, errors.New("database error"))
 				mockRepo.EXPECT().FindAll(ctx).Return(nil, dbErr).Once()
 
-				offices, err := service.GetAll(ctx)
+				offices, err := officeService.GetAll(ctx)
 
 				Expect(err).To(HaveOccurred())
 				Expect(offices).To(BeNil())
@@ -242,7 +242,7 @@ var _ = Describe("OfficeService", func() {
 		var (
 			officeID       uuid.UUID
 			existingOffice *entity.Office
-			cmd            *services.UpdateOfficeCommand
+			cmd            *service.UpdateOfficeCommand
 		)
 
 		BeforeEach(func() {
@@ -258,7 +258,7 @@ var _ = Describe("OfficeService", func() {
 
 		Context("when office is updated successfully", func() {
 			BeforeEach(func() {
-				cmd = &services.UpdateOfficeCommand{
+				cmd = &service.UpdateOfficeCommand{
 					OfficeName: "Updated Office Name",
 					OfficeType: entity.OfficeTypeSC,
 					Address:    "Updated Address",
@@ -270,7 +270,7 @@ var _ = Describe("OfficeService", func() {
 				mockRepo.EXPECT().FindByID(ctx, officeID).Return(existingOffice, nil).Once()
 				mockRepo.EXPECT().Update(ctx, MatchUpdatedOffice(officeID, cmd)).Return(nil).Once()
 
-				err := service.Update(ctx, officeID, cmd)
+				err := officeService.Update(ctx, officeID, cmd)
 
 				Expect(err).NotTo(HaveOccurred())
 			})
@@ -278,7 +278,7 @@ var _ = Describe("OfficeService", func() {
 
 		Context("when office is not found", func() {
 			BeforeEach(func() {
-				cmd = &services.UpdateOfficeCommand{
+				cmd = &service.UpdateOfficeCommand{
 					OfficeName: "Updated Office Name",
 					OfficeType: entity.OfficeTypeEVM,
 					Address:    "Updated Address",
@@ -290,7 +290,7 @@ var _ = Describe("OfficeService", func() {
 				notFoundErr := apperrors2.New(404, apperrors2.ErrorCodeOfficeNotFound, errors.New("office not found"))
 				mockRepo.EXPECT().FindByID(ctx, officeID).Return(nil, notFoundErr).Once()
 
-				err := service.Update(ctx, officeID, cmd)
+				err := officeService.Update(ctx, officeID, cmd)
 
 				ExpectAppError(err, apperrors2.ErrorCodeOfficeNotFound)
 			})
@@ -298,7 +298,7 @@ var _ = Describe("OfficeService", func() {
 
 		Context("when office type is invalid", func() {
 			BeforeEach(func() {
-				cmd = &services.UpdateOfficeCommand{
+				cmd = &service.UpdateOfficeCommand{
 					OfficeName: "Updated Office Name",
 					OfficeType: "INVALID_TYPE",
 					Address:    "Updated Address",
@@ -309,7 +309,7 @@ var _ = Describe("OfficeService", func() {
 			It("should return InvalidOfficeType error", func() {
 				mockRepo.EXPECT().FindByID(ctx, officeID).Return(existingOffice, nil).Once()
 
-				err := service.Update(ctx, officeID, cmd)
+				err := officeService.Update(ctx, officeID, cmd)
 
 				ExpectAppError(err, apperrors2.ErrorCodeInvalidOfficeType)
 			})
@@ -317,7 +317,7 @@ var _ = Describe("OfficeService", func() {
 
 		Context("when repository update fails", func() {
 			BeforeEach(func() {
-				cmd = &services.UpdateOfficeCommand{
+				cmd = &service.UpdateOfficeCommand{
 					OfficeName: "Updated Office Name",
 					OfficeType: entity.OfficeTypeEVM,
 					Address:    "Updated Address",
@@ -330,7 +330,7 @@ var _ = Describe("OfficeService", func() {
 				mockRepo.EXPECT().FindByID(ctx, officeID).Return(existingOffice, nil).Once()
 				mockRepo.EXPECT().Update(ctx, MatchUpdatedOffice(officeID, cmd)).Return(dbErr).Once()
 
-				err := service.Update(ctx, officeID, cmd)
+				err := officeService.Update(ctx, officeID, cmd)
 
 				Expect(err).To(HaveOccurred())
 				Expect(err).To(Equal(dbErr))
@@ -349,7 +349,7 @@ var _ = Describe("OfficeService", func() {
 			It("should return nil error", func() {
 				mockRepo.EXPECT().SoftDelete(ctx, officeID).Return(nil).Once()
 
-				err := service.DeleteByID(ctx, officeID)
+				err := officeService.DeleteByID(ctx, officeID)
 
 				Expect(err).NotTo(HaveOccurred())
 			})
@@ -360,7 +360,7 @@ var _ = Describe("OfficeService", func() {
 				dbErr := apperrors2.New(500, apperrors2.ErrorCodeDBOperation, errors.New("database error"))
 				mockRepo.EXPECT().SoftDelete(ctx, officeID).Return(dbErr).Once()
 
-				err := service.DeleteByID(ctx, officeID)
+				err := officeService.DeleteByID(ctx, officeID)
 
 				Expect(err).To(HaveOccurred())
 				Expect(err).To(Equal(dbErr))
@@ -372,7 +372,7 @@ var _ = Describe("OfficeService", func() {
 				notFoundErr := apperrors2.New(404, apperrors2.ErrorCodeOfficeNotFound, errors.New("office not found"))
 				mockRepo.EXPECT().SoftDelete(ctx, officeID).Return(notFoundErr).Once()
 
-				err := service.DeleteByID(ctx, officeID)
+				err := officeService.DeleteByID(ctx, officeID)
 
 				ExpectAppError(err, apperrors2.ErrorCodeOfficeNotFound)
 			})
@@ -380,7 +380,7 @@ var _ = Describe("OfficeService", func() {
 	})
 })
 
-func MatchOffice(cmd *services.CreateOfficeCommand) interface{} {
+func MatchOffice(cmd *service.CreateOfficeCommand) interface{} {
 	return mock.MatchedBy(func(o *entity.Office) bool {
 		return o.OfficeName == cmd.OfficeName &&
 			o.OfficeType == cmd.OfficeType &&
@@ -389,7 +389,7 @@ func MatchOffice(cmd *services.CreateOfficeCommand) interface{} {
 	})
 }
 
-func MatchUpdatedOffice(id uuid.UUID, cmd *services.UpdateOfficeCommand) interface{} {
+func MatchUpdatedOffice(id uuid.UUID, cmd *service.UpdateOfficeCommand) interface{} {
 	return mock.MatchedBy(func(o *entity.Office) bool {
 		return o.ID == id &&
 			o.OfficeName == cmd.OfficeName &&

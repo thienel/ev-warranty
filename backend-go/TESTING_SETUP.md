@@ -139,8 +139,8 @@ start coverage.html
 # Chạy test trong thư mục hiện tại
 ginkgo
 
-# Chạy test trong package services
-ginkgo ./internal/application/services
+# Chạy test trong package service
+ginkgo ./internal/application/service
 
 ```
 

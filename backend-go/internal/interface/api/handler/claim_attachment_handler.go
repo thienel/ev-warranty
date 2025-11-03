@@ -3,7 +3,7 @@ package handler
 import (
 	"context"
 	"ev-warranty-go/internal/application"
-	"ev-warranty-go/internal/application/services"
+	"ev-warranty-go/internal/application/service"
 	"ev-warranty-go/internal/domain/entity"
 	"ev-warranty-go/pkg/apperror"
 	"ev-warranty-go/pkg/logger"
@@ -23,10 +23,10 @@ type ClaimAttachmentHandler interface {
 type claimAttachmentHandler struct {
 	log       logger.Logger
 	txManager application.TxManager
-	service   services.ClaimAttachmentService
+	service   service.ClaimAttachmentService
 }
 
-func NewClaimAttachmentHandler(log logger.Logger, txManager application.TxManager, service services.ClaimAttachmentService) ClaimAttachmentHandler {
+func NewClaimAttachmentHandler(log logger.Logger, txManager application.TxManager, service service.ClaimAttachmentService) ClaimAttachmentHandler {
 	return &claimAttachmentHandler{
 		log:       log,
 		txManager: txManager,

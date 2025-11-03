@@ -1,7 +1,7 @@
 package handler_test
 
 import (
-	"ev-warranty-go/internal/application/services"
+	"ev-warranty-go/internal/application/service"
 	"ev-warranty-go/internal/domain/entity"
 	"ev-warranty-go/internal/interface/api/dto"
 	"ev-warranty-go/internal/interface/api/handler"
@@ -52,7 +52,7 @@ var _ = Describe("AuthHandler", func() {
 		})
 
 		It("should return access token and user info with refresh token cookie", func() {
-			claims := &services.CustomClaims{UserID: userID.String()}
+			claims := &service.CustomClaims{UserID: userID.String()}
 
 			mockAuthSvc.EXPECT().Login(mock.Anything, loginRequest.Email, loginRequest.Password).
 				Return(accessToken, refreshToken, nil).Once()
@@ -87,7 +87,7 @@ var _ = Describe("AuthHandler", func() {
 					Return(nil, apperrors2.NewInvalidAccessToken()).Once()
 			}, loginRequest, http.StatusUnauthorized, apperrors2.ErrorCodeInvalidAccessToken),
 			Entry("user not found", func() {
-				claims := &services.CustomClaims{UserID: userID.String()}
+				claims := &service.CustomClaims{UserID: userID.String()}
 				mockAuthSvc.EXPECT().Login(mock.Anything, loginRequest.Email, loginRequest.Password).
 					Return(accessToken, refreshToken, nil).Once()
 				mockTokenSvc.EXPECT().ValidateAccessToken(mock.Anything, accessToken).
@@ -196,7 +196,7 @@ var _ = Describe("AuthHandler", func() {
 		})
 
 		It("should return valid token response with user info and headers", func() {
-			claims := &services.CustomClaims{UserID: userID.String()}
+			claims := &service.CustomClaims{UserID: userID.String()}
 
 			mockTokenSvc.EXPECT().ValidateAccessToken(mock.Anything, accessToken).
 				Return(claims, nil).Once()
@@ -230,12 +230,12 @@ var _ = Describe("AuthHandler", func() {
 					Return(nil, apperrors2.NewInvalidAccessToken()).Once()
 			}, http.StatusUnauthorized, apperrors2.ErrorCodeInvalidAccessToken),
 			Entry("invalid user ID in token", "Bearer "+accessToken, func() {
-				claims := &services.CustomClaims{UserID: "invalid-uuid"}
+				claims := &service.CustomClaims{UserID: "invalid-uuid"}
 				mockTokenSvc.EXPECT().ValidateAccessToken(mock.Anything, accessToken).
 					Return(claims, nil).Once()
 			}, http.StatusBadRequest, apperrors2.ErrorCodeInvalidUserID),
 			Entry("user not found", "Bearer "+accessToken, func() {
-				claims := &services.CustomClaims{UserID: userID.String()}
+				claims := &service.CustomClaims{UserID: userID.String()}
 				mockTokenSvc.EXPECT().ValidateAccessToken(mock.Anything, accessToken).
 					Return(claims, nil).Once()
 				mockUserSvc.EXPECT().GetByID(mock.Anything, userID).

@@ -2,7 +2,7 @@ package handler
 
 import (
 	"context"
-	"ev-warranty-go/internal/application/services"
+	"ev-warranty-go/internal/application/service"
 	"ev-warranty-go/internal/domain/entity"
 	"ev-warranty-go/internal/interface/api/dto"
 	"ev-warranty-go/pkg/apperror"
@@ -24,10 +24,10 @@ type UserHandler interface {
 
 type userHandler struct {
 	log         logger.Logger
-	userService services.UserService
+	userService service.UserService
 }
 
-func NewUserHandler(log logger.Logger, userService services.UserService) UserHandler {
+func NewUserHandler(log logger.Logger, userService service.UserService) UserHandler {
 	return &userHandler{
 		log:         log,
 		userService: userService,
@@ -67,7 +67,7 @@ func (h userHandler) Create(c *gin.Context) {
 
 	h.log.Info("creating user", "email", req.Email, "role", req.Role)
 
-	params := &services.UserCreateCommand{
+	params := &service.UserCreateCommand{
 		Name:     strings.TrimSpace(req.Name),
 		Email:    strings.TrimSpace(req.Email),
 		Role:     strings.TrimSpace(req.Role),
@@ -129,7 +129,7 @@ func (h userHandler) Update(c *gin.Context) {
 
 	h.log.Info("updating user", "user_id", id, "role", req.Role)
 
-	cmd := &services.UserUpdateCommand{
+	cmd := &service.UserUpdateCommand{
 		Name:     strings.TrimSpace(req.Name),
 		Role:     strings.TrimSpace(req.Role),
 		IsActive: req.IsActive,

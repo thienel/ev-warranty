@@ -2,7 +2,7 @@ package handler_test
 
 import (
 	"errors"
-	"ev-warranty-go/internal/application/services"
+	"ev-warranty-go/internal/application/service"
 	"ev-warranty-go/internal/domain/entity"
 	"ev-warranty-go/internal/interface/api/dto"
 	"ev-warranty-go/internal/interface/api/handler"
@@ -60,7 +60,7 @@ var _ = Describe("OfficeHandler", func() {
 			})
 
 			It("should create office successfully", func() {
-				mockService.EXPECT().Create(mock.Anything, mock.MatchedBy(func(cmd *services.CreateOfficeCommand) bool {
+				mockService.EXPECT().Create(mock.Anything, mock.MatchedBy(func(cmd *service.CreateOfficeCommand) bool {
 					return cmd.OfficeName == validReq.OfficeName && cmd.OfficeType == validReq.OfficeType
 				})).Return(sampleOffice, nil).Once()
 
@@ -195,7 +195,7 @@ var _ = Describe("OfficeHandler", func() {
 				updatedOffice := *sampleOffice
 				updatedOffice.OfficeName = updateReq.OfficeName
 
-				mockService.EXPECT().Update(mock.Anything, officeID, mock.MatchedBy(func(cmd *services.UpdateOfficeCommand) bool {
+				mockService.EXPECT().Update(mock.Anything, officeID, mock.MatchedBy(func(cmd *service.UpdateOfficeCommand) bool {
 					return cmd.OfficeName == updateReq.OfficeName && cmd.Address == updateReq.Address
 				})).Return(nil).Once()
 

@@ -8,7 +8,7 @@ import (
 
 	mock "github.com/stretchr/testify/mock"
 
-	services "ev-warranty-go/internal/application/services"
+	services "ev-warranty-go/internal/application/service"
 
 	uuid "github.com/google/uuid"
 )

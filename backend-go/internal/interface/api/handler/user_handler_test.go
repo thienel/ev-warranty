@@ -2,7 +2,7 @@ package handler_test
 
 import (
 	"errors"
-	"ev-warranty-go/internal/application/services"
+	"ev-warranty-go/internal/application/service"
 	"ev-warranty-go/internal/domain/entity"
 	"ev-warranty-go/internal/interface/api/dto"
 	"ev-warranty-go/internal/interface/api/handler"
@@ -63,7 +63,7 @@ var _ = Describe("UserHandler", func() {
 			})
 
 			It("should create user successfully", func() {
-				mockService.EXPECT().Create(mock.Anything, mock.MatchedBy(func(cmd *services.UserCreateCommand) bool {
+				mockService.EXPECT().Create(mock.Anything, mock.MatchedBy(func(cmd *service.UserCreateCommand) bool {
 					return cmd.Name == validReq.Name && cmd.Email == validReq.Email && cmd.Role == validReq.Role
 				})).Return(sampleUser, nil).Once()
 
@@ -213,7 +213,7 @@ var _ = Describe("UserHandler", func() {
 				updatedUser.Name = updateReq.Name
 				updatedUser.Role = updateReq.Role
 
-				mockService.EXPECT().Update(mock.Anything, userID, mock.MatchedBy(func(cmd *services.UserUpdateCommand) bool {
+				mockService.EXPECT().Update(mock.Anything, userID, mock.MatchedBy(func(cmd *service.UserUpdateCommand) bool {
 					return cmd.Name == updateReq.Name && cmd.Role == updateReq.Role
 				})).Return(nil).Once()
 

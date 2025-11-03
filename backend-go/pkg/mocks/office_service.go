@@ -8,7 +8,7 @@ import (
 
 	mock "github.com/stretchr/testify/mock"
 
-	services "ev-warranty-go/internal/application/services"
+	services "ev-warranty-go/internal/application/service"
 
 	uuid "github.com/google/uuid"
 )
@@ -63,7 +63,7 @@ type OfficeService_Create_Call struct {
 
 // Create is a helper method to define mock.On call
 //   - ctx context.Context
-//   - cmd *services.CreateOfficeCommand
+//   - cmd *service.CreateOfficeCommand
 func (_e *OfficeService_Expecter) Create(ctx interface{}, cmd interface{}) *OfficeService_Create_Call {
 	return &OfficeService_Create_Call{Call: _e.mock.On("Create", ctx, cmd)}
 }
@@ -275,7 +275,7 @@ type OfficeService_Update_Call struct {
 // Update is a helper method to define mock.On call
 //   - ctx context.Context
 //   - id uuid.UUID
-//   - cmd *services.UpdateOfficeCommand
+//   - cmd *service.UpdateOfficeCommand
 func (_e *OfficeService_Expecter) Update(ctx interface{}, id interface{}, cmd interface{}) *OfficeService_Update_Call {
 	return &OfficeService_Update_Call{Call: _e.mock.On("Update", ctx, id, cmd)}
 }

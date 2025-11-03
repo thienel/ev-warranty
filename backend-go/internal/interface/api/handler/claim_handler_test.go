@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 	"ev-warranty-go/internal/application"
-	"ev-warranty-go/internal/application/services"
+	"ev-warranty-go/internal/application/service"
 	"ev-warranty-go/internal/domain/entity"
 	"ev-warranty-go/internal/interface/api/dto"
 	"ev-warranty-go/internal/interface/api/handler"
@@ -173,7 +173,7 @@ var _ = Describe("ClaimHandler", func() {
 
 			It("should create claim successfully", func() {
 				setupTxMock(func() {
-					mockService.EXPECT().Create(mockTx, mock.MatchedBy(func(cmd *services.CreateClaimCommand) bool {
+					mockService.EXPECT().Create(mockTx, mock.MatchedBy(func(cmd *service.CreateClaimCommand) bool {
 						return cmd.VehicleID == validCreateReq.VehicleID &&
 							cmd.CustomerID == validCreateReq.CustomerID &&
 							cmd.CreatorID == userID &&
@@ -279,7 +279,7 @@ var _ = Describe("ClaimHandler", func() {
 
 			It("should update claim successfully", func() {
 				setupTxMock(func() {
-					mockService.EXPECT().Update(mockTx, claimID, mock.MatchedBy(func(cmd *services.UpdateClaimCommand) bool {
+					mockService.EXPECT().Update(mockTx, claimID, mock.MatchedBy(func(cmd *service.UpdateClaimCommand) bool {
 						return cmd.Description == validUpdateReq.Description
 					})).Return(nil).Once()
 				})

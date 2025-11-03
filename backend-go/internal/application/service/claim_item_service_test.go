@@ -1,4 +1,4 @@
-package services_test
+package service_test
 
 import (
 	"context"
@@ -10,7 +10,7 @@ import (
 	. "github.com/onsi/gomega"
 	"github.com/stretchr/testify/mock"
 
-	"ev-warranty-go/internal/application/services"
+	"ev-warranty-go/internal/application/service"
 	"ev-warranty-go/internal/domain/entity"
 	"ev-warranty-go/pkg/mocks"
 )
@@ -20,7 +20,7 @@ var _ = Describe("ClaimItemService", func() {
 		mockClaimRepo *mocks.ClaimRepository
 		mockItemRepo  *mocks.ClaimItemRepository
 		mockTx        *mocks.Tx
-		service       services.ClaimItemService
+		itemService   service.ClaimItemService
 		ctx           context.Context
 	)
 
@@ -28,7 +28,7 @@ var _ = Describe("ClaimItemService", func() {
 		mockClaimRepo = mocks.NewClaimRepository(GinkgoT())
 		mockItemRepo = mocks.NewClaimItemRepository(GinkgoT())
 		mockTx = mocks.NewTx(GinkgoT())
-		service = services.NewClaimItemService(mockClaimRepo, mockItemRepo)
+		itemService = service.NewClaimItemService(mockClaimRepo, mockItemRepo)
 		ctx = context.Background()
 	})
 
@@ -52,7 +52,7 @@ var _ = Describe("ClaimItemService", func() {
 
 				mockItemRepo.EXPECT().FindByID(ctx, itemID).Return(expectedItem, nil).Once()
 
-				item, err := service.GetByID(ctx, itemID)
+				item, err := itemService.GetByID(ctx, itemID)
 
 				Expect(err).NotTo(HaveOccurred())
 				Expect(item).NotTo(BeNil())
@@ -66,7 +66,7 @@ var _ = Describe("ClaimItemService", func() {
 				notFoundErr := apperrors2.New(404, apperrors2.ErrorCodeClaimItemNotFound, errors.New("item not found"))
 				mockItemRepo.EXPECT().FindByID(ctx, itemID).Return(nil, notFoundErr).Once()
 
-				item, err := service.GetByID(ctx, itemID)
+				item, err := itemService.GetByID(ctx, itemID)
 
 				Expect(item).To(BeNil())
 				ExpectAppError(err, apperrors2.ErrorCodeClaimItemNotFound)
@@ -78,7 +78,7 @@ var _ = Describe("ClaimItemService", func() {
 				dbErr := apperrors2.New(500, apperrors2.ErrorCodeDBOperation, errors.New("database error"))
 				mockItemRepo.EXPECT().FindByID(ctx, itemID).Return(nil, dbErr).Once()
 
-				item, err := service.GetByID(ctx, itemID)
+				item, err := itemService.GetByID(ctx, itemID)
 
 				Expect(err).To(HaveOccurred())
 				Expect(item).To(BeNil())
@@ -113,7 +113,7 @@ var _ = Describe("ClaimItemService", func() {
 
 				mockItemRepo.EXPECT().FindByClaimID(ctx, claimID).Return(expectedItems, nil).Once()
 
-				items, err := service.GetByClaimID(ctx, claimID)
+				items, err := itemService.GetByClaimID(ctx, claimID)
 
 				Expect(err).NotTo(HaveOccurred())
 				Expect(items).NotTo(BeNil())
@@ -127,7 +127,7 @@ var _ = Describe("ClaimItemService", func() {
 			It("should return an empty slice", func() {
 				mockItemRepo.EXPECT().FindByClaimID(ctx, claimID).Return([]*entity.ClaimItem{}, nil).Once()
 
-				items, err := service.GetByClaimID(ctx, claimID)
+				items, err := itemService.GetByClaimID(ctx, claimID)
 
 				Expect(err).NotTo(HaveOccurred())
 				Expect(items).NotTo(BeNil())
@@ -140,7 +140,7 @@ var _ = Describe("ClaimItemService", func() {
 				dbErr := apperrors2.New(500, apperrors2.ErrorCodeDBOperation, errors.New("database error"))
 				mockItemRepo.EXPECT().FindByClaimID(ctx, claimID).Return(nil, dbErr).Once()
 
-				items, err := service.GetByClaimID(ctx, claimID)
+				items, err := itemService.GetByClaimID(ctx, claimID)
 
 				Expect(err).To(HaveOccurred())
 				Expect(items).To(BeNil())
@@ -152,12 +152,12 @@ var _ = Describe("ClaimItemService", func() {
 	Describe("Create", func() {
 		var (
 			claimID uuid.UUID
-			cmd     *services.CreateClaimItemCommand
+			cmd     *service.CreateClaimItemCommand
 		)
 
 		BeforeEach(func() {
 			claimID = uuid.New()
-			cmd = &services.CreateClaimItemCommand{
+			cmd = &service.CreateClaimItemCommand{
 				PartCategoryID:   uuid.New(),
 				FaultyPartID:     uuid.New(),
 				IssueDescription: "Part is damaged",
@@ -184,7 +184,7 @@ var _ = Describe("ClaimItemService", func() {
 						i.Cost == cmd.Cost
 				})).Return(nil).Once()
 
-				item, err := service.Create(mockTx, claimID, cmd)
+				item, err := itemService.Create(mockTx, claimID, cmd)
 
 				Expect(err).NotTo(HaveOccurred())
 				Expect(item).NotTo(BeNil())
@@ -198,7 +198,7 @@ var _ = Describe("ClaimItemService", func() {
 				notFoundErr := apperrors2.New(404, apperrors2.ErrorCodeClaimNotFound, errors.New("claim not found"))
 				mockClaimRepo.EXPECT().FindByID(ctx, claimID).Return(nil, notFoundErr).Once()
 
-				item, err := service.Create(mockTx, claimID, cmd)
+				item, err := itemService.Create(mockTx, claimID, cmd)
 
 				Expect(err).To(HaveOccurred())
 				Expect(item).To(BeNil())
@@ -219,7 +219,7 @@ var _ = Describe("ClaimItemService", func() {
 
 				mockClaimRepo.EXPECT().FindByID(ctx, claimID).Return(claim, nil).Once()
 
-				item, err := service.Create(mockTx, claimID, cmd)
+				item, err := itemService.Create(mockTx, claimID, cmd)
 
 				Expect(item).To(BeNil())
 				ExpectAppError(err, apperrors2.ErrorCodeInvalidClaimItemStatus)
@@ -239,7 +239,7 @@ var _ = Describe("ClaimItemService", func() {
 
 				mockClaimRepo.EXPECT().FindByID(ctx, claimID).Return(claim, nil).Once()
 
-				item, err := service.Create(mockTx, claimID, cmd)
+				item, err := itemService.Create(mockTx, claimID, cmd)
 
 				Expect(item).To(BeNil())
 				ExpectAppError(err, apperrors2.ErrorCodeInvalidClaimItemType)
@@ -257,7 +257,7 @@ var _ = Describe("ClaimItemService", func() {
 				mockClaimRepo.EXPECT().FindByID(ctx, claimID).Return(claim, nil).Once()
 				mockItemRepo.EXPECT().Create(mockTx, mock.AnythingOfType("*entity.ClaimItem")).Return(dbErr).Once()
 
-				item, err := service.Create(mockTx, claimID, cmd)
+				item, err := itemService.Create(mockTx, claimID, cmd)
 
 				Expect(err).To(HaveOccurred())
 				Expect(item).To(BeNil())
@@ -270,13 +270,13 @@ var _ = Describe("ClaimItemService", func() {
 		var (
 			claimID uuid.UUID
 			itemID  uuid.UUID
-			cmd     *services.UpdateClaimItemCommand
+			cmd     *service.UpdateClaimItemCommand
 		)
 
 		BeforeEach(func() {
 			claimID = uuid.New()
 			itemID = uuid.New()
-			cmd = &services.UpdateClaimItemCommand{
+			cmd = &service.UpdateClaimItemCommand{
 				IssueDescription: "Updated description",
 				Type:             entity.ClaimItemTypeReplacement,
 				Cost:             200.0,
@@ -307,7 +307,7 @@ var _ = Describe("ClaimItemService", func() {
 				mockItemRepo.EXPECT().SumCostByClaimID(mockTx, claimID).Return(200.0, nil).Once()
 				mockClaimRepo.EXPECT().Update(mockTx, mock.AnythingOfType("*entity.Claim")).Return(nil).Once()
 
-				err := service.Update(mockTx, claimID, itemID, cmd)
+				err := itemService.Update(mockTx, claimID, itemID, cmd)
 
 				Expect(err).NotTo(HaveOccurred())
 			})
@@ -322,7 +322,7 @@ var _ = Describe("ClaimItemService", func() {
 
 				mockClaimRepo.EXPECT().FindByID(ctx, claimID).Return(claim, nil).Once()
 
-				err := service.Update(mockTx, claimID, itemID, cmd)
+				err := itemService.Update(mockTx, claimID, itemID, cmd)
 
 				ExpectAppError(err, apperrors2.ErrorCodeClaimStatusNotAllowedUpdate)
 			})
@@ -343,7 +343,7 @@ var _ = Describe("ClaimItemService", func() {
 				mockClaimRepo.EXPECT().FindByID(ctx, claimID).Return(claim, nil).Once()
 				mockItemRepo.EXPECT().FindByID(ctx, itemID).Return(item, nil).Once()
 
-				err := service.Update(mockTx, claimID, itemID, cmd)
+				err := itemService.Update(mockTx, claimID, itemID, cmd)
 
 				ExpectAppError(err, apperrors2.ErrorCodeClaimStatusNotAllowedUpdate)
 			})
@@ -367,7 +367,7 @@ var _ = Describe("ClaimItemService", func() {
 				mockItemRepo.EXPECT().SumCostByClaimID(mockTx, claimID).Return(200.0, nil).Once()
 				mockClaimRepo.EXPECT().Update(mockTx, mock.AnythingOfType("*entity.Claim")).Return(nil).Once()
 
-				err := service.Update(mockTx, claimID, itemID, cmd)
+				err := itemService.Update(mockTx, claimID, itemID, cmd)
 
 				Expect(err).NotTo(HaveOccurred())
 			})
@@ -378,7 +378,7 @@ var _ = Describe("ClaimItemService", func() {
 				notFoundErr := apperrors2.New(404, apperrors2.ErrorCodeClaimNotFound, errors.New("claim not found"))
 				mockClaimRepo.EXPECT().FindByID(ctx, claimID).Return(nil, notFoundErr).Once()
 
-				err := service.Update(mockTx, claimID, itemID, cmd)
+				err := itemService.Update(mockTx, claimID, itemID, cmd)
 
 				Expect(err).To(HaveOccurred())
 				Expect(err).To(Equal(notFoundErr))
@@ -396,7 +396,7 @@ var _ = Describe("ClaimItemService", func() {
 				mockClaimRepo.EXPECT().FindByID(ctx, claimID).Return(claim, nil).Once()
 				mockItemRepo.EXPECT().FindByID(ctx, itemID).Return(nil, notFoundErr).Once()
 
-				err := service.Update(mockTx, claimID, itemID, cmd)
+				err := itemService.Update(mockTx, claimID, itemID, cmd)
 
 				Expect(err).To(HaveOccurred())
 				Expect(err).To(Equal(notFoundErr))
@@ -418,7 +418,7 @@ var _ = Describe("ClaimItemService", func() {
 				mockClaimRepo.EXPECT().FindByID(ctx, claimID).Return(claim, nil).Once()
 				mockItemRepo.EXPECT().FindByID(ctx, itemID).Return(item, nil).Once()
 
-				err := service.Update(mockTx, claimID, itemID, cmd)
+				err := itemService.Update(mockTx, claimID, itemID, cmd)
 
 				ExpectAppError(err, apperrors2.ErrorCodeClaimStatusNotAllowedUpdate)
 			})
@@ -443,7 +443,7 @@ var _ = Describe("ClaimItemService", func() {
 				mockClaimRepo.EXPECT().FindByID(ctx, claimID).Return(claim, nil).Once()
 				mockItemRepo.EXPECT().FindByID(ctx, itemID).Return(item, nil).Once()
 
-				err := service.Update(mockTx, claimID, itemID, cmd)
+				err := itemService.Update(mockTx, claimID, itemID, cmd)
 
 				ExpectAppError(err, apperrors2.ErrorCodeInvalidClaimItemType)
 			})
@@ -466,7 +466,7 @@ var _ = Describe("ClaimItemService", func() {
 				mockItemRepo.EXPECT().FindByID(ctx, itemID).Return(item, nil).Once()
 				mockItemRepo.EXPECT().Update(mockTx, mock.AnythingOfType("*entity.ClaimItem")).Return(dbErr).Once()
 
-				err := service.Update(mockTx, claimID, itemID, cmd)
+				err := itemService.Update(mockTx, claimID, itemID, cmd)
 
 				Expect(err).To(HaveOccurred())
 				Expect(err).To(Equal(dbErr))
@@ -491,7 +491,7 @@ var _ = Describe("ClaimItemService", func() {
 				mockItemRepo.EXPECT().Update(mockTx, mock.AnythingOfType("*entity.ClaimItem")).Return(nil).Once()
 				mockItemRepo.EXPECT().SumCostByClaimID(mockTx, claimID).Return(0.0, dbErr).Once()
 
-				err := service.Update(mockTx, claimID, itemID, cmd)
+				err := itemService.Update(mockTx, claimID, itemID, cmd)
 
 				Expect(err).To(HaveOccurred())
 				Expect(err).To(Equal(dbErr))
@@ -517,7 +517,7 @@ var _ = Describe("ClaimItemService", func() {
 				mockItemRepo.EXPECT().SumCostByClaimID(mockTx, claimID).Return(200.0, nil).Once()
 				mockClaimRepo.EXPECT().Update(mockTx, mock.AnythingOfType("*entity.Claim")).Return(dbErr).Once()
 
-				err := service.Update(mockTx, claimID, itemID, cmd)
+				err := itemService.Update(mockTx, claimID, itemID, cmd)
 
 				Expect(err).To(HaveOccurred())
 				Expect(err).To(Equal(dbErr))
@@ -549,7 +549,7 @@ var _ = Describe("ClaimItemService", func() {
 				mockItemRepo.EXPECT().SumCostByClaimID(mockTx, claimID).Return(100.0, nil).Once()
 				mockClaimRepo.EXPECT().Update(mockTx, mock.AnythingOfType("*entity.Claim")).Return(nil).Once()
 
-				err := service.HardDelete(mockTx, claimID, itemID)
+				err := itemService.HardDelete(mockTx, claimID, itemID)
 
 				Expect(err).NotTo(HaveOccurred())
 			})
@@ -564,7 +564,7 @@ var _ = Describe("ClaimItemService", func() {
 
 				mockClaimRepo.EXPECT().FindByID(ctx, claimID).Return(claim, nil).Once()
 
-				err := service.HardDelete(mockTx, claimID, itemID)
+				err := itemService.HardDelete(mockTx, claimID, itemID)
 
 				ExpectAppError(err, apperrors2.ErrorCodeClaimStatusNotAllowedDelete)
 			})
@@ -575,7 +575,7 @@ var _ = Describe("ClaimItemService", func() {
 				notFoundErr := apperrors2.New(404, apperrors2.ErrorCodeClaimNotFound, errors.New("claim not found"))
 				mockClaimRepo.EXPECT().FindByID(ctx, claimID).Return(nil, notFoundErr).Once()
 
-				err := service.HardDelete(mockTx, claimID, itemID)
+				err := itemService.HardDelete(mockTx, claimID, itemID)
 
 				Expect(err).To(HaveOccurred())
 				Expect(err).To(Equal(notFoundErr))
@@ -593,7 +593,7 @@ var _ = Describe("ClaimItemService", func() {
 				mockClaimRepo.EXPECT().FindByID(ctx, claimID).Return(claim, nil).Once()
 				mockItemRepo.EXPECT().HardDelete(mockTx, itemID).Return(dbErr).Once()
 
-				err := service.HardDelete(mockTx, claimID, itemID)
+				err := itemService.HardDelete(mockTx, claimID, itemID)
 
 				Expect(err).To(HaveOccurred())
 				Expect(err).To(Equal(dbErr))
@@ -612,7 +612,7 @@ var _ = Describe("ClaimItemService", func() {
 				mockItemRepo.EXPECT().HardDelete(mockTx, itemID).Return(nil).Once()
 				mockItemRepo.EXPECT().SumCostByClaimID(mockTx, claimID).Return(0.0, dbErr).Once()
 
-				err := service.HardDelete(mockTx, claimID, itemID)
+				err := itemService.HardDelete(mockTx, claimID, itemID)
 
 				Expect(err).To(HaveOccurred())
 				Expect(err).To(Equal(dbErr))
@@ -632,7 +632,7 @@ var _ = Describe("ClaimItemService", func() {
 				mockItemRepo.EXPECT().SumCostByClaimID(mockTx, claimID).Return(100.0, nil).Once()
 				mockClaimRepo.EXPECT().Update(mockTx, mock.AnythingOfType("*entity.Claim")).Return(dbErr).Once()
 
-				err := service.HardDelete(mockTx, claimID, itemID)
+				err := itemService.HardDelete(mockTx, claimID, itemID)
 
 				Expect(err).To(HaveOccurred())
 				Expect(err).To(Equal(dbErr))
@@ -664,7 +664,7 @@ var _ = Describe("ClaimItemService", func() {
 				mockItemRepo.EXPECT().SumCostByClaimID(mockTx, claimID).Return(150.0, nil).Once()
 				mockClaimRepo.EXPECT().Update(mockTx, mock.AnythingOfType("*entity.Claim")).Return(nil).Once()
 
-				err := service.Approve(mockTx, claimID, itemID)
+				err := itemService.Approve(mockTx, claimID, itemID)
 
 				Expect(err).NotTo(HaveOccurred())
 			})
@@ -679,7 +679,7 @@ var _ = Describe("ClaimItemService", func() {
 
 				mockClaimRepo.EXPECT().FindByID(ctx, claimID).Return(claim, nil).Once()
 
-				err := service.Approve(mockTx, claimID, itemID)
+				err := itemService.Approve(mockTx, claimID, itemID)
 
 				ExpectAppError(err, apperrors2.ErrorCodeClaimStatusNotAllowedUpdate)
 			})
@@ -690,7 +690,7 @@ var _ = Describe("ClaimItemService", func() {
 				notFoundErr := apperrors2.New(404, apperrors2.ErrorCodeClaimNotFound, errors.New("claim not found"))
 				mockClaimRepo.EXPECT().FindByID(ctx, claimID).Return(nil, notFoundErr).Once()
 
-				err := service.Approve(mockTx, claimID, itemID)
+				err := itemService.Approve(mockTx, claimID, itemID)
 
 				Expect(err).To(HaveOccurred())
 				Expect(err).To(Equal(notFoundErr))
@@ -708,7 +708,7 @@ var _ = Describe("ClaimItemService", func() {
 				mockClaimRepo.EXPECT().FindByID(ctx, claimID).Return(claim, nil).Once()
 				mockItemRepo.EXPECT().UpdateStatus(mockTx, itemID, entity.ClaimStatusApproved).Return(dbErr).Once()
 
-				err := service.Approve(mockTx, claimID, itemID)
+				err := itemService.Approve(mockTx, claimID, itemID)
 
 				Expect(err).To(HaveOccurred())
 				Expect(err).To(Equal(dbErr))
@@ -727,7 +727,7 @@ var _ = Describe("ClaimItemService", func() {
 				mockItemRepo.EXPECT().UpdateStatus(mockTx, itemID, entity.ClaimStatusApproved).Return(nil).Once()
 				mockItemRepo.EXPECT().SumCostByClaimID(mockTx, claimID).Return(0.0, dbErr).Once()
 
-				err := service.Approve(mockTx, claimID, itemID)
+				err := itemService.Approve(mockTx, claimID, itemID)
 
 				Expect(err).To(HaveOccurred())
 				Expect(err).To(Equal(dbErr))
@@ -747,7 +747,7 @@ var _ = Describe("ClaimItemService", func() {
 				mockItemRepo.EXPECT().SumCostByClaimID(mockTx, claimID).Return(150.0, nil).Once()
 				mockClaimRepo.EXPECT().Update(mockTx, mock.AnythingOfType("*entity.Claim")).Return(dbErr).Once()
 
-				err := service.Approve(mockTx, claimID, itemID)
+				err := itemService.Approve(mockTx, claimID, itemID)
 
 				Expect(err).To(HaveOccurred())
 				Expect(err).To(Equal(dbErr))
@@ -779,7 +779,7 @@ var _ = Describe("ClaimItemService", func() {
 				mockItemRepo.EXPECT().SumCostByClaimID(mockTx, claimID).Return(50.0, nil).Once()
 				mockClaimRepo.EXPECT().Update(mockTx, mock.AnythingOfType("*entity.Claim")).Return(nil).Once()
 
-				err := service.Reject(mockTx, claimID, itemID)
+				err := itemService.Reject(mockTx, claimID, itemID)
 
 				Expect(err).NotTo(HaveOccurred())
 			})
@@ -794,7 +794,7 @@ var _ = Describe("ClaimItemService", func() {
 
 				mockClaimRepo.EXPECT().FindByID(ctx, claimID).Return(claim, nil).Once()
 
-				err := service.Reject(mockTx, claimID, itemID)
+				err := itemService.Reject(mockTx, claimID, itemID)
 
 				ExpectAppError(err, apperrors2.ErrorCodeClaimStatusNotAllowedUpdate)
 			})
@@ -805,7 +805,7 @@ var _ = Describe("ClaimItemService", func() {
 				notFoundErr := apperrors2.New(404, apperrors2.ErrorCodeClaimNotFound, errors.New("claim not found"))
 				mockClaimRepo.EXPECT().FindByID(ctx, claimID).Return(nil, notFoundErr).Once()
 
-				err := service.Reject(mockTx, claimID, itemID)
+				err := itemService.Reject(mockTx, claimID, itemID)
 
 				Expect(err).To(HaveOccurred())
 				Expect(err).To(Equal(notFoundErr))
@@ -823,7 +823,7 @@ var _ = Describe("ClaimItemService", func() {
 				mockClaimRepo.EXPECT().FindByID(ctx, claimID).Return(claim, nil).Once()
 				mockItemRepo.EXPECT().UpdateStatus(mockTx, itemID, entity.ClaimStatusRejected).Return(dbErr).Once()
 
-				err := service.Reject(mockTx, claimID, itemID)
+				err := itemService.Reject(mockTx, claimID, itemID)
 
 				Expect(err).To(HaveOccurred())
 				Expect(err).To(Equal(dbErr))
@@ -842,7 +842,7 @@ var _ = Describe("ClaimItemService", func() {
 				mockItemRepo.EXPECT().UpdateStatus(mockTx, itemID, entity.ClaimStatusRejected).Return(nil).Once()
 				mockItemRepo.EXPECT().SumCostByClaimID(mockTx, claimID).Return(0.0, dbErr).Once()
 
-				err := service.Reject(mockTx, claimID, itemID)
+				err := itemService.Reject(mockTx, claimID, itemID)
 
 				Expect(err).To(HaveOccurred())
 				Expect(err).To(Equal(dbErr))
@@ -862,7 +862,7 @@ var _ = Describe("ClaimItemService", func() {
 				mockItemRepo.EXPECT().SumCostByClaimID(mockTx, claimID).Return(50.0, nil).Once()
 				mockClaimRepo.EXPECT().Update(mockTx, mock.AnythingOfType("*entity.Claim")).Return(dbErr).Once()
 
-				err := service.Reject(mockTx, claimID, itemID)
+				err := itemService.Reject(mockTx, claimID, itemID)
 
 				Expect(err).To(HaveOccurred())
 				Expect(err).To(Equal(dbErr))

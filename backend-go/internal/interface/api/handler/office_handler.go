@@ -2,7 +2,7 @@ package handler
 
 import (
 	"context"
-	"ev-warranty-go/internal/application/services"
+	"ev-warranty-go/internal/application/service"
 	"ev-warranty-go/internal/domain/entity"
 	"ev-warranty-go/internal/interface/api/dto"
 	"ev-warranty-go/pkg/apperror"
@@ -24,10 +24,10 @@ type OfficeHandler interface {
 
 type officeHandler struct {
 	log     logger.Logger
-	service services.OfficeService
+	service service.OfficeService
 }
 
-func NewOfficeHandler(log logger.Logger, service services.OfficeService) OfficeHandler {
+func NewOfficeHandler(log logger.Logger, service service.OfficeService) OfficeHandler {
 	return &officeHandler{
 		log:     log,
 		service: service,
@@ -72,7 +72,7 @@ func (h *officeHandler) Create(c *gin.Context) {
 
 	h.log.Info("creating office", "name", req.OfficeName, "type", req.OfficeType)
 
-	cmd := &services.CreateOfficeCommand{
+	cmd := &service.CreateOfficeCommand{
 		OfficeName: strings.TrimSpace(req.OfficeName),
 		OfficeType: strings.TrimSpace(req.OfficeType),
 		Address:    strings.TrimSpace(req.Address),
@@ -195,7 +195,7 @@ func (h *officeHandler) Update(c *gin.Context) {
 
 	h.log.Info("updating office", "office_id", id, "name", req.OfficeName)
 
-	cmd := &services.UpdateOfficeCommand{
+	cmd := &service.UpdateOfficeCommand{
 		OfficeName: strings.TrimSpace(req.OfficeName),
 		OfficeType: strings.TrimSpace(req.OfficeType),
 		Address:    strings.TrimSpace(req.Address),

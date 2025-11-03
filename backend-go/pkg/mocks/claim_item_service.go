@@ -10,7 +10,7 @@ import (
 
 	mock "github.com/stretchr/testify/mock"
 
-	services "ev-warranty-go/internal/application/services"
+	services "ev-warranty-go/internal/application/service"
 
 	uuid "github.com/google/uuid"
 )
@@ -114,7 +114,7 @@ type ClaimItemService_Create_Call struct {
 // Create is a helper method to define mock.On call
 //   - tx application.Tx
 //   - claimID uuid.UUID
-//   - cmd *services.CreateClaimItemCommand
+//   - cmd *service.CreateClaimItemCommand
 func (_e *ClaimItemService_Expecter) Create(tx interface{}, claimID interface{}, cmd interface{}) *ClaimItemService_Create_Call {
 	return &ClaimItemService_Create_Call{Call: _e.mock.On("Create", tx, claimID, cmd)}
 }
@@ -377,7 +377,7 @@ type ClaimItemService_Update_Call struct {
 //   - tx application.Tx
 //   - claimID uuid.UUID
 //   - itemID uuid.UUID
-//   - cmd *services.UpdateClaimItemCommand
+//   - cmd *service.UpdateClaimItemCommand
 func (_e *ClaimItemService_Expecter) Update(tx interface{}, claimID interface{}, itemID interface{}, cmd interface{}) *ClaimItemService_Update_Call {
 	return &ClaimItemService_Update_Call{Call: _e.mock.On("Update", tx, claimID, itemID, cmd)}
 }

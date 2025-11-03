@@ -1,4 +1,4 @@
-package services_test
+package service_test
 
 import (
 	"context"
@@ -10,7 +10,7 @@ import (
 	. "github.com/onsi/gomega"
 	"github.com/stretchr/testify/mock"
 
-	"ev-warranty-go/internal/application/services"
+	"ev-warranty-go/internal/application/service"
 	"ev-warranty-go/internal/domain/entity"
 	"ev-warranty-go/pkg/mocks"
 )
@@ -19,23 +19,23 @@ var _ = Describe("UserService", func() {
 	var (
 		mockUserRepo   *mocks.UserRepository
 		mockOfficeRepo *mocks.OfficeRepository
-		service        services.UserService
+		userService    service.UserService
 		ctx            context.Context
 	)
 
 	BeforeEach(func() {
 		mockUserRepo = mocks.NewUserRepository(GinkgoT())
 		mockOfficeRepo = mocks.NewOfficeRepository(GinkgoT())
-		service = services.NewUserService(mockUserRepo, mockOfficeRepo)
+		userService = service.NewUserService(mockUserRepo, mockOfficeRepo)
 		ctx = context.Background()
 	})
 
 	Describe("Create", func() {
-		var cmd *services.UserCreateCommand
+		var cmd *service.UserCreateCommand
 
 		Context("when user is created successfully", func() {
 			BeforeEach(func() {
-				cmd = &services.UserCreateCommand{
+				cmd = &service.UserCreateCommand{
 					Name:     "John Doe",
 					Email:    "john@example.com",
 					Role:     entity.UserRoleAdmin,
@@ -57,7 +57,7 @@ var _ = Describe("UserService", func() {
 						u.OfficeID == cmd.OfficeID
 				})).Return(nil).Once()
 
-				user, err := service.Create(ctx, cmd)
+				user, err := userService.Create(ctx, cmd)
 
 				Expect(err).NotTo(HaveOccurred())
 				Expect(user).NotTo(BeNil())
@@ -69,7 +69,7 @@ var _ = Describe("UserService", func() {
 
 		Context("when name is invalid", func() {
 			BeforeEach(func() {
-				cmd = &services.UserCreateCommand{
+				cmd = &service.UserCreateCommand{
 					Name:     "A",
 					Email:    "john@example.com",
 					Role:     entity.UserRoleAdmin,
@@ -80,7 +80,7 @@ var _ = Describe("UserService", func() {
 			})
 
 			It("should return InvalidUserInput error", func() {
-				user, err := service.Create(ctx, cmd)
+				user, err := userService.Create(ctx, cmd)
 
 				Expect(user).To(BeNil())
 				ExpectAppError(err, apperrors2.ErrorCodeInvalidUserInput)
@@ -89,7 +89,7 @@ var _ = Describe("UserService", func() {
 
 		Context("when email is invalid", func() {
 			BeforeEach(func() {
-				cmd = &services.UserCreateCommand{
+				cmd = &service.UserCreateCommand{
 					Name:     "John Doe",
 					Email:    "invalid-email",
 					Role:     entity.UserRoleAdmin,
@@ -100,7 +100,7 @@ var _ = Describe("UserService", func() {
 			})
 
 			It("should return InvalidUserInput error", func() {
-				user, err := service.Create(ctx, cmd)
+				user, err := userService.Create(ctx, cmd)
 
 				Expect(user).To(BeNil())
 				ExpectAppError(err, apperrors2.ErrorCodeInvalidUserInput)
@@ -109,7 +109,7 @@ var _ = Describe("UserService", func() {
 
 		Context("when password is invalid", func() {
 			BeforeEach(func() {
-				cmd = &services.UserCreateCommand{
+				cmd = &service.UserCreateCommand{
 					Name:     "John Doe",
 					Email:    "john@example.com",
 					Role:     entity.UserRoleAdmin,
@@ -120,7 +120,7 @@ var _ = Describe("UserService", func() {
 			})
 
 			It("should return InvalidUserInput error", func() {
-				user, err := service.Create(ctx, cmd)
+				user, err := userService.Create(ctx, cmd)
 
 				Expect(user).To(BeNil())
 				ExpectAppError(err, apperrors2.ErrorCodeInvalidUserInput)
@@ -129,7 +129,7 @@ var _ = Describe("UserService", func() {
 
 		Context("when role is invalid", func() {
 			BeforeEach(func() {
-				cmd = &services.UserCreateCommand{
+				cmd = &service.UserCreateCommand{
 					Name:     "John Doe",
 					Email:    "john@example.com",
 					Role:     "INVALID_ROLE",
@@ -140,7 +140,7 @@ var _ = Describe("UserService", func() {
 			})
 
 			It("should return InvalidUserInput error", func() {
-				user, err := service.Create(ctx, cmd)
+				user, err := userService.Create(ctx, cmd)
 
 				Expect(user).To(BeNil())
 				ExpectAppError(err, apperrors2.ErrorCodeInvalidUserInput)
@@ -149,7 +149,7 @@ var _ = Describe("UserService", func() {
 
 		Context("when office is not found", func() {
 			It("should return OfficeNotFound error", func() {
-				cmd = &services.UserCreateCommand{
+				cmd = &service.UserCreateCommand{
 					Name:     "John Doe",
 					Email:    "john@example.com",
 					Role:     entity.UserRoleAdmin,
@@ -161,7 +161,7 @@ var _ = Describe("UserService", func() {
 				officeErr := apperrors2.NewOfficeNotFound()
 				mockOfficeRepo.EXPECT().FindByID(mock.Anything, cmd.OfficeID).Return(nil, officeErr).Once()
 
-				user, err := service.Create(ctx, cmd)
+				user, err := userService.Create(ctx, cmd)
 
 				Expect(err).To(HaveOccurred())
 				Expect(user).To(BeNil())
@@ -171,7 +171,7 @@ var _ = Describe("UserService", func() {
 
 		Context("when role does not match office type", func() {
 			BeforeEach(func() {
-				cmd = &services.UserCreateCommand{
+				cmd = &service.UserCreateCommand{
 					Name:     "John Doe",
 					Email:    "john@example.com",
 					Role:     entity.UserRoleScStaff,
@@ -188,7 +188,7 @@ var _ = Describe("UserService", func() {
 				}
 				mockOfficeRepo.EXPECT().FindByID(ctx, cmd.OfficeID).Return(office, nil).Once()
 
-				user, err := service.Create(ctx, cmd)
+				user, err := userService.Create(ctx, cmd)
 
 				Expect(user).To(BeNil())
 				ExpectAppError(err, apperrors2.ErrorCodeInvalidOfficeType)
@@ -197,7 +197,7 @@ var _ = Describe("UserService", func() {
 
 		Context("when repository create fails", func() {
 			BeforeEach(func() {
-				cmd = &services.UserCreateCommand{
+				cmd = &service.UserCreateCommand{
 					Name:     "John Doe",
 					Email:    "john@example.com",
 					Role:     entity.UserRoleAdmin,
@@ -216,7 +216,7 @@ var _ = Describe("UserService", func() {
 				mockOfficeRepo.EXPECT().FindByID(ctx, cmd.OfficeID).Return(office, nil).Once()
 				mockUserRepo.EXPECT().Create(ctx, mock.AnythingOfType("*entity.User")).Return(dbErr).Once()
 
-				user, err := service.Create(ctx, cmd)
+				user, err := userService.Create(ctx, cmd)
 
 				Expect(err).To(HaveOccurred())
 				Expect(user).To(BeNil())
@@ -244,7 +244,7 @@ var _ = Describe("UserService", func() {
 
 				mockUserRepo.EXPECT().FindByID(ctx, userID).Return(expectedUser, nil).Once()
 
-				user, err := service.GetByID(ctx, userID)
+				user, err := userService.GetByID(ctx, userID)
 
 				Expect(err).NotTo(HaveOccurred())
 				Expect(user).NotTo(BeNil())
@@ -259,7 +259,7 @@ var _ = Describe("UserService", func() {
 				notFoundErr := apperrors2.New(404, apperrors2.ErrorCodeUserNotFound, errors.New("user not found"))
 				mockUserRepo.EXPECT().FindByID(ctx, userID).Return(nil, notFoundErr).Once()
 
-				user, err := service.GetByID(ctx, userID)
+				user, err := userService.GetByID(ctx, userID)
 
 				Expect(user).To(BeNil())
 				ExpectAppError(err, apperrors2.ErrorCodeUserNotFound)
@@ -287,7 +287,7 @@ var _ = Describe("UserService", func() {
 
 				mockUserRepo.EXPECT().FindAll(ctx).Return(expectedUsers, nil).Once()
 
-				users, err := service.GetAll(ctx)
+				users, err := userService.GetAll(ctx)
 
 				Expect(err).NotTo(HaveOccurred())
 				Expect(users).NotTo(BeNil())
@@ -301,7 +301,7 @@ var _ = Describe("UserService", func() {
 			It("should return an empty slice", func() {
 				mockUserRepo.EXPECT().FindAll(ctx).Return([]*entity.User{}, nil).Once()
 
-				users, err := service.GetAll(ctx)
+				users, err := userService.GetAll(ctx)
 
 				Expect(err).NotTo(HaveOccurred())
 				Expect(users).NotTo(BeNil())
@@ -314,7 +314,7 @@ var _ = Describe("UserService", func() {
 				dbErr := apperrors2.New(500, apperrors2.ErrorCodeDBOperation, errors.New("database error"))
 				mockUserRepo.EXPECT().FindAll(ctx).Return(nil, dbErr).Once()
 
-				users, err := service.GetAll(ctx)
+				users, err := userService.GetAll(ctx)
 
 				Expect(err).To(HaveOccurred())
 				Expect(users).To(BeNil())
@@ -327,7 +327,7 @@ var _ = Describe("UserService", func() {
 		var (
 			userID       uuid.UUID
 			existingUser *entity.User
-			cmd          *services.UserUpdateCommand
+			cmd          *service.UserUpdateCommand
 		)
 
 		BeforeEach(func() {
@@ -343,7 +343,7 @@ var _ = Describe("UserService", func() {
 
 		Context("when user is updated successfully", func() {
 			BeforeEach(func() {
-				cmd = &services.UserUpdateCommand{
+				cmd = &service.UserUpdateCommand{
 					Name:     "Updated Name",
 					Role:     entity.UserRoleEvmStaff,
 					IsActive: false,
@@ -366,7 +366,7 @@ var _ = Describe("UserService", func() {
 						u.OfficeID == cmd.OfficeID
 				})).Return(nil).Once()
 
-				err := service.Update(ctx, userID, cmd)
+				err := userService.Update(ctx, userID, cmd)
 
 				Expect(err).NotTo(HaveOccurred())
 			})
@@ -374,7 +374,7 @@ var _ = Describe("UserService", func() {
 
 		Context("when user is not found", func() {
 			BeforeEach(func() {
-				cmd = &services.UserUpdateCommand{
+				cmd = &service.UserUpdateCommand{
 					Name:     "Updated Name",
 					Role:     entity.UserRoleAdmin,
 					IsActive: true,
@@ -386,7 +386,7 @@ var _ = Describe("UserService", func() {
 				notFoundErr := apperrors2.New(404, apperrors2.ErrorCodeUserNotFound, errors.New("user not found"))
 				mockUserRepo.EXPECT().FindByID(ctx, userID).Return(nil, notFoundErr).Once()
 
-				err := service.Update(ctx, userID, cmd)
+				err := userService.Update(ctx, userID, cmd)
 
 				ExpectAppError(err, apperrors2.ErrorCodeUserNotFound)
 			})
@@ -394,7 +394,7 @@ var _ = Describe("UserService", func() {
 
 		Context("when name is invalid", func() {
 			BeforeEach(func() {
-				cmd = &services.UserUpdateCommand{
+				cmd = &service.UserUpdateCommand{
 					Name:     "A",
 					Role:     entity.UserRoleAdmin,
 					IsActive: true,
@@ -405,7 +405,7 @@ var _ = Describe("UserService", func() {
 			It("should return InvalidUserInput error", func() {
 				mockUserRepo.EXPECT().FindByID(ctx, userID).Return(existingUser, nil).Once()
 
-				err := service.Update(ctx, userID, cmd)
+				err := userService.Update(ctx, userID, cmd)
 
 				ExpectAppError(err, apperrors2.ErrorCodeInvalidUserInput)
 			})
@@ -413,7 +413,7 @@ var _ = Describe("UserService", func() {
 
 		Context("when role is invalid", func() {
 			BeforeEach(func() {
-				cmd = &services.UserUpdateCommand{
+				cmd = &service.UserUpdateCommand{
 					Name:     "Updated Name",
 					Role:     "INVALID_ROLE",
 					IsActive: true,
@@ -424,7 +424,7 @@ var _ = Describe("UserService", func() {
 			It("should return InvalidUserInput error", func() {
 				mockUserRepo.EXPECT().FindByID(ctx, userID).Return(existingUser, nil).Once()
 
-				err := service.Update(ctx, userID, cmd)
+				err := userService.Update(ctx, userID, cmd)
 
 				ExpectAppError(err, apperrors2.ErrorCodeInvalidUserInput)
 			})
@@ -432,7 +432,7 @@ var _ = Describe("UserService", func() {
 
 		Context("when office is not found", func() {
 			BeforeEach(func() {
-				cmd = &services.UserUpdateCommand{
+				cmd = &service.UserUpdateCommand{
 					Name:     "Updated Name",
 					Role:     entity.UserRoleAdmin,
 					IsActive: true,
@@ -445,7 +445,7 @@ var _ = Describe("UserService", func() {
 				mockUserRepo.EXPECT().FindByID(ctx, userID).Return(existingUser, nil).Once()
 				mockOfficeRepo.EXPECT().FindByID(ctx, cmd.OfficeID).Return(nil, officeErr).Once()
 
-				err := service.Update(ctx, userID, cmd)
+				err := userService.Update(ctx, userID, cmd)
 
 				Expect(err).To(HaveOccurred())
 				Expect(err).To(Equal(officeErr))
@@ -454,7 +454,7 @@ var _ = Describe("UserService", func() {
 
 		Context("when role does not match office type", func() {
 			BeforeEach(func() {
-				cmd = &services.UserUpdateCommand{
+				cmd = &service.UserUpdateCommand{
 					Name:     "Updated Name",
 					Role:     entity.UserRoleScStaff,
 					IsActive: true,
@@ -470,7 +470,7 @@ var _ = Describe("UserService", func() {
 				mockUserRepo.EXPECT().FindByID(ctx, userID).Return(existingUser, nil).Once()
 				mockOfficeRepo.EXPECT().FindByID(ctx, cmd.OfficeID).Return(office, nil).Once()
 
-				err := service.Update(ctx, userID, cmd)
+				err := userService.Update(ctx, userID, cmd)
 
 				ExpectAppError(err, apperrors2.ErrorCodeInvalidOfficeType)
 			})
@@ -478,7 +478,7 @@ var _ = Describe("UserService", func() {
 
 		Context("when repository update fails", func() {
 			BeforeEach(func() {
-				cmd = &services.UserUpdateCommand{
+				cmd = &service.UserUpdateCommand{
 					Name:     "Updated Name",
 					Role:     entity.UserRoleAdmin,
 					IsActive: true,
@@ -496,7 +496,7 @@ var _ = Describe("UserService", func() {
 				mockOfficeRepo.EXPECT().FindByID(ctx, cmd.OfficeID).Return(office, nil).Once()
 				mockUserRepo.EXPECT().Update(ctx, mock.AnythingOfType("*entity.User")).Return(dbErr).Once()
 
-				err := service.Update(ctx, userID, cmd)
+				err := userService.Update(ctx, userID, cmd)
 
 				Expect(err).To(HaveOccurred())
 				Expect(err).To(Equal(dbErr))
@@ -515,7 +515,7 @@ var _ = Describe("UserService", func() {
 			It("should return nil error", func() {
 				mockUserRepo.EXPECT().SoftDelete(ctx, userID).Return(nil).Once()
 
-				err := service.Delete(ctx, userID)
+				err := userService.Delete(ctx, userID)
 
 				Expect(err).NotTo(HaveOccurred())
 			})
@@ -526,7 +526,7 @@ var _ = Describe("UserService", func() {
 				dbErr := apperrors2.New(500, apperrors2.ErrorCodeDBOperation, errors.New("database error"))
 				mockUserRepo.EXPECT().SoftDelete(ctx, userID).Return(dbErr).Once()
 
-				err := service.Delete(ctx, userID)
+				err := userService.Delete(ctx, userID)
 
 				Expect(err).To(HaveOccurred())
 				Expect(err).To(Equal(dbErr))

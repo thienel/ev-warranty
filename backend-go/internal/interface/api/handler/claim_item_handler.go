@@ -3,7 +3,7 @@ package handler
 import (
 	"context"
 	"ev-warranty-go/internal/application"
-	"ev-warranty-go/internal/application/services"
+	"ev-warranty-go/internal/application/service"
 	"ev-warranty-go/internal/domain/entity"
 	"ev-warranty-go/internal/interface/api/dto"
 	"ev-warranty-go/pkg/apperror"
@@ -26,10 +26,10 @@ type ClaimItemHandler interface {
 type claimItemHandler struct {
 	log       logger.Logger
 	txManager application.TxManager
-	service   services.ClaimItemService
+	service   service.ClaimItemService
 }
 
-func NewClaimItemHandler(log logger.Logger, txManager application.TxManager, service services.ClaimItemService) ClaimItemHandler {
+func NewClaimItemHandler(log logger.Logger, txManager application.TxManager, service service.ClaimItemService) ClaimItemHandler {
 	return &claimItemHandler{
 		log:       log,
 		txManager: txManager,
@@ -143,7 +143,7 @@ func (h *claimItemHandler) Create(c *gin.Context) {
 		return
 	}
 
-	cmd := &services.CreateClaimItemCommand{
+	cmd := &service.CreateClaimItemCommand{
 		PartCategoryID:    req.PartCategoryID,
 		FaultyPartID:      req.FaultyPartID,
 		ReplacementPartID: req.ReplacementPartID,

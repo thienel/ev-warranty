@@ -2,7 +2,7 @@ package handler
 
 import (
 	"context"
-	"ev-warranty-go/internal/application/services"
+	"ev-warranty-go/internal/application/service"
 	"ev-warranty-go/internal/interface/api/dto"
 	"ev-warranty-go/pkg/apperror"
 	"ev-warranty-go/pkg/logger"
@@ -22,13 +22,13 @@ type AuthHandler interface {
 
 type authHandler struct {
 	log          logger.Logger
-	authService  services.AuthService
-	tokenService services.TokenService
-	userService  services.UserService
+	authService  service.AuthService
+	tokenService service.TokenService
+	userService  service.UserService
 }
 
-func NewAuthHandler(log logger.Logger, authService services.AuthService, tokenService services.TokenService,
-	userService services.UserService) AuthHandler {
+func NewAuthHandler(log logger.Logger, authService service.AuthService, tokenService service.TokenService,
+	userService service.UserService) AuthHandler {
 
 	return &authHandler{
 		log:          log,

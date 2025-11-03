@@ -1,7 +1,7 @@
 package handler
 
 import (
-	"ev-warranty-go/internal/application/services"
+	"ev-warranty-go/internal/application/service"
 	"ev-warranty-go/internal/infrastructure/oauth"
 	"ev-warranty-go/pkg/logger"
 	"fmt"
@@ -23,10 +23,10 @@ type oauthHandler struct {
 	log             logger.Logger
 	frontendBaseURL string
 	oauthService    oauth.OAuthService
-	authService     services.AuthService
+	authService     service.AuthService
 }
 
-func NewOAuthHandler(log logger.Logger, frontendBaseURL string, oauthService oauth.OAuthService, authService services.AuthService) OAuthHandler {
+func NewOAuthHandler(log logger.Logger, frontendBaseURL string, oauthService oauth.OAuthService, authService service.AuthService) OAuthHandler {
 	return &oauthHandler{
 		log:             log,
 		frontendBaseURL: frontendBaseURL,

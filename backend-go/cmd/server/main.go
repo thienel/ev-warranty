@@ -3,7 +3,7 @@ package main
 import (
 	"context"
 	"errors"
-	"ev-warranty-go/internal/application/services"
+	"ev-warranty-go/internal/application/service"
 	"ev-warranty-go/internal/infrastructure/cloudinary"
 	"ev-warranty-go/internal/infrastructure/config"
 	"ev-warranty-go/internal/infrastructure/database"
@@ -100,15 +100,15 @@ func main() {
 		os.Exit(1)
 	}
 
-	officeService := services.NewOfficeService(officeRepo)
-	tokenService := services.NewTokenService(tokenRepo,
+	officeService := service.NewOfficeService(officeRepo)
+	tokenService := service.NewTokenService(tokenRepo,
 		cfg.AccessTokenTTL, cfg.RefreshTokenTTL, security.PrivateKey(), security.PublicKey())
-	authService := services.NewAuthService(userRepo, tokenService)
-	userService := services.NewUserService(userRepo, officeRepo)
+	authService := service.NewAuthService(userRepo, tokenService)
+	userService := service.NewUserService(userRepo, officeRepo)
 	oauthService := oauth.NewOAuthService(googleProvider, userRepo)
-	claimService := services.NewClaimService(log, claimRepo, claimItemRepo, claimAttachmentRepo, claimHistoryRepo, cloudinaryService)
-	claimItemService := services.NewClaimItemService(claimRepo, claimItemRepo)
-	claimAttachmentService := services.NewClaimAttachmentService(log, claimRepo, claimAttachmentRepo, cloudinaryService)
+	claimService := service.NewClaimService(log, claimRepo, claimItemRepo, claimAttachmentRepo, claimHistoryRepo, cloudinaryService)
+	claimItemService := service.NewClaimItemService(claimRepo, claimItemRepo)
+	claimAttachmentService := service.NewClaimAttachmentService(log, claimRepo, claimAttachmentRepo, cloudinaryService)
 
 	officeHandler := handler.NewOfficeHandler(log, officeService)
 	authHandler := handler.NewAuthHandler(log, authService, tokenService, userService)
