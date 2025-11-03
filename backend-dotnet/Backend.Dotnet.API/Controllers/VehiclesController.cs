@@ -1,5 +1,7 @@
-﻿using Backend.Dotnet.Application.DTOs;
+﻿using Backend.Dotnet.Application.Constants;
+using Backend.Dotnet.Application.DTOs;
 using Backend.Dotnet.Application.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using static Backend.Dotnet.Application.DTOs.VehicleDto;
 
@@ -9,6 +11,7 @@ namespace Backend.Dotnet.API.Controllers
     [ApiController]
     [Route("vehicles")]
     [Produces("application/json")]
+    [Authorize(Roles = SystemRoles.UserRoleScStaff + "," + SystemRoles.UserRoleEvmStaff)]
     public class VehiclesController : ControllerBase
     {
         private readonly IVehicleService _vehicleService;

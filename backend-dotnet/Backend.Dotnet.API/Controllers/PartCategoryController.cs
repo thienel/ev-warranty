@@ -1,5 +1,7 @@
-﻿using Backend.Dotnet.Application.DTOs;
+﻿using Backend.Dotnet.Application.Constants;
+using Backend.Dotnet.Application.DTOs;
 using Backend.Dotnet.Application.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using static Backend.Dotnet.Application.DTOs.PartCategoryDto;
@@ -9,6 +11,7 @@ namespace Backend.Dotnet.API.Controllers
     [ApiController]
     [Route("part-categories")]
     [Produces("application/json")]
+    [Authorize(Roles = SystemRoles.UserRoleAdmin + "," + SystemRoles.UserRoleEvmStaff)]
     public class PartCategoriesController : ControllerBase
     {
         private readonly IPartCategoryService _partCategoryService;

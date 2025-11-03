@@ -10,7 +10,7 @@ namespace Backend.Dotnet.API.Controllers
     [ApiController]
     [Route("customers")]
     [Produces("application/json")]
-    //[Authorize(Roles = SystemRoles.UserRoleScStaff)]
+    [Authorize(Roles = SystemRoles.UserRoleScStaff)]
     public class CustomersController : ControllerBase
     {
         private readonly ICustomerService _customerService;
@@ -24,7 +24,6 @@ namespace Backend.Dotnet.API.Controllers
         /// Get customers with optional filtering
         /// </summary>
         [HttpGet]
-        //[Authorize(Roles = SystemRoles.UserRoleScTechnician)]
         [ProducesResponseType(typeof(BaseResponseDto<IEnumerable<CustomerResponse>>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BaseResponseDto), StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> GetAll(
