@@ -26,7 +26,9 @@ type claimAttachmentHandler struct {
 	service   service.ClaimAttachmentService
 }
 
-func NewClaimAttachmentHandler(log logger.Logger, txManager application.TxManager, service service.ClaimAttachmentService) ClaimAttachmentHandler {
+func NewClaimAttachmentHandler(log logger.Logger, txManager application.TxManager,
+	service service.ClaimAttachmentService,
+) ClaimAttachmentHandler {
 	return &claimAttachmentHandler{
 		log:       log,
 		txManager: txManager,
@@ -131,13 +133,13 @@ func (h *claimAttachmentHandler) Create(c *gin.Context) {
 
 	form, err := c.MultipartForm()
 	if err != nil || form == nil {
-		handleError(h.log, c, apperror.NewInvalidMultipartFormRequest())
+		handleError(h.log, c, apperror.ErrInvalidMultipartForm)
 		return
 	}
 
 	files := form.File["files"]
 	if len(files) == 0 {
-		handleError(h.log, c, apperror.NewInvalidMultipartFormRequest())
+		handleError(h.log, c, apperror.ErrInvalidMultipartForm)
 		return
 	}
 
@@ -146,7 +148,7 @@ func (h *claimAttachmentHandler) Create(c *gin.Context) {
 		for _, fileHeader := range files {
 			file, err := fileHeader.Open()
 			if err != nil {
-				return apperror.NewInvalidMultipartFormRequest()
+				return apperror.ErrInvalidMultipartForm
 			}
 			attachment, err := h.service.Create(tx, claimID, file)
 			if err != nil {
@@ -218,7 +220,7 @@ func parseAttachmentIDParam(c *gin.Context) (uuid.UUID, error) {
 	attachmentIDStr := c.Param("attachmentID")
 	attachmentID, err := uuid.Parse(attachmentIDStr)
 	if err != nil {
-		return uuid.Nil, apperror.NewInvalidUUID()
+		return uuid.Nil, apperror.ErrInvalidParams.WithMessage("Invalid attachment ID")
 	}
 	return attachmentID, nil
 }

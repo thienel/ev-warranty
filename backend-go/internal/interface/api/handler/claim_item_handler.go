@@ -29,7 +29,8 @@ type claimItemHandler struct {
 	service   service.ClaimItemService
 }
 
-func NewClaimItemHandler(log logger.Logger, txManager application.TxManager, service service.ClaimItemService) ClaimItemHandler {
+func NewClaimItemHandler(log logger.Logger, txManager application.TxManager, service service.ClaimItemService,
+) ClaimItemHandler {
 	return &claimItemHandler{
 		log:       log,
 		txManager: txManager,
@@ -134,12 +135,12 @@ func (h *claimItemHandler) Create(c *gin.Context) {
 
 	var req dto.CreateClaimItemRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		handleError(h.log, c, apperror.NewInvalidJsonRequest())
+		handleError(h.log, c, apperror.ErrInvalidJsonRequest)
 		return
 	}
 
 	if !entity.IsValidClaimItemType(req.Type) {
-		handleError(h.log, c, apperror.NewInvalidClaimItemType())
+		handleError(h.log, c, apperror.ErrInvalidJsonRequest)
 		return
 	}
 
@@ -310,7 +311,7 @@ func parseItemIDParam(c *gin.Context) (uuid.UUID, error) {
 	itemIDStr := c.Param("itemID")
 	itemID, err := uuid.Parse(itemIDStr)
 	if err != nil {
-		return uuid.Nil, apperror.NewInvalidUUID()
+		return uuid.Nil, apperror.ErrInvalidParams
 	}
 	return itemID, nil
 }
@@ -319,7 +320,7 @@ func parseClaimIDParam(c *gin.Context) (uuid.UUID, error) {
 	claimIDStr := c.Param("id")
 	claimID, err := uuid.Parse(claimIDStr)
 	if err != nil {
-		return uuid.Nil, apperror.NewInvalidUUID()
+		return uuid.Nil, apperror.ErrInvalidParams
 	}
 	return claimID, nil
 }

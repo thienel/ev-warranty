@@ -64,7 +64,7 @@ var _ = Describe("ClaimRepository", func() {
 
 				err := repository.Create(mockTx, claim)
 
-				ExpectAppError(err, apperror.ErrorCodeDuplicateKey)
+				ExpectAppError(err, apperror.ErrDuplicateKey.ErrorCode)
 			})
 		})
 
@@ -76,7 +76,7 @@ var _ = Describe("ClaimRepository", func() {
 
 				err := repository.Create(mockTx, claim)
 
-				ExpectAppError(err, apperror.ErrorCodeDBOperation)
+				ExpectAppError(err, apperror.ErrDBOperation.ErrorCode)
 			})
 		})
 	})
@@ -110,7 +110,7 @@ var _ = Describe("ClaimRepository", func() {
 
 				err := repository.Update(mockTx, claim)
 
-				ExpectAppError(err, apperror.ErrorCodeDBOperation)
+				ExpectAppError(err, apperror.ErrDBOperation.ErrorCode)
 			})
 		})
 	})
@@ -150,7 +150,7 @@ var _ = Describe("ClaimRepository", func() {
 
 				err := repository.HardDelete(mockTx, claimID)
 
-				ExpectAppError(err, apperror.ErrorCodeDBOperation)
+				ExpectAppError(err, apperror.ErrDBOperation.ErrorCode)
 			})
 		})
 	})
@@ -182,7 +182,7 @@ var _ = Describe("ClaimRepository", func() {
 
 				err := repository.SoftDelete(mockTx, claimID)
 
-				ExpectAppError(err, apperror.ErrorCodeDBOperation)
+				ExpectAppError(err, apperror.ErrDBOperation.ErrorCode)
 			})
 		})
 	})
@@ -224,7 +224,7 @@ var _ = Describe("ClaimRepository", func() {
 
 				err := repository.UpdateStatus(mockTx, claimID, status)
 
-				ExpectAppError(err, apperror.ErrorCodeDBOperation)
+				ExpectAppError(err, apperror.ErrDBOperation.ErrorCode)
 			})
 		})
 
@@ -296,7 +296,7 @@ var _ = Describe("ClaimRepository", func() {
 				claim, err := repository.FindByID(ctx, claimID)
 
 				Expect(claim).To(BeNil())
-				ExpectAppError(err, apperror.ErrorCodeClaimNotFound)
+				ExpectAppError(err, apperror.ErrNotFoundError.ErrorCode)
 			})
 		})
 
@@ -307,7 +307,7 @@ var _ = Describe("ClaimRepository", func() {
 				claim, err := repository.FindByID(ctx, claimID)
 
 				Expect(claim).To(BeNil())
-				ExpectAppError(err, apperror.ErrorCodeDBOperation)
+				ExpectAppError(err, apperror.ErrDBOperation.ErrorCode)
 			})
 		})
 	})
@@ -366,7 +366,7 @@ var _ = Describe("ClaimRepository", func() {
 				claims, err := repository.FindAll(ctx)
 
 				Expect(claims).To(BeNil())
-				ExpectAppError(err, apperror.ErrorCodeDBOperation)
+				ExpectAppError(err, apperror.ErrDBOperation.ErrorCode)
 			})
 		})
 	})
@@ -434,7 +434,7 @@ var _ = Describe("ClaimRepository", func() {
 				claims, err := repository.FindByCustomerID(ctx, customerID)
 
 				Expect(claims).To(BeNil())
-				ExpectAppError(err, apperror.ErrorCodeDBOperation)
+				ExpectAppError(err, apperror.ErrDBOperation.ErrorCode)
 			})
 		})
 	})
@@ -502,7 +502,7 @@ var _ = Describe("ClaimRepository", func() {
 				claims, err := repository.FindByVehicleID(ctx, vehicleID)
 
 				Expect(claims).To(BeNil())
-				ExpectAppError(err, apperror.ErrorCodeDBOperation)
+				ExpectAppError(err, apperror.ErrDBOperation.ErrorCode)
 			})
 		})
 	})

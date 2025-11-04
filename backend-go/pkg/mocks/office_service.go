@@ -4,11 +4,11 @@ package mocks
 
 import (
 	context "context"
-	entities "ev-warranty-go/internal/domain/entity"
+	entity "ev-warranty-go/internal/domain/entity"
 
 	mock "github.com/stretchr/testify/mock"
 
-	services "ev-warranty-go/internal/application/service"
+	service "ev-warranty-go/internal/application/service"
 
 	uuid "github.com/google/uuid"
 )
@@ -27,27 +27,27 @@ func (_m *OfficeService) EXPECT() *OfficeService_Expecter {
 }
 
 // Create provides a mock function with given fields: ctx, cmd
-func (_m *OfficeService) Create(ctx context.Context, cmd *services.CreateOfficeCommand) (*entities.Office, error) {
+func (_m *OfficeService) Create(ctx context.Context, cmd *service.CreateOfficeCommand) (*entity.Office, error) {
 	ret := _m.Called(ctx, cmd)
 
 	if len(ret) == 0 {
 		panic("no return value specified for Create")
 	}
 
-	var r0 *entities.Office
+	var r0 *entity.Office
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, *services.CreateOfficeCommand) (*entities.Office, error)); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, *service.CreateOfficeCommand) (*entity.Office, error)); ok {
 		return rf(ctx, cmd)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, *services.CreateOfficeCommand) *entities.Office); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, *service.CreateOfficeCommand) *entity.Office); ok {
 		r0 = rf(ctx, cmd)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*entities.Office)
+			r0 = ret.Get(0).(*entity.Office)
 		}
 	}
 
-	if rf, ok := ret.Get(1).(func(context.Context, *services.CreateOfficeCommand) error); ok {
+	if rf, ok := ret.Get(1).(func(context.Context, *service.CreateOfficeCommand) error); ok {
 		r1 = rf(ctx, cmd)
 	} else {
 		r1 = ret.Error(1)
@@ -68,19 +68,19 @@ func (_e *OfficeService_Expecter) Create(ctx interface{}, cmd interface{}) *Offi
 	return &OfficeService_Create_Call{Call: _e.mock.On("Create", ctx, cmd)}
 }
 
-func (_c *OfficeService_Create_Call) Run(run func(ctx context.Context, cmd *services.CreateOfficeCommand)) *OfficeService_Create_Call {
+func (_c *OfficeService_Create_Call) Run(run func(ctx context.Context, cmd *service.CreateOfficeCommand)) *OfficeService_Create_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(*services.CreateOfficeCommand))
+		run(args[0].(context.Context), args[1].(*service.CreateOfficeCommand))
 	})
 	return _c
 }
 
-func (_c *OfficeService_Create_Call) Return(_a0 *entities.Office, _a1 error) *OfficeService_Create_Call {
+func (_c *OfficeService_Create_Call) Return(_a0 *entity.Office, _a1 error) *OfficeService_Create_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
-func (_c *OfficeService_Create_Call) RunAndReturn(run func(context.Context, *services.CreateOfficeCommand) (*entities.Office, error)) *OfficeService_Create_Call {
+func (_c *OfficeService_Create_Call) RunAndReturn(run func(context.Context, *service.CreateOfficeCommand) (*entity.Office, error)) *OfficeService_Create_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -133,23 +133,23 @@ func (_c *OfficeService_DeleteByID_Call) RunAndReturn(run func(context.Context, 
 }
 
 // GetAll provides a mock function with given fields: ctx
-func (_m *OfficeService) GetAll(ctx context.Context) ([]*entities.Office, error) {
+func (_m *OfficeService) GetAll(ctx context.Context) ([]*entity.Office, error) {
 	ret := _m.Called(ctx)
 
 	if len(ret) == 0 {
 		panic("no return value specified for GetAll")
 	}
 
-	var r0 []*entities.Office
+	var r0 []*entity.Office
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context) ([]*entities.Office, error)); ok {
+	if rf, ok := ret.Get(0).(func(context.Context) ([]*entity.Office, error)); ok {
 		return rf(ctx)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context) []*entities.Office); ok {
+	if rf, ok := ret.Get(0).(func(context.Context) []*entity.Office); ok {
 		r0 = rf(ctx)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).([]*entities.Office)
+			r0 = ret.Get(0).([]*entity.Office)
 		}
 	}
 
@@ -180,34 +180,34 @@ func (_c *OfficeService_GetAll_Call) Run(run func(ctx context.Context)) *OfficeS
 	return _c
 }
 
-func (_c *OfficeService_GetAll_Call) Return(_a0 []*entities.Office, _a1 error) *OfficeService_GetAll_Call {
+func (_c *OfficeService_GetAll_Call) Return(_a0 []*entity.Office, _a1 error) *OfficeService_GetAll_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
-func (_c *OfficeService_GetAll_Call) RunAndReturn(run func(context.Context) ([]*entities.Office, error)) *OfficeService_GetAll_Call {
+func (_c *OfficeService_GetAll_Call) RunAndReturn(run func(context.Context) ([]*entity.Office, error)) *OfficeService_GetAll_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
 // GetByID provides a mock function with given fields: ctx, id
-func (_m *OfficeService) GetByID(ctx context.Context, id uuid.UUID) (*entities.Office, error) {
+func (_m *OfficeService) GetByID(ctx context.Context, id uuid.UUID) (*entity.Office, error) {
 	ret := _m.Called(ctx, id)
 
 	if len(ret) == 0 {
 		panic("no return value specified for GetByID")
 	}
 
-	var r0 *entities.Office
+	var r0 *entity.Office
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID) (*entities.Office, error)); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID) (*entity.Office, error)); ok {
 		return rf(ctx, id)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID) *entities.Office); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID) *entity.Office); ok {
 		r0 = rf(ctx, id)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*entities.Office)
+			r0 = ret.Get(0).(*entity.Office)
 		}
 	}
 
@@ -239,18 +239,18 @@ func (_c *OfficeService_GetByID_Call) Run(run func(ctx context.Context, id uuid.
 	return _c
 }
 
-func (_c *OfficeService_GetByID_Call) Return(_a0 *entities.Office, _a1 error) *OfficeService_GetByID_Call {
+func (_c *OfficeService_GetByID_Call) Return(_a0 *entity.Office, _a1 error) *OfficeService_GetByID_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
-func (_c *OfficeService_GetByID_Call) RunAndReturn(run func(context.Context, uuid.UUID) (*entities.Office, error)) *OfficeService_GetByID_Call {
+func (_c *OfficeService_GetByID_Call) RunAndReturn(run func(context.Context, uuid.UUID) (*entity.Office, error)) *OfficeService_GetByID_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
 // Update provides a mock function with given fields: ctx, id, cmd
-func (_m *OfficeService) Update(ctx context.Context, id uuid.UUID, cmd *services.UpdateOfficeCommand) error {
+func (_m *OfficeService) Update(ctx context.Context, id uuid.UUID, cmd *service.UpdateOfficeCommand) error {
 	ret := _m.Called(ctx, id, cmd)
 
 	if len(ret) == 0 {
@@ -258,7 +258,7 @@ func (_m *OfficeService) Update(ctx context.Context, id uuid.UUID, cmd *services
 	}
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID, *services.UpdateOfficeCommand) error); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID, *service.UpdateOfficeCommand) error); ok {
 		r0 = rf(ctx, id, cmd)
 	} else {
 		r0 = ret.Error(0)
@@ -280,9 +280,9 @@ func (_e *OfficeService_Expecter) Update(ctx interface{}, id interface{}, cmd in
 	return &OfficeService_Update_Call{Call: _e.mock.On("Update", ctx, id, cmd)}
 }
 
-func (_c *OfficeService_Update_Call) Run(run func(ctx context.Context, id uuid.UUID, cmd *services.UpdateOfficeCommand)) *OfficeService_Update_Call {
+func (_c *OfficeService_Update_Call) Run(run func(ctx context.Context, id uuid.UUID, cmd *service.UpdateOfficeCommand)) *OfficeService_Update_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(uuid.UUID), args[2].(*services.UpdateOfficeCommand))
+		run(args[0].(context.Context), args[1].(uuid.UUID), args[2].(*service.UpdateOfficeCommand))
 	})
 	return _c
 }
@@ -292,7 +292,7 @@ func (_c *OfficeService_Update_Call) Return(_a0 error) *OfficeService_Update_Cal
 	return _c
 }
 
-func (_c *OfficeService_Update_Call) RunAndReturn(run func(context.Context, uuid.UUID, *services.UpdateOfficeCommand) error) *OfficeService_Update_Call {
+func (_c *OfficeService_Update_Call) RunAndReturn(run func(context.Context, uuid.UUID, *service.UpdateOfficeCommand) error) *OfficeService_Update_Call {
 	_c.Call.Return(run)
 	return _c
 }

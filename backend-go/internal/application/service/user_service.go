@@ -44,9 +44,20 @@ func NewUserService(userRepo repository.UserRepository, officeRepo repository.Of
 }
 
 func (s *userService) Create(ctx context.Context, cmd *UserCreateCommand) (*entity.User, error) {
-	if !entity.IsValidName(cmd.Name) || !entity.IsValidEmail(cmd.Email) ||
-		!entity.IsValidPassword(cmd.Password) || !entity.IsValidUserRole(cmd.Role) {
-		return nil, apperror.NewInvalidUserInput()
+	if !entity.IsValidName(cmd.Name) {
+		return nil, apperror.ErrInvalidInput.WithMessage("Invalid name")
+	}
+
+	if !entity.IsValidEmail(cmd.Email) {
+		return nil, apperror.ErrInvalidInput.WithMessage("Invalid email")
+	}
+
+	if !entity.IsValidPassword(cmd.Password) {
+		return nil, apperror.ErrInvalidInput.WithMessage("Invalid password")
+	}
+
+	if !entity.IsValidUserRole(cmd.Role) {
+		return nil, apperror.ErrInvalidInput.WithMessage("Invalid role")
 	}
 
 	office, err := s.officeRepo.FindByID(ctx, cmd.OfficeID)
@@ -56,12 +67,12 @@ func (s *userService) Create(ctx context.Context, cmd *UserCreateCommand) (*enti
 
 	passwordHash, err := security.HashPassword(cmd.Password)
 	if err != nil {
-		return nil, apperror.NewHashPasswordError(err)
+		return nil, apperror.ErrHashPassword.WithError(err)
 	}
 
 	user := entity.NewUser(cmd.Name, cmd.Email, cmd.Role, passwordHash, cmd.IsActive, cmd.OfficeID)
 	if !user.IsValidOfficeByRole(office.OfficeType) {
-		return nil, apperror.NewInvalidOfficeType()
+		return nil, apperror.ErrInvalidInput.WithMessage("Invalid office type")
 	}
 
 	if err = s.userRepo.Create(ctx, user); err != nil {
@@ -90,8 +101,11 @@ func (s *userService) Update(ctx context.Context, id uuid.UUID, cmd *UserUpdateC
 		return err
 	}
 
-	if !entity.IsValidName(cmd.Name) || !entity.IsValidUserRole(cmd.Role) {
-		return apperror.NewInvalidUserInput()
+	if !entity.IsValidName(cmd.Name) {
+		return apperror.ErrInvalidInput.WithMessage("Invalid name")
+	}
+	if !entity.IsValidUserRole(cmd.Role) {
+		return apperror.ErrInvalidInput.WithMessage("Invalid role")
 	}
 	user.Role = cmd.Role
 	user.Name = cmd.Name
@@ -102,7 +116,7 @@ func (s *userService) Update(ctx context.Context, id uuid.UUID, cmd *UserUpdateC
 		return err
 	}
 	if !user.IsValidOfficeByRole(office.OfficeType) {
-		return apperror.NewInvalidOfficeType()
+		return apperror.ErrInvalidInput.WithMessage("Invalid office type")
 	}
 	user.OfficeID = cmd.OfficeID
 

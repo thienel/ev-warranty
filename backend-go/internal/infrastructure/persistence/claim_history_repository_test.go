@@ -64,7 +64,7 @@ var _ = Describe("ClaimHistoryRepository", func() {
 
 				err := repository.Create(mockTx, history)
 
-				ExpectAppError(err, apperror.ErrorCodeDuplicateKey)
+				ExpectAppError(err, apperror.ErrDuplicateKey.ErrorCode)
 			})
 		})
 
@@ -76,7 +76,7 @@ var _ = Describe("ClaimHistoryRepository", func() {
 
 				err := repository.Create(mockTx, history)
 
-				ExpectAppError(err, apperror.ErrorCodeDBOperation)
+				ExpectAppError(err, apperror.ErrDBOperation.ErrorCode)
 			})
 		})
 
@@ -139,7 +139,7 @@ var _ = Describe("ClaimHistoryRepository", func() {
 
 				err := repository.SoftDeleteByClaimID(mockTx, claimID)
 
-				ExpectAppError(err, apperror.ErrorCodeDBOperation)
+				ExpectAppError(err, apperror.ErrDBOperation.ErrorCode)
 			})
 		})
 	})
@@ -205,7 +205,7 @@ var _ = Describe("ClaimHistoryRepository", func() {
 				histories, err := repository.FindByClaimID(ctx, claimID)
 
 				Expect(histories).To(BeNil())
-				ExpectAppError(err, apperror.ErrorCodeDBOperation)
+				ExpectAppError(err, apperror.ErrDBOperation.ErrorCode)
 			})
 		})
 
@@ -296,7 +296,7 @@ var _ = Describe("ClaimHistoryRepository", func() {
 				history, err := repository.FindLatestByClaimID(ctx, claimID)
 
 				Expect(history).To(BeNil())
-				ExpectAppError(err, apperror.ErrorCodeClaimHistoryNotFound)
+				ExpectAppError(err, apperror.ErrNotFoundError.ErrorCode)
 			})
 		})
 
@@ -309,7 +309,7 @@ var _ = Describe("ClaimHistoryRepository", func() {
 				history, err := repository.FindLatestByClaimID(ctx, claimID)
 
 				Expect(history).To(BeNil())
-				ExpectAppError(err, apperror.ErrorCodeDBOperation)
+				ExpectAppError(err, apperror.ErrDBOperation.ErrorCode)
 			})
 		})
 	})
@@ -379,7 +379,7 @@ var _ = Describe("ClaimHistoryRepository", func() {
 				histories, err := repository.FindByDateRange(ctx, claimID, startDate, endDate)
 
 				Expect(histories).To(BeNil())
-				ExpectAppError(err, apperror.ErrorCodeDBOperation)
+				ExpectAppError(err, apperror.ErrDBOperation.ErrorCode)
 			})
 		})
 

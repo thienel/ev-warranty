@@ -27,7 +27,8 @@ type authHandler struct {
 	userService  service.UserService
 }
 
-func NewAuthHandler(log logger.Logger, authService service.AuthService, tokenService service.TokenService,
+func NewAuthHandler(log logger.Logger, authService service.AuthService,
+	tokenService service.TokenService,
 	userService service.UserService) AuthHandler {
 
 	return &authHandler{
@@ -58,7 +59,7 @@ func (h *authHandler) Login(c *gin.Context) {
 
 	var req dto.LoginRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		handleError(h.log, c, apperror.NewInvalidJsonRequest())
+		handleError(h.log, c, apperror.ErrInvalidJsonRequest)
 		return
 	}
 
@@ -111,7 +112,7 @@ func (h *authHandler) Logout(c *gin.Context) {
 
 	token, err := c.Cookie("refreshToken")
 	if err != nil {
-		err = apperror.NewRefreshTokenNotFound()
+		err = apperror.ErrNotFoundError.WithMessage("Refresh token not found")
 		handleError(h.log, c, err)
 		return
 	}
@@ -146,7 +147,7 @@ func (h *authHandler) RefreshToken(c *gin.Context) {
 
 	refreshToken, err := c.Cookie("refreshToken")
 	if err != nil {
-		err = apperror.NewRefreshTokenNotFound()
+		err = apperror.ErrNotFoundError.WithMessage("Refresh token not found")
 		handleError(h.log, c, err)
 		return
 	}
@@ -183,7 +184,7 @@ func (h *authHandler) ValidateToken(c *gin.Context) {
 
 	token := h.extractBearerToken(c)
 	if token == "" {
-		handleError(h.log, c, apperror.NewInvalidAuthHeader())
+		handleError(h.log, c, apperror.ErrInvalidAuthHeader)
 		return
 	}
 
@@ -195,7 +196,7 @@ func (h *authHandler) ValidateToken(c *gin.Context) {
 
 	userID, err := uuid.Parse(claims.UserID)
 	if err != nil {
-		handleError(h.log, c, apperror.NewInvalidUserID())
+		handleError(h.log, c, apperror.ErrInvalidUserID)
 		return
 	}
 
@@ -224,7 +225,8 @@ func (h *authHandler) extractBearerToken(c *gin.Context) string {
 	return strings.TrimPrefix(authHeader, bearerPrefix)
 }
 
-func (h *authHandler) extractUserIDFromToken(ctx context.Context, accessToken string) (uuid.UUID, error) {
+func (h *authHandler) extractUserIDFromToken(ctx context.Context, accessToken string) (uuid.UUID,
+	error) {
 	claims, err := h.tokenService.ValidateAccessToken(ctx, accessToken)
 	if err != nil {
 		return uuid.Nil, err
@@ -232,7 +234,7 @@ func (h *authHandler) extractUserIDFromToken(ctx context.Context, accessToken st
 
 	userID, err := uuid.Parse(claims.UserID)
 	if err != nil {
-		return uuid.Nil, apperror.NewInvalidUserID()
+		return uuid.Nil, apperror.ErrInvalidUserID
 	}
 
 	return userID, nil

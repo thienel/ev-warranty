@@ -79,10 +79,10 @@ func (s *claimItemService) Create(tx application.Tx, claimID uuid.UUID,
 	}
 
 	if !entity.IsValidClaimItemStatus(cmd.Status) {
-		return nil, apperror.NewInvalidClaimItemStatus()
+		return nil, apperror.ErrInvalidInput.WithMessage("Invalid claim item status")
 	}
 	if !entity.IsValidClaimItemType(cmd.Type) {
-		return nil, apperror.NewInvalidClaimItemType()
+		return nil, apperror.ErrInvalidInput.WithMessage("Invalid claim item type")
 	}
 
 	item := entity.NewClaimItem(claimID, cmd.PartCategoryID, cmd.FaultyPartID, cmd.ReplacementPartID,
@@ -102,9 +102,9 @@ func (s *claimItemService) Update(tx application.Tx, claimID, itemID uuid.UUID, 
 	}
 
 	switch claim.Status {
-	case entity.ClaimStatusDraft, entity.ClaimStatusRequestInfo:
+	case entity.ClaimStatusDraft:
 	default:
-		return apperror.NewNotAllowUpdateClaim()
+		return apperror.ErrInvalidClaimAction.WithMessage("Can only update when claim status if draft")
 	}
 
 	item, err := s.itemRepo.FindByID(tx.GetCtx(), itemID)
@@ -115,11 +115,11 @@ func (s *claimItemService) Update(tx application.Tx, claimID, itemID uuid.UUID, 
 	switch item.Status {
 	case entity.ClaimItemStatusPending:
 	default:
-		return apperror.NewNotAllowUpdateClaim()
+		return apperror.ErrInvalidClaimAction.WithMessage("Can only update when item status is pending")
 	}
 
 	if !entity.IsValidClaimItemType(cmd.Type) {
-		return apperror.NewInvalidClaimItemType()
+		return apperror.ErrInvalidInput.WithMessage("Invalid claim item type")
 	}
 	item.IssueDescription = cmd.IssueDescription
 	item.Type = cmd.Type
@@ -150,7 +150,7 @@ func (s *claimItemService) HardDelete(tx application.Tx, claimID, itemID uuid.UU
 	}
 
 	if claim.Status != entity.ClaimStatusDraft {
-		return apperror.NewNotAllowDeleteClaim()
+		return apperror.ErrInvalidClaimAction.WithMessage("Can only hard delete when claim status is draft")
 	}
 
 	err = s.itemRepo.HardDelete(tx, itemID)
@@ -178,7 +178,7 @@ func (s *claimItemService) Approve(tx application.Tx, claimID, itemID uuid.UUID)
 	}
 
 	if claim.Status != entity.ClaimStatusReviewing {
-		return apperror.NewNotAllowUpdateClaim()
+		return apperror.ErrInvalidClaimAction.WithMessage("Can only approve if claim status is reviewing")
 	}
 
 	err = s.itemRepo.UpdateStatus(tx, itemID, entity.ClaimItemStatusApproved)
@@ -206,7 +206,7 @@ func (s *claimItemService) Reject(tx application.Tx, claimID, itemID uuid.UUID) 
 	}
 
 	if claim.Status != entity.ClaimStatusReviewing {
-		return apperror.NewNotAllowUpdateClaim()
+		return apperror.ErrInvalidClaimAction.WithMessage("Can only reject when claim status is reviewing")
 	}
 
 	err = s.itemRepo.UpdateStatus(tx, itemID, entity.ClaimItemStatusRejected)

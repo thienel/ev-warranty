@@ -4,7 +4,7 @@ package mocks
 
 import (
 	context "context"
-	entities "ev-warranty-go/internal/domain/entity"
+	entity "ev-warranty-go/internal/domain/entity"
 
 	mock "github.com/stretchr/testify/mock"
 
@@ -25,7 +25,7 @@ func (_m *OfficeRepository) EXPECT() *OfficeRepository_Expecter {
 }
 
 // Create provides a mock function with given fields: ctx, office
-func (_m *OfficeRepository) Create(ctx context.Context, office *entities.Office) error {
+func (_m *OfficeRepository) Create(ctx context.Context, office *entity.Office) error {
 	ret := _m.Called(ctx, office)
 
 	if len(ret) == 0 {
@@ -33,7 +33,7 @@ func (_m *OfficeRepository) Create(ctx context.Context, office *entities.Office)
 	}
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(context.Context, *entities.Office) error); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, *entity.Office) error); ok {
 		r0 = rf(ctx, office)
 	} else {
 		r0 = ret.Error(0)
@@ -54,9 +54,9 @@ func (_e *OfficeRepository_Expecter) Create(ctx interface{}, office interface{})
 	return &OfficeRepository_Create_Call{Call: _e.mock.On("Create", ctx, office)}
 }
 
-func (_c *OfficeRepository_Create_Call) Run(run func(ctx context.Context, office *entities.Office)) *OfficeRepository_Create_Call {
+func (_c *OfficeRepository_Create_Call) Run(run func(ctx context.Context, office *entity.Office)) *OfficeRepository_Create_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(*entities.Office))
+		run(args[0].(context.Context), args[1].(*entity.Office))
 	})
 	return _c
 }
@@ -66,29 +66,29 @@ func (_c *OfficeRepository_Create_Call) Return(_a0 error) *OfficeRepository_Crea
 	return _c
 }
 
-func (_c *OfficeRepository_Create_Call) RunAndReturn(run func(context.Context, *entities.Office) error) *OfficeRepository_Create_Call {
+func (_c *OfficeRepository_Create_Call) RunAndReturn(run func(context.Context, *entity.Office) error) *OfficeRepository_Create_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
 // FindAll provides a mock function with given fields: ctx
-func (_m *OfficeRepository) FindAll(ctx context.Context) ([]*entities.Office, error) {
+func (_m *OfficeRepository) FindAll(ctx context.Context) ([]*entity.Office, error) {
 	ret := _m.Called(ctx)
 
 	if len(ret) == 0 {
 		panic("no return value specified for FindAll")
 	}
 
-	var r0 []*entities.Office
+	var r0 []*entity.Office
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context) ([]*entities.Office, error)); ok {
+	if rf, ok := ret.Get(0).(func(context.Context) ([]*entity.Office, error)); ok {
 		return rf(ctx)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context) []*entities.Office); ok {
+	if rf, ok := ret.Get(0).(func(context.Context) []*entity.Office); ok {
 		r0 = rf(ctx)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).([]*entities.Office)
+			r0 = ret.Get(0).([]*entity.Office)
 		}
 	}
 
@@ -119,34 +119,34 @@ func (_c *OfficeRepository_FindAll_Call) Run(run func(ctx context.Context)) *Off
 	return _c
 }
 
-func (_c *OfficeRepository_FindAll_Call) Return(_a0 []*entities.Office, _a1 error) *OfficeRepository_FindAll_Call {
+func (_c *OfficeRepository_FindAll_Call) Return(_a0 []*entity.Office, _a1 error) *OfficeRepository_FindAll_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
-func (_c *OfficeRepository_FindAll_Call) RunAndReturn(run func(context.Context) ([]*entities.Office, error)) *OfficeRepository_FindAll_Call {
+func (_c *OfficeRepository_FindAll_Call) RunAndReturn(run func(context.Context) ([]*entity.Office, error)) *OfficeRepository_FindAll_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
 // FindByID provides a mock function with given fields: ctx, id
-func (_m *OfficeRepository) FindByID(ctx context.Context, id uuid.UUID) (*entities.Office, error) {
+func (_m *OfficeRepository) FindByID(ctx context.Context, id uuid.UUID) (*entity.Office, error) {
 	ret := _m.Called(ctx, id)
 
 	if len(ret) == 0 {
 		panic("no return value specified for FindByID")
 	}
 
-	var r0 *entities.Office
+	var r0 *entity.Office
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID) (*entities.Office, error)); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID) (*entity.Office, error)); ok {
 		return rf(ctx, id)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID) *entities.Office); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID) *entity.Office); ok {
 		r0 = rf(ctx, id)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*entities.Office)
+			r0 = ret.Get(0).(*entity.Office)
 		}
 	}
 
@@ -178,12 +178,12 @@ func (_c *OfficeRepository_FindByID_Call) Run(run func(ctx context.Context, id u
 	return _c
 }
 
-func (_c *OfficeRepository_FindByID_Call) Return(_a0 *entities.Office, _a1 error) *OfficeRepository_FindByID_Call {
+func (_c *OfficeRepository_FindByID_Call) Return(_a0 *entity.Office, _a1 error) *OfficeRepository_FindByID_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
-func (_c *OfficeRepository_FindByID_Call) RunAndReturn(run func(context.Context, uuid.UUID) (*entities.Office, error)) *OfficeRepository_FindByID_Call {
+func (_c *OfficeRepository_FindByID_Call) RunAndReturn(run func(context.Context, uuid.UUID) (*entity.Office, error)) *OfficeRepository_FindByID_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -236,7 +236,7 @@ func (_c *OfficeRepository_SoftDelete_Call) RunAndReturn(run func(context.Contex
 }
 
 // Update provides a mock function with given fields: ctx, office
-func (_m *OfficeRepository) Update(ctx context.Context, office *entities.Office) error {
+func (_m *OfficeRepository) Update(ctx context.Context, office *entity.Office) error {
 	ret := _m.Called(ctx, office)
 
 	if len(ret) == 0 {
@@ -244,7 +244,7 @@ func (_m *OfficeRepository) Update(ctx context.Context, office *entities.Office)
 	}
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(context.Context, *entities.Office) error); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, *entity.Office) error); ok {
 		r0 = rf(ctx, office)
 	} else {
 		r0 = ret.Error(0)
@@ -265,9 +265,9 @@ func (_e *OfficeRepository_Expecter) Update(ctx interface{}, office interface{})
 	return &OfficeRepository_Update_Call{Call: _e.mock.On("Update", ctx, office)}
 }
 
-func (_c *OfficeRepository_Update_Call) Run(run func(ctx context.Context, office *entities.Office)) *OfficeRepository_Update_Call {
+func (_c *OfficeRepository_Update_Call) Run(run func(ctx context.Context, office *entity.Office)) *OfficeRepository_Update_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(*entities.Office))
+		run(args[0].(context.Context), args[1].(*entity.Office))
 	})
 	return _c
 }
@@ -277,7 +277,7 @@ func (_c *OfficeRepository_Update_Call) Return(_a0 error) *OfficeRepository_Upda
 	return _c
 }
 
-func (_c *OfficeRepository_Update_Call) RunAndReturn(run func(context.Context, *entities.Office) error) *OfficeRepository_Update_Call {
+func (_c *OfficeRepository_Update_Call) RunAndReturn(run func(context.Context, *entity.Office) error) *OfficeRepository_Update_Call {
 	_c.Call.Return(run)
 	return _c
 }

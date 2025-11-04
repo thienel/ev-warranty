@@ -27,7 +27,7 @@ type cloudinaryService struct {
 func NewCloudinaryService(cfg *config.CloudinaryConfig) (CloudinaryService, error) {
 	cld, err := cloudinary.NewFromURL(cfg.URL)
 	if err != nil {
-		return nil, apperror.NewFailedInitializeCloudinary()
+		return nil, apperror.ErrFailedInitializeCloudinary.WithError(err)
 	}
 	cld.Config.URL.Secure = true
 
@@ -48,7 +48,7 @@ func (s *cloudinaryService) UploadFile(ctx context.Context, file multipart.File,
 
 	resp, err := s.cld.Upload.Upload(ctx, file, uploadParams)
 	if err != nil {
-		return "", apperror.NewFailedUploadCloudinary()
+		return "", apperror.ErrFailedUploadCloudinary.WithError(err)
 	}
 
 	return resp.SecureURL, nil
@@ -56,7 +56,7 @@ func (s *cloudinaryService) UploadFile(ctx context.Context, file multipart.File,
 
 func (s *cloudinaryService) DeleteFile(ctx context.Context, publicID string, resourceType string) error {
 	if publicID == "" {
-		return apperror.NewEmptyCloudinaryParameter("publicID")
+		return apperror.ErrEmptyCloudinaryParameter
 	}
 
 	_, err := s.cld.Upload.Destroy(ctx, uploader.DestroyParams{
@@ -64,14 +64,14 @@ func (s *cloudinaryService) DeleteFile(ctx context.Context, publicID string, res
 		ResourceType: resourceType,
 	})
 	if err != nil {
-		return apperror.NewFailedDeleteCloudinary()
+		return apperror.ErrFailedDeleteCloudinary.WithError(err)
 	}
 	return nil
 }
 
 func (s *cloudinaryService) DeleteFileByURL(ctx context.Context, fileURL string) error {
 	if fileURL == "" {
-		return apperror.NewEmptyCloudinaryParameter("fileURL")
+		return apperror.ErrEmptyCloudinaryParameter
 	}
 
 	publicID, resourceType, err := parseCloudinaryURL(fileURL)
@@ -85,13 +85,13 @@ func (s *cloudinaryService) DeleteFileByURL(ctx context.Context, fileURL string)
 func parseCloudinaryURL(fileURL string) (publicID, resourceType string, err error) {
 	parsedURL, err := url.Parse(fileURL)
 	if err != nil {
-		return "", "", apperror.NewInvalidCloudinaryURL()
+		return "", "", apperror.ErrInvalidCloudinaryURL
 	}
 
 	parts := strings.Split(strings.TrimPrefix(parsedURL.Path, "/"), "/")
 
 	if len(parts) < 5 {
-		return "", "", apperror.NewInvalidCloudinaryURL()
+		return "", "", apperror.ErrInvalidCloudinaryURL
 	}
 
 	resourceType = parts[1]

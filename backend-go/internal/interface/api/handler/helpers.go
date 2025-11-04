@@ -21,7 +21,7 @@ const (
 func handleError(log logger.Logger, c *gin.Context, err error) {
 	var appErr *apperror.AppError
 	if !errors.As(err, &appErr) {
-		appErr = apperror.NewInternalServerError(err)
+		appErr = apperror.ErrInternalServerError.WithError(err)
 	}
 
 	log.Error(appErr.ErrorCode, "error", appErr.Error())
@@ -39,12 +39,12 @@ func writeSuccessResponse(c *gin.Context, statusCode int, data any) {
 func getUserIDFromHeader(c *gin.Context) (uuid.UUID, error) {
 	userIDStr := c.GetHeader(headerUserIDKey)
 	if userIDStr == "" {
-		return uuid.Nil, apperror.NewMissingUserID()
+		return uuid.Nil, apperror.ErrMissingUserID
 	}
 
 	userID, err := uuid.Parse(userIDStr)
 	if err != nil {
-		return uuid.Nil, apperror.NewInvalidUserID()
+		return uuid.Nil, apperror.ErrInvalidUserID
 	}
 
 	return userID, nil
@@ -53,7 +53,7 @@ func getUserIDFromHeader(c *gin.Context) (uuid.UUID, error) {
 func getUserRoleFromHeader(c *gin.Context) (string, error) {
 	role := c.GetHeader(headerUserRole)
 	if role == "" {
-		return "", apperror.NewMissingUserRole()
+		return "", apperror.ErrMissingUserRole
 	}
 
 	return role, nil
@@ -71,5 +71,5 @@ func allowedRoles(c *gin.Context, allowedRoles ...string) error {
 		}
 	}
 
-	return apperror.NewUnauthorizedRole()
+	return apperror.ErrUnauthorizedRole
 }

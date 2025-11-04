@@ -2,21 +2,25 @@ package service
 
 import (
 	"context"
+	"errors"
 	"ev-warranty-go/internal/application"
 	"ev-warranty-go/internal/application/repository"
 	"ev-warranty-go/internal/domain/entity"
 	"ev-warranty-go/internal/infrastructure/cloudinary"
 	"ev-warranty-go/pkg/apperror"
 	"ev-warranty-go/pkg/logger"
+	"fmt"
 
 	"github.com/google/uuid"
 )
 
 type CreateClaimCommand struct {
-	VehicleID   uuid.UUID
-	CustomerID  uuid.UUID
-	CreatorID   uuid.UUID
-	Description string
+	VehicleID    uuid.UUID
+	CustomerID   uuid.UUID
+	StaffID      uuid.UUID
+	TechnicianID uuid.UUID
+	OfficeID     uuid.UUID
+	Description  string
 }
 
 type UpdateClaimCommand struct {
@@ -42,6 +46,7 @@ type ClaimService interface {
 type claimService struct {
 	log            logger.Logger
 	claimRepo      repository.ClaimRepository
+	userRepo       repository.UserRepository
 	itemRepo       repository.ClaimItemRepository
 	attachmentRepo repository.ClaimAttachmentRepository
 	historyRepo    repository.ClaimHistoryRepository
@@ -51,6 +56,7 @@ type claimService struct {
 func NewClaimService(
 	log logger.Logger,
 	claimRepo repository.ClaimRepository,
+	userRepo repository.UserRepository,
 	itemRepo repository.ClaimItemRepository,
 	attachmentRepo repository.ClaimAttachmentRepository,
 	historyRepo repository.ClaimHistoryRepository,
@@ -59,6 +65,7 @@ func NewClaimService(
 	return &claimService{
 		log:            log,
 		claimRepo:      claimRepo,
+		userRepo:       userRepo,
 		itemRepo:       itemRepo,
 		attachmentRepo: attachmentRepo,
 		historyRepo:    historyRepo,
@@ -80,13 +87,26 @@ func (s *claimService) GetAll(ctx context.Context) ([]*entity.Claim, error) {
 }
 
 func (s *claimService) Create(tx application.Tx, cmd *CreateClaimCommand) (*entity.Claim, error) {
+	staff, err := s.userRepo.FindByID(tx.GetCtx(), cmd.StaffID)
+	if err != nil {
+		return nil, err
+	}
+	technician, err := s.userRepo.FindByID(tx.GetCtx(), cmd.StaffID)
+	if err != nil {
+		return nil, err
+	}
+	if staff.OfficeID != technician.OfficeID {
+		return nil, errors.New("Staff and technician must be same office")
+	}
+
 	claim := entity.NewClaim(cmd.VehicleID, cmd.CustomerID, cmd.Description, entity.ClaimStatusDraft, nil)
 
 	if err := s.claimRepo.Create(tx, claim); err != nil {
 		return nil, err
 	}
 
-	history := entity.NewClaimHistory(claim.ID, entity.ClaimStatusDraft, cmd.CreatorID)
+	history := entity.NewClaimHistory(claim.ID, entity.ClaimStatusDraft, cmd.StaffID)
+
 	if err := s.historyRepo.Create(tx, history); err != nil {
 		return nil, err
 	}
@@ -100,8 +120,8 @@ func (s *claimService) Update(tx application.Tx, id uuid.UUID, cmd *UpdateClaimC
 		return err
 	}
 
-	if claim.Status != entity.ClaimStatusDraft && claim.Status != entity.ClaimStatusRequestInfo {
-		return apperror.NewNotAllowUpdateClaim()
+	if claim.Status != entity.ClaimStatusDraft {
+		return apperror.ErrInvalidClaimAction.WithMessage("Conn only update when status if draft")
 	}
 
 	claim.Description = cmd.Description
@@ -120,7 +140,7 @@ func (s *claimService) HardDelete(tx application.Tx, id uuid.UUID) error {
 	}
 
 	if claim.Status != entity.ClaimStatusDraft {
-		return apperror.NewNotAllowDeleteClaim()
+		return apperror.ErrInvalidClaimAction.WithMessage("Can only hard delete when status if draft")
 	}
 
 	attachments, err := s.attachmentRepo.FindByClaimID(tx.GetCtx(), id)
@@ -147,7 +167,7 @@ func (s *claimService) SoftDelete(tx application.Tx, id uuid.UUID) error {
 	}
 
 	if claim.Status != entity.ClaimStatusCancelled {
-		return apperror.NewNotAllowDeleteClaim()
+		return apperror.ErrInvalidClaimAction.WithMessage("Can only soft delete when status is cancelled")
 	}
 
 	softDeleters := []func(application.Tx, uuid.UUID) error{
@@ -168,7 +188,7 @@ func (s *claimService) SoftDelete(tx application.Tx, id uuid.UUID) error {
 
 func (s *claimService) UpdateStatus(tx application.Tx, id uuid.UUID, status string, changedBy uuid.UUID) error {
 	if !entity.IsValidClaimStatus(status) {
-		return apperror.NewInvalidClaimStatus()
+		return apperror.ErrInvalidInput.WithMessage("Invalid claim status")
 	}
 
 	claim, err := s.claimRepo.FindByID(tx.GetCtx(), id)
@@ -177,7 +197,7 @@ func (s *claimService) UpdateStatus(tx application.Tx, id uuid.UUID, status stri
 	}
 
 	if !entity.IsValidClaimStatusTransition(claim.Status, status) {
-		return apperror.NewInvalidClaimAction()
+		return apperror.ErrInvalidClaimAction.WithMessage("This action are not allowed")
 	}
 
 	err = s.claimRepo.UpdateStatus(tx, id, status)
@@ -200,7 +220,7 @@ func (s *claimService) Submit(tx application.Tx, id uuid.UUID, changedBy uuid.UU
 	}
 
 	if !entity.IsValidClaimStatusTransition(claim.Status, entity.ClaimStatusSubmitted) {
-		return apperror.NewInvalidClaimAction()
+		return apperror.ErrInvalidClaimAction.WithMessage("Invalid claim action")
 	}
 
 	items, err := s.itemRepo.FindByClaimID(tx.GetCtx(), id)
@@ -212,8 +232,13 @@ func (s *claimService) Submit(tx application.Tx, id uuid.UUID, changedBy uuid.UU
 		return err
 	}
 
-	if len(items) < entity.ClaimItemRequirePerClaim || len(attachments) < entity.AttachmentRequirePerClaim {
-		return apperror.NewMissingInformationClaim()
+	if len(items) < entity.ClaimItemRequirePerClaim {
+		return apperror.ErrMissingInformationClaim.
+			WithMessage(fmt.Sprintf("Claim item must be atleast %d", entity.ClaimItemRequirePerClaim))
+	}
+	if len(attachments) < entity.AttachmentRequirePerClaim {
+		return apperror.ErrMissingInformationClaim.
+			WithMessage(fmt.Sprintf("Claim attachment must be atleast %d", entity.AttachmentRequirePerClaim))
 	}
 
 	err = s.claimRepo.UpdateStatus(tx, id, entity.ClaimStatusSubmitted)
@@ -247,7 +272,7 @@ func (s *claimService) Complete(tx application.Tx, id uuid.UUID, changedBy uuid.
 			approvedCount++
 		case entity.ClaimItemStatusRejected:
 		default:
-			return apperror.NewInvalidClaimAction()
+			return apperror.ErrInvalidInput.WithMessage("Can only complete when all item are approved or rejected")
 		}
 	}
 
@@ -259,7 +284,7 @@ func (s *claimService) Complete(tx application.Tx, id uuid.UUID, changedBy uuid.
 	}
 
 	if !entity.IsValidClaimStatusTransition(claim.Status, newStatus) {
-		return apperror.NewInvalidClaimAction()
+		return apperror.ErrInvalidInput.WithMessage("This action are not allowed")
 	}
 
 	err = s.claimRepo.UpdateStatus(tx, id, newStatus)

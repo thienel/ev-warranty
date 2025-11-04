@@ -8,7 +8,7 @@ import (
 	"ev-warranty-go/internal/domain/entity"
 	"ev-warranty-go/internal/interface/api/dto"
 	"ev-warranty-go/internal/interface/api/handler"
-	apperrors2 "ev-warranty-go/pkg/apperror"
+	apperror "ev-warranty-go/pkg/apperror"
 	"ev-warranty-go/pkg/mocks"
 	"net/http"
 	"net/http/httptest"
@@ -90,7 +90,8 @@ var _ = Describe("ClaimItemHandler", func() {
 
 		It("should handle successful retrieval", func() {
 			mockService.EXPECT().GetByID(mock.Anything, itemID).Return(sampleClaimItem, nil).Once()
-			req, _ := http.NewRequest(http.MethodGet, "/claims/"+claimID.String()+"/items/"+itemID.String(), nil)
+			req, _ := http.NewRequest(http.MethodGet, "/claims/"+claimID.String()+"/items/"+itemID.String(),
+				nil)
 			r.ServeHTTP(w, req)
 			ExpectResponseNotNil(w, http.StatusOK)
 		})
@@ -98,23 +99,25 @@ var _ = Describe("ClaimItemHandler", func() {
 		It("should handle invalid item UUID", func() {
 			req, _ := http.NewRequest(http.MethodGet, "/claims/"+claimID.String()+"/items/invalid-uuid", nil)
 			r.ServeHTTP(w, req)
-			ExpectErrorCode(w, http.StatusBadRequest, apperrors2.ErrorCodeInvalidUUID)
+			ExpectErrorCode(w, http.StatusBadRequest, apperror.ErrInvalidParams.ErrorCode)
 		})
 
 		It("should handle item not found", func() {
 			mockService.EXPECT().GetByID(mock.Anything, itemID).
-				Return(nil, apperrors2.NewClaimItemNotFound()).Once()
-			req, _ := http.NewRequest(http.MethodGet, "/claims/"+claimID.String()+"/items/"+itemID.String(), nil)
+				Return(nil, apperror.ErrNotFoundError).Once()
+			req, _ := http.NewRequest(http.MethodGet, "/claims/"+claimID.String()+"/items/"+itemID.String(),
+				nil)
 			r.ServeHTTP(w, req)
-			ExpectErrorCode(w, http.StatusNotFound, apperrors2.ErrorCodeClaimItemNotFound)
+			ExpectErrorCode(w, http.StatusNotFound, apperror.ErrNotFoundError.ErrorCode)
 		})
 
 		It("should handle service error", func() {
 			mockService.EXPECT().GetByID(mock.Anything, itemID).
 				Return(nil, errors.New("database error")).Once()
-			req, _ := http.NewRequest(http.MethodGet, "/claims/"+claimID.String()+"/items/"+itemID.String(), nil)
+			req, _ := http.NewRequest(http.MethodGet, "/claims/"+claimID.String()+"/items/"+itemID.String(),
+				nil)
 			r.ServeHTTP(w, req)
-			ExpectErrorCode(w, http.StatusInternalServerError, apperrors2.ErrorCodeInternalServerError)
+			ExpectErrorCode(w, http.StatusInternalServerError, apperror.ErrInternalServerError.ErrorCode)
 		})
 	})
 
@@ -134,19 +137,20 @@ var _ = Describe("ClaimItemHandler", func() {
 		It("should handle invalid claim UUID", func() {
 			req, _ := http.NewRequest(http.MethodGet, "/claims/invalid-uuid/items", nil)
 			r.ServeHTTP(w, req)
-			ExpectErrorCode(w, http.StatusBadRequest, apperrors2.ErrorCodeInvalidUUID)
+			ExpectErrorCode(w, http.StatusBadRequest, apperror.ErrInvalidParams.ErrorCode)
 		})
 
 		It("should handle service error", func() {
-			dbError := apperrors2.NewDBOperationError(errors.New("database error"))
+			dbError := apperror.ErrDBOperation
 			mockService.EXPECT().GetByClaimID(mock.Anything, claimID).Return(nil, dbError).Once()
 			req, _ := http.NewRequest(http.MethodGet, "/claims/"+claimID.String()+"/items", nil)
 			r.ServeHTTP(w, req)
-			ExpectErrorCode(w, http.StatusInternalServerError, apperrors2.ErrorCodeDBOperation)
+			ExpectErrorCode(w, http.StatusInternalServerError, apperror.ErrDBOperation.ErrorCode)
 		})
 
 		It("should handle empty results", func() {
-			mockService.EXPECT().GetByClaimID(mock.Anything, claimID).Return([]*entity.ClaimItem{}, nil).Once()
+			mockService.EXPECT().GetByClaimID(mock.Anything, claimID).Return([]*entity.ClaimItem{},
+				nil).Once()
 			req, _ := http.NewRequest(http.MethodGet, "/claims/"+claimID.String()+"/items", nil)
 			r.ServeHTTP(w, req)
 			ExpectResponseNotNil(w, http.StatusOK)
@@ -161,9 +165,10 @@ var _ = Describe("ClaimItemHandler", func() {
 
 			It("should create claim item successfully", func() {
 				setupTxMock(func() {
-					mockService.EXPECT().Create(mockTx, claimID, mock.MatchedBy(func(cmd *service.CreateClaimItemCommand) bool {
-						return cmd.PartCategoryID == validReq.PartCategoryID && cmd.Type == validReq.Type
-					})).Return(sampleClaimItem, nil).Once()
+					mockService.EXPECT().Create(mockTx, claimID,
+						mock.MatchedBy(func(cmd *service.CreateClaimItemCommand) bool {
+							return cmd.PartCategoryID == validReq.PartCategoryID && cmd.Type == validReq.Type
+						})).Return(sampleClaimItem, nil).Once()
 				})
 
 				SendRequest(r, http.MethodPost, "/claims/"+claimID.String()+"/items", w, validReq)
@@ -171,7 +176,9 @@ var _ = Describe("ClaimItemHandler", func() {
 			})
 
 			DescribeTable("should handle error scenarios",
-				func(setupMock func(), url string, reqBody interface{}, expectedStatus int, expectedError string) {
+				func(setupMock func(), url string, reqBody interface{}, expectedStatus int,
+					expectedError string,
+				) {
 					if setupMock != nil {
 						setupMock()
 					}
@@ -180,35 +187,36 @@ var _ = Describe("ClaimItemHandler", func() {
 				},
 				Entry("invalid claim UUID",
 					nil,
-					"/claims/invalid-uuid/items", validReq, http.StatusBadRequest, apperrors2.ErrorCodeInvalidUUID),
+					"/claims/invalid-uuid/items", validReq, http.StatusBadRequest, apperror.ErrInvalidParams),
 				Entry("invalid JSON",
 					nil,
-					"/claims/"+claimID.String()+"/items", "invalid json", http.StatusBadRequest, apperrors2.ErrorCodeInvalidJsonRequest),
+					"/claims/"+claimID.String()+"/items", "invalid json", http.StatusBadRequest,
+					apperror.ErrInvalidJsonRequest),
 			)
 
 			It("should handle invalid claim item type", func() {
 				invalidReq := validReq
 				invalidReq.Type = "INVALID_TYPE"
 				SendRequest(r, http.MethodPost, "/claims/"+claimID.String()+"/items", w, invalidReq)
-				ExpectErrorCode(w, http.StatusBadRequest, apperrors2.ErrorCodeInvalidClaimItemType)
+				ExpectErrorCode(w, http.StatusBadRequest, apperror.ErrInvalidInput.ErrorCode)
 			})
 
 			It("should handle service error during creation", func() {
 				setupTxMock(func() {
 					mockService.EXPECT().Create(mockTx, claimID, mock.Anything).
-						Return(nil, apperrors2.NewClaimNotFound()).Once()
+						Return(nil, apperror.ErrNotFoundError).Once()
 				})
-				mockTxManager.ExpectedCalls[0].ReturnArguments = []interface{}{apperrors2.NewClaimNotFound()}
+				mockTxManager.ExpectedCalls[0].ReturnArguments = []interface{}{apperror.ErrNotFoundError}
 
 				SendRequest(r, http.MethodPost, "/claims/"+claimID.String()+"/items", w, validReq)
-				ExpectErrorCode(w, http.StatusNotFound, apperrors2.ErrorCodeClaimNotFound)
+				ExpectErrorCode(w, http.StatusNotFound, apperror.ErrNotFoundError.ErrorCode)
 			})
 		})
 
 		It("should deny access for unauthorized roles", func() {
 			setupRoute("POST", "/claims/:id/items", entity.UserRoleEvmStaff, itemHandler.Create)
 			SendRequest(r, http.MethodPost, "/claims/"+claimID.String()+"/items", w, validReq)
-			ExpectErrorCode(w, http.StatusForbidden, apperrors2.ErrorCodeUnauthorizedRole)
+			ExpectErrorCode(w, http.StatusForbidden, apperror.ErrUnauthorizedRole.ErrorCode)
 		})
 	})
 
@@ -223,7 +231,8 @@ var _ = Describe("ClaimItemHandler", func() {
 					mockService.EXPECT().HardDelete(mockTx, claimID, itemID).Return(nil).Once()
 				})
 
-				req, _ := http.NewRequest(http.MethodDelete, "/claims/"+claimID.String()+"/items/"+itemID.String(), nil)
+				req, _ := http.NewRequest(http.MethodDelete,
+					"/claims/"+claimID.String()+"/items/"+itemID.String(), nil)
 				r.ServeHTTP(w, req)
 				Expect(w.Code).To(Equal(http.StatusNoContent))
 			})
@@ -239,47 +248,53 @@ var _ = Describe("ClaimItemHandler", func() {
 				},
 				Entry("invalid claim UUID",
 					nil,
-					"/claims/invalid-uuid/items/"+itemID.String(), http.StatusBadRequest, apperrors2.ErrorCodeInvalidUUID),
+					"/claims/invalid-uuid/items/"+itemID.String(), http.StatusBadRequest,
+					apperror.ErrInvalidParams),
 				Entry("invalid item UUID",
 					nil,
-					"/claims/"+claimID.String()+"/items/invalid-uuid", http.StatusBadRequest, apperrors2.ErrorCodeInvalidUUID),
+					"/claims/"+claimID.String()+"/items/invalid-uuid", http.StatusBadRequest,
+					apperror.ErrInvalidParams),
 			)
 
 			It("should handle service error during deletion", func() {
 				setupTxMock(func() {
 					mockService.EXPECT().HardDelete(mockTx, claimID, itemID).
-						Return(apperrors2.NewClaimItemNotFound()).Once()
+						Return(apperror.ErrNotFoundError).Once()
 				})
-				mockTxManager.ExpectedCalls[0].ReturnArguments = []interface{}{apperrors2.NewClaimItemNotFound()}
+				mockTxManager.ExpectedCalls[0].ReturnArguments = []interface{}{apperror.ErrNotFoundError}
 
-				req, _ := http.NewRequest(http.MethodDelete, "/claims/"+claimID.String()+"/items/"+itemID.String(), nil)
+				req, _ := http.NewRequest(http.MethodDelete,
+					"/claims/"+claimID.String()+"/items/"+itemID.String(), nil)
 				r.ServeHTTP(w, req)
-				ExpectErrorCode(w, http.StatusNotFound, apperrors2.ErrorCodeClaimItemNotFound)
+				ExpectErrorCode(w, http.StatusNotFound, apperror.ErrNotFoundError.ErrorCode)
 			})
 
 			It("should handle transaction manager error", func() {
 				mockTxManager.EXPECT().Do(mock.Anything, mock.AnythingOfType("func(application.Tx) error")).
-					Return(apperrors2.NewDBOperationError(errors.New("transaction failed"))).Once()
+					Return(apperror.ErrDBOperation).Once()
 
-				req, _ := http.NewRequest(http.MethodDelete, "/claims/"+claimID.String()+"/items/"+itemID.String(), nil)
+				req, _ := http.NewRequest(http.MethodDelete,
+					"/claims/"+claimID.String()+"/items/"+itemID.String(), nil)
 				r.ServeHTTP(w, req)
-				ExpectErrorCode(w, http.StatusInternalServerError, apperrors2.ErrorCodeDBOperation)
+				ExpectErrorCode(w, http.StatusInternalServerError, apperror.ErrDBOperation.ErrorCode)
 			})
 
 		})
 
 		It("should deny access for unauthorized roles", func() {
 			setupRoute("DELETE", "/claims/:id/items/:itemID", entity.UserRoleScTechnician, itemHandler.Delete)
-			req, _ := http.NewRequest(http.MethodDelete, "/claims/"+claimID.String()+"/items/"+itemID.String(), nil)
+			req, _ := http.NewRequest(http.MethodDelete,
+				"/claims/"+claimID.String()+"/items/"+itemID.String(), nil)
 			r.ServeHTTP(w, req)
-			ExpectErrorCode(w, http.StatusForbidden, apperrors2.ErrorCodeUnauthorizedRole)
+			ExpectErrorCode(w, http.StatusForbidden, apperror.ErrUnauthorizedRole.ErrorCode)
 		})
 	})
 
 	Describe("Approve", func() {
 		Context("when authorized as EVM_STAFF", func() {
 			BeforeEach(func() {
-				setupRoute("POST", "/claims/:id/items/:itemID/approve", entity.UserRoleEvmStaff, itemHandler.Approve)
+				setupRoute("POST", "/claims/:id/items/:itemID/approve", entity.UserRoleEvmStaff,
+					itemHandler.Approve)
 			})
 
 			It("should approve claim item successfully", func() {
@@ -287,7 +302,8 @@ var _ = Describe("ClaimItemHandler", func() {
 					mockService.EXPECT().Approve(mockTx, claimID, itemID).Return(nil).Once()
 				})
 
-				req, _ := http.NewRequest(http.MethodPost, "/claims/"+claimID.String()+"/items/"+itemID.String()+"/approve", nil)
+				req, _ := http.NewRequest(http.MethodPost,
+					"/claims/"+claimID.String()+"/items/"+itemID.String()+"/approve", nil)
 				r.ServeHTTP(w, req)
 				Expect(w.Code).To(Equal(http.StatusNoContent))
 			})
@@ -303,46 +319,53 @@ var _ = Describe("ClaimItemHandler", func() {
 				},
 				Entry("invalid claim UUID",
 					nil,
-					"/claims/invalid-uuid/items/"+itemID.String()+"/approve", http.StatusBadRequest, apperrors2.ErrorCodeInvalidUUID),
+					"/claims/invalid-uuid/items/"+itemID.String()+"/approve", http.StatusBadRequest,
+					apperror.ErrInvalidParams),
 				Entry("invalid item UUID",
 					nil,
-					"/claims/"+claimID.String()+"/items/invalid-uuid/approve", http.StatusBadRequest, apperrors2.ErrorCodeInvalidUUID),
+					"/claims/"+claimID.String()+"/items/invalid-uuid/approve", http.StatusBadRequest,
+					apperror.ErrInvalidParams),
 			)
 
 			It("should handle service error during approval", func() {
 				setupTxMock(func() {
 					mockService.EXPECT().Approve(mockTx, claimID, itemID).
-						Return(apperrors2.NewClaimItemNotFound()).Once()
+						Return(apperror.ErrNotFoundError).Once()
 				})
-				mockTxManager.ExpectedCalls[0].ReturnArguments = []interface{}{apperrors2.NewClaimItemNotFound()}
+				mockTxManager.ExpectedCalls[0].ReturnArguments = []interface{}{apperror.ErrNotFoundError}
 
-				req, _ := http.NewRequest(http.MethodPost, "/claims/"+claimID.String()+"/items/"+itemID.String()+"/approve", nil)
+				req, _ := http.NewRequest(http.MethodPost,
+					"/claims/"+claimID.String()+"/items/"+itemID.String()+"/approve", nil)
 				r.ServeHTTP(w, req)
-				ExpectErrorCode(w, http.StatusNotFound, apperrors2.ErrorCodeClaimItemNotFound)
+				ExpectErrorCode(w, http.StatusNotFound, apperror.ErrNotFoundError.ErrorCode)
 			})
 
 			It("should handle transaction manager error", func() {
 				mockTxManager.EXPECT().Do(mock.Anything, mock.AnythingOfType("func(application.Tx) error")).
-					Return(apperrors2.NewDBOperationError(errors.New("transaction failed"))).Once()
+					Return(apperror.ErrDBOperation).Once()
 
-				req, _ := http.NewRequest(http.MethodPost, "/claims/"+claimID.String()+"/items/"+itemID.String()+"/approve", nil)
+				req, _ := http.NewRequest(http.MethodPost,
+					"/claims/"+claimID.String()+"/items/"+itemID.String()+"/approve", nil)
 				r.ServeHTTP(w, req)
-				ExpectErrorCode(w, http.StatusInternalServerError, apperrors2.ErrorCodeDBOperation)
+				ExpectErrorCode(w, http.StatusInternalServerError, apperror.ErrDBOperation.ErrorCode)
 			})
 		})
 
 		It("should deny access for unauthorized roles", func() {
-			setupRoute("POST", "/claims/:id/items/:itemID/approve", entity.UserRoleScStaff, itemHandler.Approve)
-			req, _ := http.NewRequest(http.MethodPost, "/claims/"+claimID.String()+"/items/"+itemID.String()+"/approve", nil)
+			setupRoute("POST", "/claims/:id/items/:itemID/approve", entity.UserRoleScStaff,
+				itemHandler.Approve)
+			req, _ := http.NewRequest(http.MethodPost,
+				"/claims/"+claimID.String()+"/items/"+itemID.String()+"/approve", nil)
 			r.ServeHTTP(w, req)
-			ExpectErrorCode(w, http.StatusForbidden, apperrors2.ErrorCodeUnauthorizedRole)
+			ExpectErrorCode(w, http.StatusForbidden, apperror.ErrUnauthorizedRole.ErrorCode)
 		})
 	})
 
 	Describe("Reject", func() {
 		Context("when authorized as EVM_STAFF", func() {
 			BeforeEach(func() {
-				setupRoute("POST", "/claims/:id/items/:itemID/reject", entity.UserRoleEvmStaff, itemHandler.Reject)
+				setupRoute("POST", "/claims/:id/items/:itemID/reject", entity.UserRoleEvmStaff,
+					itemHandler.Reject)
 			})
 
 			It("should reject claim item successfully", func() {
@@ -350,7 +373,8 @@ var _ = Describe("ClaimItemHandler", func() {
 					mockService.EXPECT().Reject(mockTx, claimID, itemID).Return(nil).Once()
 				})
 
-				req, _ := http.NewRequest(http.MethodPost, "/claims/"+claimID.String()+"/items/"+itemID.String()+"/reject", nil)
+				req, _ := http.NewRequest(http.MethodPost,
+					"/claims/"+claimID.String()+"/items/"+itemID.String()+"/reject", nil)
 				r.ServeHTTP(w, req)
 				Expect(w.Code).To(Equal(http.StatusNoContent))
 			})
@@ -366,39 +390,44 @@ var _ = Describe("ClaimItemHandler", func() {
 				},
 				Entry("invalid claim UUID",
 					nil,
-					"/claims/invalid-uuid/items/"+itemID.String()+"/reject", http.StatusBadRequest, apperrors2.ErrorCodeInvalidUUID),
+					"/claims/invalid-uuid/items/"+itemID.String()+"/reject", http.StatusBadRequest,
+					apperror.ErrInvalidParams),
 				Entry("invalid item UUID",
 					nil,
-					"/claims/"+claimID.String()+"/items/invalid-uuid/reject", http.StatusBadRequest, apperrors2.ErrorCodeInvalidUUID),
+					"/claims/"+claimID.String()+"/items/invalid-uuid/reject", http.StatusBadRequest,
+					apperror.ErrInvalidParams),
 			)
 
 			It("should handle service error during rejection", func() {
 				setupTxMock(func() {
 					mockService.EXPECT().Reject(mockTx, claimID, itemID).
-						Return(apperrors2.NewClaimItemNotFound()).Once()
+						Return(apperror.ErrNotFoundError).Once()
 				})
-				mockTxManager.ExpectedCalls[0].ReturnArguments = []interface{}{apperrors2.NewClaimItemNotFound()}
+				mockTxManager.ExpectedCalls[0].ReturnArguments = []interface{}{apperror.ErrNotFoundError}
 
-				req, _ := http.NewRequest(http.MethodPost, "/claims/"+claimID.String()+"/items/"+itemID.String()+"/reject", nil)
+				req, _ := http.NewRequest(http.MethodPost,
+					"/claims/"+claimID.String()+"/items/"+itemID.String()+"/reject", nil)
 				r.ServeHTTP(w, req)
-				ExpectErrorCode(w, http.StatusNotFound, apperrors2.ErrorCodeClaimItemNotFound)
+				ExpectErrorCode(w, http.StatusNotFound, apperror.ErrNotFoundError.ErrorCode)
 			})
 
 			It("should handle transaction manager error", func() {
 				mockTxManager.EXPECT().Do(mock.Anything, mock.AnythingOfType("func(application.Tx) error")).
-					Return(apperrors2.NewDBOperationError(errors.New("transaction failed"))).Once()
+					Return(apperror.ErrDBOperation).Once()
 
-				req, _ := http.NewRequest(http.MethodPost, "/claims/"+claimID.String()+"/items/"+itemID.String()+"/reject", nil)
+				req, _ := http.NewRequest(http.MethodPost,
+					"/claims/"+claimID.String()+"/items/"+itemID.String()+"/reject", nil)
 				r.ServeHTTP(w, req)
-				ExpectErrorCode(w, http.StatusInternalServerError, apperrors2.ErrorCodeDBOperation)
+				ExpectErrorCode(w, http.StatusInternalServerError, apperror.ErrDBOperation.ErrorCode)
 			})
 		})
 
 		It("should deny access for unauthorized roles", func() {
 			setupRoute("POST", "/claims/:id/items/:itemID/reject", entity.UserRoleScStaff, itemHandler.Reject)
-			req, _ := http.NewRequest(http.MethodPost, "/claims/"+claimID.String()+"/items/"+itemID.String()+"/reject", nil)
+			req, _ := http.NewRequest(http.MethodPost,
+				"/claims/"+claimID.String()+"/items/"+itemID.String()+"/reject", nil)
 			r.ServeHTTP(w, req)
-			ExpectErrorCode(w, http.StatusForbidden, apperrors2.ErrorCodeUnauthorizedRole)
+			ExpectErrorCode(w, http.StatusForbidden, apperror.ErrUnauthorizedRole.ErrorCode)
 		})
 	})
 })

@@ -8,7 +8,7 @@ import (
 	"ev-warranty-go/internal/domain/entity"
 	"ev-warranty-go/internal/interface/api/dto"
 	"ev-warranty-go/internal/interface/api/handler"
-	apperrors2 "ev-warranty-go/pkg/apperror"
+	"ev-warranty-go/pkg/apperror"
 	"ev-warranty-go/pkg/mocks"
 	"net/http"
 	"net/http/httptest"
@@ -72,19 +72,22 @@ var _ = Describe("ClaimHandler", func() {
 		userID = uuid.New()
 		claimID = uuid.New()
 		vehicleID := uuid.New()
+		technicianID := uuid.New()
 		customerID := uuid.New()
 
 		validCreateReq = dto.CreateClaimRequest{
-			VehicleID:   vehicleID,
-			CustomerID:  customerID,
-			Description: "Test claim description for warranty issue",
+			VehicleID:    vehicleID,
+			CustomerID:   customerID,
+			TechnicianID: technicianID,
+			Description:  "Test claim description for warranty issue",
 		}
 
 		validUpdateReq = dto.UpdateClaimRequest{
 			Description: "Updated claim description for warranty issue",
 		}
 
-		sampleClaim = entity.NewClaim(vehicleID, customerID, validCreateReq.Description, entity.ClaimStatusDraft, nil)
+		sampleClaim = entity.NewClaim(vehicleID, customerID, validCreateReq.Description,
+			entity.ClaimStatusDraft, nil)
 		sampleClaim.ID = claimID
 	})
 
@@ -106,17 +109,17 @@ var _ = Describe("ClaimHandler", func() {
 			req, _ := http.NewRequest(http.MethodGet, "/claims/invalid-uuid", nil)
 			r.ServeHTTP(w, req)
 
-			ExpectErrorCode(w, http.StatusBadRequest, apperrors2.ErrorCodeInvalidUUID)
+			ExpectErrorCode(w, http.StatusBadRequest, apperror.ErrInvalidParams.ErrorCode)
 		})
 
 		It("should handle claim not found", func() {
 			mockService.EXPECT().GetByID(mock.Anything, claimID).
-				Return(nil, apperrors2.NewClaimNotFound()).Once()
+				Return(nil, apperror.ErrNotFoundError).Once()
 
 			req, _ := http.NewRequest(http.MethodGet, "/claims/"+claimID.String(), nil)
 			r.ServeHTTP(w, req)
 
-			ExpectErrorCode(w, http.StatusNotFound, apperrors2.ErrorCodeClaimNotFound)
+			ExpectErrorCode(w, http.StatusNotFound, apperror.ErrNotFoundError.ErrorCode)
 		})
 
 		It("should handle service errors", func() {
@@ -126,7 +129,7 @@ var _ = Describe("ClaimHandler", func() {
 			req, _ := http.NewRequest(http.MethodGet, "/claims/"+claimID.String(), nil)
 			r.ServeHTTP(w, req)
 
-			ExpectErrorCode(w, http.StatusInternalServerError, apperrors2.ErrorCodeInternalServerError)
+			ExpectErrorCode(w, http.StatusInternalServerError, apperror.ErrInternalServerError.ErrorCode)
 		})
 	})
 
@@ -161,7 +164,7 @@ var _ = Describe("ClaimHandler", func() {
 			req, _ := http.NewRequest(http.MethodGet, "/claims", nil)
 			r.ServeHTTP(w, req)
 
-			ExpectErrorCode(w, http.StatusInternalServerError, apperrors2.ErrorCodeInternalServerError)
+			ExpectErrorCode(w, http.StatusInternalServerError, apperror.ErrInternalServerError.ErrorCode)
 		})
 	})
 
@@ -173,12 +176,13 @@ var _ = Describe("ClaimHandler", func() {
 
 			It("should create claim successfully", func() {
 				setupTxMock(func() {
-					mockService.EXPECT().Create(mockTx, mock.MatchedBy(func(cmd *service.CreateClaimCommand) bool {
-						return cmd.VehicleID == validCreateReq.VehicleID &&
-							cmd.CustomerID == validCreateReq.CustomerID &&
-							cmd.CreatorID == userID &&
-							cmd.Description == validCreateReq.Description
-					})).Return(sampleClaim, nil).Once()
+					mockService.EXPECT().Create(mockTx,
+						mock.MatchedBy(func(cmd *service.CreateClaimCommand) bool {
+							return cmd.VehicleID == validCreateReq.VehicleID &&
+								cmd.CustomerID == validCreateReq.CustomerID &&
+								cmd.StaffID == userID &&
+								cmd.Description == validCreateReq.Description
+						})).Return(sampleClaim, nil).Once()
 				})
 
 				SendRequest(r, http.MethodPost, "/claims", w, validCreateReq)
@@ -187,7 +191,7 @@ var _ = Describe("ClaimHandler", func() {
 
 			It("should handle invalid JSON", func() {
 				SendRequest(r, http.MethodPost, "/claims", w, "invalid json")
-				ExpectErrorCode(w, http.StatusBadRequest, apperrors2.ErrorCodeInvalidJsonRequest)
+				ExpectErrorCode(w, http.StatusBadRequest, apperror.ErrInvalidJsonRequest.ErrorCode)
 			})
 
 			DescribeTable("should handle validation errors",
@@ -200,10 +204,10 @@ var _ = Describe("ClaimHandler", func() {
 				},
 				Entry("empty description", func(req *dto.CreateClaimRequest) {
 					req.Description = ""
-				}, apperrors2.ErrorCodeInvalidJsonRequest),
+				}, apperror.ErrInvalidJsonRequest),
 				Entry("description too short", func(req *dto.CreateClaimRequest) {
 					req.Description = "short"
-				}, apperrors2.ErrorCodeInvalidJsonRequest),
+				}, apperror.ErrInvalidJsonRequest),
 			)
 
 			It("should handle service errors", func() {
@@ -214,7 +218,7 @@ var _ = Describe("ClaimHandler", func() {
 				}, dbError)
 
 				SendRequest(r, http.MethodPost, "/claims", w, validCreateReq)
-				ExpectErrorCode(w, http.StatusInternalServerError, apperrors2.ErrorCodeInternalServerError)
+				ExpectErrorCode(w, http.StatusInternalServerError, apperror.ErrInternalServerError.ErrorCode)
 			})
 
 			It("should handle transaction errors", func() {
@@ -222,7 +226,7 @@ var _ = Describe("ClaimHandler", func() {
 					Return(errors.New("transaction error")).Once()
 
 				SendRequest(r, http.MethodPost, "/claims", w, validCreateReq)
-				ExpectErrorCode(w, http.StatusInternalServerError, apperrors2.ErrorCodeInternalServerError)
+				ExpectErrorCode(w, http.StatusInternalServerError, apperror.ErrInternalServerError.ErrorCode)
 			})
 		})
 
@@ -244,7 +248,7 @@ var _ = Describe("ClaimHandler", func() {
 		It("should deny access for unauthorized roles", func() {
 			setupRoute("POST", "/claims", entity.UserRoleEvmStaff, claimHandler.Create)
 			SendRequest(r, http.MethodPost, "/claims", w, validCreateReq)
-			ExpectErrorCode(w, http.StatusForbidden, apperrors2.ErrorCodeUnauthorizedRole)
+			ExpectErrorCode(w, http.StatusForbidden, apperror.ErrUnauthorizedRole.ErrorCode)
 		})
 
 		It("should handle missing user ID header", func() {
@@ -255,7 +259,7 @@ var _ = Describe("ClaimHandler", func() {
 			})
 
 			SendRequest(r, http.MethodPost, "/claims", w, validCreateReq)
-			ExpectErrorCode(w, http.StatusBadRequest, apperrors2.ErrorCodeMissingUserID)
+			ExpectErrorCode(w, http.StatusBadRequest, apperror.ErrMissingUserID.ErrorCode)
 		})
 
 		It("should handle invalid user ID header", func() {
@@ -267,7 +271,7 @@ var _ = Describe("ClaimHandler", func() {
 			})
 
 			SendRequest(r, http.MethodPost, "/claims", w, validCreateReq)
-			ExpectErrorCode(w, http.StatusBadRequest, apperrors2.ErrorCodeInvalidUserID)
+			ExpectErrorCode(w, http.StatusBadRequest, apperror.ErrInvalidUserID.ErrorCode)
 		})
 	})
 
@@ -279,9 +283,10 @@ var _ = Describe("ClaimHandler", func() {
 
 			It("should update claim successfully", func() {
 				setupTxMock(func() {
-					mockService.EXPECT().Update(mockTx, claimID, mock.MatchedBy(func(cmd *service.UpdateClaimCommand) bool {
-						return cmd.Description == validUpdateReq.Description
-					})).Return(nil).Once()
+					mockService.EXPECT().Update(mockTx, claimID,
+						mock.MatchedBy(func(cmd *service.UpdateClaimCommand) bool {
+							return cmd.Description == validUpdateReq.Description
+						})).Return(nil).Once()
 				})
 
 				SendRequest(r, http.MethodPut, "/claims/"+claimID.String(), w, validUpdateReq)
@@ -290,30 +295,30 @@ var _ = Describe("ClaimHandler", func() {
 
 			It("should handle invalid UUID", func() {
 				SendRequest(r, http.MethodPut, "/claims/invalid-uuid", w, validUpdateReq)
-				ExpectErrorCode(w, http.StatusBadRequest, apperrors2.ErrorCodeInvalidUUID)
+				ExpectErrorCode(w, http.StatusBadRequest, apperror.ErrInvalidParams.ErrorCode)
 			})
 
 			It("should handle invalid JSON", func() {
 				SendRequest(r, http.MethodPut, "/claims/"+claimID.String(), w, "invalid json")
-				ExpectErrorCode(w, http.StatusBadRequest, apperrors2.ErrorCodeInvalidJsonRequest)
+				ExpectErrorCode(w, http.StatusBadRequest, apperror.ErrInvalidJsonRequest.ErrorCode)
 			})
 
 			It("should handle service errors", func() {
-				notFoundError := apperrors2.NewClaimNotFound()
+				notFoundError := apperror.ErrNotFoundError
 				setupTxMockWithError(func() {
 					mockService.EXPECT().Update(mockTx, claimID, mock.Anything).
 						Return(notFoundError).Once()
 				}, notFoundError)
 
 				SendRequest(r, http.MethodPut, "/claims/"+claimID.String(), w, validUpdateReq)
-				ExpectErrorCode(w, http.StatusNotFound, apperrors2.ErrorCodeClaimNotFound)
+				ExpectErrorCode(w, http.StatusNotFound, apperror.ErrNotFoundError.ErrorCode)
 			})
 		})
 
 		It("should deny access for unauthorized roles", func() {
 			setupRoute("PUT", "/claims/:id", entity.UserRoleScTechnician, claimHandler.Update)
 			SendRequest(r, http.MethodPut, "/claims/"+claimID.String(), w, validUpdateReq)
-			ExpectErrorCode(w, http.StatusForbidden, apperrors2.ErrorCodeUnauthorizedRole)
+			ExpectErrorCode(w, http.StatusForbidden, apperror.ErrUnauthorizedRole.ErrorCode)
 		})
 	})
 
@@ -334,18 +339,18 @@ var _ = Describe("ClaimHandler", func() {
 
 			It("should handle invalid UUID", func() {
 				SendRequest(r, http.MethodDelete, "/claims/invalid-uuid", w, nil)
-				ExpectErrorCode(w, http.StatusBadRequest, apperrors2.ErrorCodeInvalidUUID)
+				ExpectErrorCode(w, http.StatusBadRequest, apperror.ErrInvalidParams.ErrorCode)
 			})
 
 			It("should handle service errors", func() {
-				notFoundError := apperrors2.NewClaimNotFound()
+				notFoundError := apperror.ErrNotFoundError
 				setupTxMockWithError(func() {
 					mockService.EXPECT().HardDelete(mockTx, claimID).
 						Return(notFoundError).Once()
 				}, notFoundError)
 
 				SendRequest(r, http.MethodDelete, "/claims/"+claimID.String(), w, nil)
-				ExpectErrorCode(w, http.StatusNotFound, apperrors2.ErrorCodeClaimNotFound)
+				ExpectErrorCode(w, http.StatusNotFound, apperror.ErrNotFoundError.ErrorCode)
 			})
 		})
 
@@ -367,7 +372,7 @@ var _ = Describe("ClaimHandler", func() {
 		It("should deny access for unauthorized roles", func() {
 			setupRoute("DELETE", "/claims/:id", entity.UserRoleScTechnician, claimHandler.Delete)
 			SendRequest(r, http.MethodDelete, "/claims/"+claimID.String(), w, nil)
-			ExpectErrorCode(w, http.StatusForbidden, apperrors2.ErrorCodeUnauthorizedRole)
+			ExpectErrorCode(w, http.StatusForbidden, apperror.ErrUnauthorizedRole.ErrorCode)
 		})
 	})
 
@@ -388,25 +393,25 @@ var _ = Describe("ClaimHandler", func() {
 
 			It("should handle invalid UUID", func() {
 				SendRequest(r, http.MethodPost, "/claims/invalid-uuid/submit", w, nil)
-				ExpectErrorCode(w, http.StatusBadRequest, apperrors2.ErrorCodeInvalidUUID)
+				ExpectErrorCode(w, http.StatusBadRequest, apperror.ErrInvalidParams.ErrorCode)
 			})
 
 			It("should handle service errors", func() {
-				invalidActionError := apperrors2.NewInvalidClaimAction()
+				invalidActionError := apperror.ErrInvalidClaimAction
 				setupTxMockWithError(func() {
 					mockService.EXPECT().Submit(mockTx, claimID, userID).
 						Return(invalidActionError).Once()
 				}, invalidActionError)
 
 				SendRequest(r, http.MethodPost, "/claims/"+claimID.String()+"/submit", w, nil)
-				ExpectErrorCode(w, http.StatusConflict, apperrors2.ErrorCodeInvalidClaimAction)
+				ExpectErrorCode(w, http.StatusConflict, apperror.ErrInvalidClaimAction.ErrorCode)
 			})
 		})
 
 		It("should deny access for unauthorized roles", func() {
 			setupRoute("POST", "/claims/:id/submit", entity.UserRoleScTechnician, claimHandler.Submit)
 			SendRequest(r, http.MethodPost, "/claims/"+claimID.String()+"/submit", w, nil)
-			ExpectErrorCode(w, http.StatusForbidden, apperrors2.ErrorCodeUnauthorizedRole)
+			ExpectErrorCode(w, http.StatusForbidden, apperror.ErrUnauthorizedRole.ErrorCode)
 		})
 
 		It("should handle missing user ID header", func() {
@@ -417,7 +422,7 @@ var _ = Describe("ClaimHandler", func() {
 			})
 
 			SendRequest(r, http.MethodPost, "/claims/"+claimID.String()+"/submit", w, nil)
-			ExpectErrorCode(w, http.StatusBadRequest, apperrors2.ErrorCodeMissingUserID)
+			ExpectErrorCode(w, http.StatusBadRequest, apperror.ErrMissingUserID.ErrorCode)
 		})
 
 		It("should handle invalid user ID header", func() {
@@ -429,7 +434,7 @@ var _ = Describe("ClaimHandler", func() {
 			})
 
 			SendRequest(r, http.MethodPost, "/claims/"+claimID.String()+"/submit", w, nil)
-			ExpectErrorCode(w, http.StatusBadRequest, apperrors2.ErrorCodeInvalidUserID)
+			ExpectErrorCode(w, http.StatusBadRequest, apperror.ErrInvalidUserID.ErrorCode)
 		})
 	})
 
@@ -441,7 +446,8 @@ var _ = Describe("ClaimHandler", func() {
 
 			It("should start review successfully", func() {
 				setupTxMock(func() {
-					mockService.EXPECT().UpdateStatus(mockTx, claimID, entity.ClaimStatusReviewing, userID).Return(nil).Once()
+					mockService.EXPECT().UpdateStatus(mockTx, claimID, entity.ClaimStatusReviewing,
+						userID).Return(nil).Once()
 				})
 
 				SendRequest(r, http.MethodPost, "/claims/"+claimID.String()+"/review", w, nil)
@@ -450,25 +456,25 @@ var _ = Describe("ClaimHandler", func() {
 
 			It("should handle invalid UUID", func() {
 				SendRequest(r, http.MethodPost, "/claims/invalid-uuid/review", w, nil)
-				ExpectErrorCode(w, http.StatusBadRequest, apperrors2.ErrorCodeInvalidUUID)
+				ExpectErrorCode(w, http.StatusBadRequest, apperror.ErrInvalidParams.ErrorCode)
 			})
 
 			It("should handle service errors", func() {
-				invalidActionError := apperrors2.NewInvalidClaimAction()
+				invalidActionError := apperror.ErrInvalidClaimAction
 				setupTxMockWithError(func() {
 					mockService.EXPECT().UpdateStatus(mockTx, claimID, entity.ClaimStatusReviewing, userID).
 						Return(invalidActionError).Once()
 				}, invalidActionError)
 
 				SendRequest(r, http.MethodPost, "/claims/"+claimID.String()+"/review", w, nil)
-				ExpectErrorCode(w, http.StatusConflict, apperrors2.ErrorCodeInvalidClaimAction)
+				ExpectErrorCode(w, http.StatusConflict, apperror.ErrInvalidClaimAction.ErrorCode)
 			})
 		})
 
 		It("should deny access for unauthorized roles", func() {
 			setupRoute("POST", "/claims/:id/review", entity.UserRoleScStaff, claimHandler.Review)
 			SendRequest(r, http.MethodPost, "/claims/"+claimID.String()+"/review", w, nil)
-			ExpectErrorCode(w, http.StatusForbidden, apperrors2.ErrorCodeUnauthorizedRole)
+			ExpectErrorCode(w, http.StatusForbidden, apperror.ErrUnauthorizedRole.ErrorCode)
 		})
 
 		It("should handle missing user ID header", func() {
@@ -479,7 +485,7 @@ var _ = Describe("ClaimHandler", func() {
 			})
 
 			SendRequest(r, http.MethodPost, "/claims/"+claimID.String()+"/review", w, nil)
-			ExpectErrorCode(w, http.StatusBadRequest, apperrors2.ErrorCodeMissingUserID)
+			ExpectErrorCode(w, http.StatusBadRequest, apperror.ErrMissingUserID.ErrorCode)
 		})
 
 		It("should handle invalid user ID header", func() {
@@ -491,69 +497,7 @@ var _ = Describe("ClaimHandler", func() {
 			})
 
 			SendRequest(r, http.MethodPost, "/claims/"+claimID.String()+"/review", w, nil)
-			ExpectErrorCode(w, http.StatusBadRequest, apperrors2.ErrorCodeInvalidUserID)
-		})
-	})
-
-	Describe("RequestInformation", func() {
-		Context("when authorized as EVM_STAFF", func() {
-			BeforeEach(func() {
-				setupRoute("POST", "/claims/:id/request-information", entity.UserRoleEvmStaff, claimHandler.RequestInformation)
-			})
-
-			It("should request info successfully", func() {
-				setupTxMock(func() {
-					mockService.EXPECT().UpdateStatus(mockTx, claimID, entity.ClaimStatusRequestInfo, userID).Return(nil).Once()
-				})
-
-				SendRequest(r, http.MethodPost, "/claims/"+claimID.String()+"/request-information", w, nil)
-				ExpectResponseNotNil(w, http.StatusNoContent)
-			})
-
-			It("should handle invalid UUID", func() {
-				SendRequest(r, http.MethodPost, "/claims/invalid-uuid/request-information", w, nil)
-				ExpectErrorCode(w, http.StatusBadRequest, apperrors2.ErrorCodeInvalidUUID)
-			})
-
-			It("should handle service errors", func() {
-				invalidActionError := apperrors2.NewInvalidClaimAction()
-				setupTxMockWithError(func() {
-					mockService.EXPECT().UpdateStatus(mockTx, claimID, entity.ClaimStatusRequestInfo, userID).
-						Return(invalidActionError).Once()
-				}, invalidActionError)
-
-				SendRequest(r, http.MethodPost, "/claims/"+claimID.String()+"/request-information", w, nil)
-				ExpectErrorCode(w, http.StatusConflict, apperrors2.ErrorCodeInvalidClaimAction)
-			})
-		})
-
-		It("should deny access for unauthorized roles", func() {
-			setupRoute("POST", "/claims/:id/request-information", entity.UserRoleScStaff, claimHandler.RequestInformation)
-			SendRequest(r, http.MethodPost, "/claims/"+claimID.String()+"/request-information", w, nil)
-			ExpectErrorCode(w, http.StatusForbidden, apperrors2.ErrorCodeUnauthorizedRole)
-		})
-
-		It("should handle missing user ID header", func() {
-			r.POST("/claims/:id/request-information", func(c *gin.Context) {
-				SetHeaderRole(c, entity.UserRoleEvmStaff)
-				SetContentTypeJSON(c)
-				claimHandler.RequestInformation(c)
-			})
-
-			SendRequest(r, http.MethodPost, "/claims/"+claimID.String()+"/request-information", w, nil)
-			ExpectErrorCode(w, http.StatusBadRequest, apperrors2.ErrorCodeMissingUserID)
-		})
-
-		It("should handle invalid user ID header", func() {
-			r.POST("/claims/:id/request-information", func(c *gin.Context) {
-				SetHeaderRole(c, entity.UserRoleEvmStaff)
-				c.Request.Header.Set("X-User-ID", "invalid-uuid")
-				SetContentTypeJSON(c)
-				claimHandler.RequestInformation(c)
-			})
-
-			SendRequest(r, http.MethodPost, "/claims/"+claimID.String()+"/request-information", w, nil)
-			ExpectErrorCode(w, http.StatusBadRequest, apperrors2.ErrorCodeInvalidUserID)
+			ExpectErrorCode(w, http.StatusBadRequest, apperror.ErrInvalidUserID.ErrorCode)
 		})
 	})
 
@@ -565,7 +509,8 @@ var _ = Describe("ClaimHandler", func() {
 
 			It("should cancel claim successfully", func() {
 				setupTxMock(func() {
-					mockService.EXPECT().UpdateStatus(mockTx, claimID, entity.ClaimStatusCancelled, userID).Return(nil).Once()
+					mockService.EXPECT().UpdateStatus(mockTx, claimID, entity.ClaimStatusCancelled,
+						userID).Return(nil).Once()
 				})
 
 				SendRequest(r, http.MethodPost, "/claims/"+claimID.String()+"/cancel", w, nil)
@@ -574,25 +519,25 @@ var _ = Describe("ClaimHandler", func() {
 
 			It("should handle invalid UUID", func() {
 				SendRequest(r, http.MethodPost, "/claims/invalid-uuid/cancel", w, nil)
-				ExpectErrorCode(w, http.StatusBadRequest, apperrors2.ErrorCodeInvalidUUID)
+				ExpectErrorCode(w, http.StatusBadRequest, apperror.ErrInvalidParams.ErrorCode)
 			})
 
 			It("should handle service errors", func() {
-				invalidActionError := apperrors2.NewInvalidClaimAction()
+				invalidActionError := apperror.ErrInvalidClaimAction
 				setupTxMockWithError(func() {
 					mockService.EXPECT().UpdateStatus(mockTx, claimID, entity.ClaimStatusCancelled, userID).
 						Return(invalidActionError).Once()
 				}, invalidActionError)
 
 				SendRequest(r, http.MethodPost, "/claims/"+claimID.String()+"/cancel", w, nil)
-				ExpectErrorCode(w, http.StatusConflict, apperrors2.ErrorCodeInvalidClaimAction)
+				ExpectErrorCode(w, http.StatusConflict, apperror.ErrInvalidClaimAction.ErrorCode)
 			})
 		})
 
 		It("should deny access for unauthorized roles", func() {
 			setupRoute("POST", "/claims/:id/cancel", entity.UserRoleEvmStaff, claimHandler.Cancel)
 			SendRequest(r, http.MethodPost, "/claims/"+claimID.String()+"/cancel", w, nil)
-			ExpectErrorCode(w, http.StatusForbidden, apperrors2.ErrorCodeUnauthorizedRole)
+			ExpectErrorCode(w, http.StatusForbidden, apperror.ErrUnauthorizedRole.ErrorCode)
 		})
 
 		It("should handle missing user ID header", func() {
@@ -603,7 +548,7 @@ var _ = Describe("ClaimHandler", func() {
 			})
 
 			SendRequest(r, http.MethodPost, "/claims/"+claimID.String()+"/cancel", w, nil)
-			ExpectErrorCode(w, http.StatusBadRequest, apperrors2.ErrorCodeMissingUserID)
+			ExpectErrorCode(w, http.StatusBadRequest, apperror.ErrMissingUserID.ErrorCode)
 		})
 
 		It("should handle invalid user ID header", func() {
@@ -615,7 +560,7 @@ var _ = Describe("ClaimHandler", func() {
 			})
 
 			SendRequest(r, http.MethodPost, "/claims/"+claimID.String()+"/cancel", w, nil)
-			ExpectErrorCode(w, http.StatusBadRequest, apperrors2.ErrorCodeInvalidUserID)
+			ExpectErrorCode(w, http.StatusBadRequest, apperror.ErrInvalidUserID.ErrorCode)
 		})
 	})
 
@@ -636,25 +581,25 @@ var _ = Describe("ClaimHandler", func() {
 
 			It("should handle invalid UUID", func() {
 				SendRequest(r, http.MethodPost, "/claims/invalid-uuid/complete", w, nil)
-				ExpectErrorCode(w, http.StatusBadRequest, apperrors2.ErrorCodeInvalidUUID)
+				ExpectErrorCode(w, http.StatusBadRequest, apperror.ErrInvalidParams.ErrorCode)
 			})
 
 			It("should handle service errors", func() {
-				invalidActionError := apperrors2.NewInvalidClaimAction()
+				invalidActionError := apperror.ErrInvalidClaimAction
 				setupTxMockWithError(func() {
 					mockService.EXPECT().Complete(mockTx, claimID, userID).
 						Return(invalidActionError).Once()
 				}, invalidActionError)
 
 				SendRequest(r, http.MethodPost, "/claims/"+claimID.String()+"/complete", w, nil)
-				ExpectErrorCode(w, http.StatusConflict, apperrors2.ErrorCodeInvalidClaimAction)
+				ExpectErrorCode(w, http.StatusConflict, apperror.ErrInvalidClaimAction.ErrorCode)
 			})
 		})
 
 		It("should deny access for unauthorized roles", func() {
 			setupRoute("POST", "/claims/:id/complete", entity.UserRoleScStaff, claimHandler.Complete)
 			SendRequest(r, http.MethodPost, "/claims/"+claimID.String()+"/complete", w, nil)
-			ExpectErrorCode(w, http.StatusForbidden, apperrors2.ErrorCodeUnauthorizedRole)
+			ExpectErrorCode(w, http.StatusForbidden, apperror.ErrUnauthorizedRole.ErrorCode)
 		})
 
 		It("should handle missing user ID header", func() {
@@ -665,7 +610,7 @@ var _ = Describe("ClaimHandler", func() {
 			})
 
 			SendRequest(r, http.MethodPost, "/claims/"+claimID.String()+"/complete", w, nil)
-			ExpectErrorCode(w, http.StatusBadRequest, apperrors2.ErrorCodeMissingUserID)
+			ExpectErrorCode(w, http.StatusBadRequest, apperror.ErrMissingUserID.ErrorCode)
 		})
 
 		It("should handle invalid user ID header", func() {
@@ -677,7 +622,7 @@ var _ = Describe("ClaimHandler", func() {
 			})
 
 			SendRequest(r, http.MethodPost, "/claims/"+claimID.String()+"/complete", w, nil)
-			ExpectErrorCode(w, http.StatusBadRequest, apperrors2.ErrorCodeInvalidUserID)
+			ExpectErrorCode(w, http.StatusBadRequest, apperror.ErrInvalidUserID.ErrorCode)
 		})
 	})
 
@@ -702,17 +647,17 @@ var _ = Describe("ClaimHandler", func() {
 			req, _ := http.NewRequest(http.MethodGet, "/claims/invalid-uuid/history", nil)
 			r.ServeHTTP(w, req)
 
-			ExpectErrorCode(w, http.StatusBadRequest, apperrors2.ErrorCodeInvalidUUID)
+			ExpectErrorCode(w, http.StatusBadRequest, apperror.ErrInvalidParams.ErrorCode)
 		})
 
 		It("should handle claim not found", func() {
 			mockService.EXPECT().GetHistory(mock.Anything, claimID).
-				Return(nil, apperrors2.NewClaimNotFound()).Once()
+				Return(nil, apperror.ErrNotFoundError).Once()
 
 			req, _ := http.NewRequest(http.MethodGet, "/claims/"+claimID.String()+"/history", nil)
 			r.ServeHTTP(w, req)
 
-			ExpectErrorCode(w, http.StatusNotFound, apperrors2.ErrorCodeClaimNotFound)
+			ExpectErrorCode(w, http.StatusNotFound, apperror.ErrNotFoundError.ErrorCode)
 		})
 
 		It("should handle service errors", func() {
@@ -722,7 +667,7 @@ var _ = Describe("ClaimHandler", func() {
 			req, _ := http.NewRequest(http.MethodGet, "/claims/"+claimID.String()+"/history", nil)
 			r.ServeHTTP(w, req)
 
-			ExpectErrorCode(w, http.StatusInternalServerError, apperrors2.ErrorCodeInternalServerError)
+			ExpectErrorCode(w, http.StatusInternalServerError, apperror.ErrInternalServerError.ErrorCode)
 		})
 	})
 })

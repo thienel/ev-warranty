@@ -59,7 +59,7 @@ var _ = Describe("RefreshTokenRepository", func() {
 
 				err := repository.Create(ctx, token)
 
-				ExpectAppError(err, apperror.ErrorCodeDuplicateKey)
+				ExpectAppError(err, apperror.ErrDuplicateKey.ErrorCode)
 			})
 		})
 
@@ -69,7 +69,7 @@ var _ = Describe("RefreshTokenRepository", func() {
 
 				err := repository.Create(ctx, token)
 
-				ExpectAppError(err, apperror.ErrorCodeDBOperation)
+				ExpectAppError(err, apperror.ErrDBOperation.ErrorCode)
 			})
 		})
 
@@ -138,7 +138,7 @@ var _ = Describe("RefreshTokenRepository", func() {
 
 				err := repository.Update(ctx, token)
 
-				ExpectAppError(err, apperror.ErrorCodeDBOperation)
+				ExpectAppError(err, apperror.ErrDBOperation.ErrorCode)
 			})
 		})
 
@@ -203,7 +203,7 @@ var _ = Describe("RefreshTokenRepository", func() {
 				token, err := repository.Find(ctx, tokenStr)
 
 				Expect(token).To(BeNil())
-				ExpectAppError(err, apperror.ErrorCodeRefreshTokenNotFound)
+				ExpectAppError(err, apperror.ErrNotFoundError.ErrorCode)
 			})
 		})
 
@@ -216,7 +216,7 @@ var _ = Describe("RefreshTokenRepository", func() {
 				token, err := repository.Find(ctx, tokenStr)
 
 				Expect(token).To(BeNil())
-				ExpectAppError(err, apperror.ErrorCodeDBOperation)
+				ExpectAppError(err, apperror.ErrDBOperation.ErrorCode)
 			})
 		})
 
@@ -375,7 +375,7 @@ var _ = Describe("RefreshTokenRepository", func() {
 
 				err := repository.Revoke(ctx, tokenStr)
 
-				ExpectAppError(err, apperror.ErrorCodeDBOperation)
+				ExpectAppError(err, apperror.ErrDBOperation.ErrorCode)
 			})
 		})
 

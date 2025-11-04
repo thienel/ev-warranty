@@ -2,8 +2,7 @@ package service_test
 
 import (
 	"context"
-	"errors"
-	apperrors2 "ev-warranty-go/pkg/apperror"
+	"ev-warranty-go/pkg/apperror"
 
 	"github.com/google/uuid"
 	. "github.com/onsi/ginkgo/v2"
@@ -83,7 +82,7 @@ var _ = Describe("UserService", func() {
 				user, err := userService.Create(ctx, cmd)
 
 				Expect(user).To(BeNil())
-				ExpectAppError(err, apperrors2.ErrorCodeInvalidUserInput)
+				ExpectAppError(err, apperror.ErrInvalidInput.ErrorCode)
 			})
 		})
 
@@ -103,7 +102,7 @@ var _ = Describe("UserService", func() {
 				user, err := userService.Create(ctx, cmd)
 
 				Expect(user).To(BeNil())
-				ExpectAppError(err, apperrors2.ErrorCodeInvalidUserInput)
+				ExpectAppError(err, apperror.ErrInvalidInput.ErrorCode)
 			})
 		})
 
@@ -123,7 +122,7 @@ var _ = Describe("UserService", func() {
 				user, err := userService.Create(ctx, cmd)
 
 				Expect(user).To(BeNil())
-				ExpectAppError(err, apperrors2.ErrorCodeInvalidUserInput)
+				ExpectAppError(err, apperror.ErrInvalidInput.ErrorCode)
 			})
 		})
 
@@ -143,7 +142,7 @@ var _ = Describe("UserService", func() {
 				user, err := userService.Create(ctx, cmd)
 
 				Expect(user).To(BeNil())
-				ExpectAppError(err, apperrors2.ErrorCodeInvalidUserInput)
+				ExpectAppError(err, apperror.ErrInvalidInput.ErrorCode)
 			})
 		})
 
@@ -158,14 +157,14 @@ var _ = Describe("UserService", func() {
 					OfficeID: uuid.New(),
 				}
 
-				officeErr := apperrors2.NewOfficeNotFound()
+				officeErr := apperror.ErrNotFoundError
 				mockOfficeRepo.EXPECT().FindByID(mock.Anything, cmd.OfficeID).Return(nil, officeErr).Once()
 
 				user, err := userService.Create(ctx, cmd)
 
 				Expect(err).To(HaveOccurred())
 				Expect(user).To(BeNil())
-				ExpectAppError(err, apperrors2.ErrorCodeOfficeNotFound)
+				ExpectAppError(err, apperror.ErrNotFoundError.ErrorCode)
 			})
 		})
 
@@ -191,7 +190,7 @@ var _ = Describe("UserService", func() {
 				user, err := userService.Create(ctx, cmd)
 
 				Expect(user).To(BeNil())
-				ExpectAppError(err, apperrors2.ErrorCodeInvalidOfficeType)
+				ExpectAppError(err, apperror.ErrInvalidInput.ErrorCode)
 			})
 		})
 
@@ -212,7 +211,7 @@ var _ = Describe("UserService", func() {
 					ID:         cmd.OfficeID,
 					OfficeType: entity.OfficeTypeEVM,
 				}
-				dbErr := apperrors2.New(500, apperrors2.ErrorCodeDBOperation, errors.New("database error"))
+				dbErr := apperror.ErrDBOperation
 				mockOfficeRepo.EXPECT().FindByID(ctx, cmd.OfficeID).Return(office, nil).Once()
 				mockUserRepo.EXPECT().Create(ctx, mock.AnythingOfType("*entity.User")).Return(dbErr).Once()
 
@@ -256,13 +255,13 @@ var _ = Describe("UserService", func() {
 
 		Context("when user is not found", func() {
 			It("should return UserNotFound error", func() {
-				notFoundErr := apperrors2.New(404, apperrors2.ErrorCodeUserNotFound, errors.New("user not found"))
+				notFoundErr := apperror.ErrNotFoundError
 				mockUserRepo.EXPECT().FindByID(ctx, userID).Return(nil, notFoundErr).Once()
 
 				user, err := userService.GetByID(ctx, userID)
 
 				Expect(user).To(BeNil())
-				ExpectAppError(err, apperrors2.ErrorCodeUserNotFound)
+				ExpectAppError(err, apperror.ErrNotFoundError.ErrorCode)
 			})
 		})
 	})
@@ -311,7 +310,7 @@ var _ = Describe("UserService", func() {
 
 		Context("when there is a repository error", func() {
 			It("should return DBOperationError", func() {
-				dbErr := apperrors2.New(500, apperrors2.ErrorCodeDBOperation, errors.New("database error"))
+				dbErr := apperror.ErrDBOperation
 				mockUserRepo.EXPECT().FindAll(ctx).Return(nil, dbErr).Once()
 
 				users, err := userService.GetAll(ctx)
@@ -383,12 +382,12 @@ var _ = Describe("UserService", func() {
 			})
 
 			It("should return UserNotFound error", func() {
-				notFoundErr := apperrors2.New(404, apperrors2.ErrorCodeUserNotFound, errors.New("user not found"))
+				notFoundErr := apperror.ErrNotFoundError
 				mockUserRepo.EXPECT().FindByID(ctx, userID).Return(nil, notFoundErr).Once()
 
 				err := userService.Update(ctx, userID, cmd)
 
-				ExpectAppError(err, apperrors2.ErrorCodeUserNotFound)
+				ExpectAppError(err, apperror.ErrNotFoundError.ErrorCode)
 			})
 		})
 
@@ -407,7 +406,7 @@ var _ = Describe("UserService", func() {
 
 				err := userService.Update(ctx, userID, cmd)
 
-				ExpectAppError(err, apperrors2.ErrorCodeInvalidUserInput)
+				ExpectAppError(err, apperror.ErrInvalidInput.ErrorCode)
 			})
 		})
 
@@ -426,7 +425,7 @@ var _ = Describe("UserService", func() {
 
 				err := userService.Update(ctx, userID, cmd)
 
-				ExpectAppError(err, apperrors2.ErrorCodeInvalidUserInput)
+				ExpectAppError(err, apperror.ErrInvalidInput.ErrorCode)
 			})
 		})
 
@@ -441,7 +440,7 @@ var _ = Describe("UserService", func() {
 			})
 
 			It("should return OfficeNotFound error", func() {
-				officeErr := apperrors2.New(404, apperrors2.ErrorCodeOfficeNotFound, errors.New("office not found"))
+				officeErr := apperror.ErrNotFoundError
 				mockUserRepo.EXPECT().FindByID(ctx, userID).Return(existingUser, nil).Once()
 				mockOfficeRepo.EXPECT().FindByID(ctx, cmd.OfficeID).Return(nil, officeErr).Once()
 
@@ -472,7 +471,7 @@ var _ = Describe("UserService", func() {
 
 				err := userService.Update(ctx, userID, cmd)
 
-				ExpectAppError(err, apperrors2.ErrorCodeInvalidOfficeType)
+				ExpectAppError(err, apperror.ErrInvalidInput.ErrorCode)
 			})
 		})
 
@@ -491,7 +490,7 @@ var _ = Describe("UserService", func() {
 					ID:         cmd.OfficeID,
 					OfficeType: entity.OfficeTypeEVM,
 				}
-				dbErr := apperrors2.New(500, apperrors2.ErrorCodeDBOperation, errors.New("database error"))
+				dbErr := apperror.ErrDBOperation
 				mockUserRepo.EXPECT().FindByID(ctx, userID).Return(existingUser, nil).Once()
 				mockOfficeRepo.EXPECT().FindByID(ctx, cmd.OfficeID).Return(office, nil).Once()
 				mockUserRepo.EXPECT().Update(ctx, mock.AnythingOfType("*entity.User")).Return(dbErr).Once()
@@ -523,7 +522,7 @@ var _ = Describe("UserService", func() {
 
 		Context("when repository delete fails", func() {
 			It("should return DBOperationError", func() {
-				dbErr := apperrors2.New(500, apperrors2.ErrorCodeDBOperation, errors.New("database error"))
+				dbErr := apperror.ErrDBOperation
 				mockUserRepo.EXPECT().SoftDelete(ctx, userID).Return(dbErr).Once()
 
 				err := userService.Delete(ctx, userID)

@@ -4,11 +4,11 @@ package mocks
 
 import (
 	context "context"
-	entities "ev-warranty-go/internal/domain/entity"
+	entity "ev-warranty-go/internal/domain/entity"
 
 	mock "github.com/stretchr/testify/mock"
 
-	services "ev-warranty-go/internal/application/service"
+	service "ev-warranty-go/internal/application/service"
 
 	uuid "github.com/google/uuid"
 )
@@ -27,27 +27,27 @@ func (_m *UserService) EXPECT() *UserService_Expecter {
 }
 
 // Create provides a mock function with given fields: ctx, cmd
-func (_m *UserService) Create(ctx context.Context, cmd *services.UserCreateCommand) (*entities.User, error) {
+func (_m *UserService) Create(ctx context.Context, cmd *service.UserCreateCommand) (*entity.User, error) {
 	ret := _m.Called(ctx, cmd)
 
 	if len(ret) == 0 {
 		panic("no return value specified for Create")
 	}
 
-	var r0 *entities.User
+	var r0 *entity.User
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, *services.UserCreateCommand) (*entities.User, error)); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, *service.UserCreateCommand) (*entity.User, error)); ok {
 		return rf(ctx, cmd)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, *services.UserCreateCommand) *entities.User); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, *service.UserCreateCommand) *entity.User); ok {
 		r0 = rf(ctx, cmd)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*entities.User)
+			r0 = ret.Get(0).(*entity.User)
 		}
 	}
 
-	if rf, ok := ret.Get(1).(func(context.Context, *services.UserCreateCommand) error); ok {
+	if rf, ok := ret.Get(1).(func(context.Context, *service.UserCreateCommand) error); ok {
 		r1 = rf(ctx, cmd)
 	} else {
 		r1 = ret.Error(1)
@@ -68,19 +68,19 @@ func (_e *UserService_Expecter) Create(ctx interface{}, cmd interface{}) *UserSe
 	return &UserService_Create_Call{Call: _e.mock.On("Create", ctx, cmd)}
 }
 
-func (_c *UserService_Create_Call) Run(run func(ctx context.Context, cmd *services.UserCreateCommand)) *UserService_Create_Call {
+func (_c *UserService_Create_Call) Run(run func(ctx context.Context, cmd *service.UserCreateCommand)) *UserService_Create_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(*services.UserCreateCommand))
+		run(args[0].(context.Context), args[1].(*service.UserCreateCommand))
 	})
 	return _c
 }
 
-func (_c *UserService_Create_Call) Return(_a0 *entities.User, _a1 error) *UserService_Create_Call {
+func (_c *UserService_Create_Call) Return(_a0 *entity.User, _a1 error) *UserService_Create_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
-func (_c *UserService_Create_Call) RunAndReturn(run func(context.Context, *services.UserCreateCommand) (*entities.User, error)) *UserService_Create_Call {
+func (_c *UserService_Create_Call) RunAndReturn(run func(context.Context, *service.UserCreateCommand) (*entity.User, error)) *UserService_Create_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -133,23 +133,23 @@ func (_c *UserService_Delete_Call) RunAndReturn(run func(context.Context, uuid.U
 }
 
 // GetAll provides a mock function with given fields: ctx
-func (_m *UserService) GetAll(ctx context.Context) ([]*entities.User, error) {
+func (_m *UserService) GetAll(ctx context.Context) ([]*entity.User, error) {
 	ret := _m.Called(ctx)
 
 	if len(ret) == 0 {
 		panic("no return value specified for GetAll")
 	}
 
-	var r0 []*entities.User
+	var r0 []*entity.User
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context) ([]*entities.User, error)); ok {
+	if rf, ok := ret.Get(0).(func(context.Context) ([]*entity.User, error)); ok {
 		return rf(ctx)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context) []*entities.User); ok {
+	if rf, ok := ret.Get(0).(func(context.Context) []*entity.User); ok {
 		r0 = rf(ctx)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).([]*entities.User)
+			r0 = ret.Get(0).([]*entity.User)
 		}
 	}
 
@@ -180,34 +180,34 @@ func (_c *UserService_GetAll_Call) Run(run func(ctx context.Context)) *UserServi
 	return _c
 }
 
-func (_c *UserService_GetAll_Call) Return(_a0 []*entities.User, _a1 error) *UserService_GetAll_Call {
+func (_c *UserService_GetAll_Call) Return(_a0 []*entity.User, _a1 error) *UserService_GetAll_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
-func (_c *UserService_GetAll_Call) RunAndReturn(run func(context.Context) ([]*entities.User, error)) *UserService_GetAll_Call {
+func (_c *UserService_GetAll_Call) RunAndReturn(run func(context.Context) ([]*entity.User, error)) *UserService_GetAll_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
 // GetByID provides a mock function with given fields: ctx, id
-func (_m *UserService) GetByID(ctx context.Context, id uuid.UUID) (*entities.User, error) {
+func (_m *UserService) GetByID(ctx context.Context, id uuid.UUID) (*entity.User, error) {
 	ret := _m.Called(ctx, id)
 
 	if len(ret) == 0 {
 		panic("no return value specified for GetByID")
 	}
 
-	var r0 *entities.User
+	var r0 *entity.User
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID) (*entities.User, error)); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID) (*entity.User, error)); ok {
 		return rf(ctx, id)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID) *entities.User); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID) *entity.User); ok {
 		r0 = rf(ctx, id)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*entities.User)
+			r0 = ret.Get(0).(*entity.User)
 		}
 	}
 
@@ -239,18 +239,18 @@ func (_c *UserService_GetByID_Call) Run(run func(ctx context.Context, id uuid.UU
 	return _c
 }
 
-func (_c *UserService_GetByID_Call) Return(_a0 *entities.User, _a1 error) *UserService_GetByID_Call {
+func (_c *UserService_GetByID_Call) Return(_a0 *entity.User, _a1 error) *UserService_GetByID_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
-func (_c *UserService_GetByID_Call) RunAndReturn(run func(context.Context, uuid.UUID) (*entities.User, error)) *UserService_GetByID_Call {
+func (_c *UserService_GetByID_Call) RunAndReturn(run func(context.Context, uuid.UUID) (*entity.User, error)) *UserService_GetByID_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
 // Update provides a mock function with given fields: ctx, id, cmd
-func (_m *UserService) Update(ctx context.Context, id uuid.UUID, cmd *services.UserUpdateCommand) error {
+func (_m *UserService) Update(ctx context.Context, id uuid.UUID, cmd *service.UserUpdateCommand) error {
 	ret := _m.Called(ctx, id, cmd)
 
 	if len(ret) == 0 {
@@ -258,7 +258,7 @@ func (_m *UserService) Update(ctx context.Context, id uuid.UUID, cmd *services.U
 	}
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID, *services.UserUpdateCommand) error); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID, *service.UserUpdateCommand) error); ok {
 		r0 = rf(ctx, id, cmd)
 	} else {
 		r0 = ret.Error(0)
@@ -280,9 +280,9 @@ func (_e *UserService_Expecter) Update(ctx interface{}, id interface{}, cmd inte
 	return &UserService_Update_Call{Call: _e.mock.On("Update", ctx, id, cmd)}
 }
 
-func (_c *UserService_Update_Call) Run(run func(ctx context.Context, id uuid.UUID, cmd *services.UserUpdateCommand)) *UserService_Update_Call {
+func (_c *UserService_Update_Call) Run(run func(ctx context.Context, id uuid.UUID, cmd *service.UserUpdateCommand)) *UserService_Update_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(uuid.UUID), args[2].(*services.UserUpdateCommand))
+		run(args[0].(context.Context), args[1].(uuid.UUID), args[2].(*service.UserUpdateCommand))
 	})
 	return _c
 }
@@ -292,7 +292,7 @@ func (_c *UserService_Update_Call) Return(_a0 error) *UserService_Update_Call {
 	return _c
 }
 
-func (_c *UserService_Update_Call) RunAndReturn(run func(context.Context, uuid.UUID, *services.UserUpdateCommand) error) *UserService_Update_Call {
+func (_c *UserService_Update_Call) RunAndReturn(run func(context.Context, uuid.UUID, *service.UserUpdateCommand) error) *UserService_Update_Call {
 	_c.Call.Return(run)
 	return _c
 }

@@ -23,7 +23,8 @@ func NewPartHTTPAdapter(baseURL string, client *http.Client) port.PartPort {
 	}
 }
 
-func (a *partHTTPAdapter) ReserveByOfficeIDAndCategoryID(officeID, categoryID uuid.UUID) (*entity.Part, error) {
+func (a *partHTTPAdapter) ReserveByOfficeIDAndCategoryID(officeID, categoryID uuid.UUID) (*entity.Part,
+	error) {
 	request := struct {
 		OfficeLocationID uuid.UUID `json:"office_location_id"`
 		CategoryID       uuid.UUID `json:"category_id"`
@@ -39,13 +40,13 @@ func (a *partHTTPAdapter) ReserveByOfficeIDAndCategoryID(officeID, categoryID uu
 		Data      entity.Part `json:"data"`
 	}
 
-	err := utils.PostJSON(a.client, fmt.Sprintf("%s/parts/reserve", a.baseURL), request, &respDto)
+	statusCode, err := utils.PostJSON(a.client, fmt.Sprintf("%s/parts/reserve", a.baseURL), request, &respDto)
 	if err != nil {
 		return nil, err
 	}
 
 	if !respDto.IsSuccess {
-		return nil, apperror.NewInternalServerError(fmt.Errorf("reserve failed: %s", respDto.Message))
+		return nil, apperror.New(statusCode, respDto.Error, respDto.Message)
 	}
 
 	return &respDto.Data, nil
@@ -59,14 +60,14 @@ func (a *partHTTPAdapter) UnReserveByID(id uuid.UUID) error {
 		Error     string `json:"error"`
 	}
 
-	err := utils.PostJSON(a.client, fmt.Sprintf("%s/parts/%s/unreserve",
+	statusCode, err := utils.PostJSON(a.client, fmt.Sprintf("%s/parts/%s/unreserve",
 		a.baseURL, id.String()), request, &respDto)
 	if err != nil {
 		return err
 	}
 
 	if !respDto.IsSuccess {
-		return apperror.NewInternalServerError(fmt.Errorf("reserve failed: %s", respDto.Message))
+		return apperror.New(statusCode, respDto.Error, respDto.Message)
 	}
 
 	return nil

@@ -64,7 +64,7 @@ var _ = Describe("ClaimAttachmentRepository", func() {
 
 				err := repository.Create(mockTx, attachment)
 
-				ExpectAppError(err, apperror.ErrorCodeDuplicateKey)
+				ExpectAppError(err, apperror.ErrDuplicateKey.ErrorCode)
 			})
 		})
 
@@ -76,7 +76,7 @@ var _ = Describe("ClaimAttachmentRepository", func() {
 
 				err := repository.Create(mockTx, attachment)
 
-				ExpectAppError(err, apperror.ErrorCodeDBOperation)
+				ExpectAppError(err, apperror.ErrDBOperation.ErrorCode)
 			})
 		})
 
@@ -164,7 +164,7 @@ var _ = Describe("ClaimAttachmentRepository", func() {
 
 				err := repository.HardDelete(mockTx, attachmentID)
 
-				ExpectAppError(err, apperror.ErrorCodeDBOperation)
+				ExpectAppError(err, apperror.ErrDBOperation.ErrorCode)
 			})
 		})
 	})
@@ -204,7 +204,7 @@ var _ = Describe("ClaimAttachmentRepository", func() {
 
 				err := repository.SoftDeleteByClaimID(mockTx, claimID)
 
-				ExpectAppError(err, apperror.ErrorCodeDBOperation)
+				ExpectAppError(err, apperror.ErrDBOperation.ErrorCode)
 			})
 		})
 	})
@@ -247,7 +247,7 @@ var _ = Describe("ClaimAttachmentRepository", func() {
 				attachment, err := repository.FindByID(ctx, attachmentID)
 
 				Expect(attachment).To(BeNil())
-				ExpectAppError(err, apperror.ErrorCodeClaimAttachmentNotFound)
+				ExpectAppError(err, apperror.ErrNotFoundError.ErrorCode)
 			})
 		})
 
@@ -258,7 +258,7 @@ var _ = Describe("ClaimAttachmentRepository", func() {
 				attachment, err := repository.FindByID(ctx, attachmentID)
 
 				Expect(attachment).To(BeNil())
-				ExpectAppError(err, apperror.ErrorCodeDBOperation)
+				ExpectAppError(err, apperror.ErrDBOperation.ErrorCode)
 			})
 		})
 	})
@@ -324,7 +324,7 @@ var _ = Describe("ClaimAttachmentRepository", func() {
 				attachments, err := repository.FindByClaimID(ctx, claimID)
 
 				Expect(attachments).To(BeNil())
-				ExpectAppError(err, apperror.ErrorCodeDBOperation)
+				ExpectAppError(err, apperror.ErrDBOperation.ErrorCode)
 			})
 		})
 	})
@@ -375,7 +375,7 @@ var _ = Describe("ClaimAttachmentRepository", func() {
 				count, err := repository.CountByClaimID(ctx, claimID)
 
 				Expect(count).To(Equal(int64(0)))
-				ExpectAppError(err, apperror.ErrorCodeDBOperation)
+				ExpectAppError(err, apperror.ErrDBOperation.ErrorCode)
 			})
 		})
 
@@ -458,7 +458,7 @@ var _ = Describe("ClaimAttachmentRepository", func() {
 				attachments, err := repository.FindByType(ctx, claimID, attachmentType)
 
 				Expect(attachments).To(BeNil())
-				ExpectAppError(err, apperror.ErrorCodeDBOperation)
+				ExpectAppError(err, apperror.ErrDBOperation.ErrorCode)
 			})
 		})
 

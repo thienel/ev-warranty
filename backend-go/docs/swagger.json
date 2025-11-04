@@ -115,7 +115,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dtos.LoginRequest"
+                            "$ref": "#/definitions/dto.LoginRequest"
                         }
                     }
                 ],
@@ -125,13 +125,13 @@
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/dtos.SuccessResponse"
+                                    "$ref": "#/definitions/dto.SuccessResponse"
                                 },
                                 {
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/dtos.LoginResponse"
+                                            "$ref": "#/definitions/dto.LoginResponse"
                                         }
                                     }
                                 }
@@ -141,19 +141,19 @@
                     "400": {
                         "description": "Bad request",
                         "schema": {
-                            "$ref": "#/definitions/dtos.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/dtos.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/dtos.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -179,13 +179,13 @@
                     "400": {
                         "description": "Bad request",
                         "schema": {
-                            "$ref": "#/definitions/dtos.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/dtos.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -215,13 +215,13 @@
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/dtos.SuccessResponse"
+                                    "$ref": "#/definitions/dto.SuccessResponse"
                                 },
                                 {
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/dtos.ValidateTokenResponse"
+                                            "$ref": "#/definitions/dto.ValidateTokenResponse"
                                         }
                                     }
                                 }
@@ -231,19 +231,19 @@
                     "400": {
                         "description": "Bad request",
                         "schema": {
-                            "$ref": "#/definitions/dtos.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/dtos.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/dtos.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -266,13 +266,13 @@
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/dtos.SuccessResponse"
+                                    "$ref": "#/definitions/dto.SuccessResponse"
                                 },
                                 {
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/dtos.RefreshTokenResponse"
+                                            "$ref": "#/definitions/dto.RefreshTokenResponse"
                                         }
                                     }
                                 }
@@ -282,19 +282,19 @@
                     "400": {
                         "description": "Bad request",
                         "schema": {
-                            "$ref": "#/definitions/dtos.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/dtos.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/dtos.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -324,7 +324,7 @@
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/dtos.SuccessResponse"
+                                    "$ref": "#/definitions/dto.SuccessResponse"
                                 },
                                 {
                                     "type": "object",
@@ -332,7 +332,7 @@
                                         "data": {
                                             "type": "array",
                                             "items": {
-                                                "$ref": "#/definitions/entities.Claim"
+                                                "$ref": "#/definitions/entity.Claim"
                                             }
                                         }
                                     }
@@ -343,13 +343,13 @@
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/dtos.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/dtos.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -378,7 +378,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dtos.CreateClaimRequest"
+                            "$ref": "#/definitions/dto.CreateClaimRequest"
                         }
                     }
                 ],
@@ -388,13 +388,13 @@
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/dtos.SuccessResponse"
+                                    "$ref": "#/definitions/dto.SuccessResponse"
                                 },
                                 {
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/entities.Claim"
+                                            "$ref": "#/definitions/entity.Claim"
                                         }
                                     }
                                 }
@@ -404,25 +404,25 @@
                     "400": {
                         "description": "Bad request",
                         "schema": {
-                            "$ref": "#/definitions/dtos.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/dtos.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "403": {
                         "description": "Forbidden",
                         "schema": {
-                            "$ref": "#/definitions/dtos.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/dtos.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -461,13 +461,13 @@
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/dtos.SuccessResponse"
+                                    "$ref": "#/definitions/dto.SuccessResponse"
                                 },
                                 {
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/entities.Claim"
+                                            "$ref": "#/definitions/entity.Claim"
                                         }
                                     }
                                 }
@@ -477,25 +477,25 @@
                     "400": {
                         "description": "Bad request",
                         "schema": {
-                            "$ref": "#/definitions/dtos.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/dtos.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Claim not found",
                         "schema": {
-                            "$ref": "#/definitions/dtos.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/dtos.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -531,7 +531,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dtos.UpdateClaimRequest"
+                            "$ref": "#/definitions/dto.UpdateClaimRequest"
                         }
                     }
                 ],
@@ -542,31 +542,31 @@
                     "400": {
                         "description": "Bad request",
                         "schema": {
-                            "$ref": "#/definitions/dtos.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/dtos.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "403": {
                         "description": "Forbidden",
                         "schema": {
-                            "$ref": "#/definitions/dtos.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Claim not found",
                         "schema": {
-                            "$ref": "#/definitions/dtos.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/dtos.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -604,31 +604,31 @@
                     "400": {
                         "description": "Bad request",
                         "schema": {
-                            "$ref": "#/definitions/dtos.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/dtos.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "403": {
                         "description": "Forbidden",
                         "schema": {
-                            "$ref": "#/definitions/dtos.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Claim not found",
                         "schema": {
-                            "$ref": "#/definitions/dtos.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/dtos.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -667,13 +667,13 @@
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/dtos.SuccessResponse"
+                                    "$ref": "#/definitions/dto.SuccessResponse"
                                 },
                                 {
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/dtos.ClaimAttachmentListResponse"
+                                            "$ref": "#/definitions/dto.ClaimAttachmentListResponse"
                                         }
                                     }
                                 }
@@ -683,25 +683,25 @@
                     "400": {
                         "description": "Bad request",
                         "schema": {
-                            "$ref": "#/definitions/dtos.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/dtos.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Claim not found",
                         "schema": {
-                            "$ref": "#/definitions/dtos.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/dtos.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -745,7 +745,7 @@
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/dtos.SuccessResponse"
+                                    "$ref": "#/definitions/dto.SuccessResponse"
                                 },
                                 {
                                     "type": "object",
@@ -753,7 +753,7 @@
                                         "data": {
                                             "type": "array",
                                             "items": {
-                                                "$ref": "#/definitions/entities.ClaimAttachment"
+                                                "$ref": "#/definitions/entity.ClaimAttachment"
                                             }
                                         }
                                     }
@@ -764,31 +764,31 @@
                     "400": {
                         "description": "Bad request",
                         "schema": {
-                            "$ref": "#/definitions/dtos.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/dtos.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "403": {
                         "description": "Forbidden",
                         "schema": {
-                            "$ref": "#/definitions/dtos.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Claim not found",
                         "schema": {
-                            "$ref": "#/definitions/dtos.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/dtos.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -834,13 +834,13 @@
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/dtos.SuccessResponse"
+                                    "$ref": "#/definitions/dto.SuccessResponse"
                                 },
                                 {
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/entities.ClaimAttachment"
+                                            "$ref": "#/definitions/entity.ClaimAttachment"
                                         }
                                     }
                                 }
@@ -850,25 +850,25 @@
                     "400": {
                         "description": "Bad request",
                         "schema": {
-                            "$ref": "#/definitions/dtos.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/dtos.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Claim attachment not found",
                         "schema": {
-                            "$ref": "#/definitions/dtos.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/dtos.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -910,37 +910,37 @@
                     "204": {
                         "description": "Claim attachment deleted successfully",
                         "schema": {
-                            "$ref": "#/definitions/dtos.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "400": {
                         "description": "Bad request",
                         "schema": {
-                            "$ref": "#/definitions/dtos.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/dtos.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "403": {
                         "description": "Forbidden",
                         "schema": {
-                            "$ref": "#/definitions/dtos.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Claim attachment not found",
                         "schema": {
-                            "$ref": "#/definitions/dtos.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/dtos.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -980,31 +980,31 @@
                     "400": {
                         "description": "Bad request",
                         "schema": {
-                            "$ref": "#/definitions/dtos.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/dtos.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "403": {
                         "description": "Forbidden",
                         "schema": {
-                            "$ref": "#/definitions/dtos.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Claim not found",
                         "schema": {
-                            "$ref": "#/definitions/dtos.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/dtos.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -1044,31 +1044,31 @@
                     "400": {
                         "description": "Bad request",
                         "schema": {
-                            "$ref": "#/definitions/dtos.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/dtos.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "403": {
                         "description": "Forbidden",
                         "schema": {
-                            "$ref": "#/definitions/dtos.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Claim not found",
                         "schema": {
-                            "$ref": "#/definitions/dtos.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/dtos.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -1107,7 +1107,7 @@
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/dtos.SuccessResponse"
+                                    "$ref": "#/definitions/dto.SuccessResponse"
                                 },
                                 {
                                     "type": "object",
@@ -1115,7 +1115,7 @@
                                         "data": {
                                             "type": "array",
                                             "items": {
-                                                "$ref": "#/definitions/entities.ClaimHistory"
+                                                "$ref": "#/definitions/entity.ClaimHistory"
                                             }
                                         }
                                     }
@@ -1126,25 +1126,25 @@
                     "400": {
                         "description": "Bad request",
                         "schema": {
-                            "$ref": "#/definitions/dtos.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/dtos.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Claim not found",
                         "schema": {
-                            "$ref": "#/definitions/dtos.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/dtos.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -1183,13 +1183,13 @@
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/dtos.SuccessResponse"
+                                    "$ref": "#/definitions/dto.SuccessResponse"
                                 },
                                 {
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/dtos.ClaimItemListResponse"
+                                            "$ref": "#/definitions/dto.ClaimItemListResponse"
                                         }
                                     }
                                 }
@@ -1199,25 +1199,25 @@
                     "400": {
                         "description": "Bad request",
                         "schema": {
-                            "$ref": "#/definitions/dtos.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/dtos.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Claim not found",
                         "schema": {
-                            "$ref": "#/definitions/dtos.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/dtos.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -1253,7 +1253,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dtos.CreateClaimItemRequest"
+                            "$ref": "#/definitions/dto.CreateClaimItemRequest"
                         }
                     }
                 ],
@@ -1263,13 +1263,13 @@
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/dtos.SuccessResponse"
+                                    "$ref": "#/definitions/dto.SuccessResponse"
                                 },
                                 {
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/entities.ClaimItem"
+                                            "$ref": "#/definitions/entity.ClaimItem"
                                         }
                                     }
                                 }
@@ -1279,31 +1279,31 @@
                     "400": {
                         "description": "Bad request",
                         "schema": {
-                            "$ref": "#/definitions/dtos.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/dtos.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "403": {
                         "description": "Forbidden",
                         "schema": {
-                            "$ref": "#/definitions/dtos.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Claim not found",
                         "schema": {
-                            "$ref": "#/definitions/dtos.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/dtos.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -1349,13 +1349,13 @@
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/dtos.SuccessResponse"
+                                    "$ref": "#/definitions/dto.SuccessResponse"
                                 },
                                 {
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/entities.ClaimItem"
+                                            "$ref": "#/definitions/entity.ClaimItem"
                                         }
                                     }
                                 }
@@ -1365,25 +1365,25 @@
                     "400": {
                         "description": "Bad request",
                         "schema": {
-                            "$ref": "#/definitions/dtos.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/dtos.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Claim item not found",
                         "schema": {
-                            "$ref": "#/definitions/dtos.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/dtos.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -1428,31 +1428,31 @@
                     "400": {
                         "description": "Bad request",
                         "schema": {
-                            "$ref": "#/definitions/dtos.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/dtos.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "403": {
                         "description": "Forbidden",
                         "schema": {
-                            "$ref": "#/definitions/dtos.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Claim item not found",
                         "schema": {
-                            "$ref": "#/definitions/dtos.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/dtos.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -1499,31 +1499,31 @@
                     "400": {
                         "description": "Bad request",
                         "schema": {
-                            "$ref": "#/definitions/dtos.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/dtos.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "403": {
                         "description": "Forbidden",
                         "schema": {
-                            "$ref": "#/definitions/dtos.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Claim item not found",
                         "schema": {
-                            "$ref": "#/definitions/dtos.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/dtos.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -1570,31 +1570,31 @@
                     "400": {
                         "description": "Bad request",
                         "schema": {
-                            "$ref": "#/definitions/dtos.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/dtos.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "403": {
                         "description": "Forbidden",
                         "schema": {
-                            "$ref": "#/definitions/dtos.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Claim item not found",
                         "schema": {
-                            "$ref": "#/definitions/dtos.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/dtos.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -1634,31 +1634,31 @@
                     "400": {
                         "description": "Bad request",
                         "schema": {
-                            "$ref": "#/definitions/dtos.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/dtos.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "403": {
                         "description": "Forbidden",
                         "schema": {
-                            "$ref": "#/definitions/dtos.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Claim not found",
                         "schema": {
-                            "$ref": "#/definitions/dtos.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/dtos.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -1698,31 +1698,31 @@
                     "400": {
                         "description": "Bad request",
                         "schema": {
-                            "$ref": "#/definitions/dtos.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/dtos.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "403": {
                         "description": "Forbidden",
                         "schema": {
-                            "$ref": "#/definitions/dtos.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Claim not found",
                         "schema": {
-                            "$ref": "#/definitions/dtos.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/dtos.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -1762,31 +1762,31 @@
                     "400": {
                         "description": "Bad request",
                         "schema": {
-                            "$ref": "#/definitions/dtos.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/dtos.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "403": {
                         "description": "Forbidden",
                         "schema": {
-                            "$ref": "#/definitions/dtos.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Claim not found",
                         "schema": {
-                            "$ref": "#/definitions/dtos.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/dtos.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -1816,7 +1816,7 @@
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/dtos.SuccessResponse"
+                                    "$ref": "#/definitions/dto.SuccessResponse"
                                 },
                                 {
                                     "type": "object",
@@ -1824,7 +1824,7 @@
                                         "data": {
                                             "type": "array",
                                             "items": {
-                                                "$ref": "#/definitions/entities.Office"
+                                                "$ref": "#/definitions/entity.Office"
                                             }
                                         }
                                     }
@@ -1835,13 +1835,13 @@
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/dtos.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/dtos.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -1870,7 +1870,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dtos.CreateOfficeRequest"
+                            "$ref": "#/definitions/dto.CreateOfficeRequest"
                         }
                     }
                 ],
@@ -1880,13 +1880,13 @@
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/dtos.SuccessResponse"
+                                    "$ref": "#/definitions/dto.SuccessResponse"
                                 },
                                 {
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/entities.Office"
+                                            "$ref": "#/definitions/entity.Office"
                                         }
                                     }
                                 }
@@ -1896,25 +1896,25 @@
                     "400": {
                         "description": "Bad request",
                         "schema": {
-                            "$ref": "#/definitions/dtos.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/dtos.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "403": {
                         "description": "Forbidden",
                         "schema": {
-                            "$ref": "#/definitions/dtos.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/dtos.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -1953,13 +1953,13 @@
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/dtos.SuccessResponse"
+                                    "$ref": "#/definitions/dto.SuccessResponse"
                                 },
                                 {
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/entities.Office"
+                                            "$ref": "#/definitions/entity.Office"
                                         }
                                     }
                                 }
@@ -1969,25 +1969,25 @@
                     "400": {
                         "description": "Bad request",
                         "schema": {
-                            "$ref": "#/definitions/dtos.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/dtos.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Office not found",
                         "schema": {
-                            "$ref": "#/definitions/dtos.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/dtos.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -2023,7 +2023,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dtos.UpdateOfficeRequest"
+                            "$ref": "#/definitions/dto.UpdateOfficeRequest"
                         }
                     }
                 ],
@@ -2034,31 +2034,31 @@
                     "400": {
                         "description": "Bad request",
                         "schema": {
-                            "$ref": "#/definitions/dtos.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/dtos.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "403": {
                         "description": "Forbidden",
                         "schema": {
-                            "$ref": "#/definitions/dtos.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Office not found",
                         "schema": {
-                            "$ref": "#/definitions/dtos.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/dtos.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -2096,31 +2096,31 @@
                     "400": {
                         "description": "Bad request",
                         "schema": {
-                            "$ref": "#/definitions/dtos.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/dtos.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "403": {
                         "description": "Forbidden",
                         "schema": {
-                            "$ref": "#/definitions/dtos.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Office not found",
                         "schema": {
-                            "$ref": "#/definitions/dtos.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/dtos.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -2150,7 +2150,7 @@
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/dtos.SuccessResponse"
+                                    "$ref": "#/definitions/dto.SuccessResponse"
                                 },
                                 {
                                     "type": "object",
@@ -2158,7 +2158,7 @@
                                         "data": {
                                             "type": "array",
                                             "items": {
-                                                "$ref": "#/definitions/dtos.UserDTO"
+                                                "$ref": "#/definitions/dto.UserDTO"
                                             }
                                         }
                                     }
@@ -2169,13 +2169,13 @@
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/dtos.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/dtos.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -2204,7 +2204,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dtos.CreateUserRequest"
+                            "$ref": "#/definitions/dto.CreateUserRequest"
                         }
                     }
                 ],
@@ -2214,13 +2214,13 @@
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/dtos.SuccessResponse"
+                                    "$ref": "#/definitions/dto.SuccessResponse"
                                 },
                                 {
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/dtos.UserDTO"
+                                            "$ref": "#/definitions/dto.UserDTO"
                                         }
                                     }
                                 }
@@ -2230,25 +2230,25 @@
                     "400": {
                         "description": "Bad request",
                         "schema": {
-                            "$ref": "#/definitions/dtos.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/dtos.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "403": {
                         "description": "Forbidden",
                         "schema": {
-                            "$ref": "#/definitions/dtos.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/dtos.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -2287,13 +2287,13 @@
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/dtos.SuccessResponse"
+                                    "$ref": "#/definitions/dto.SuccessResponse"
                                 },
                                 {
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/dtos.UserDTO"
+                                            "$ref": "#/definitions/dto.UserDTO"
                                         }
                                     }
                                 }
@@ -2303,25 +2303,25 @@
                     "400": {
                         "description": "Bad request",
                         "schema": {
-                            "$ref": "#/definitions/dtos.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/dtos.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "User not found",
                         "schema": {
-                            "$ref": "#/definitions/dtos.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/dtos.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -2357,7 +2357,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dtos.UpdateUserRequest"
+                            "$ref": "#/definitions/dto.UpdateUserRequest"
                         }
                     }
                 ],
@@ -2368,31 +2368,31 @@
                     "400": {
                         "description": "Bad request",
                         "schema": {
-                            "$ref": "#/definitions/dtos.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/dtos.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "403": {
                         "description": "Forbidden",
                         "schema": {
-                            "$ref": "#/definitions/dtos.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "User not found",
                         "schema": {
-                            "$ref": "#/definitions/dtos.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/dtos.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -2430,31 +2430,31 @@
                     "400": {
                         "description": "Bad request",
                         "schema": {
-                            "$ref": "#/definitions/dtos.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/dtos.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "403": {
                         "description": "Forbidden",
                         "schema": {
-                            "$ref": "#/definitions/dtos.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "User not found",
                         "schema": {
-                            "$ref": "#/definitions/dtos.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/dtos.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -2462,13 +2462,13 @@
         }
     },
     "definitions": {
-        "dtos.ClaimAttachmentListResponse": {
+        "dto.ClaimAttachmentListResponse": {
             "type": "object",
             "properties": {
                 "attachments": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/entities.ClaimAttachment"
+                        "$ref": "#/definitions/entity.ClaimAttachment"
                     }
                 },
                 "total": {
@@ -2476,13 +2476,13 @@
                 }
             }
         },
-        "dtos.ClaimItemListResponse": {
+        "dto.ClaimItemListResponse": {
             "type": "object",
             "properties": {
                 "items": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/entities.ClaimItem"
+                        "$ref": "#/definitions/entity.ClaimItem"
                     }
                 },
                 "total": {
@@ -2490,7 +2490,7 @@
                 }
             }
         },
-        "dtos.CreateClaimItemRequest": {
+        "dto.CreateClaimItemRequest": {
             "type": "object",
             "required": [
                 "cost",
@@ -2523,7 +2523,7 @@
                 }
             }
         },
-        "dtos.CreateClaimRequest": {
+        "dto.CreateClaimRequest": {
             "type": "object",
             "required": [
                 "customer_id",
@@ -2544,7 +2544,7 @@
                 }
             }
         },
-        "dtos.CreateOfficeRequest": {
+        "dto.CreateOfficeRequest": {
             "type": "object",
             "required": [
                 "address",
@@ -2566,7 +2566,7 @@
                 }
             }
         },
-        "dtos.CreateUserRequest": {
+        "dto.CreateUserRequest": {
             "type": "object",
             "required": [
                 "email",
@@ -2598,7 +2598,7 @@
                 }
             }
         },
-        "dtos.ErrorResponse": {
+        "dto.ErrorResponse": {
             "type": "object",
             "properties": {
                 "error": {
@@ -2606,7 +2606,7 @@
                 }
             }
         },
-        "dtos.LoginRequest": {
+        "dto.LoginRequest": {
             "type": "object",
             "required": [
                 "email",
@@ -2621,18 +2621,18 @@
                 }
             }
         },
-        "dtos.LoginResponse": {
+        "dto.LoginResponse": {
             "type": "object",
             "properties": {
                 "token": {
                     "type": "string"
                 },
                 "user": {
-                    "$ref": "#/definitions/dtos.UserDTO"
+                    "$ref": "#/definitions/dto.UserDTO"
                 }
             }
         },
-        "dtos.RefreshTokenResponse": {
+        "dto.RefreshTokenResponse": {
             "type": "object",
             "properties": {
                 "token": {
@@ -2640,13 +2640,13 @@
                 }
             }
         },
-        "dtos.SuccessResponse": {
+        "dto.SuccessResponse": {
             "type": "object",
             "properties": {
                 "data": {}
             }
         },
-        "dtos.UpdateClaimRequest": {
+        "dto.UpdateClaimRequest": {
             "type": "object",
             "required": [
                 "description"
@@ -2659,7 +2659,7 @@
                 }
             }
         },
-        "dtos.UpdateOfficeRequest": {
+        "dto.UpdateOfficeRequest": {
             "type": "object",
             "properties": {
                 "address": {
@@ -2676,7 +2676,7 @@
                 }
             }
         },
-        "dtos.UpdateUserRequest": {
+        "dto.UpdateUserRequest": {
             "type": "object",
             "properties": {
                 "is_active": {
@@ -2693,7 +2693,7 @@
                 }
             }
         },
-        "dtos.UserDTO": {
+        "dto.UserDTO": {
             "type": "object",
             "required": [
                 "email",
@@ -2725,18 +2725,18 @@
                 }
             }
         },
-        "dtos.ValidateTokenResponse": {
+        "dto.ValidateTokenResponse": {
             "type": "object",
             "properties": {
                 "user": {
-                    "$ref": "#/definitions/dtos.UserDTO"
+                    "$ref": "#/definitions/dto.UserDTO"
                 },
                 "valid": {
                     "type": "boolean"
                 }
             }
         },
-        "entities.Claim": {
+        "entity.Claim": {
             "type": "object",
             "properties": {
                 "approved_by": {
@@ -2768,7 +2768,7 @@
                 }
             }
         },
-        "entities.ClaimAttachment": {
+        "entity.ClaimAttachment": {
             "type": "object",
             "properties": {
                 "claim_id": {
@@ -2788,7 +2788,7 @@
                 }
             }
         },
-        "entities.ClaimHistory": {
+        "entity.ClaimHistory": {
             "type": "object",
             "properties": {
                 "changed_at": {
@@ -2808,7 +2808,7 @@
                 }
             }
         },
-        "entities.ClaimItem": {
+        "entity.ClaimItem": {
             "type": "object",
             "properties": {
                 "claim_id": {
@@ -2846,7 +2846,7 @@
                 }
             }
         },
-        "entities.Office": {
+        "entity.Office": {
             "type": "object",
             "properties": {
                 "address": {

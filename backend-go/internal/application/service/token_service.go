@@ -34,7 +34,10 @@ type tokenService struct {
 	publicKey        *rsa.PublicKey
 }
 
-func NewTokenService(repoRefreshToken repository.RefreshTokenRepository, accessTokenTTL, refreshTokenTTL time.Duration, pri *rsa.PrivateKey, pub *rsa.PublicKey) TokenService {
+func NewTokenService(
+	repoRefreshToken repository.RefreshTokenRepository, accessTokenTTL, refreshTokenTTL time.Duration,
+	pri *rsa.PrivateKey, pub *rsa.PublicKey,
+) TokenService {
 	return &tokenService{
 		repoRefreshToken: repoRefreshToken,
 		accessTTL:        accessTokenTTL,
@@ -63,7 +66,7 @@ func (t *tokenService) GenerateAccessToken(userID uuid.UUID) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodRS256, claims)
 	signedToken, err := token.SignedString(t.privateKey)
 	if err != nil {
-		return "", apperror.NewFailedSignAccessToken(err)
+		return "", apperror.ErrFailedSignAccessToken.WithError(err)
 	}
 
 	return signedToken, nil
@@ -72,13 +75,13 @@ func (t *tokenService) GenerateAccessToken(userID uuid.UUID) (string, error) {
 func (t *tokenService) GenerateRefreshToken(ctx context.Context, userID uuid.UUID) (string, error) {
 	bytes := make([]byte, 32)
 	if _, err := rand.Read(bytes); err != nil {
-		return "", apperror.NewFailedGenerateRefreshToken(err)
+		return "", apperror.ErrFailedGenerateRefreshToken.WithError(err)
 	}
 
 	rawToken := base64.URLEncoding.WithPadding(base64.NoPadding).EncodeToString(bytes)
 	hashedToken, err := hashToken(rawToken)
 	if err != nil {
-		return "", apperror.NewFailedGenerateRefreshToken(err)
+		return "", apperror.ErrFailedGenerateRefreshToken.WithError(err)
 	}
 
 	rfToken := &entity.RefreshToken{
@@ -88,7 +91,7 @@ func (t *tokenService) GenerateRefreshToken(ctx context.Context, userID uuid.UUI
 	}
 
 	if err = t.repoRefreshToken.Create(ctx, rfToken); err != nil {
-		return "", apperror.NewFailedGenerateRefreshToken(err)
+		return "", apperror.ErrFailedGenerateRefreshToken.WithError(err)
 	}
 
 	return rawToken, nil
@@ -100,37 +103,39 @@ type CustomClaims struct {
 }
 
 func (t *tokenService) ValidateAccessToken(ctx context.Context, tokenStr string) (*CustomClaims, error) {
-	token, err := jwt.ParseWithClaims(tokenStr, &CustomClaims{}, func(token *jwt.Token) (any, error) {
-		if _, ok := token.Method.(*jwt.SigningMethodRSA); !ok {
-			return nil, apperror.NewUnexpectedSigningMethod(token.Header["alg"])
-		}
-		return t.publicKey, nil
-	})
+	token, err := jwt.ParseWithClaims(
+		tokenStr, &CustomClaims{}, func(token *jwt.Token) (any, error) {
+			if _, ok := token.Method.(*jwt.SigningMethodRSA); !ok {
+				return nil, apperror.ErrUnexpectedSigningMethod
+			}
+			return t.publicKey, nil
+		},
+	)
 
 	if err != nil {
 		switch {
 		case errors.Is(err, jwt.ErrTokenExpired):
-			return nil, apperror.NewExpiredAccessToken()
+			return nil, apperror.ErrExpiredAccessToken
 		case errors.Is(err, jwt.ErrTokenNotValidYet):
-			return nil, apperror.NewInvalidAccessToken()
+			return nil, apperror.ErrInvalidAccessToken
 		case errors.Is(err, jwt.ErrTokenMalformed):
-			return nil, apperror.NewInvalidAccessToken()
+			return nil, apperror.ErrInvalidAccessToken.WithMessage("Token malformed")
 		default:
-			return nil, apperror.NewInvalidAccessToken()
+			return nil, apperror.ErrInvalidAccessToken.WithError(err)
 		}
 	}
 
 	if token == nil || !token.Valid {
-		return nil, apperror.NewInvalidAccessToken()
+		return nil, apperror.ErrInvalidAccessToken
 	}
 
 	claims, ok := token.Claims.(*CustomClaims)
 	if !ok {
-		return nil, apperror.NewInvalidAccessToken()
+		return nil, apperror.ErrInvalidAccessToken
 	}
 
 	if claims.UserID == "" {
-		return nil, apperror.NewInvalidAccessToken()
+		return nil, apperror.ErrInvalidAccessToken
 	}
 
 	return claims, nil
@@ -139,20 +144,20 @@ func (t *tokenService) ValidateAccessToken(ctx context.Context, tokenStr string)
 func (t *tokenService) ValidateRefreshToken(ctx context.Context, token string) (*entity.RefreshToken, error) {
 	hashedToken, err := hashToken(token)
 	if err != nil {
-		return nil, apperror.NewFailedHashToken()
+		return nil, apperror.ErrFailedHashToken.WithError(err)
 	}
 
 	rfToken, err := t.repoRefreshToken.Find(ctx, hashedToken)
 	if err != nil {
-		return nil, apperror.NewInvalidRefreshToken()
+		return nil, apperror.ErrInvalidRefreshToken.WithError(err)
 	}
 
 	if rfToken.IsExpired() {
-		return nil, apperror.NewExpiredRefreshToken()
+		return nil, apperror.ErrExpiredRefreshToken
 	}
 
 	if rfToken.IsRevoked {
-		return nil, apperror.NewRevokedRefreshToken()
+		return nil, apperror.ErrRevokedRefreshToken
 	}
 
 	return rfToken, nil
@@ -161,7 +166,7 @@ func (t *tokenService) ValidateRefreshToken(ctx context.Context, token string) (
 func (t *tokenService) RevokeRefreshToken(ctx context.Context, token string) error {
 	hashedToken, err := hashToken(token)
 	if err != nil {
-		return apperror.NewFailedHashToken()
+		return apperror.ErrFailedHashToken
 	}
 
 	return t.repoRefreshToken.Revoke(ctx, hashedToken)

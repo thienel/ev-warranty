@@ -70,7 +70,7 @@ func (s *claimAttachmentService) Create(tx application.Tx, claimID uuid.UUID, fi
 
 	attachType := cloudinary.DetermineResourceType(mimeType)
 	if !entity.IsValidAttachmentType(attachType) {
-		return nil, apperror.NewInvalidAttachmentType()
+		return nil, apperror.ErrInvalidInput.WithMessage("Invalid Attachment Type")
 	}
 	attachURL, err := s.cloudService.UploadFile(tx.GetCtx(), file, attachType)
 	if err != nil {
@@ -93,7 +93,7 @@ func (s *claimAttachmentService) HardDelete(tx application.Tx, claimID, attachme
 	}
 
 	if claim.Status != entity.ClaimStatusDraft {
-		return apperror.NewNotAllowDeleteClaim()
+		return apperror.ErrInvalidClaimAction.WithMessage("Claim is not allowed to delete")
 	}
 	attach, err := s.attachRepo.FindByID(tx.GetCtx(), attachmentID)
 	if err != nil {
@@ -114,12 +114,12 @@ func GetMimeType(file multipart.File) (string, error) {
 	buffer := make([]byte, 512)
 	_, err := file.Read(buffer)
 	if err != nil {
-		return "", apperror.NewInternalServerError(err)
+		return "", apperror.ErrInternalServerError.WithError(err)
 	}
 
 	_, err = file.Seek(0, 0)
 	if err != nil {
-		return "", apperror.NewInternalServerError(err)
+		return "", apperror.ErrInvalidAccessToken.WithError(err)
 	}
 
 	mimeType := http.DetectContentType(buffer)

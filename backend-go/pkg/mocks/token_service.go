@@ -4,11 +4,11 @@ package mocks
 
 import (
 	context "context"
-	entities "ev-warranty-go/internal/domain/entity"
+	entity "ev-warranty-go/internal/domain/entity"
 
 	mock "github.com/stretchr/testify/mock"
 
-	services "ev-warranty-go/internal/application/service"
+	service "ev-warranty-go/internal/application/service"
 
 	uuid "github.com/google/uuid"
 )
@@ -244,23 +244,23 @@ func (_c *TokenService_RevokeRefreshToken_Call) RunAndReturn(run func(context.Co
 }
 
 // ValidateAccessToken provides a mock function with given fields: ctx, token
-func (_m *TokenService) ValidateAccessToken(ctx context.Context, token string) (*services.CustomClaims, error) {
+func (_m *TokenService) ValidateAccessToken(ctx context.Context, token string) (*service.CustomClaims, error) {
 	ret := _m.Called(ctx, token)
 
 	if len(ret) == 0 {
 		panic("no return value specified for ValidateAccessToken")
 	}
 
-	var r0 *services.CustomClaims
+	var r0 *service.CustomClaims
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, string) (*services.CustomClaims, error)); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, string) (*service.CustomClaims, error)); ok {
 		return rf(ctx, token)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, string) *services.CustomClaims); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, string) *service.CustomClaims); ok {
 		r0 = rf(ctx, token)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*services.CustomClaims)
+			r0 = ret.Get(0).(*service.CustomClaims)
 		}
 	}
 
@@ -292,34 +292,34 @@ func (_c *TokenService_ValidateAccessToken_Call) Run(run func(ctx context.Contex
 	return _c
 }
 
-func (_c *TokenService_ValidateAccessToken_Call) Return(_a0 *services.CustomClaims, _a1 error) *TokenService_ValidateAccessToken_Call {
+func (_c *TokenService_ValidateAccessToken_Call) Return(_a0 *service.CustomClaims, _a1 error) *TokenService_ValidateAccessToken_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
-func (_c *TokenService_ValidateAccessToken_Call) RunAndReturn(run func(context.Context, string) (*services.CustomClaims, error)) *TokenService_ValidateAccessToken_Call {
+func (_c *TokenService_ValidateAccessToken_Call) RunAndReturn(run func(context.Context, string) (*service.CustomClaims, error)) *TokenService_ValidateAccessToken_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
 // ValidateRefreshToken provides a mock function with given fields: ctx, token
-func (_m *TokenService) ValidateRefreshToken(ctx context.Context, token string) (*entities.RefreshToken, error) {
+func (_m *TokenService) ValidateRefreshToken(ctx context.Context, token string) (*entity.RefreshToken, error) {
 	ret := _m.Called(ctx, token)
 
 	if len(ret) == 0 {
 		panic("no return value specified for ValidateRefreshToken")
 	}
 
-	var r0 *entities.RefreshToken
+	var r0 *entity.RefreshToken
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, string) (*entities.RefreshToken, error)); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, string) (*entity.RefreshToken, error)); ok {
 		return rf(ctx, token)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, string) *entities.RefreshToken); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, string) *entity.RefreshToken); ok {
 		r0 = rf(ctx, token)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*entities.RefreshToken)
+			r0 = ret.Get(0).(*entity.RefreshToken)
 		}
 	}
 
@@ -351,12 +351,12 @@ func (_c *TokenService_ValidateRefreshToken_Call) Run(run func(ctx context.Conte
 	return _c
 }
 
-func (_c *TokenService_ValidateRefreshToken_Call) Return(_a0 *entities.RefreshToken, _a1 error) *TokenService_ValidateRefreshToken_Call {
+func (_c *TokenService_ValidateRefreshToken_Call) Return(_a0 *entity.RefreshToken, _a1 error) *TokenService_ValidateRefreshToken_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
-func (_c *TokenService_ValidateRefreshToken_Call) RunAndReturn(run func(context.Context, string) (*entities.RefreshToken, error)) *TokenService_ValidateRefreshToken_Call {
+func (_c *TokenService_ValidateRefreshToken_Call) RunAndReturn(run func(context.Context, string) (*entity.RefreshToken, error)) *TokenService_ValidateRefreshToken_Call {
 	_c.Call.Return(run)
 	return _c
 }

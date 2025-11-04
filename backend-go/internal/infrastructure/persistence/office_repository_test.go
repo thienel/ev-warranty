@@ -57,7 +57,7 @@ var _ = Describe("OfficeRepository", func() {
 
 				err := repository.Create(ctx, office)
 
-				ExpectAppError(err, apperror.ErrorCodeDuplicateKey)
+				ExpectAppError(err, apperror.ErrDuplicateKey.ErrorCode)
 			})
 		})
 
@@ -67,7 +67,7 @@ var _ = Describe("OfficeRepository", func() {
 
 				err := repository.Create(ctx, office)
 
-				ExpectAppError(err, apperror.ErrorCodeDBOperation)
+				ExpectAppError(err, apperror.ErrDBOperation.ErrorCode)
 			})
 		})
 	})
@@ -113,7 +113,7 @@ var _ = Describe("OfficeRepository", func() {
 				office, err := repository.FindByID(ctx, officeID)
 
 				Expect(office).To(BeNil())
-				ExpectAppError(err, apperror.ErrorCodeOfficeNotFound)
+				ExpectAppError(err, apperror.ErrNotFoundError.ErrorCode)
 			})
 		})
 
@@ -124,7 +124,7 @@ var _ = Describe("OfficeRepository", func() {
 				office, err := repository.FindByID(ctx, officeID)
 
 				Expect(office).To(BeNil())
-				ExpectAppError(err, apperror.ErrorCodeDBOperation)
+				ExpectAppError(err, apperror.ErrDBOperation.ErrorCode)
 			})
 		})
 	})
@@ -181,7 +181,7 @@ var _ = Describe("OfficeRepository", func() {
 				offices, err := repository.FindAll(ctx)
 
 				Expect(offices).To(BeNil())
-				ExpectAppError(err, apperror.ErrorCodeDBOperation)
+				ExpectAppError(err, apperror.ErrDBOperation.ErrorCode)
 			})
 		})
 	})
@@ -209,7 +209,7 @@ var _ = Describe("OfficeRepository", func() {
 
 				err := repository.Update(ctx, office)
 
-				ExpectAppError(err, apperror.ErrorCodeDBOperation)
+				ExpectAppError(err, apperror.ErrDBOperation.ErrorCode)
 			})
 		})
 	})
@@ -237,7 +237,7 @@ var _ = Describe("OfficeRepository", func() {
 
 				err := repository.SoftDelete(ctx, officeID)
 
-				ExpectAppError(err, apperror.ErrorCodeDBOperation)
+				ExpectAppError(err, apperror.ErrDBOperation.ErrorCode)
 			})
 		})
 	})

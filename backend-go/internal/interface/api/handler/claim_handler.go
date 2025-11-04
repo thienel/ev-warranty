@@ -24,7 +24,6 @@ type ClaimHandler interface {
 
 	Submit(c *gin.Context)
 	Review(c *gin.Context)
-	RequestInformation(c *gin.Context)
 	Cancel(c *gin.Context)
 	Complete(c *gin.Context)
 
@@ -37,7 +36,8 @@ type claimHandler struct {
 	service   service.ClaimService
 }
 
-func NewClaimHandler(log logger.Logger, txManager application.TxManager, claimService service.ClaimService) ClaimHandler {
+func NewClaimHandler(log logger.Logger, txManager application.TxManager, claimService service.ClaimService,
+) ClaimHandler {
 	return &claimHandler{
 		log:       log,
 		txManager: txManager,
@@ -66,7 +66,7 @@ func (h *claimHandler) GetByID(c *gin.Context) {
 	idParam := c.Param("id")
 	id, err := uuid.Parse(idParam)
 	if err != nil {
-		handleError(h.log, c, apperror.NewInvalidUUID())
+		handleError(h.log, c, apperror.ErrInvalidParams.WithMessage("Invalid claim id"))
 		return
 	}
 
@@ -125,7 +125,7 @@ func (h *claimHandler) Create(c *gin.Context) {
 
 	var req dto.CreateClaimRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		handleError(h.log, c, apperror.NewInvalidJsonRequest())
+		handleError(h.log, c, apperror.ErrInvalidJsonRequest)
 		return
 	}
 
@@ -136,10 +136,11 @@ func (h *claimHandler) Create(c *gin.Context) {
 	}
 
 	cmd := &service.CreateClaimCommand{
-		VehicleID:   req.VehicleID,
-		CustomerID:  req.CustomerID,
-		CreatorID:   userID,
-		Description: req.Description,
+		VehicleID:    req.VehicleID,
+		CustomerID:   req.CustomerID,
+		StaffID:      userID,
+		TechnicianID: req.TechnicianID,
+		Description:  req.Description,
 	}
 
 	var claim *entity.Claim
@@ -182,13 +183,13 @@ func (h *claimHandler) Update(c *gin.Context) {
 	idParam := c.Param("id")
 	id, err := uuid.Parse(idParam)
 	if err != nil {
-		handleError(h.log, c, apperror.NewInvalidUUID())
+		handleError(h.log, c, apperror.ErrInvalidParams.WithMessage("Invalid claim id"))
 		return
 	}
 
 	var req dto.UpdateClaimRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		handleError(h.log, c, apperror.NewInvalidJsonRequest())
+		handleError(h.log, c, apperror.ErrInvalidJsonRequest)
 		return
 	}
 
@@ -232,7 +233,7 @@ func (h *claimHandler) Delete(c *gin.Context) {
 	idParam := c.Param("id")
 	id, err := uuid.Parse(idParam)
 	if err != nil {
-		handleError(h.log, c, apperror.NewInvalidUUID())
+		handleError(h.log, c, apperror.ErrInvalidParams)
 		return
 	}
 
@@ -276,7 +277,7 @@ func (h *claimHandler) Submit(c *gin.Context) {
 	idParam := c.Param("id")
 	id, err := uuid.Parse(idParam)
 	if err != nil {
-		handleError(h.log, c, apperror.NewInvalidUUID())
+		handleError(h.log, c, apperror.ErrInvalidParams)
 		return
 	}
 
@@ -322,7 +323,7 @@ func (h *claimHandler) Review(c *gin.Context) {
 	idParam := c.Param("id")
 	id, err := uuid.Parse(idParam)
 	if err != nil {
-		handleError(h.log, c, apperror.NewInvalidUUID())
+		handleError(h.log, c, apperror.ErrInvalidParams)
 		return
 	}
 
@@ -334,52 +335,6 @@ func (h *claimHandler) Review(c *gin.Context) {
 
 	err = h.txManager.Do(c.Request.Context(), func(tx application.Tx) error {
 		return h.service.UpdateStatus(tx, id, entity.ClaimStatusReviewing, userID)
-	})
-
-	if err != nil {
-		handleError(h.log, c, err)
-		return
-	}
-
-	c.Status(http.StatusNoContent)
-}
-
-// RequestInformation godoc
-// @Summary Request additional information for a claim
-// @Description Request additional information from SC for a claim (EVM Staff only)
-// @Tags claims
-// @Accept json
-// @Produce json
-// @Security Bearer
-// @Param id path string true "Claim ID"
-// @Success 204 "Information request sent successfully"
-// @Failure 400 {object} dto.ErrorResponse "Bad request"
-// @Failure 401 {object} dto.ErrorResponse "Unauthorized"
-// @Failure 403 {object} dto.ErrorResponse "Forbidden"
-// @Failure 404 {object} dto.ErrorResponse "Claim not found"
-// @Failure 500 {object} dto.ErrorResponse "Internal server error"
-// @Router /claims/{id}/request-information [post]
-func (h *claimHandler) RequestInformation(c *gin.Context) {
-	if err := allowedRoles(c, entity.UserRoleEvmStaff); err != nil {
-		handleError(h.log, c, err)
-		return
-	}
-
-	idParam := c.Param("id")
-	id, err := uuid.Parse(idParam)
-	if err != nil {
-		handleError(h.log, c, apperror.NewInvalidUUID())
-		return
-	}
-
-	userID, err := getUserIDFromHeader(c)
-	if err != nil {
-		handleError(h.log, c, err)
-		return
-	}
-
-	err = h.txManager.Do(c.Request.Context(), func(tx application.Tx) error {
-		return h.service.UpdateStatus(tx, id, entity.ClaimStatusRequestInfo, userID)
 	})
 
 	if err != nil {
@@ -414,7 +369,7 @@ func (h *claimHandler) Cancel(c *gin.Context) {
 	idParam := c.Param("id")
 	id, err := uuid.Parse(idParam)
 	if err != nil {
-		handleError(h.log, c, apperror.NewInvalidUUID())
+		handleError(h.log, c, apperror.ErrInvalidParams)
 		return
 	}
 
@@ -460,7 +415,7 @@ func (h *claimHandler) Complete(c *gin.Context) {
 	idParam := c.Param("id")
 	id, err := uuid.Parse(idParam)
 	if err != nil {
-		handleError(h.log, c, apperror.NewInvalidUUID())
+		handleError(h.log, c, apperror.ErrInvalidParams)
 		return
 	}
 
@@ -503,7 +458,7 @@ func (h *claimHandler) History(c *gin.Context) {
 	idParam := c.Param("id")
 	id, err := uuid.Parse(idParam)
 	if err != nil {
-		handleError(h.log, c, apperror.NewInvalidUUID())
+		handleError(h.log, c, apperror.ErrInvalidParams)
 		return
 	}
 

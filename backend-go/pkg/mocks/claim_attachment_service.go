@@ -6,7 +6,7 @@ import (
 	context "context"
 	application "ev-warranty-go/internal/application"
 
-	entities "ev-warranty-go/internal/domain/entity"
+	entity "ev-warranty-go/internal/domain/entity"
 
 	mock "github.com/stretchr/testify/mock"
 
@@ -29,23 +29,23 @@ func (_m *ClaimAttachmentService) EXPECT() *ClaimAttachmentService_Expecter {
 }
 
 // Create provides a mock function with given fields: tx, claimID, file
-func (_m *ClaimAttachmentService) Create(tx application.Tx, claimID uuid.UUID, file multipart.File) (*entities.ClaimAttachment, error) {
+func (_m *ClaimAttachmentService) Create(tx application.Tx, claimID uuid.UUID, file multipart.File) (*entity.ClaimAttachment, error) {
 	ret := _m.Called(tx, claimID, file)
 
 	if len(ret) == 0 {
 		panic("no return value specified for Create")
 	}
 
-	var r0 *entities.ClaimAttachment
+	var r0 *entity.ClaimAttachment
 	var r1 error
-	if rf, ok := ret.Get(0).(func(application.Tx, uuid.UUID, multipart.File) (*entities.ClaimAttachment, error)); ok {
+	if rf, ok := ret.Get(0).(func(application.Tx, uuid.UUID, multipart.File) (*entity.ClaimAttachment, error)); ok {
 		return rf(tx, claimID, file)
 	}
-	if rf, ok := ret.Get(0).(func(application.Tx, uuid.UUID, multipart.File) *entities.ClaimAttachment); ok {
+	if rf, ok := ret.Get(0).(func(application.Tx, uuid.UUID, multipart.File) *entity.ClaimAttachment); ok {
 		r0 = rf(tx, claimID, file)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*entities.ClaimAttachment)
+			r0 = ret.Get(0).(*entity.ClaimAttachment)
 		}
 	}
 
@@ -78,34 +78,34 @@ func (_c *ClaimAttachmentService_Create_Call) Run(run func(tx application.Tx, cl
 	return _c
 }
 
-func (_c *ClaimAttachmentService_Create_Call) Return(_a0 *entities.ClaimAttachment, _a1 error) *ClaimAttachmentService_Create_Call {
+func (_c *ClaimAttachmentService_Create_Call) Return(_a0 *entity.ClaimAttachment, _a1 error) *ClaimAttachmentService_Create_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
-func (_c *ClaimAttachmentService_Create_Call) RunAndReturn(run func(application.Tx, uuid.UUID, multipart.File) (*entities.ClaimAttachment, error)) *ClaimAttachmentService_Create_Call {
+func (_c *ClaimAttachmentService_Create_Call) RunAndReturn(run func(application.Tx, uuid.UUID, multipart.File) (*entity.ClaimAttachment, error)) *ClaimAttachmentService_Create_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
 // GetByClaimID provides a mock function with given fields: ctx, claimID
-func (_m *ClaimAttachmentService) GetByClaimID(ctx context.Context, claimID uuid.UUID) ([]*entities.ClaimAttachment, error) {
+func (_m *ClaimAttachmentService) GetByClaimID(ctx context.Context, claimID uuid.UUID) ([]*entity.ClaimAttachment, error) {
 	ret := _m.Called(ctx, claimID)
 
 	if len(ret) == 0 {
 		panic("no return value specified for GetByClaimID")
 	}
 
-	var r0 []*entities.ClaimAttachment
+	var r0 []*entity.ClaimAttachment
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID) ([]*entities.ClaimAttachment, error)); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID) ([]*entity.ClaimAttachment, error)); ok {
 		return rf(ctx, claimID)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID) []*entities.ClaimAttachment); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID) []*entity.ClaimAttachment); ok {
 		r0 = rf(ctx, claimID)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).([]*entities.ClaimAttachment)
+			r0 = ret.Get(0).([]*entity.ClaimAttachment)
 		}
 	}
 
@@ -137,34 +137,34 @@ func (_c *ClaimAttachmentService_GetByClaimID_Call) Run(run func(ctx context.Con
 	return _c
 }
 
-func (_c *ClaimAttachmentService_GetByClaimID_Call) Return(_a0 []*entities.ClaimAttachment, _a1 error) *ClaimAttachmentService_GetByClaimID_Call {
+func (_c *ClaimAttachmentService_GetByClaimID_Call) Return(_a0 []*entity.ClaimAttachment, _a1 error) *ClaimAttachmentService_GetByClaimID_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
-func (_c *ClaimAttachmentService_GetByClaimID_Call) RunAndReturn(run func(context.Context, uuid.UUID) ([]*entities.ClaimAttachment, error)) *ClaimAttachmentService_GetByClaimID_Call {
+func (_c *ClaimAttachmentService_GetByClaimID_Call) RunAndReturn(run func(context.Context, uuid.UUID) ([]*entity.ClaimAttachment, error)) *ClaimAttachmentService_GetByClaimID_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
 // GetByID provides a mock function with given fields: ctx, id
-func (_m *ClaimAttachmentService) GetByID(ctx context.Context, id uuid.UUID) (*entities.ClaimAttachment, error) {
+func (_m *ClaimAttachmentService) GetByID(ctx context.Context, id uuid.UUID) (*entity.ClaimAttachment, error) {
 	ret := _m.Called(ctx, id)
 
 	if len(ret) == 0 {
 		panic("no return value specified for GetByID")
 	}
 
-	var r0 *entities.ClaimAttachment
+	var r0 *entity.ClaimAttachment
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID) (*entities.ClaimAttachment, error)); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID) (*entity.ClaimAttachment, error)); ok {
 		return rf(ctx, id)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID) *entities.ClaimAttachment); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID) *entity.ClaimAttachment); ok {
 		r0 = rf(ctx, id)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*entities.ClaimAttachment)
+			r0 = ret.Get(0).(*entity.ClaimAttachment)
 		}
 	}
 
@@ -196,12 +196,12 @@ func (_c *ClaimAttachmentService_GetByID_Call) Run(run func(ctx context.Context,
 	return _c
 }
 
-func (_c *ClaimAttachmentService_GetByID_Call) Return(_a0 *entities.ClaimAttachment, _a1 error) *ClaimAttachmentService_GetByID_Call {
+func (_c *ClaimAttachmentService_GetByID_Call) Return(_a0 *entity.ClaimAttachment, _a1 error) *ClaimAttachmentService_GetByID_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
-func (_c *ClaimAttachmentService_GetByID_Call) RunAndReturn(run func(context.Context, uuid.UUID) (*entities.ClaimAttachment, error)) *ClaimAttachmentService_GetByID_Call {
+func (_c *ClaimAttachmentService_GetByID_Call) RunAndReturn(run func(context.Context, uuid.UUID) (*entity.ClaimAttachment, error)) *ClaimAttachmentService_GetByID_Call {
 	_c.Call.Return(run)
 	return _c
 }

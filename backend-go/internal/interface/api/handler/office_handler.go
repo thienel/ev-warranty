@@ -61,12 +61,12 @@ func (h *officeHandler) Create(c *gin.Context) {
 
 	var req dto.CreateOfficeRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		handleError(h.log, c, apperror.NewInvalidJsonRequest())
+		handleError(h.log, c, apperror.ErrInvalidJsonRequest)
 		return
 	}
 
 	if !entity.IsValidOfficeType(req.OfficeType) {
-		handleError(h.log, c, apperror.NewInvalidOfficeType())
+		handleError(h.log, c, apperror.ErrInvalidInput)
 		return
 	}
 
@@ -112,7 +112,7 @@ func (h *officeHandler) GetByID(c *gin.Context) {
 	officeIDStr := c.Param("id")
 	officeID, err := uuid.Parse(officeIDStr)
 	if err != nil {
-		handleError(h.log, c, apperror.NewInvalidUUID())
+		handleError(h.log, c, apperror.ErrInvalidParams)
 		return
 	}
 
@@ -183,13 +183,13 @@ func (h *officeHandler) Update(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := uuid.Parse(idStr)
 	if err != nil {
-		handleError(h.log, c, apperror.NewInvalidUUID())
+		handleError(h.log, c, apperror.ErrInvalidParams)
 		return
 	}
 
 	var req dto.UpdateOfficeRequest
 	if err = c.ShouldBindJSON(&req); err != nil {
-		handleError(h.log, c, apperror.NewInvalidJsonRequest())
+		handleError(h.log, c, apperror.ErrInvalidJsonRequest)
 		return
 	}
 
@@ -241,7 +241,7 @@ func (h *officeHandler) Delete(c *gin.Context) {
 	officeIDStr := c.Param("id")
 	officeID, err := uuid.Parse(officeIDStr)
 	if err != nil {
-		handleError(h.log, c, apperror.NewInvalidUUID())
+		handleError(h.log, c, apperror.ErrInvalidParams)
 		return
 	}
 

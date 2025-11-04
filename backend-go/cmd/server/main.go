@@ -106,9 +106,11 @@ func main() {
 	authService := service.NewAuthService(userRepo, tokenService)
 	userService := service.NewUserService(userRepo, officeRepo)
 	oauthService := oauth.NewOAuthService(googleProvider, userRepo)
-	claimService := service.NewClaimService(log, claimRepo, claimItemRepo, claimAttachmentRepo, claimHistoryRepo, cloudinaryService)
+	claimService := service.NewClaimService(log, claimRepo, userRepo, claimItemRepo, claimAttachmentRepo,
+		claimHistoryRepo, cloudinaryService)
 	claimItemService := service.NewClaimItemService(claimRepo, claimItemRepo)
-	claimAttachmentService := service.NewClaimAttachmentService(log, claimRepo, claimAttachmentRepo, cloudinaryService)
+	claimAttachmentService := service.NewClaimAttachmentService(log, claimRepo, claimAttachmentRepo,
+		cloudinaryService)
 
 	officeHandler := handler.NewOfficeHandler(log, officeService)
 	authHandler := handler.NewAuthHandler(log, authService, tokenService, userService)

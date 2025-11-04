@@ -2,8 +2,7 @@ package service_test
 
 import (
 	"context"
-	"errors"
-	apperrors2 "ev-warranty-go/pkg/apperror"
+	"ev-warranty-go/pkg/apperror"
 
 	"github.com/google/uuid"
 	. "github.com/onsi/ginkgo/v2"
@@ -94,7 +93,7 @@ var _ = Describe("OfficeService", func() {
 				office, err := officeService.Create(ctx, cmd)
 
 				Expect(office).To(BeNil())
-				ExpectAppError(err, apperrors2.ErrorCodeInvalidOfficeType)
+				ExpectAppError(err, apperror.ErrInvalidInput.ErrorCode)
 			})
 		})
 
@@ -109,7 +108,7 @@ var _ = Describe("OfficeService", func() {
 			})
 
 			It("should return DBOperationError", func() {
-				dbErr := apperrors2.New(500, apperrors2.ErrorCodeDBOperation, errors.New("database error"))
+				dbErr := apperror.ErrDBOperation
 				mockRepo.EXPECT().Create(ctx, MatchOffice(cmd)).Return(dbErr).Once()
 
 				office, err := officeService.Create(ctx, cmd)
@@ -154,19 +153,19 @@ var _ = Describe("OfficeService", func() {
 
 		Context("when office is not found", func() {
 			It("should return OfficeNotFound error", func() {
-				notFoundErr := apperrors2.New(404, apperrors2.ErrorCodeOfficeNotFound, errors.New("office not found"))
+				notFoundErr := apperror.ErrNotFoundError
 				mockRepo.EXPECT().FindByID(ctx, officeID).Return(nil, notFoundErr).Once()
 
 				office, err := officeService.GetByID(ctx, officeID)
 
 				Expect(office).To(BeNil())
-				ExpectAppError(err, apperrors2.ErrorCodeOfficeNotFound)
+				ExpectAppError(err, apperror.ErrNotFoundError.ErrorCode)
 			})
 		})
 
 		Context("when there is a repository error", func() {
 			It("should return DBOperationError", func() {
-				dbErr := apperrors2.New(500, apperrors2.ErrorCodeDBOperation, errors.New("database error"))
+				dbErr := apperror.ErrDBOperation
 				mockRepo.EXPECT().FindByID(ctx, officeID).Return(nil, dbErr).Once()
 
 				office, err := officeService.GetByID(ctx, officeID)
@@ -226,7 +225,7 @@ var _ = Describe("OfficeService", func() {
 
 		Context("when there is a repository error", func() {
 			It("should return DBOperationError", func() {
-				dbErr := apperrors2.New(500, apperrors2.ErrorCodeDBOperation, errors.New("database error"))
+				dbErr := apperror.ErrDBOperation
 				mockRepo.EXPECT().FindAll(ctx).Return(nil, dbErr).Once()
 
 				offices, err := officeService.GetAll(ctx)
@@ -287,12 +286,12 @@ var _ = Describe("OfficeService", func() {
 			})
 
 			It("should return OfficeNotFound error", func() {
-				notFoundErr := apperrors2.New(404, apperrors2.ErrorCodeOfficeNotFound, errors.New("office not found"))
+				notFoundErr := apperror.ErrNotFoundError
 				mockRepo.EXPECT().FindByID(ctx, officeID).Return(nil, notFoundErr).Once()
 
 				err := officeService.Update(ctx, officeID, cmd)
 
-				ExpectAppError(err, apperrors2.ErrorCodeOfficeNotFound)
+				ExpectAppError(err, apperror.ErrNotFoundError.ErrorCode)
 			})
 		})
 
@@ -311,7 +310,7 @@ var _ = Describe("OfficeService", func() {
 
 				err := officeService.Update(ctx, officeID, cmd)
 
-				ExpectAppError(err, apperrors2.ErrorCodeInvalidOfficeType)
+				ExpectAppError(err, apperror.ErrInvalidInput.ErrorCode)
 			})
 		})
 
@@ -326,7 +325,7 @@ var _ = Describe("OfficeService", func() {
 			})
 
 			It("should return DBOperationError", func() {
-				dbErr := apperrors2.New(500, apperrors2.ErrorCodeDBOperation, errors.New("database error"))
+				dbErr := apperror.ErrDBOperation
 				mockRepo.EXPECT().FindByID(ctx, officeID).Return(existingOffice, nil).Once()
 				mockRepo.EXPECT().Update(ctx, MatchUpdatedOffice(officeID, cmd)).Return(dbErr).Once()
 
@@ -357,7 +356,7 @@ var _ = Describe("OfficeService", func() {
 
 		Context("when repository delete fails", func() {
 			It("should return DBOperationError", func() {
-				dbErr := apperrors2.New(500, apperrors2.ErrorCodeDBOperation, errors.New("database error"))
+				dbErr := apperror.ErrDBOperation
 				mockRepo.EXPECT().SoftDelete(ctx, officeID).Return(dbErr).Once()
 
 				err := officeService.DeleteByID(ctx, officeID)
@@ -369,12 +368,12 @@ var _ = Describe("OfficeService", func() {
 
 		Context("when office is not found", func() {
 			It("should return OfficeNotFound error", func() {
-				notFoundErr := apperrors2.New(404, apperrors2.ErrorCodeOfficeNotFound, errors.New("office not found"))
+				notFoundErr := apperror.ErrNotFoundError
 				mockRepo.EXPECT().SoftDelete(ctx, officeID).Return(notFoundErr).Once()
 
 				err := officeService.DeleteByID(ctx, officeID)
 
-				ExpectAppError(err, apperrors2.ErrorCodeOfficeNotFound)
+				ExpectAppError(err, apperror.ErrNotFoundError.ErrorCode)
 			})
 		})
 	})

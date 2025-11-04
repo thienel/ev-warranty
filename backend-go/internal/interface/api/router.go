@@ -17,7 +17,8 @@ type HealthHandler struct {
 func NewRouter(db *database.Database, authHandler handler.AuthHandler,
 	oauthHandler handler.OAuthHandler, officeHandler handler.OfficeHandler,
 	userHandler handler.UserHandler, claimHandler handler.ClaimHandler,
-	itemHandler handler.ClaimItemHandler, attachmentHandler handler.ClaimAttachmentHandler) *gin.Engine {
+	itemHandler handler.ClaimItemHandler, attachmentHandler handler.ClaimAttachmentHandler,
+) *gin.Engine {
 
 	router := gin.New()
 
@@ -70,7 +71,6 @@ func NewRouter(db *database.Database, authHandler handler.AuthHandler,
 
 		claim.POST("/:id/submit", claimHandler.Submit)
 		claim.POST("/:id/review", claimHandler.Review)
-		claim.POST("/:id/request-information", claimHandler.RequestInformation)
 		claim.POST("/:id/cancel", claimHandler.Cancel)
 		claim.POST("/:id/complete", claimHandler.Complete)
 		claim.GET("/:id/history", claimHandler.History)

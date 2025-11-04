@@ -6,7 +6,7 @@ import (
 	"errors"
 	"ev-warranty-go/internal/application/service"
 	"ev-warranty-go/internal/domain/entity"
-	apperrors2 "ev-warranty-go/pkg/apperror"
+	"ev-warranty-go/pkg/apperror"
 	"ev-warranty-go/pkg/mocks"
 	"io"
 	"mime/multipart"
@@ -67,13 +67,13 @@ var _ = Describe("ClaimAttachmentService", func() {
 
 		Context("when attachment is not found", func() {
 			It("should return ClaimAttachmentNotFound error", func() {
-				notFoundErr := apperrors2.New(404, apperrors2.ErrorCodeClaimAttachmentNotFound, errors.New("attachment not found"))
+				notFoundErr := apperror.ErrNotFoundError
 				mockAttachRepo.EXPECT().FindByID(ctx, attachmentID).Return(nil, notFoundErr).Once()
 
 				attachment, err := attachService.GetByID(ctx, attachmentID)
 
 				Expect(attachment).To(BeNil())
-				ExpectAppError(err, apperrors2.ErrorCodeClaimAttachmentNotFound)
+				ExpectAppError(err, apperror.ErrNotFoundError.ErrorCode)
 			})
 		})
 	})
@@ -128,7 +128,7 @@ var _ = Describe("ClaimAttachmentService", func() {
 
 		Context("when repository returns error", func() {
 			It("should return the error", func() {
-				dbErr := apperrors2.New(500, apperrors2.ErrorCodeDBOperation, errors.New("database error"))
+				dbErr := apperror.ErrDBOperation
 				mockAttachRepo.EXPECT().FindByClaimID(ctx, claimID).Return(nil, dbErr).Once()
 
 				attachments, err := attachService.GetByClaimID(ctx, claimID)
@@ -204,7 +204,7 @@ var _ = Describe("ClaimAttachmentService", func() {
 		Context("when claim is not found", func() {
 			It("should return ClaimNotFound error", func() {
 				file = &mockFile{Reader: bytes.NewReader([]byte("test"))}
-				notFoundErr := apperrors2.New(404, apperrors2.ErrorCodeClaimNotFound, errors.New("claim not found"))
+				notFoundErr := apperror.ErrNotFoundError
 				mockClaimRepo.EXPECT().FindByID(ctx, claimID).Return(nil, notFoundErr).Once()
 
 				attachment, err := attachService.Create(mockTx, claimID, file)
@@ -265,7 +265,7 @@ var _ = Describe("ClaimAttachmentService", func() {
 				attachment, err := attachService.Create(mockTx, claimID, file)
 
 				Expect(attachment).To(BeNil())
-				ExpectAppError(err, apperrors2.ErrorCodeInvalidAttachmentType)
+				ExpectAppError(err, apperror.ErrInvalidInput.ErrorCode)
 			})
 		})
 
@@ -302,7 +302,7 @@ var _ = Describe("ClaimAttachmentService", func() {
 					ID:     claimID,
 					Status: entity.ClaimStatusDraft,
 				}
-				dbErr := apperrors2.New(500, apperrors2.ErrorCodeDBOperation, errors.New("database error"))
+				dbErr := apperror.ErrDBOperation
 
 				mockClaimRepo.EXPECT().FindByID(ctx, claimID).Return(claim, nil).Once()
 				mockCloudServ.EXPECT().UploadFile(ctx, file, "image").Return("https://example.com/image.jpg", nil).Once()
@@ -364,7 +364,7 @@ var _ = Describe("ClaimAttachmentService", func() {
 
 				err := attachService.HardDelete(mockTx, claimID, attachmentID)
 
-				ExpectAppError(err, apperrors2.ErrorCodeClaimStatusNotAllowedDelete)
+				ExpectAppError(err, apperror.ErrInvalidClaimAction.ErrorCode)
 			})
 		})
 
@@ -374,7 +374,7 @@ var _ = Describe("ClaimAttachmentService", func() {
 					ID:     claimID,
 					Status: entity.ClaimStatusDraft,
 				}
-				notFoundErr := apperrors2.New(404, apperrors2.ErrorCodeClaimAttachmentNotFound, errors.New("attachment not found"))
+				notFoundErr := apperror.ErrNotFoundError
 
 				mockClaimRepo.EXPECT().FindByID(ctx, claimID).Return(claim, nil).Once()
 				mockAttachRepo.EXPECT().FindByID(ctx, attachmentID).Return(nil, notFoundErr).Once()
@@ -397,7 +397,7 @@ var _ = Describe("ClaimAttachmentService", func() {
 					ClaimID: claimID,
 					URL:     "https://example.com/image.jpg",
 				}
-				dbErr := apperrors2.New(500, apperrors2.ErrorCodeDBOperation, errors.New("database error"))
+				dbErr := apperror.ErrDBOperation
 
 				mockClaimRepo.EXPECT().FindByID(ctx, claimID).Return(claim, nil).Once()
 				mockAttachRepo.EXPECT().FindByID(ctx, attachmentID).Return(attachment, nil).Once()
@@ -438,7 +438,7 @@ var _ = Describe("ClaimAttachmentService", func() {
 
 		Context("when claim is not found", func() {
 			It("should return ClaimNotFound error", func() {
-				notFoundErr := apperrors2.New(404, apperrors2.ErrorCodeClaimNotFound, errors.New("claim not found"))
+				notFoundErr := apperror.ErrNotFoundError
 				mockClaimRepo.EXPECT().FindByID(ctx, claimID).Return(nil, notFoundErr).Once()
 
 				err := attachService.HardDelete(mockTx, claimID, attachmentID)

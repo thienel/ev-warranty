@@ -41,7 +41,7 @@ func NewOfficeService(repo repository.OfficeRepository) OfficeService {
 
 func (s *officeService) Create(ctx context.Context, cmd *CreateOfficeCommand) (*entity.Office, error) {
 	if !entity.IsValidOfficeType(cmd.OfficeType) {
-		return nil, apperror.NewInvalidOfficeType()
+		return nil, apperror.ErrInvalidInput.WithMessage("Invalid office type")
 	}
 
 	office := entity.NewOffice(cmd.OfficeName, cmd.OfficeType, cmd.Address, cmd.IsActive)
@@ -67,7 +67,7 @@ func (s *officeService) Update(ctx context.Context, id uuid.UUID, cmd *UpdateOff
 	}
 
 	if !entity.IsValidOfficeType(cmd.OfficeType) {
-		return apperror.NewInvalidOfficeType()
+		return apperror.ErrInvalidInput.WithMessage("Invalid office type")
 	}
 	office.OfficeName = cmd.OfficeName
 	office.OfficeType = cmd.OfficeType

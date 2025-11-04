@@ -5,7 +5,7 @@ import (
 	"ev-warranty-go/internal/domain/entity"
 	"ev-warranty-go/internal/interface/api/dto"
 	"ev-warranty-go/internal/interface/api/handler"
-	apperrors2 "ev-warranty-go/pkg/apperror"
+	"ev-warranty-go/pkg/apperror"
 	"ev-warranty-go/pkg/mocks"
 	"net/http"
 	"net/http/httptest"
@@ -47,7 +47,8 @@ var _ = Describe("AuthHandler", func() {
 
 		BeforeEach(func() {
 			r.POST("/auth/login", authHandler.Login)
-			user = entity.NewUser("Test User", "test@example.com", entity.UserRoleAdmin, "password_hash", true, uuid.New())
+			user = entity.NewUser("Test User", "test@example.com", entity.UserRoleAdmin, "password_hash",
+				true, uuid.New())
 			user.ID = userID
 		})
 
@@ -75,17 +76,21 @@ var _ = Describe("AuthHandler", func() {
 				SendRequest(r, http.MethodPost, "/auth/login", w, request)
 				ExpectErrorCode(w, expectedCode, expectedError)
 			},
-			Entry("invalid JSON", nil, "invalid json", http.StatusBadRequest, apperrors2.ErrorCodeInvalidJsonRequest),
+			Entry("invalid JSON", nil, "invalid json", http.StatusBadRequest,
+				apperror.ErrInvalidJsonRequest),
+
 			Entry("auth service login fails", func() {
 				mockAuthSvc.EXPECT().Login(mock.Anything, loginRequest.Email, loginRequest.Password).
-					Return("", "", apperrors2.NewInvalidCredentials()).Once()
-			}, loginRequest, http.StatusUnauthorized, apperrors2.ErrorCodeInvalidCredentials),
+					Return("", "", apperror.ErrInvalidCredentials).Once()
+			}, loginRequest, http.StatusUnauthorized, apperror.ErrInvalidCredentials),
+
 			Entry("token validation fails", func() {
 				mockAuthSvc.EXPECT().Login(mock.Anything, loginRequest.Email, loginRequest.Password).
 					Return(accessToken, refreshToken, nil).Once()
 				mockTokenSvc.EXPECT().ValidateAccessToken(mock.Anything, accessToken).
-					Return(nil, apperrors2.NewInvalidAccessToken()).Once()
-			}, loginRequest, http.StatusUnauthorized, apperrors2.ErrorCodeInvalidAccessToken),
+					Return(nil, apperror.ErrInvalidAccessToken).Once()
+			}, loginRequest, http.StatusUnauthorized, apperror.ErrInvalidAccessToken),
+
 			Entry("user not found", func() {
 				claims := &service.CustomClaims{UserID: userID.String()}
 				mockAuthSvc.EXPECT().Login(mock.Anything, loginRequest.Email, loginRequest.Password).
@@ -93,8 +98,8 @@ var _ = Describe("AuthHandler", func() {
 				mockTokenSvc.EXPECT().ValidateAccessToken(mock.Anything, accessToken).
 					Return(claims, nil).Once()
 				mockUserSvc.EXPECT().GetByID(mock.Anything, userID).
-					Return(nil, apperrors2.NewUserNotFound()).Once()
-			}, loginRequest, http.StatusNotFound, apperrors2.ErrorCodeUserNotFound),
+					Return(nil, apperror.ErrNotFoundError).Once()
+			}, loginRequest, http.StatusNotFound, apperror.ErrNotFoundError),
 		)
 	})
 
@@ -131,11 +136,14 @@ var _ = Describe("AuthHandler", func() {
 				r.ServeHTTP(w, req)
 				ExpectErrorCode(w, expectedCode, expectedError)
 			},
-			Entry("missing refresh token", false, nil, http.StatusNotFound, apperrors2.ErrorCodeRefreshTokenNotFound),
+
+			Entry("missing refresh token", false, nil, http.StatusNotFound,
+				apperror.ErrNotFoundError),
+
 			Entry("auth service logout fails", true, func() {
 				mockAuthSvc.EXPECT().Logout(mock.Anything, refreshToken).
-					Return(apperrors2.NewInvalidRefreshToken()).Once()
-			}, http.StatusUnauthorized, apperrors2.ErrorCodeInvalidRefreshToken),
+					Return(apperror.ErrInvalidRefreshToken).Once()
+			}, http.StatusUnauthorized, apperror.ErrInvalidRefreshToken),
 		)
 	})
 
@@ -172,11 +180,12 @@ var _ = Describe("AuthHandler", func() {
 				r.ServeHTTP(w, req)
 				ExpectErrorCode(w, expectedCode, expectedError)
 			},
-			Entry("missing refresh token", false, nil, http.StatusNotFound, apperrors2.ErrorCodeRefreshTokenNotFound),
+			Entry("missing refresh token", false, nil, http.StatusNotFound,
+				apperror.ErrInvalidRefreshToken),
 			Entry("token service refresh fails", true, func() {
 				mockTokenSvc.EXPECT().RefreshAccessToken(mock.Anything, refreshToken).
-					Return("", apperrors2.NewInvalidRefreshToken()).Once()
-			}, http.StatusUnauthorized, apperrors2.ErrorCodeInvalidRefreshToken),
+					Return("", apperror.ErrInvalidRefreshToken).Once()
+			}, http.StatusUnauthorized, apperror.ErrInvalidRefreshToken),
 		)
 	})
 
@@ -223,24 +232,30 @@ var _ = Describe("AuthHandler", func() {
 				r.ServeHTTP(w, req)
 				ExpectErrorCode(w, expectedCode, expectedError)
 			},
-			Entry("missing authorization header", "", nil, http.StatusUnauthorized, apperrors2.ErrorCodeInvalidAuthHeader),
-			Entry("invalid authorization header format", "InvalidFormat "+accessToken, nil, http.StatusUnauthorized, apperrors2.ErrorCodeInvalidAuthHeader),
+			Entry("missing authorization header", "", nil, http.StatusUnauthorized,
+				apperror.ErrInvalidAuthHeader),
+
+			Entry("invalid authorization header format", "InvalidFormat "+accessToken, nil,
+				http.StatusUnauthorized, apperror.ErrInvalidAuthHeader),
+
 			Entry("token validation fails", "Bearer "+accessToken, func() {
 				mockTokenSvc.EXPECT().ValidateAccessToken(mock.Anything, accessToken).
-					Return(nil, apperrors2.NewInvalidAccessToken()).Once()
-			}, http.StatusUnauthorized, apperrors2.ErrorCodeInvalidAccessToken),
+					Return(nil, apperror.ErrInvalidAccessToken).Once()
+			}, http.StatusUnauthorized, apperror.ErrInvalidAccessToken),
+
 			Entry("invalid user ID in token", "Bearer "+accessToken, func() {
 				claims := &service.CustomClaims{UserID: "invalid-uuid"}
 				mockTokenSvc.EXPECT().ValidateAccessToken(mock.Anything, accessToken).
 					Return(claims, nil).Once()
-			}, http.StatusBadRequest, apperrors2.ErrorCodeInvalidUserID),
+			}, http.StatusBadRequest, apperror.ErrInvalidUserID),
+
 			Entry("user not found", "Bearer "+accessToken, func() {
 				claims := &service.CustomClaims{UserID: userID.String()}
 				mockTokenSvc.EXPECT().ValidateAccessToken(mock.Anything, accessToken).
 					Return(claims, nil).Once()
 				mockUserSvc.EXPECT().GetByID(mock.Anything, userID).
-					Return(nil, apperrors2.NewUserNotFound()).Once()
-			}, http.StatusNotFound, apperrors2.ErrorCodeUserNotFound),
+					Return(nil, apperror.ErrNotFoundError).Once()
+			}, http.StatusNotFound, apperror.ErrNotFoundError),
 		)
 	})
 })

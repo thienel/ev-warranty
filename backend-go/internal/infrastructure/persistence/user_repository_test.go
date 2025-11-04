@@ -59,7 +59,7 @@ var _ = Describe("UserRepository", func() {
 
 				err := repository.Create(ctx, user)
 
-				ExpectAppError(err, apperror.ErrorCodeDuplicateKey)
+				ExpectAppError(err, apperror.ErrDuplicateKey.ErrorCode)
 			})
 		})
 
@@ -69,7 +69,7 @@ var _ = Describe("UserRepository", func() {
 
 				err := repository.Create(ctx, user)
 
-				ExpectAppError(err, apperror.ErrorCodeDBOperation)
+				ExpectAppError(err, apperror.ErrDBOperation.ErrorCode)
 			})
 		})
 	})
@@ -116,7 +116,7 @@ var _ = Describe("UserRepository", func() {
 				user, err := repository.FindByID(ctx, userID)
 
 				Expect(user).To(BeNil())
-				ExpectAppError(err, apperror.ErrorCodeUserNotFound)
+				ExpectAppError(err, apperror.ErrNotFoundError.ErrorCode)
 			})
 		})
 
@@ -127,7 +127,7 @@ var _ = Describe("UserRepository", func() {
 				user, err := repository.FindByID(ctx, userID)
 
 				Expect(user).To(BeNil())
-				ExpectAppError(err, apperror.ErrorCodeDBOperation)
+				ExpectAppError(err, apperror.ErrDBOperation.ErrorCode)
 			})
 		})
 	})
@@ -174,7 +174,7 @@ var _ = Describe("UserRepository", func() {
 				user, err := repository.FindByEmail(ctx, email)
 
 				Expect(user).To(BeNil())
-				ExpectAppError(err, apperror.ErrorCodeUserNotFound)
+				ExpectAppError(err, apperror.ErrNotFoundError.ErrorCode)
 			})
 		})
 
@@ -187,7 +187,7 @@ var _ = Describe("UserRepository", func() {
 				user, err := repository.FindByEmail(ctx, email)
 
 				Expect(user).To(BeNil())
-				ExpectAppError(err, apperror.ErrorCodeDBOperation)
+				ExpectAppError(err, apperror.ErrDBOperation.ErrorCode)
 			})
 		})
 
@@ -270,7 +270,7 @@ var _ = Describe("UserRepository", func() {
 				users, err := repository.FindAll(ctx)
 
 				Expect(users).To(BeNil())
-				ExpectAppError(err, apperror.ErrorCodeDBOperation)
+				ExpectAppError(err, apperror.ErrDBOperation.ErrorCode)
 			})
 		})
 	})
@@ -300,7 +300,7 @@ var _ = Describe("UserRepository", func() {
 
 				err := repository.Update(ctx, user)
 
-				ExpectAppError(err, apperror.ErrorCodeDBOperation)
+				ExpectAppError(err, apperror.ErrDBOperation.ErrorCode)
 			})
 		})
 
@@ -348,7 +348,7 @@ var _ = Describe("UserRepository", func() {
 
 				err := repository.SoftDelete(ctx, userID)
 
-				ExpectAppError(err, apperror.ErrorCodeDBOperation)
+				ExpectAppError(err, apperror.ErrDBOperation.ErrorCode)
 			})
 		})
 	})
@@ -396,7 +396,7 @@ var _ = Describe("UserRepository", func() {
 				user, err := repository.FindByOAuth(ctx, provider, oauthID)
 
 				Expect(user).To(BeNil())
-				ExpectAppError(err, apperror.ErrorCodeUserNotFound)
+				ExpectAppError(err, apperror.ErrNotFoundError.ErrorCode)
 			})
 		})
 
@@ -409,7 +409,7 @@ var _ = Describe("UserRepository", func() {
 				user, err := repository.FindByOAuth(ctx, provider, oauthID)
 
 				Expect(user).To(BeNil())
-				ExpectAppError(err, apperror.ErrorCodeDBOperation)
+				ExpectAppError(err, apperror.ErrDBOperation.ErrorCode)
 			})
 		})
 
@@ -422,7 +422,7 @@ var _ = Describe("UserRepository", func() {
 				user, err := repository.FindByOAuth(ctx, "", oauthID)
 
 				Expect(user).To(BeNil())
-				ExpectAppError(err, apperror.ErrorCodeUserNotFound)
+				ExpectAppError(err, apperror.ErrNotFoundError.ErrorCode)
 			})
 
 			It("should handle empty oauth_id", func() {
@@ -433,7 +433,7 @@ var _ = Describe("UserRepository", func() {
 				user, err := repository.FindByOAuth(ctx, provider, "")
 
 				Expect(user).To(BeNil())
-				ExpectAppError(err, apperror.ErrorCodeUserNotFound)
+				ExpectAppError(err, apperror.ErrNotFoundError.ErrorCode)
 			})
 		})
 	})

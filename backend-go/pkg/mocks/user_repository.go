@@ -4,7 +4,7 @@ package mocks
 
 import (
 	context "context"
-	entities "ev-warranty-go/internal/domain/entity"
+	entity "ev-warranty-go/internal/domain/entity"
 
 	mock "github.com/stretchr/testify/mock"
 
@@ -25,7 +25,7 @@ func (_m *UserRepository) EXPECT() *UserRepository_Expecter {
 }
 
 // Create provides a mock function with given fields: ctx, user
-func (_m *UserRepository) Create(ctx context.Context, user *entities.User) error {
+func (_m *UserRepository) Create(ctx context.Context, user *entity.User) error {
 	ret := _m.Called(ctx, user)
 
 	if len(ret) == 0 {
@@ -33,7 +33,7 @@ func (_m *UserRepository) Create(ctx context.Context, user *entities.User) error
 	}
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(context.Context, *entities.User) error); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, *entity.User) error); ok {
 		r0 = rf(ctx, user)
 	} else {
 		r0 = ret.Error(0)
@@ -54,9 +54,9 @@ func (_e *UserRepository_Expecter) Create(ctx interface{}, user interface{}) *Us
 	return &UserRepository_Create_Call{Call: _e.mock.On("Create", ctx, user)}
 }
 
-func (_c *UserRepository_Create_Call) Run(run func(ctx context.Context, user *entities.User)) *UserRepository_Create_Call {
+func (_c *UserRepository_Create_Call) Run(run func(ctx context.Context, user *entity.User)) *UserRepository_Create_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(*entities.User))
+		run(args[0].(context.Context), args[1].(*entity.User))
 	})
 	return _c
 }
@@ -66,29 +66,29 @@ func (_c *UserRepository_Create_Call) Return(_a0 error) *UserRepository_Create_C
 	return _c
 }
 
-func (_c *UserRepository_Create_Call) RunAndReturn(run func(context.Context, *entities.User) error) *UserRepository_Create_Call {
+func (_c *UserRepository_Create_Call) RunAndReturn(run func(context.Context, *entity.User) error) *UserRepository_Create_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
 // FindAll provides a mock function with given fields: ctx
-func (_m *UserRepository) FindAll(ctx context.Context) ([]*entities.User, error) {
+func (_m *UserRepository) FindAll(ctx context.Context) ([]*entity.User, error) {
 	ret := _m.Called(ctx)
 
 	if len(ret) == 0 {
 		panic("no return value specified for FindAll")
 	}
 
-	var r0 []*entities.User
+	var r0 []*entity.User
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context) ([]*entities.User, error)); ok {
+	if rf, ok := ret.Get(0).(func(context.Context) ([]*entity.User, error)); ok {
 		return rf(ctx)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context) []*entities.User); ok {
+	if rf, ok := ret.Get(0).(func(context.Context) []*entity.User); ok {
 		r0 = rf(ctx)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).([]*entities.User)
+			r0 = ret.Get(0).([]*entity.User)
 		}
 	}
 
@@ -119,34 +119,34 @@ func (_c *UserRepository_FindAll_Call) Run(run func(ctx context.Context)) *UserR
 	return _c
 }
 
-func (_c *UserRepository_FindAll_Call) Return(_a0 []*entities.User, _a1 error) *UserRepository_FindAll_Call {
+func (_c *UserRepository_FindAll_Call) Return(_a0 []*entity.User, _a1 error) *UserRepository_FindAll_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
-func (_c *UserRepository_FindAll_Call) RunAndReturn(run func(context.Context) ([]*entities.User, error)) *UserRepository_FindAll_Call {
+func (_c *UserRepository_FindAll_Call) RunAndReturn(run func(context.Context) ([]*entity.User, error)) *UserRepository_FindAll_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
 // FindByEmail provides a mock function with given fields: ctx, email
-func (_m *UserRepository) FindByEmail(ctx context.Context, email string) (*entities.User, error) {
+func (_m *UserRepository) FindByEmail(ctx context.Context, email string) (*entity.User, error) {
 	ret := _m.Called(ctx, email)
 
 	if len(ret) == 0 {
 		panic("no return value specified for FindByEmail")
 	}
 
-	var r0 *entities.User
+	var r0 *entity.User
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, string) (*entities.User, error)); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, string) (*entity.User, error)); ok {
 		return rf(ctx, email)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, string) *entities.User); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, string) *entity.User); ok {
 		r0 = rf(ctx, email)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*entities.User)
+			r0 = ret.Get(0).(*entity.User)
 		}
 	}
 
@@ -178,34 +178,34 @@ func (_c *UserRepository_FindByEmail_Call) Run(run func(ctx context.Context, ema
 	return _c
 }
 
-func (_c *UserRepository_FindByEmail_Call) Return(_a0 *entities.User, _a1 error) *UserRepository_FindByEmail_Call {
+func (_c *UserRepository_FindByEmail_Call) Return(_a0 *entity.User, _a1 error) *UserRepository_FindByEmail_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
-func (_c *UserRepository_FindByEmail_Call) RunAndReturn(run func(context.Context, string) (*entities.User, error)) *UserRepository_FindByEmail_Call {
+func (_c *UserRepository_FindByEmail_Call) RunAndReturn(run func(context.Context, string) (*entity.User, error)) *UserRepository_FindByEmail_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
 // FindByID provides a mock function with given fields: ctx, id
-func (_m *UserRepository) FindByID(ctx context.Context, id uuid.UUID) (*entities.User, error) {
+func (_m *UserRepository) FindByID(ctx context.Context, id uuid.UUID) (*entity.User, error) {
 	ret := _m.Called(ctx, id)
 
 	if len(ret) == 0 {
 		panic("no return value specified for FindByID")
 	}
 
-	var r0 *entities.User
+	var r0 *entity.User
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID) (*entities.User, error)); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID) (*entity.User, error)); ok {
 		return rf(ctx, id)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID) *entities.User); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID) *entity.User); ok {
 		r0 = rf(ctx, id)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*entities.User)
+			r0 = ret.Get(0).(*entity.User)
 		}
 	}
 
@@ -237,34 +237,34 @@ func (_c *UserRepository_FindByID_Call) Run(run func(ctx context.Context, id uui
 	return _c
 }
 
-func (_c *UserRepository_FindByID_Call) Return(_a0 *entities.User, _a1 error) *UserRepository_FindByID_Call {
+func (_c *UserRepository_FindByID_Call) Return(_a0 *entity.User, _a1 error) *UserRepository_FindByID_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
-func (_c *UserRepository_FindByID_Call) RunAndReturn(run func(context.Context, uuid.UUID) (*entities.User, error)) *UserRepository_FindByID_Call {
+func (_c *UserRepository_FindByID_Call) RunAndReturn(run func(context.Context, uuid.UUID) (*entity.User, error)) *UserRepository_FindByID_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
 // FindByOAuth provides a mock function with given fields: ctx, provider, oauthID
-func (_m *UserRepository) FindByOAuth(ctx context.Context, provider string, oauthID string) (*entities.User, error) {
+func (_m *UserRepository) FindByOAuth(ctx context.Context, provider string, oauthID string) (*entity.User, error) {
 	ret := _m.Called(ctx, provider, oauthID)
 
 	if len(ret) == 0 {
 		panic("no return value specified for FindByOAuth")
 	}
 
-	var r0 *entities.User
+	var r0 *entity.User
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, string, string) (*entities.User, error)); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, string, string) (*entity.User, error)); ok {
 		return rf(ctx, provider, oauthID)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, string, string) *entities.User); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, string, string) *entity.User); ok {
 		r0 = rf(ctx, provider, oauthID)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*entities.User)
+			r0 = ret.Get(0).(*entity.User)
 		}
 	}
 
@@ -297,12 +297,12 @@ func (_c *UserRepository_FindByOAuth_Call) Run(run func(ctx context.Context, pro
 	return _c
 }
 
-func (_c *UserRepository_FindByOAuth_Call) Return(_a0 *entities.User, _a1 error) *UserRepository_FindByOAuth_Call {
+func (_c *UserRepository_FindByOAuth_Call) Return(_a0 *entity.User, _a1 error) *UserRepository_FindByOAuth_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
-func (_c *UserRepository_FindByOAuth_Call) RunAndReturn(run func(context.Context, string, string) (*entities.User, error)) *UserRepository_FindByOAuth_Call {
+func (_c *UserRepository_FindByOAuth_Call) RunAndReturn(run func(context.Context, string, string) (*entity.User, error)) *UserRepository_FindByOAuth_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -355,7 +355,7 @@ func (_c *UserRepository_SoftDelete_Call) RunAndReturn(run func(context.Context,
 }
 
 // Update provides a mock function with given fields: ctx, user
-func (_m *UserRepository) Update(ctx context.Context, user *entities.User) error {
+func (_m *UserRepository) Update(ctx context.Context, user *entity.User) error {
 	ret := _m.Called(ctx, user)
 
 	if len(ret) == 0 {
@@ -363,7 +363,7 @@ func (_m *UserRepository) Update(ctx context.Context, user *entities.User) error
 	}
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(context.Context, *entities.User) error); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, *entity.User) error); ok {
 		r0 = rf(ctx, user)
 	} else {
 		r0 = ret.Error(0)
@@ -384,9 +384,9 @@ func (_e *UserRepository_Expecter) Update(ctx interface{}, user interface{}) *Us
 	return &UserRepository_Update_Call{Call: _e.mock.On("Update", ctx, user)}
 }
 
-func (_c *UserRepository_Update_Call) Run(run func(ctx context.Context, user *entities.User)) *UserRepository_Update_Call {
+func (_c *UserRepository_Update_Call) Run(run func(ctx context.Context, user *entity.User)) *UserRepository_Update_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(*entities.User))
+		run(args[0].(context.Context), args[1].(*entity.User))
 	})
 	return _c
 }
@@ -396,7 +396,7 @@ func (_c *UserRepository_Update_Call) Return(_a0 error) *UserRepository_Update_C
 	return _c
 }
 
-func (_c *UserRepository_Update_Call) RunAndReturn(run func(context.Context, *entities.User) error) *UserRepository_Update_Call {
+func (_c *UserRepository_Update_Call) RunAndReturn(run func(context.Context, *entity.User) error) *UserRepository_Update_Call {
 	_c.Call.Return(run)
 	return _c
 }
