@@ -87,6 +87,21 @@ func (c *claimRepository) FindAll(ctx context.Context) ([]*entity.Claim, error) 
 
 	return claims, nil
 }
+func (c *claimRepository) CountPendingClaimByTechnicianID(ctx context.Context, id uuid.UUID) (int64, error) {
+	var count int64
+
+	err := c.db.WithContext(ctx).
+		Model(&entity.Claim{}).
+		Where("technician_id = ? AND status NOT IN ?", id,
+			[]string{entity.ClaimStatusDraft, entity.ClaimStatusCompleted}).
+		Count(&count).Error
+
+	if err != nil {
+		return 0, apperror.NewDBOperationError(err)
+	}
+
+	return count, nil
+}
 
 func (c *claimRepository) FindByCustomerID(ctx context.Context, customerID uuid.UUID) ([]*entity.Claim, error) {
 	var claims []*entity.Claim

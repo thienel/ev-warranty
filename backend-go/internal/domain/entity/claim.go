@@ -11,11 +11,11 @@ const (
 	ClaimStatusDraft             = "DRAFT"
 	ClaimStatusSubmitted         = "SUBMITTED"
 	ClaimStatusReviewing         = "REVIEWING"
-	ClaimStatusRequestInfo       = "REQUEST_INFO"
 	ClaimStatusApproved          = "APPROVED"
 	ClaimStatusPartiallyApproved = "PARTIALLY_APPROVED"
 	ClaimStatusRejected          = "REJECTED"
 	ClaimStatusCancelled         = "CANCELLED"
+	ClaimStatusCompleted         = "COMPLETED"
 )
 
 type Claim struct {
@@ -45,7 +45,7 @@ func NewClaim(vehicleID, customerID uuid.UUID, description, status string, appro
 func IsValidClaimStatus(status string) bool {
 	switch status {
 	case ClaimStatusDraft, ClaimStatusSubmitted, ClaimStatusApproved, ClaimStatusPartiallyApproved,
-		ClaimStatusCancelled, ClaimStatusReviewing, ClaimStatusRequestInfo, ClaimStatusRejected:
+		ClaimStatusCancelled, ClaimStatusReviewing, ClaimStatusRejected:
 		return true
 	default:
 		return false
@@ -62,14 +62,9 @@ func IsValidClaimStatusTransition(currentStatus, newStatus string) bool {
 			ClaimStatusCancelled,
 		},
 		ClaimStatusReviewing: {
-			ClaimStatusRequestInfo,
 			ClaimStatusApproved,
 			ClaimStatusPartiallyApproved,
 			ClaimStatusRejected,
-		},
-		ClaimStatusRequestInfo: {
-			ClaimStatusSubmitted,
-			ClaimStatusCancelled,
 		},
 		ClaimStatusApproved:          {},
 		ClaimStatusPartiallyApproved: {},
