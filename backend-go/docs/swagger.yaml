@@ -1,5 +1,15 @@
 basePath: /
 definitions:
+  dto.APIResponse:
+    properties:
+      data: {}
+      error:
+        type: string
+      is_success:
+        type: boolean
+      message:
+        type: string
+    type: object
   dto.ClaimAttachmentListResponse:
     properties:
       attachments:
@@ -50,11 +60,14 @@ definitions:
         maxLength: 1000
         minLength: 10
         type: string
+      technician_id:
+        type: string
       vehicle_id:
         type: string
     required:
     - customer_id
     - description
+    - technician_id
     - vehicle_id
     type: object
   dto.CreateOfficeRequest:
@@ -95,11 +108,6 @@ definitions:
     - password
     - role
     type: object
-  dto.ErrorResponse:
-    properties:
-      error:
-        type: string
-    type: object
   dto.LoginRequest:
     properties:
       email:
@@ -121,10 +129,6 @@ definitions:
     properties:
       token:
         type: string
-    type: object
-  dto.SuccessResponse:
-    properties:
-      data: {}
     type: object
   dto.UpdateClaimRequest:
     properties:
@@ -357,7 +361,7 @@ paths:
           description: Login successful
           schema:
             allOf:
-            - $ref: '#/definitions/dto.SuccessResponse'
+            - $ref: '#/definitions/dto.APIResponse'
             - properties:
                 data:
                   $ref: '#/definitions/dto.LoginResponse'
@@ -365,15 +369,15 @@ paths:
         "400":
           description: Bad request
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/dto.APIResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/dto.APIResponse'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/dto.APIResponse'
       summary: User login
       tags:
       - auth
@@ -390,11 +394,11 @@ paths:
         "400":
           description: Bad request
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/dto.APIResponse'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/dto.APIResponse'
       summary: User logout
       tags:
       - auth
@@ -410,7 +414,7 @@ paths:
           description: Token is valid
           schema:
             allOf:
-            - $ref: '#/definitions/dto.SuccessResponse'
+            - $ref: '#/definitions/dto.APIResponse'
             - properties:
                 data:
                   $ref: '#/definitions/dto.ValidateTokenResponse'
@@ -418,15 +422,15 @@ paths:
         "400":
           description: Bad request
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/dto.APIResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/dto.APIResponse'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/dto.APIResponse'
       security:
       - Bearer: []
       summary: Validate access token
@@ -443,7 +447,7 @@ paths:
           description: New access token
           schema:
             allOf:
-            - $ref: '#/definitions/dto.SuccessResponse'
+            - $ref: '#/definitions/dto.APIResponse'
             - properties:
                 data:
                   $ref: '#/definitions/dto.RefreshTokenResponse'
@@ -451,15 +455,15 @@ paths:
         "400":
           description: Bad request
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/dto.APIResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/dto.APIResponse'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/dto.APIResponse'
       summary: Refresh access token
       tags:
       - auth
@@ -475,7 +479,7 @@ paths:
           description: Claims retrieved successfully
           schema:
             allOf:
-            - $ref: '#/definitions/dto.SuccessResponse'
+            - $ref: '#/definitions/dto.APIResponse'
             - properties:
                 data:
                   items:
@@ -485,11 +489,11 @@ paths:
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/dto.APIResponse'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/dto.APIResponse'
       security:
       - Bearer: []
       summary: Get all claims
@@ -513,7 +517,7 @@ paths:
           description: Claim created successfully
           schema:
             allOf:
-            - $ref: '#/definitions/dto.SuccessResponse'
+            - $ref: '#/definitions/dto.APIResponse'
             - properties:
                 data:
                   $ref: '#/definitions/entity.Claim'
@@ -521,19 +525,19 @@ paths:
         "400":
           description: Bad request
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/dto.APIResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/dto.APIResponse'
         "403":
           description: Forbidden
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/dto.APIResponse'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/dto.APIResponse'
       security:
       - Bearer: []
       summary: Create a new claim
@@ -558,23 +562,23 @@ paths:
         "400":
           description: Bad request
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/dto.APIResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/dto.APIResponse'
         "403":
           description: Forbidden
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/dto.APIResponse'
         "404":
           description: Claim not found
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/dto.APIResponse'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/dto.APIResponse'
       security:
       - Bearer: []
       summary: Delete a claim
@@ -597,7 +601,7 @@ paths:
           description: Claim retrieved successfully
           schema:
             allOf:
-            - $ref: '#/definitions/dto.SuccessResponse'
+            - $ref: '#/definitions/dto.APIResponse'
             - properties:
                 data:
                   $ref: '#/definitions/entity.Claim'
@@ -605,19 +609,19 @@ paths:
         "400":
           description: Bad request
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/dto.APIResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/dto.APIResponse'
         "404":
           description: Claim not found
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/dto.APIResponse'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/dto.APIResponse'
       security:
       - Bearer: []
       summary: Get claim by ID
@@ -647,23 +651,23 @@ paths:
         "400":
           description: Bad request
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/dto.APIResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/dto.APIResponse'
         "403":
           description: Forbidden
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/dto.APIResponse'
         "404":
           description: Claim not found
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/dto.APIResponse'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/dto.APIResponse'
       security:
       - Bearer: []
       summary: Update a claim
@@ -687,7 +691,7 @@ paths:
           description: Claim attachments retrieved successfully
           schema:
             allOf:
-            - $ref: '#/definitions/dto.SuccessResponse'
+            - $ref: '#/definitions/dto.APIResponse'
             - properties:
                 data:
                   $ref: '#/definitions/dto.ClaimAttachmentListResponse'
@@ -695,19 +699,19 @@ paths:
         "400":
           description: Bad request
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/dto.APIResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/dto.APIResponse'
         "404":
           description: Claim not found
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/dto.APIResponse'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/dto.APIResponse'
       security:
       - Bearer: []
       summary: Get claim attachments by claim ID
@@ -735,7 +739,7 @@ paths:
           description: Claim attachments uploaded successfully
           schema:
             allOf:
-            - $ref: '#/definitions/dto.SuccessResponse'
+            - $ref: '#/definitions/dto.APIResponse'
             - properties:
                 data:
                   items:
@@ -745,23 +749,23 @@ paths:
         "400":
           description: Bad request
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/dto.APIResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/dto.APIResponse'
         "403":
           description: Forbidden
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/dto.APIResponse'
         "404":
           description: Claim not found
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/dto.APIResponse'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/dto.APIResponse'
       security:
       - Bearer: []
       summary: Upload claim attachments
@@ -789,27 +793,27 @@ paths:
         "204":
           description: Claim attachment deleted successfully
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/dto.APIResponse'
         "400":
           description: Bad request
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/dto.APIResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/dto.APIResponse'
         "403":
           description: Forbidden
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/dto.APIResponse'
         "404":
           description: Claim attachment not found
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/dto.APIResponse'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/dto.APIResponse'
       security:
       - Bearer: []
       summary: Delete a claim attachment
@@ -837,7 +841,7 @@ paths:
           description: Claim attachment retrieved successfully
           schema:
             allOf:
-            - $ref: '#/definitions/dto.SuccessResponse'
+            - $ref: '#/definitions/dto.APIResponse'
             - properties:
                 data:
                   $ref: '#/definitions/entity.ClaimAttachment'
@@ -845,19 +849,19 @@ paths:
         "400":
           description: Bad request
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/dto.APIResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/dto.APIResponse'
         "404":
           description: Claim attachment not found
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/dto.APIResponse'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/dto.APIResponse'
       security:
       - Bearer: []
       summary: Get claim attachment by ID
@@ -882,23 +886,23 @@ paths:
         "400":
           description: Bad request
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/dto.APIResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/dto.APIResponse'
         "403":
           description: Forbidden
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/dto.APIResponse'
         "404":
           description: Claim not found
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/dto.APIResponse'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/dto.APIResponse'
       security:
       - Bearer: []
       summary: Cancel a claim
@@ -923,23 +927,23 @@ paths:
         "400":
           description: Bad request
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/dto.APIResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/dto.APIResponse'
         "403":
           description: Forbidden
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/dto.APIResponse'
         "404":
           description: Claim not found
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/dto.APIResponse'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/dto.APIResponse'
       security:
       - Bearer: []
       summary: Complete a claim
@@ -963,7 +967,7 @@ paths:
           description: Claim history retrieved successfully
           schema:
             allOf:
-            - $ref: '#/definitions/dto.SuccessResponse'
+            - $ref: '#/definitions/dto.APIResponse'
             - properties:
                 data:
                   items:
@@ -973,19 +977,19 @@ paths:
         "400":
           description: Bad request
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/dto.APIResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/dto.APIResponse'
         "404":
           description: Claim not found
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/dto.APIResponse'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/dto.APIResponse'
       security:
       - Bearer: []
       summary: Get claim history
@@ -1009,7 +1013,7 @@ paths:
           description: Claim items retrieved successfully
           schema:
             allOf:
-            - $ref: '#/definitions/dto.SuccessResponse'
+            - $ref: '#/definitions/dto.APIResponse'
             - properties:
                 data:
                   $ref: '#/definitions/dto.ClaimItemListResponse'
@@ -1017,19 +1021,19 @@ paths:
         "400":
           description: Bad request
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/dto.APIResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/dto.APIResponse'
         "404":
           description: Claim not found
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/dto.APIResponse'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/dto.APIResponse'
       security:
       - Bearer: []
       summary: Get claim items by claim ID
@@ -1058,7 +1062,7 @@ paths:
           description: Claim item created successfully
           schema:
             allOf:
-            - $ref: '#/definitions/dto.SuccessResponse'
+            - $ref: '#/definitions/dto.APIResponse'
             - properties:
                 data:
                   $ref: '#/definitions/entity.ClaimItem'
@@ -1066,23 +1070,23 @@ paths:
         "400":
           description: Bad request
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/dto.APIResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/dto.APIResponse'
         "403":
           description: Forbidden
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/dto.APIResponse'
         "404":
           description: Claim not found
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/dto.APIResponse'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/dto.APIResponse'
       security:
       - Bearer: []
       summary: Create a new claim item
@@ -1112,23 +1116,23 @@ paths:
         "400":
           description: Bad request
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/dto.APIResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/dto.APIResponse'
         "403":
           description: Forbidden
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/dto.APIResponse'
         "404":
           description: Claim item not found
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/dto.APIResponse'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/dto.APIResponse'
       security:
       - Bearer: []
       summary: Delete a claim item
@@ -1156,7 +1160,7 @@ paths:
           description: Claim item retrieved successfully
           schema:
             allOf:
-            - $ref: '#/definitions/dto.SuccessResponse'
+            - $ref: '#/definitions/dto.APIResponse'
             - properties:
                 data:
                   $ref: '#/definitions/entity.ClaimItem'
@@ -1164,19 +1168,19 @@ paths:
         "400":
           description: Bad request
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/dto.APIResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/dto.APIResponse'
         "404":
           description: Claim item not found
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/dto.APIResponse'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/dto.APIResponse'
       security:
       - Bearer: []
       summary: Get claim item by ID
@@ -1206,23 +1210,23 @@ paths:
         "400":
           description: Bad request
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/dto.APIResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/dto.APIResponse'
         "403":
           description: Forbidden
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/dto.APIResponse'
         "404":
           description: Claim item not found
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/dto.APIResponse'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/dto.APIResponse'
       security:
       - Bearer: []
       summary: Approve a claim item
@@ -1252,69 +1256,28 @@ paths:
         "400":
           description: Bad request
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/dto.APIResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/dto.APIResponse'
         "403":
           description: Forbidden
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/dto.APIResponse'
         "404":
           description: Claim item not found
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/dto.APIResponse'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/dto.APIResponse'
       security:
       - Bearer: []
       summary: Reject a claim item
       tags:
       - claim-items
-  /claims/{id}/request-information:
-    post:
-      consumes:
-      - application/json
-      description: Request additional information from SC for a claim (EVM Staff only)
-      parameters:
-      - description: Claim ID
-        in: path
-        name: id
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "204":
-          description: Information request sent successfully
-        "400":
-          description: Bad request
-          schema:
-            $ref: '#/definitions/dto.ErrorResponse'
-        "401":
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/dto.ErrorResponse'
-        "403":
-          description: Forbidden
-          schema:
-            $ref: '#/definitions/dto.ErrorResponse'
-        "404":
-          description: Claim not found
-          schema:
-            $ref: '#/definitions/dto.ErrorResponse'
-        "500":
-          description: Internal server error
-          schema:
-            $ref: '#/definitions/dto.ErrorResponse'
-      security:
-      - Bearer: []
-      summary: Request additional information for a claim
-      tags:
-      - claims
   /claims/{id}/review:
     post:
       consumes:
@@ -1334,23 +1297,23 @@ paths:
         "400":
           description: Bad request
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/dto.APIResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/dto.APIResponse'
         "403":
           description: Forbidden
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/dto.APIResponse'
         "404":
           description: Claim not found
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/dto.APIResponse'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/dto.APIResponse'
       security:
       - Bearer: []
       summary: Review a claim
@@ -1375,23 +1338,23 @@ paths:
         "400":
           description: Bad request
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/dto.APIResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/dto.APIResponse'
         "403":
           description: Forbidden
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/dto.APIResponse'
         "404":
           description: Claim not found
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/dto.APIResponse'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/dto.APIResponse'
       security:
       - Bearer: []
       summary: Submit a claim for review
@@ -1409,7 +1372,7 @@ paths:
           description: Offices retrieved successfully
           schema:
             allOf:
-            - $ref: '#/definitions/dto.SuccessResponse'
+            - $ref: '#/definitions/dto.APIResponse'
             - properties:
                 data:
                   items:
@@ -1419,11 +1382,11 @@ paths:
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/dto.APIResponse'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/dto.APIResponse'
       security:
       - Bearer: []
       summary: Get all offices
@@ -1447,7 +1410,7 @@ paths:
           description: Office created successfully
           schema:
             allOf:
-            - $ref: '#/definitions/dto.SuccessResponse'
+            - $ref: '#/definitions/dto.APIResponse'
             - properties:
                 data:
                   $ref: '#/definitions/entity.Office'
@@ -1455,19 +1418,19 @@ paths:
         "400":
           description: Bad request
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/dto.APIResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/dto.APIResponse'
         "403":
           description: Forbidden
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/dto.APIResponse'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/dto.APIResponse'
       security:
       - Bearer: []
       summary: Create a new office
@@ -1492,23 +1455,23 @@ paths:
         "400":
           description: Bad request
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/dto.APIResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/dto.APIResponse'
         "403":
           description: Forbidden
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/dto.APIResponse'
         "404":
           description: Office not found
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/dto.APIResponse'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/dto.APIResponse'
       security:
       - Bearer: []
       summary: Delete an office
@@ -1531,7 +1494,7 @@ paths:
           description: Office retrieved successfully
           schema:
             allOf:
-            - $ref: '#/definitions/dto.SuccessResponse'
+            - $ref: '#/definitions/dto.APIResponse'
             - properties:
                 data:
                   $ref: '#/definitions/entity.Office'
@@ -1539,19 +1502,19 @@ paths:
         "400":
           description: Bad request
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/dto.APIResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/dto.APIResponse'
         "404":
           description: Office not found
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/dto.APIResponse'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/dto.APIResponse'
       security:
       - Bearer: []
       summary: Get office by ID
@@ -1581,23 +1544,23 @@ paths:
         "400":
           description: Bad request
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/dto.APIResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/dto.APIResponse'
         "403":
           description: Forbidden
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/dto.APIResponse'
         "404":
           description: Office not found
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/dto.APIResponse'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/dto.APIResponse'
       security:
       - Bearer: []
       summary: Update an office
@@ -1615,7 +1578,7 @@ paths:
           description: Users retrieved successfully
           schema:
             allOf:
-            - $ref: '#/definitions/dto.SuccessResponse'
+            - $ref: '#/definitions/dto.APIResponse'
             - properties:
                 data:
                   items:
@@ -1625,11 +1588,11 @@ paths:
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/dto.APIResponse'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/dto.APIResponse'
       security:
       - Bearer: []
       summary: Get all users
@@ -1653,7 +1616,7 @@ paths:
           description: User created successfully
           schema:
             allOf:
-            - $ref: '#/definitions/dto.SuccessResponse'
+            - $ref: '#/definitions/dto.APIResponse'
             - properties:
                 data:
                   $ref: '#/definitions/dto.UserDTO'
@@ -1661,19 +1624,19 @@ paths:
         "400":
           description: Bad request
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/dto.APIResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/dto.APIResponse'
         "403":
           description: Forbidden
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/dto.APIResponse'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/dto.APIResponse'
       security:
       - Bearer: []
       summary: Create a new user
@@ -1698,23 +1661,23 @@ paths:
         "400":
           description: Bad request
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/dto.APIResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/dto.APIResponse'
         "403":
           description: Forbidden
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/dto.APIResponse'
         "404":
           description: User not found
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/dto.APIResponse'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/dto.APIResponse'
       security:
       - Bearer: []
       summary: Delete a user
@@ -1737,7 +1700,7 @@ paths:
           description: User retrieved successfully
           schema:
             allOf:
-            - $ref: '#/definitions/dto.SuccessResponse'
+            - $ref: '#/definitions/dto.APIResponse'
             - properties:
                 data:
                   $ref: '#/definitions/dto.UserDTO'
@@ -1745,19 +1708,19 @@ paths:
         "400":
           description: Bad request
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/dto.APIResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/dto.APIResponse'
         "404":
           description: User not found
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/dto.APIResponse'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/dto.APIResponse'
       security:
       - Bearer: []
       summary: Get user by ID
@@ -1787,23 +1750,23 @@ paths:
         "400":
           description: Bad request
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/dto.APIResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/dto.APIResponse'
         "403":
           description: Forbidden
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/dto.APIResponse'
         "404":
           description: User not found
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/dto.APIResponse'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            $ref: '#/definitions/dto.APIResponse'
       security:
       - Bearer: []
       summary: Update a user

@@ -47,11 +47,11 @@ func NewClaimItemHandler(log logger.Logger, txManager application.TxManager, ser
 // @Security Bearer
 // @Param id path string true "Claim ID"
 // @Param itemID path string true "Claim Item ID"
-// @Success 200 {object} dto.SuccessResponse{data=entity.ClaimItem} "Claim item retrieved successfully"
-// @Failure 400 {object} dto.ErrorResponse "Bad request"
-// @Failure 401 {object} dto.ErrorResponse "Unauthorized"
-// @Failure 404 {object} dto.ErrorResponse "Claim item not found"
-// @Failure 500 {object} dto.ErrorResponse "Internal server error"
+// @Success 200 {object} dto.APIResponse{data=entity.ClaimItem} "Claim item retrieved successfully"
+// @Failure 400 {object} dto.APIResponse "Bad request"
+// @Failure 401 {object} dto.APIResponse "Unauthorized"
+// @Failure 404 {object} dto.APIResponse "Claim item not found"
+// @Failure 500 {object} dto.APIResponse "Internal server error"
 // @Router /claims/{id}/items/{itemID} [get]
 func (h *claimItemHandler) GetByID(c *gin.Context) {
 	ctx, cancel := context.WithTimeout(c.Request.Context(), requestTimeout)
@@ -59,13 +59,13 @@ func (h *claimItemHandler) GetByID(c *gin.Context) {
 
 	itemID, err := parseItemIDParam(c)
 	if err != nil {
-		handleError(h.log, c, err)
+		writeErrorResponse(h.log, c, err)
 		return
 	}
 
 	item, err := h.service.GetByID(ctx, itemID)
 	if err != nil {
-		handleError(h.log, c, err)
+		writeErrorResponse(h.log, c, err)
 		return
 	}
 
@@ -80,11 +80,11 @@ func (h *claimItemHandler) GetByID(c *gin.Context) {
 // @Produce json
 // @Security Bearer
 // @Param id path string true "Claim ID"
-// @Success 200 {object} dto.SuccessResponse{data=dto.ClaimItemListResponse} "Claim items retrieved successfully"
-// @Failure 400 {object} dto.ErrorResponse "Bad request"
-// @Failure 401 {object} dto.ErrorResponse "Unauthorized"
-// @Failure 404 {object} dto.ErrorResponse "Claim not found"
-// @Failure 500 {object} dto.ErrorResponse "Internal server error"
+// @Success 200 {object} dto.APIResponse{data=dto.ClaimItemListResponse} "Claim items retrieved successfully"
+// @Failure 400 {object} dto.APIResponse "Bad request"
+// @Failure 401 {object} dto.APIResponse "Unauthorized"
+// @Failure 404 {object} dto.APIResponse "Claim not found"
+// @Failure 500 {object} dto.APIResponse "Internal server error"
 // @Router /claims/{id}/items [get]
 func (h *claimItemHandler) GetByClaimID(c *gin.Context) {
 	ctx, cancel := context.WithTimeout(c.Request.Context(), requestTimeout)
@@ -92,13 +92,13 @@ func (h *claimItemHandler) GetByClaimID(c *gin.Context) {
 
 	claimID, err := parseClaimIDParam(c)
 	if err != nil {
-		handleError(h.log, c, err)
+		writeErrorResponse(h.log, c, err)
 		return
 	}
 
 	items, err := h.service.GetByClaimID(ctx, claimID)
 	if err != nil {
-		handleError(h.log, c, err)
+		writeErrorResponse(h.log, c, err)
 		return
 	}
 
@@ -114,33 +114,33 @@ func (h *claimItemHandler) GetByClaimID(c *gin.Context) {
 // @Security Bearer
 // @Param id path string true "Claim ID"
 // @Param createClaimItemRequest body dto.CreateClaimItemRequest true "Claim item creation data"
-// @Success 201 {object} dto.SuccessResponse{data=entity.ClaimItem} "Claim item created successfully"
-// @Failure 400 {object} dto.ErrorResponse "Bad request"
-// @Failure 401 {object} dto.ErrorResponse "Unauthorized"
-// @Failure 403 {object} dto.ErrorResponse "Forbidden"
-// @Failure 404 {object} dto.ErrorResponse "Claim not found"
-// @Failure 500 {object} dto.ErrorResponse "Internal server error"
+// @Success 201 {object} dto.APIResponse{data=entity.ClaimItem} "Claim item created successfully"
+// @Failure 400 {object} dto.APIResponse "Bad request"
+// @Failure 401 {object} dto.APIResponse "Unauthorized"
+// @Failure 403 {object} dto.APIResponse "Forbidden"
+// @Failure 404 {object} dto.APIResponse "Claim not found"
+// @Failure 500 {object} dto.APIResponse "Internal server error"
 // @Router /claims/{id}/items [post]
 func (h *claimItemHandler) Create(c *gin.Context) {
 	if err := allowedRoles(c, entity.UserRoleScStaff); err != nil {
-		handleError(h.log, c, err)
+		writeErrorResponse(h.log, c, err)
 		return
 	}
 
 	claimID, err := parseClaimIDParam(c)
 	if err != nil {
-		handleError(h.log, c, err)
+		writeErrorResponse(h.log, c, err)
 		return
 	}
 
 	var req dto.CreateClaimItemRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		handleError(h.log, c, apperror.ErrInvalidJsonRequest)
+		writeErrorResponse(h.log, c, apperror.ErrInvalidJsonRequest)
 		return
 	}
 
 	if !entity.IsValidClaimItemType(req.Type) {
-		handleError(h.log, c, apperror.ErrInvalidInput.WithMessage("Invalid claim item type"))
+		writeErrorResponse(h.log, c, apperror.ErrInvalidInput.WithMessage("Invalid claim item type"))
 		return
 	}
 
@@ -162,7 +162,7 @@ func (h *claimItemHandler) Create(c *gin.Context) {
 	})
 
 	if err != nil {
-		handleError(h.log, c, err)
+		writeErrorResponse(h.log, c, err)
 		return
 	}
 
@@ -179,27 +179,27 @@ func (h *claimItemHandler) Create(c *gin.Context) {
 // @Param id path string true "Claim ID"
 // @Param itemID path string true "Claim Item ID"
 // @Success 204 "Claim item deleted successfully"
-// @Failure 400 {object} dto.ErrorResponse "Bad request"
-// @Failure 401 {object} dto.ErrorResponse "Unauthorized"
-// @Failure 403 {object} dto.ErrorResponse "Forbidden"
-// @Failure 404 {object} dto.ErrorResponse "Claim item not found"
-// @Failure 500 {object} dto.ErrorResponse "Internal server error"
+// @Failure 400 {object} dto.APIResponse "Bad request"
+// @Failure 401 {object} dto.APIResponse "Unauthorized"
+// @Failure 403 {object} dto.APIResponse "Forbidden"
+// @Failure 404 {object} dto.APIResponse "Claim item not found"
+// @Failure 500 {object} dto.APIResponse "Internal server error"
 // @Router /claims/{id}/items/{itemID} [delete]
 func (h *claimItemHandler) Delete(c *gin.Context) {
 	if err := allowedRoles(c, entity.UserRoleScStaff); err != nil {
-		handleError(h.log, c, err)
+		writeErrorResponse(h.log, c, err)
 		return
 	}
 
 	claimID, err := parseClaimIDParam(c)
 	if err != nil {
-		handleError(h.log, c, err)
+		writeErrorResponse(h.log, c, err)
 		return
 	}
 
 	itemID, err := parseItemIDParam(c)
 	if err != nil {
-		handleError(h.log, c, err)
+		writeErrorResponse(h.log, c, err)
 		return
 	}
 
@@ -208,7 +208,7 @@ func (h *claimItemHandler) Delete(c *gin.Context) {
 	})
 
 	if err != nil {
-		handleError(h.log, c, err)
+		writeErrorResponse(h.log, c, err)
 		return
 	}
 
@@ -225,27 +225,27 @@ func (h *claimItemHandler) Delete(c *gin.Context) {
 // @Param id path string true "Claim ID"
 // @Param itemID path string true "Claim Item ID"
 // @Success 204 "Claim item approved successfully"
-// @Failure 400 {object} dto.ErrorResponse "Bad request"
-// @Failure 401 {object} dto.ErrorResponse "Unauthorized"
-// @Failure 403 {object} dto.ErrorResponse "Forbidden"
-// @Failure 404 {object} dto.ErrorResponse "Claim item not found"
-// @Failure 500 {object} dto.ErrorResponse "Internal server error"
+// @Failure 400 {object} dto.APIResponse "Bad request"
+// @Failure 401 {object} dto.APIResponse "Unauthorized"
+// @Failure 403 {object} dto.APIResponse "Forbidden"
+// @Failure 404 {object} dto.APIResponse "Claim item not found"
+// @Failure 500 {object} dto.APIResponse "Internal server error"
 // @Router /claims/{id}/items/{itemID}/approve [post]
 func (h *claimItemHandler) Approve(c *gin.Context) {
 	if err := allowedRoles(c, entity.UserRoleEvmStaff); err != nil {
-		handleError(h.log, c, err)
+		writeErrorResponse(h.log, c, err)
 		return
 	}
 
 	claimID, err := parseClaimIDParam(c)
 	if err != nil {
-		handleError(h.log, c, err)
+		writeErrorResponse(h.log, c, err)
 		return
 	}
 
 	itemID, err := parseItemIDParam(c)
 	if err != nil {
-		handleError(h.log, c, err)
+		writeErrorResponse(h.log, c, err)
 		return
 	}
 
@@ -254,7 +254,7 @@ func (h *claimItemHandler) Approve(c *gin.Context) {
 	})
 
 	if err != nil {
-		handleError(h.log, c, err)
+		writeErrorResponse(h.log, c, err)
 		return
 	}
 
@@ -271,27 +271,27 @@ func (h *claimItemHandler) Approve(c *gin.Context) {
 // @Param id path string true "Claim ID"
 // @Param itemID path string true "Claim Item ID"
 // @Success 204 "Claim item rejected successfully"
-// @Failure 400 {object} dto.ErrorResponse "Bad request"
-// @Failure 401 {object} dto.ErrorResponse "Unauthorized"
-// @Failure 403 {object} dto.ErrorResponse "Forbidden"
-// @Failure 404 {object} dto.ErrorResponse "Claim item not found"
-// @Failure 500 {object} dto.ErrorResponse "Internal server error"
+// @Failure 400 {object} dto.APIResponse "Bad request"
+// @Failure 401 {object} dto.APIResponse "Unauthorized"
+// @Failure 403 {object} dto.APIResponse "Forbidden"
+// @Failure 404 {object} dto.APIResponse "Claim item not found"
+// @Failure 500 {object} dto.APIResponse "Internal server error"
 // @Router /claims/{id}/items/{itemID}/reject [post]
 func (h *claimItemHandler) Reject(c *gin.Context) {
 	if err := allowedRoles(c, entity.UserRoleEvmStaff); err != nil {
-		handleError(h.log, c, err)
+		writeErrorResponse(h.log, c, err)
 		return
 	}
 
 	claimID, err := parseClaimIDParam(c)
 	if err != nil {
-		handleError(h.log, c, err)
+		writeErrorResponse(h.log, c, err)
 		return
 	}
 
 	itemID, err := parseItemIDParam(c)
 	if err != nil {
-		handleError(h.log, c, err)
+		writeErrorResponse(h.log, c, err)
 		return
 	}
 
@@ -300,7 +300,7 @@ func (h *claimItemHandler) Reject(c *gin.Context) {
 	})
 
 	if err != nil {
-		handleError(h.log, c, err)
+		writeErrorResponse(h.log, c, err)
 		return
 	}
 

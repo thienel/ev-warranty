@@ -1,9 +1,8 @@
 package dto
 
-type ErrorResponse struct {
-	Error string `json:"error"`
-}
-
-type SuccessResponse struct {
-	Data any `json:"data,omitempty"`
+type APIResponse struct {
+	IsSuccess bool   `json:"is_success"`
+	Error     string `json:"error,omitempty"`
+	Data      any    `json:"data,omitempty"`
+	Message   string `json:"message,omitempty"`
 }

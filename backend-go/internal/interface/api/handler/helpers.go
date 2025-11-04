@@ -18,21 +18,27 @@ const (
 	headerUserRole  = "X-User-Role"
 )
 
-func handleError(log logger.Logger, c *gin.Context, err error) {
+func writeErrorResponse(log logger.Logger, c *gin.Context, err error) {
 	var appErr *apperror.AppError
 	if !errors.As(err, &appErr) {
 		appErr = apperror.ErrInternalServerError.WithError(err)
 	}
 
 	log.Error(appErr.ErrorCode, "error", appErr.Error())
-	c.JSON(appErr.HttpCode, dto.ErrorResponse{
-		Error: appErr.ErrorCode,
+
+	log.Error(err.Error(), "method", c.Request.Method, "path", c.FullPath(), "error", err)
+
+	c.JSON(appErr.HttpCode, dto.APIResponse{
+		IsSuccess: false,
+		Error:     appErr.ErrorCode,
+		Message:   appErr.Message,
 	})
 }
 
 func writeSuccessResponse(c *gin.Context, statusCode int, data any) {
-	c.JSON(statusCode, dto.SuccessResponse{
-		Data: data,
+	c.JSON(statusCode, dto.APIResponse{
+		IsSuccess: true,
+		Data:      data,
 	})
 }
 

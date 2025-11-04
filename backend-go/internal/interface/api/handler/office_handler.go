@@ -42,15 +42,15 @@ func NewOfficeHandler(log logger.Logger, service service.OfficeService) OfficeHa
 // @Produce json
 // @Security Bearer
 // @Param createOfficeRequest body dto.CreateOfficeRequest true "Office creation data"
-// @Success 201 {object} dto.SuccessResponse{data=entity.Office} "Office created successfully"
-// @Failure 400 {object} dto.ErrorResponse "Bad request"
-// @Failure 401 {object} dto.ErrorResponse "Unauthorized"
-// @Failure 403 {object} dto.ErrorResponse "Forbidden"
-// @Failure 500 {object} dto.ErrorResponse "Internal server error"
+// @Success 201 {object} dto.APIResponse{data=entity.Office} "Office created successfully"
+// @Failure 400 {object} dto.APIResponse "Bad request"
+// @Failure 401 {object} dto.APIResponse "Unauthorized"
+// @Failure 403 {object} dto.APIResponse "Forbidden"
+// @Failure 500 {object} dto.APIResponse "Internal server error"
 // @Router /offices [post]
 func (h *officeHandler) Create(c *gin.Context) {
 	if err := allowedRoles(c, entity.UserRoleAdmin); err != nil {
-		handleError(h.log, c, err)
+		writeErrorResponse(h.log, c, err)
 		return
 	}
 
@@ -61,12 +61,12 @@ func (h *officeHandler) Create(c *gin.Context) {
 
 	var req dto.CreateOfficeRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		handleError(h.log, c, apperror.ErrInvalidJsonRequest)
+		writeErrorResponse(h.log, c, apperror.ErrInvalidJsonRequest)
 		return
 	}
 
 	if !entity.IsValidOfficeType(req.OfficeType) {
-		handleError(h.log, c, apperror.ErrInvalidInput.WithMessage("Invalid office type"))
+		writeErrorResponse(h.log, c, apperror.ErrInvalidInput.WithMessage("Invalid office type"))
 		return
 	}
 
@@ -81,7 +81,7 @@ func (h *officeHandler) Create(c *gin.Context) {
 
 	office, err := h.service.Create(ctx, cmd)
 	if err != nil {
-		handleError(h.log, c, err)
+		writeErrorResponse(h.log, c, err)
 		return
 	}
 
@@ -97,11 +97,11 @@ func (h *officeHandler) Create(c *gin.Context) {
 // @Produce json
 // @Security Bearer
 // @Param id path string true "Office ID"
-// @Success 200 {object} dto.SuccessResponse{data=entity.Office} "Office retrieved successfully"
-// @Failure 400 {object} dto.ErrorResponse "Bad request"
-// @Failure 401 {object} dto.ErrorResponse "Unauthorized"
-// @Failure 404 {object} dto.ErrorResponse "Office not found"
-// @Failure 500 {object} dto.ErrorResponse "Internal server error"
+// @Success 200 {object} dto.APIResponse{data=entity.Office} "Office retrieved successfully"
+// @Failure 400 {object} dto.APIResponse "Bad request"
+// @Failure 401 {object} dto.APIResponse "Unauthorized"
+// @Failure 404 {object} dto.APIResponse "Office not found"
+// @Failure 500 {object} dto.APIResponse "Internal server error"
 // @Router /offices/{id} [get]
 func (h *officeHandler) GetByID(c *gin.Context) {
 	ctx, cancel := context.WithTimeout(c.Request.Context(), requestTimeout)
@@ -112,13 +112,13 @@ func (h *officeHandler) GetByID(c *gin.Context) {
 	officeIDStr := c.Param("id")
 	officeID, err := uuid.Parse(officeIDStr)
 	if err != nil {
-		handleError(h.log, c, apperror.ErrInvalidParams.WithMessage("Invalid office id"))
+		writeErrorResponse(h.log, c, apperror.ErrInvalidParams.WithMessage("Invalid office id"))
 		return
 	}
 
 	office, err := h.service.GetByID(ctx, officeID)
 	if err != nil {
-		handleError(h.log, c, err)
+		writeErrorResponse(h.log, c, err)
 		return
 	}
 
@@ -133,9 +133,9 @@ func (h *officeHandler) GetByID(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Security Bearer
-// @Success 200 {object} dto.SuccessResponse{data=[]entity.Office} "Offices retrieved successfully"
-// @Failure 401 {object} dto.ErrorResponse "Unauthorized"
-// @Failure 500 {object} dto.ErrorResponse "Internal server error"
+// @Success 200 {object} dto.APIResponse{data=[]entity.Office} "Offices retrieved successfully"
+// @Failure 401 {object} dto.APIResponse "Unauthorized"
+// @Failure 500 {object} dto.APIResponse "Internal server error"
 // @Router /offices [get]
 func (h *officeHandler) GetAll(c *gin.Context) {
 	ctx, cancel := context.WithTimeout(c.Request.Context(), requestTimeout)
@@ -145,7 +145,7 @@ func (h *officeHandler) GetAll(c *gin.Context) {
 
 	offices, err := h.service.GetAll(ctx)
 	if err != nil {
-		handleError(h.log, c, err)
+		writeErrorResponse(h.log, c, err)
 		return
 	}
 
@@ -163,15 +163,15 @@ func (h *officeHandler) GetAll(c *gin.Context) {
 // @Param id path string true "Office ID"
 // @Param updateOfficeRequest body dto.UpdateOfficeRequest true "Office update data"
 // @Success 204 "Office updated successfully"
-// @Failure 400 {object} dto.ErrorResponse "Bad request"
-// @Failure 401 {object} dto.ErrorResponse "Unauthorized"
-// @Failure 403 {object} dto.ErrorResponse "Forbidden"
-// @Failure 404 {object} dto.ErrorResponse "Office not found"
-// @Failure 500 {object} dto.ErrorResponse "Internal server error"
+// @Failure 400 {object} dto.APIResponse "Bad request"
+// @Failure 401 {object} dto.APIResponse "Unauthorized"
+// @Failure 403 {object} dto.APIResponse "Forbidden"
+// @Failure 404 {object} dto.APIResponse "Office not found"
+// @Failure 500 {object} dto.APIResponse "Internal server error"
 // @Router /offices/{id} [put]
 func (h *officeHandler) Update(c *gin.Context) {
 	if err := allowedRoles(c, entity.UserRoleAdmin); err != nil {
-		handleError(h.log, c, err)
+		writeErrorResponse(h.log, c, err)
 		return
 	}
 
@@ -183,13 +183,13 @@ func (h *officeHandler) Update(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := uuid.Parse(idStr)
 	if err != nil {
-		handleError(h.log, c, apperror.ErrInvalidParams.WithMessage("Invalid office id"))
+		writeErrorResponse(h.log, c, apperror.ErrInvalidParams.WithMessage("Invalid office id"))
 		return
 	}
 
 	var req dto.UpdateOfficeRequest
 	if err = c.ShouldBindJSON(&req); err != nil {
-		handleError(h.log, c, apperror.ErrInvalidJsonRequest)
+		writeErrorResponse(h.log, c, apperror.ErrInvalidJsonRequest)
 		return
 	}
 
@@ -204,7 +204,7 @@ func (h *officeHandler) Update(c *gin.Context) {
 
 	err = h.service.Update(ctx, id, cmd)
 	if err != nil {
-		handleError(h.log, c, err)
+		writeErrorResponse(h.log, c, err)
 		return
 	}
 
@@ -221,15 +221,15 @@ func (h *officeHandler) Update(c *gin.Context) {
 // @Security Bearer
 // @Param id path string true "Office ID"
 // @Success 204 "Office deleted successfully"
-// @Failure 400 {object} dto.ErrorResponse "Bad request"
-// @Failure 401 {object} dto.ErrorResponse "Unauthorized"
-// @Failure 403 {object} dto.ErrorResponse "Forbidden"
-// @Failure 404 {object} dto.ErrorResponse "Office not found"
-// @Failure 500 {object} dto.ErrorResponse "Internal server error"
+// @Failure 400 {object} dto.APIResponse "Bad request"
+// @Failure 401 {object} dto.APIResponse "Unauthorized"
+// @Failure 403 {object} dto.APIResponse "Forbidden"
+// @Failure 404 {object} dto.APIResponse "Office not found"
+// @Failure 500 {object} dto.APIResponse "Internal server error"
 // @Router /offices/{id} [delete]
 func (h *officeHandler) Delete(c *gin.Context) {
 	if err := allowedRoles(c, entity.UserRoleAdmin); err != nil {
-		handleError(h.log, c, err)
+		writeErrorResponse(h.log, c, err)
 		return
 	}
 
@@ -241,13 +241,13 @@ func (h *officeHandler) Delete(c *gin.Context) {
 	officeIDStr := c.Param("id")
 	officeID, err := uuid.Parse(officeIDStr)
 	if err != nil {
-		handleError(h.log, c, apperror.ErrInvalidParams.WithMessage("Invalid claim id"))
+		writeErrorResponse(h.log, c, apperror.ErrInvalidParams.WithMessage("Invalid claim id"))
 		return
 	}
 
 	err = h.service.DeleteByID(ctx, officeID)
 	if err != nil {
-		handleError(h.log, c, err)
+		writeErrorResponse(h.log, c, err)
 		return
 	}
 

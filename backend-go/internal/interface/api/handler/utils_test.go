@@ -18,9 +18,11 @@ import (
 func SetupMock(t FullGinkgoTInterface) (*mocks.Logger, *gin.Engine, *httptest.ResponseRecorder) {
 	mockLogger := mocks.NewLogger(t)
 	mockLogger.EXPECT().Info(mock.Anything, mock.Anything, mock.Anything).Return().Maybe()
-	mockLogger.EXPECT().Info(mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return().Maybe()
+	mockLogger.EXPECT().Info(mock.Anything, mock.Anything, mock.Anything, mock.Anything,
+		mock.Anything).Return().Maybe()
 	mockLogger.EXPECT().Error(mock.Anything, mock.Anything, mock.Anything).Return().Maybe()
-	mockLogger.EXPECT().Error(mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return().Maybe()
+	mockLogger.EXPECT().Error(mock.Anything, mock.Anything, mock.Anything, mock.Anything,
+		mock.Anything).Return().Maybe()
 
 	gin.SetMode(gin.TestMode)
 	router := gin.New()
@@ -59,7 +61,7 @@ func ExpectResponseNotNil(w *httptest.ResponseRecorder, httpStatus int) {
 		return
 	}
 
-	var response dto.SuccessResponse
+	var response dto.APIResponse
 	err := json.Unmarshal(w.Body.Bytes(), &response)
 	Expect(err).NotTo(HaveOccurred())
 	Expect(response.Data).NotTo(BeNil())
@@ -68,7 +70,7 @@ func ExpectResponseNotNil(w *httptest.ResponseRecorder, httpStatus int) {
 func ExpectErrorCode(w *httptest.ResponseRecorder, httpStatus int, errorCode string) {
 	GinkgoHelper()
 	Expect(w.Code).To(Equal(httpStatus))
-	var response dto.ErrorResponse
+	var response dto.APIResponse
 	err := json.Unmarshal(w.Body.Bytes(), &response)
 	Expect(err).NotTo(HaveOccurred())
 	Expect(response.Error).To(Equal(errorCode))

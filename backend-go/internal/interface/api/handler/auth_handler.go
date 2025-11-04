@@ -29,7 +29,8 @@ type authHandler struct {
 
 func NewAuthHandler(log logger.Logger, authService service.AuthService,
 	tokenService service.TokenService,
-	userService service.UserService) AuthHandler {
+	userService service.UserService,
+) AuthHandler {
 
 	return &authHandler{
 		log:          log,
@@ -46,10 +47,10 @@ func NewAuthHandler(log logger.Logger, authService service.AuthService,
 // @Accept json
 // @Produce json
 // @Param loginRequest body dto.LoginRequest true "Login credentials"
-// @Success 200 {object} dto.SuccessResponse{data=dto.LoginResponse} "Login successful"
-// @Failure 400 {object} dto.ErrorResponse "Bad request"
-// @Failure 401 {object} dto.ErrorResponse "Unauthorized"
-// @Failure 500 {object} dto.ErrorResponse "Internal server error"
+// @Success 200 {object} dto.APIResponse{data=dto.LoginResponse} "Login successful"
+// @Failure 400 {object} dto.APIResponse "Bad request"
+// @Failure 401 {object} dto.APIResponse "Unauthorized"
+// @Failure 500 {object} dto.APIResponse "Internal server error"
 // @Router /auth/login [post]
 func (h *authHandler) Login(c *gin.Context) {
 	ctx, cancel := context.WithTimeout(c.Request.Context(), requestTimeout)
@@ -59,7 +60,7 @@ func (h *authHandler) Login(c *gin.Context) {
 
 	var req dto.LoginRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		handleError(h.log, c, apperror.ErrInvalidJsonRequest)
+		writeErrorResponse(h.log, c, apperror.ErrInvalidJsonRequest)
 		return
 	}
 
@@ -67,19 +68,19 @@ func (h *authHandler) Login(c *gin.Context) {
 
 	accessToken, refreshToken, err := h.authService.Login(ctx, req.Email, req.Password)
 	if err != nil {
-		handleError(h.log, c, err)
+		writeErrorResponse(h.log, c, err)
 		return
 	}
 
 	userID, err := h.extractUserIDFromToken(ctx, accessToken)
 	if err != nil {
-		handleError(h.log, c, err)
+		writeErrorResponse(h.log, c, err)
 		return
 	}
 
 	user, err := h.userService.GetByID(ctx, userID)
 	if err != nil {
-		handleError(h.log, c, err)
+		writeErrorResponse(h.log, c, err)
 		return
 	}
 
@@ -101,8 +102,8 @@ func (h *authHandler) Login(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Success 204 "Logout successful"
-// @Failure 400 {object} dto.ErrorResponse "Bad request"
-// @Failure 500 {object} dto.ErrorResponse "Internal server error"
+// @Failure 400 {object} dto.APIResponse "Bad request"
+// @Failure 500 {object} dto.APIResponse "Internal server error"
 // @Router /auth/logout [post]
 func (h *authHandler) Logout(c *gin.Context) {
 	ctx, cancel := context.WithTimeout(c.Request.Context(), requestTimeout)
@@ -113,12 +114,12 @@ func (h *authHandler) Logout(c *gin.Context) {
 	token, err := c.Cookie("refreshToken")
 	if err != nil {
 		err = apperror.ErrNotFoundError.WithMessage("Refresh token not found")
-		handleError(h.log, c, err)
+		writeErrorResponse(h.log, c, err)
 		return
 	}
 
 	if err = h.authService.Logout(ctx, token); err != nil {
-		handleError(h.log, c, err)
+		writeErrorResponse(h.log, c, err)
 		return
 	}
 
@@ -134,10 +135,10 @@ func (h *authHandler) Logout(c *gin.Context) {
 // @Tags auth
 // @Accept json
 // @Produce json
-// @Success 200 {object} dto.SuccessResponse{data=dto.RefreshTokenResponse} "New access token"
-// @Failure 400 {object} dto.ErrorResponse "Bad request"
-// @Failure 401 {object} dto.ErrorResponse "Unauthorized"
-// @Failure 500 {object} dto.ErrorResponse "Internal server error"
+// @Success 200 {object} dto.APIResponse{data=dto.RefreshTokenResponse} "New access token"
+// @Failure 400 {object} dto.APIResponse "Bad request"
+// @Failure 401 {object} dto.APIResponse "Unauthorized"
+// @Failure 500 {object} dto.APIResponse "Internal server error"
 // @Router /auth/token [post]
 func (h *authHandler) RefreshToken(c *gin.Context) {
 	ctx, cancel := context.WithTimeout(c.Request.Context(), requestTimeout)
@@ -148,13 +149,13 @@ func (h *authHandler) RefreshToken(c *gin.Context) {
 	refreshToken, err := c.Cookie("refreshToken")
 	if err != nil {
 		err = apperror.ErrNotFoundError.WithMessage("Refresh token not found")
-		handleError(h.log, c, err)
+		writeErrorResponse(h.log, c, err)
 		return
 	}
 
 	newAccessToken, err := h.tokenService.RefreshAccessToken(ctx, refreshToken)
 	if err != nil {
-		handleError(h.log, c, err)
+		writeErrorResponse(h.log, c, err)
 		return
 	}
 
@@ -171,10 +172,10 @@ func (h *authHandler) RefreshToken(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Security Bearer
-// @Success 200 {object} dto.SuccessResponse{data=dto.ValidateTokenResponse} "Token is valid"
-// @Failure 400 {object} dto.ErrorResponse "Bad request"
-// @Failure 401 {object} dto.ErrorResponse "Unauthorized"
-// @Failure 500 {object} dto.ErrorResponse "Internal server error"
+// @Success 200 {object} dto.APIResponse{data=dto.ValidateTokenResponse} "Token is valid"
+// @Failure 400 {object} dto.APIResponse "Bad request"
+// @Failure 401 {object} dto.APIResponse "Unauthorized"
+// @Failure 500 {object} dto.APIResponse "Internal server error"
 // @Router /auth/token [get]
 func (h *authHandler) ValidateToken(c *gin.Context) {
 	ctx, cancel := context.WithTimeout(c.Request.Context(), requestTimeout)
@@ -184,25 +185,25 @@ func (h *authHandler) ValidateToken(c *gin.Context) {
 
 	token := h.extractBearerToken(c)
 	if token == "" {
-		handleError(h.log, c, apperror.ErrInvalidAuthHeader)
+		writeErrorResponse(h.log, c, apperror.ErrInvalidAuthHeader)
 		return
 	}
 
 	claims, err := h.tokenService.ValidateAccessToken(ctx, token)
 	if err != nil {
-		handleError(h.log, c, err)
+		writeErrorResponse(h.log, c, err)
 		return
 	}
 
 	userID, err := uuid.Parse(claims.UserID)
 	if err != nil {
-		handleError(h.log, c, apperror.ErrInvalidUserID)
+		writeErrorResponse(h.log, c, apperror.ErrInvalidUserID)
 		return
 	}
 
 	user, err := h.userService.GetByID(ctx, userID)
 	if err != nil {
-		handleError(h.log, c, err)
+		writeErrorResponse(h.log, c, err)
 		return
 	}
 
