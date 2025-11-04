@@ -47,6 +47,7 @@ func NewRouter(db *database.Database, authHandler handler.AuthHandler,
 	{
 		users.POST("", userHandler.Create)
 		users.GET("", userHandler.GetAll)
+		users.GET("/technicians/available", userHandler.GetAvailableTechnician)
 		users.GET("/:id", userHandler.GetByID)
 		users.PUT("/:id", userHandler.Update)
 		users.DELETE("/:id", userHandler.Delete)

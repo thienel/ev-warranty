@@ -2084,7 +2084,7 @@ const docTemplate = `{
                 "summary": "Get all users",
                 "responses": {
                     "200": {
-                        "description": "Users retrieved successfully",
+                        "description": "Technicians retrieved successfully",
                         "schema": {
                             "allOf": [
                                 {
@@ -2697,7 +2697,13 @@ const docTemplate = `{
                 "id": {
                     "type": "string"
                 },
+                "staff_id": {
+                    "type": "string"
+                },
                 "status": {
+                    "type": "string"
+                },
+                "technician_id": {
                     "type": "string"
                 },
                 "total_cost": {

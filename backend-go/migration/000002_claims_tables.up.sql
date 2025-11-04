@@ -7,6 +7,8 @@ CREATE TABLE IF NOT EXISTS claims (
     description TEXT NOT NULL,
     status TEXT NOT NULL DEFAULT 'DRAFT',
     total_cost DECIMAL(15, 2) DEFAULT 0,
+    staff_id UUID NOT NULL,
+    technician_id UUID NOT NULL,
     approved_by UUID,
     created_at TIMESTAMP WITH TIME ZONE NOT NULL,
     updated_at TIMESTAMP WITH TIME ZONE NOT NULL,

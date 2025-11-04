@@ -19,6 +19,7 @@ type UserHandler interface {
 	Update(c *gin.Context)
 	GetByID(c *gin.Context)
 	GetAll(c *gin.Context)
+	GetAvailableTechnician(c *gin.Context)
 	Delete(c *gin.Context)
 }
 
@@ -201,6 +202,51 @@ func (h userHandler) GetAll(c *gin.Context) {
 	h.log.Info("get all users request", "remote_addr", c.ClientIP())
 
 	users, err := h.userService.GetAll(ctx)
+	if err != nil {
+		writeErrorResponse(h.log, c, err)
+		return
+	}
+
+	usersDto := dto.GenerateUserDTOList(users)
+	h.log.Info("users retrieved", "count", len(usersDto))
+	writeSuccessResponse(c, http.StatusOK, usersDto)
+}
+
+// GetAvailableTechnician godoc
+// @Summary Get all users
+// @Description Retrieve a list of all users
+// @Tags users
+// @Accept json
+// @Produce json
+// @Security Bearer
+// @Success 200 {object} dto.APIResponse{data=[]dto.UserDTO} "Technicians retrieved successfully"
+// @Failure 401 {object} dto.APIResponse "Unauthorized"
+// @Failure 500 {object} dto.APIResponse "Internal server error"
+// @Router /users [get]
+func (h userHandler) GetAvailableTechnician(c *gin.Context) {
+	err := allowedRoles(c, entity.UserRoleScStaff)
+	if err != nil {
+		writeErrorResponse(h.log, c, err)
+		return
+	}
+
+	ctx, cancel := context.WithTimeout(c.Request.Context(), requestTimeout)
+	defer cancel()
+
+	h.log.Info("get all available technicians request", "remote_addr", c.ClientIP())
+
+	staffID, err := getUserIDFromHeader(c)
+	if err != nil {
+		writeErrorResponse(h.log, c, err)
+		return
+	}
+
+	staff, err := h.userService.GetByID(ctx, staffID)
+	if err != nil {
+		writeErrorResponse(h.log, c, err)
+	}
+
+	users, err := h.userService.GetAvailableTechnicianByOfficeID(ctx, staff.OfficeID)
 	if err != nil {
 		writeErrorResponse(h.log, c, err)
 		return

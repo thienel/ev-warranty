@@ -104,7 +104,7 @@ func (s *claimService) Create(tx application.Tx, cmd *CreateClaimCommand) (*enti
 	if err != nil {
 		return nil, err
 	}
-	if count < entity.MaxClaimsPerTechnician {
+	if count >= entity.MaxClaimsPerTechnician {
 		return nil, apperror.ErrTechnicianWorkloadExceed
 	}
 

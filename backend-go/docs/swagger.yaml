@@ -203,7 +203,11 @@ definitions:
         type: string
       id:
         type: string
+      staff_id:
+        type: string
       status:
+        type: string
+      technician_id:
         type: string
       total_cost:
         type: number
@@ -1575,7 +1579,7 @@ paths:
       - application/json
       responses:
         "200":
-          description: Users retrieved successfully
+          description: Technicians retrieved successfully
           schema:
             allOf:
             - $ref: '#/definitions/dto.APIResponse'

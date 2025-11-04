@@ -30,6 +30,7 @@ type UserService interface {
 	Create(ctx context.Context, cmd *UserCreateCommand) (*entity.User, error)
 	GetByID(ctx context.Context, id uuid.UUID) (*entity.User, error)
 	GetAll(ctx context.Context) ([]*entity.User, error)
+	GetAvailableTechnicianByOfficeID(ctx context.Context, officeID uuid.UUID) ([]*entity.User, error)
 	Update(ctx context.Context, id uuid.UUID, cmd *UserUpdateCommand) error
 	Delete(ctx context.Context, id uuid.UUID) error
 }
@@ -37,10 +38,12 @@ type UserService interface {
 type userService struct {
 	userRepo   repository.UserRepository
 	officeRepo repository.OfficeRepository
+	claimRepo  repository.ClaimRepository
 }
 
-func NewUserService(userRepo repository.UserRepository, officeRepo repository.OfficeRepository) UserService {
-	return &userService{userRepo, officeRepo}
+func NewUserService(userRepo repository.UserRepository, officeRepo repository.OfficeRepository,
+	claimRepo repository.ClaimRepository) UserService {
+	return &userService{userRepo, officeRepo, claimRepo}
 }
 
 func (s *userService) Create(ctx context.Context, cmd *UserCreateCommand) (*entity.User, error) {
@@ -93,6 +96,27 @@ func (s *userService) GetAll(ctx context.Context) ([]*entity.User, error) {
 	}
 
 	return users, nil
+}
+
+func (s *userService) GetAvailableTechnicianByOfficeID(ctx context.Context, officeID uuid.UUID) ([]*entity.User,
+	error) {
+	users, err := s.userRepo.FindAll(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	var availableTechnicians []*entity.User
+	for _, user := range users {
+		count, err := s.claimRepo.CountPendingByTechnician(ctx, user.ID)
+		if err != nil {
+			return nil, err
+		}
+		if count < entity.MaxClaimsPerTechnician && user.OfficeID == officeID {
+			availableTechnicians = append(availableTechnicians, user)
+		}
+	}
+
+	return availableTechnicians, nil
 }
 
 func (s *userService) Update(ctx context.Context, id uuid.UUID, cmd *UserUpdateCommand) error {
