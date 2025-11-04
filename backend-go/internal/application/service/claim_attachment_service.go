@@ -30,7 +30,8 @@ type claimAttachmentService struct {
 }
 
 func NewClaimAttachmentService(log logger.Logger, claimRepo repository.ClaimRepository,
-	attachRepo repository.ClaimAttachmentRepository, cloudService cloudinary.CloudinaryService) ClaimAttachmentService {
+	attachRepo repository.ClaimAttachmentRepository, cloudService cloudinary.CloudinaryService,
+) ClaimAttachmentService {
 	return &claimAttachmentService{
 		log:          log,
 		claimRepo:    claimRepo,
@@ -48,7 +49,8 @@ func (s *claimAttachmentService) GetByID(ctx context.Context, id uuid.UUID) (*en
 	return claimAttachment, nil
 }
 
-func (s *claimAttachmentService) GetByClaimID(ctx context.Context, claimID uuid.UUID) ([]*entity.ClaimAttachment, error) {
+func (s *claimAttachmentService) GetByClaimID(ctx context.Context, claimID uuid.UUID,
+) ([]*entity.ClaimAttachment, error) {
 	claimAttachments, err := s.attachRepo.FindByClaimID(ctx, claimID)
 	if err != nil {
 		return nil, err
@@ -57,13 +59,14 @@ func (s *claimAttachmentService) GetByClaimID(ctx context.Context, claimID uuid.
 	return claimAttachments, nil
 }
 
-func (s *claimAttachmentService) Create(tx application.Tx, claimID uuid.UUID, file multipart.File) (*entity.ClaimAttachment, error) {
+func (s *claimAttachmentService) Create(tx application.Tx, claimID uuid.UUID, file multipart.File,
+) (*entity.ClaimAttachment, error) {
 	_, err := s.claimRepo.FindByID(tx.GetCtx(), claimID)
 	if err != nil {
 		return nil, err
 	}
 
-	mimeType, err := GetMimeType(file)
+	mimeType, err := getMimeType(file)
 	if err != nil {
 		return nil, err
 	}
@@ -93,7 +96,7 @@ func (s *claimAttachmentService) HardDelete(tx application.Tx, claimID, attachme
 	}
 
 	if claim.Status != entity.ClaimStatusDraft {
-		return apperror.ErrInvalidClaimAction.WithMessage("Claim is not allowed to delete")
+		return apperror.ErrInvalidClaimAction.WithMessage("Can only hard delete if claim status is draft")
 	}
 	attach, err := s.attachRepo.FindByID(tx.GetCtx(), attachmentID)
 	if err != nil {
@@ -103,23 +106,24 @@ func (s *claimAttachmentService) HardDelete(tx application.Tx, claimID, attachme
 	err = s.attachRepo.HardDelete(tx, attachmentID)
 	if err == nil {
 		if cloudErr := s.cloudService.DeleteFileByURL(tx.GetCtx(), attach.URL); cloudErr != nil {
-			s.log.Error("[Cloudinary] Failed to delete file when hard delete claim attachment", "error", cloudErr)
+			s.log.Error("[Cloudinary] Failed to delete file when hard delete claim attachment", "error",
+				cloudErr)
 		}
 	}
 
 	return err
 }
 
-func GetMimeType(file multipart.File) (string, error) {
+func getMimeType(file multipart.File) (string, error) {
 	buffer := make([]byte, 512)
 	_, err := file.Read(buffer)
 	if err != nil {
-		return "", apperror.ErrInternalServerError.WithError(err)
+		return "", apperror.ErrInvalidFile.WithError(err)
 	}
 
 	_, err = file.Seek(0, 0)
 	if err != nil {
-		return "", apperror.ErrInvalidAccessToken.WithError(err)
+		return "", apperror.ErrInvalidFile.WithError(err)
 	}
 
 	mimeType := http.DetectContentType(buffer)

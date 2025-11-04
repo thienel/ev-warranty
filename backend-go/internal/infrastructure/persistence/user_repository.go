@@ -6,6 +6,7 @@ import (
 	"ev-warranty-go/internal/application/repository"
 	"ev-warranty-go/internal/domain/entity"
 	"ev-warranty-go/pkg/apperror"
+	"strings"
 
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgconn"
@@ -23,7 +24,7 @@ func NewUserRepository(db *gorm.DB) repository.UserRepository {
 func (u *userRepository) Create(ctx context.Context, user *entity.User) error {
 	if err := u.db.WithContext(ctx).Create(user).Error; err != nil {
 		if dup := getDuplicateKeyConstraint(err); dup != "" {
-			return apperror.ErrDuplicateKey.WithMessage(dup + " already existed")
+			return apperror.ErrDuplicateKey.WithMessage(dup + " already existed").WithError(err)
 		}
 		return apperror.ErrDBOperation.WithError(err)
 	}
@@ -36,7 +37,7 @@ func (u *userRepository) FindByID(ctx context.Context, id uuid.UUID) (*entity.Us
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, apperror.ErrNotFoundError.WithMessage("User not found").WithError(err)
 		}
-		return nil, apperror.ErrDBOperation
+		return nil, apperror.ErrDBOperation.WithError(err)
 	}
 	return &user, nil
 }
@@ -79,7 +80,8 @@ func (u *userRepository) SoftDelete(ctx context.Context, id uuid.UUID) error {
 
 func (u *userRepository) FindByOAuth(ctx context.Context, provider, oauthID string) (*entity.User, error) {
 	var user entity.User
-	if err := u.db.WithContext(ctx).Where("oauth_provider = ? AND oauth_id = ?", provider, oauthID).First(&user).Error; err != nil {
+	if err := u.db.WithContext(ctx).Where("oauth_provider = ? AND oauth_id = ?", provider,
+		oauthID).First(&user).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, apperror.ErrNotFoundError.WithMessage("User not found").WithError(err)
 		}
@@ -91,7 +93,7 @@ func (u *userRepository) FindByOAuth(ctx context.Context, provider, oauthID stri
 func getDuplicateKeyConstraint(err error) string {
 	var pgErr *pgconn.PgError
 	if errors.As(err, &pgErr) && pgErr.Code == "23505" {
-		return pgErr.ConstraintName
+		return strings.ReplaceAll(pgErr.ConstraintName, "_", " ")
 	}
 	return ""
 }

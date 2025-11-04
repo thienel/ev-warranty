@@ -121,7 +121,7 @@ func (s *claimService) Update(tx application.Tx, id uuid.UUID, cmd *UpdateClaimC
 	}
 
 	if claim.Status != entity.ClaimStatusDraft {
-		return apperror.ErrInvalidClaimAction.WithMessage("Conn only update when status if draft")
+		return apperror.ErrInvalidClaimAction.WithMessage("Can only update when status if draft")
 	}
 
 	claim.Description = cmd.Description
@@ -186,7 +186,8 @@ func (s *claimService) SoftDelete(tx application.Tx, id uuid.UUID) error {
 	return nil
 }
 
-func (s *claimService) UpdateStatus(tx application.Tx, id uuid.UUID, status string, changedBy uuid.UUID) error {
+func (s *claimService) UpdateStatus(tx application.Tx, id uuid.UUID, status string, changedBy uuid.UUID,
+) error {
 	if !entity.IsValidClaimStatus(status) {
 		return apperror.ErrInvalidInput.WithMessage("Invalid claim status")
 	}
@@ -232,13 +233,13 @@ func (s *claimService) Submit(tx application.Tx, id uuid.UUID, changedBy uuid.UU
 		return err
 	}
 
-	if len(items) < entity.ClaimItemRequirePerClaim {
+	if len(items) < entity.MinItemPerClaim {
 		return apperror.ErrMissingInformationClaim.
-			WithMessage(fmt.Sprintf("Claim item must be atleast %d", entity.ClaimItemRequirePerClaim))
+			WithMessage(fmt.Sprintf("Claim item must be atleast %d", entity.MinItemPerClaim))
 	}
-	if len(attachments) < entity.AttachmentRequirePerClaim {
+	if len(attachments) < entity.MinAttachmentPerClaim {
 		return apperror.ErrMissingInformationClaim.
-			WithMessage(fmt.Sprintf("Claim attachment must be atleast %d", entity.AttachmentRequirePerClaim))
+			WithMessage(fmt.Sprintf("Claim attachment must be atleast %d", entity.MinAttachmentPerClaim))
 	}
 
 	err = s.claimRepo.UpdateStatus(tx, id, entity.ClaimStatusSubmitted)

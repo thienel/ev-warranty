@@ -24,7 +24,8 @@ func (c *claimRepository) Create(tx application.Tx, claim *entity.Claim) error {
 	db := tx.GetTx().(*gorm.DB)
 	if err := db.Create(claim).Error; err != nil {
 		if dup := getDuplicateKeyConstraint(err); dup != "" {
-			return apperror.ErrDuplicateKey.WithMessage(dup + " already existed").WithError(err)
+			return apperror.ErrDuplicateKey.WithMessage("Claim with " + dup + " already existed").
+				WithError(err)
 		}
 		return apperror.ErrDBOperation.WithError(err)
 	}
@@ -102,7 +103,8 @@ func (c *claimRepository) CountPendingClaimByTechnicianID(ctx context.Context, i
 	return count, nil
 }
 
-func (c *claimRepository) FindByCustomerID(ctx context.Context, customerID uuid.UUID) ([]*entity.Claim, error) {
+func (c *claimRepository) FindByCustomerID(ctx context.Context, customerID uuid.UUID) ([]*entity.Claim,
+	error) {
 	var claims []*entity.Claim
 	if err := c.db.WithContext(ctx).
 		Where("customer_id = ?", customerID).

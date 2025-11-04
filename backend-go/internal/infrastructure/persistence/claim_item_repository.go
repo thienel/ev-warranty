@@ -24,7 +24,8 @@ func (c *claimItemRepository) Create(tx application.Tx, item *entity.ClaimItem) 
 	db := tx.GetTx().(*gorm.DB)
 	if err := db.Create(item).Error; err != nil {
 		if dup := getDuplicateKeyConstraint(err); dup != "" {
-			return apperror.ErrDuplicateKey.WithMessage(dup + " already existed")
+			return apperror.ErrDuplicateKey.WithMessage("Claim item with " + dup + " already existed").
+				WithError(err)
 		}
 		return apperror.ErrDBOperation.WithError(err)
 	}
@@ -90,7 +91,8 @@ func (c *claimItemRepository) FindByID(ctx context.Context, id uuid.UUID) (*enti
 	return &item, nil
 }
 
-func (c *claimItemRepository) FindByClaimID(ctx context.Context, claimID uuid.UUID) ([]*entity.ClaimItem, error) {
+func (c *claimItemRepository) FindByClaimID(ctx context.Context, claimID uuid.UUID) ([]*entity.ClaimItem,
+	error) {
 	var items []*entity.ClaimItem
 	if err := c.db.WithContext(ctx).
 		Where("claim_id = ?", claimID).
@@ -112,7 +114,8 @@ func (c *claimItemRepository) CountByClaimID(ctx context.Context, claimID uuid.U
 	return count, nil
 }
 
-func (c *claimItemRepository) FindByStatus(ctx context.Context, claimID uuid.UUID, status string) ([]*entity.ClaimItem, error) {
+func (c *claimItemRepository) FindByStatus(ctx context.Context, claimID uuid.UUID, status string,
+) ([]*entity.ClaimItem, error) {
 	var items []*entity.ClaimItem
 	if err := c.db.WithContext(ctx).
 		Where("claim_id = ? AND status = ?", claimID, status).

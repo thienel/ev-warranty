@@ -10,8 +10,6 @@ import (
 const (
 	AttachmentTypeVideo = "video"
 	AttachmentTypeImage = "image"
-
-	AttachmentRequirePerClaim = 3
 )
 
 type ClaimAttachment struct {

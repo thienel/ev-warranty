@@ -233,7 +233,7 @@ func (h *claimHandler) Delete(c *gin.Context) {
 	idParam := c.Param("id")
 	id, err := uuid.Parse(idParam)
 	if err != nil {
-		handleError(h.log, c, apperror.ErrInvalidParams)
+		handleError(h.log, c, apperror.ErrInvalidParams.WithMessage("Invalid claim ID"))
 		return
 	}
 
@@ -277,7 +277,7 @@ func (h *claimHandler) Submit(c *gin.Context) {
 	idParam := c.Param("id")
 	id, err := uuid.Parse(idParam)
 	if err != nil {
-		handleError(h.log, c, apperror.ErrInvalidParams)
+		handleError(h.log, c, apperror.ErrInvalidParams.WithMessage("Invalid claim ID"))
 		return
 	}
 
@@ -323,7 +323,7 @@ func (h *claimHandler) Review(c *gin.Context) {
 	idParam := c.Param("id")
 	id, err := uuid.Parse(idParam)
 	if err != nil {
-		handleError(h.log, c, apperror.ErrInvalidParams)
+		handleError(h.log, c, apperror.ErrInvalidParams.WithMessage("Invalid claim ID"))
 		return
 	}
 
@@ -369,7 +369,7 @@ func (h *claimHandler) Cancel(c *gin.Context) {
 	idParam := c.Param("id")
 	id, err := uuid.Parse(idParam)
 	if err != nil {
-		handleError(h.log, c, apperror.ErrInvalidParams)
+		handleError(h.log, c, apperror.ErrInvalidParams.WithMessage("Invalid claim ID"))
 		return
 	}
 
@@ -415,7 +415,7 @@ func (h *claimHandler) Complete(c *gin.Context) {
 	idParam := c.Param("id")
 	id, err := uuid.Parse(idParam)
 	if err != nil {
-		handleError(h.log, c, apperror.ErrInvalidParams)
+		handleError(h.log, c, apperror.ErrInvalidParams.WithMessage("Invalid claim ID"))
 		return
 	}
 
@@ -458,7 +458,7 @@ func (h *claimHandler) History(c *gin.Context) {
 	idParam := c.Param("id")
 	id, err := uuid.Parse(idParam)
 	if err != nil {
-		handleError(h.log, c, apperror.ErrInvalidParams)
+		handleError(h.log, c, apperror.ErrInvalidParams.WithMessage("Invalid claim ID"))
 		return
 	}
 

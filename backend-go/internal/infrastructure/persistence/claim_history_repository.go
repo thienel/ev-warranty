@@ -25,7 +25,8 @@ func (c *claimHistoryRepository) Create(tx application.Tx, history *entity.Claim
 	db := tx.GetTx().(*gorm.DB)
 	if err := db.Create(history).Error; err != nil {
 		if dup := getDuplicateKeyConstraint(err); dup != "" {
-			return apperror.ErrDuplicateKey.WithMessage(dup + " already existed").WithError(err)
+			return apperror.ErrDuplicateKey.WithMessage("Claim history with " + dup + " already existed").
+				WithError(err)
 		}
 		return apperror.ErrDBOperation.WithError(err)
 	}
@@ -40,7 +41,8 @@ func (c *claimHistoryRepository) SoftDeleteByClaimID(tx application.Tx, claimID 
 	return nil
 }
 
-func (c *claimHistoryRepository) FindByClaimID(ctx context.Context, claimID uuid.UUID) ([]*entity.ClaimHistory, error) {
+func (c *claimHistoryRepository) FindByClaimID(ctx context.Context, claimID uuid.UUID,
+) ([]*entity.ClaimHistory, error) {
 	var histories []*entity.ClaimHistory
 	if err := c.db.WithContext(ctx).
 		Where("claim_id = ?", claimID).
@@ -51,21 +53,24 @@ func (c *claimHistoryRepository) FindByClaimID(ctx context.Context, claimID uuid
 	return histories, nil
 }
 
-func (c *claimHistoryRepository) FindLatestByClaimID(ctx context.Context, claimID uuid.UUID) (*entity.ClaimHistory, error) {
+func (c *claimHistoryRepository) FindLatestByClaimID(ctx context.Context, claimID uuid.UUID,
+) (*entity.ClaimHistory, error) {
 	var history entity.ClaimHistory
 	if err := c.db.WithContext(ctx).
 		Where("claim_id = ?", claimID).
 		Order("changed_at DESC").
 		First(&history).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, apperror.ErrNotFoundError.WithMessage("claim history not found").WithError(err)
+			return nil, apperror.ErrNotFoundError.WithMessage("Claim history not found").WithError(err)
 		}
 		return nil, apperror.ErrDBOperation.WithError(err)
 	}
 	return &history, nil
 }
 
-func (c *claimHistoryRepository) FindByDateRange(ctx context.Context, claimID uuid.UUID, startDate, endDate time.Time) ([]*entity.ClaimHistory, error) {
+func (c *claimHistoryRepository) FindByDateRange(ctx context.Context, claimID uuid.UUID,
+	startDate, endDate time.Time,
+) ([]*entity.ClaimHistory, error) {
 	var histories []*entity.ClaimHistory
 	if err := c.db.WithContext(ctx).
 		Where("claim_id = ? AND changed_at BETWEEN ? AND ?", claimID, startDate, endDate).

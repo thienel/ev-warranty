@@ -24,7 +24,8 @@ func (c *claimAttachmentRepository) Create(tx application.Tx, attachment *entity
 	db := tx.GetTx().(*gorm.DB)
 	if err := db.Create(attachment).Error; err != nil {
 		if dup := getDuplicateKeyConstraint(err); dup != "" {
-			return apperror.ErrDuplicateKey.WithMessage(dup + " already existed").WithError(err)
+			return apperror.ErrDuplicateKey.WithMessage("Claim attachment with " + dup + " already existed").
+				WithError(err)
 		}
 		return apperror.ErrDBOperation.WithError(err)
 	}
@@ -47,7 +48,8 @@ func (c *claimAttachmentRepository) SoftDeleteByClaimID(tx application.Tx, claim
 	return nil
 }
 
-func (c *claimAttachmentRepository) FindByID(ctx context.Context, id uuid.UUID) (*entity.ClaimAttachment, error) {
+func (c *claimAttachmentRepository) FindByID(ctx context.Context, id uuid.UUID) (*entity.ClaimAttachment,
+	error) {
 	var attachment entity.ClaimAttachment
 	if err := c.db.WithContext(ctx).Where("id = ?", id).First(&attachment).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -58,7 +60,8 @@ func (c *claimAttachmentRepository) FindByID(ctx context.Context, id uuid.UUID) 
 	return &attachment, nil
 }
 
-func (c *claimAttachmentRepository) FindByClaimID(ctx context.Context, claimID uuid.UUID) ([]*entity.ClaimAttachment, error) {
+func (c *claimAttachmentRepository) FindByClaimID(ctx context.Context, claimID uuid.UUID,
+) ([]*entity.ClaimAttachment, error) {
 	var attachments []*entity.ClaimAttachment
 	if err := c.db.WithContext(ctx).
 		Where("claim_id = ?", claimID).
@@ -80,7 +83,8 @@ func (c *claimAttachmentRepository) CountByClaimID(ctx context.Context, claimID 
 	return count, nil
 }
 
-func (c *claimAttachmentRepository) FindByType(ctx context.Context, claimID uuid.UUID, attachmentType string) ([]*entity.ClaimAttachment, error) {
+func (c *claimAttachmentRepository) FindByType(ctx context.Context, claimID uuid.UUID, attachmentType string,
+) ([]*entity.ClaimAttachment, error) {
 	var attachments []*entity.ClaimAttachment
 	if err := c.db.WithContext(ctx).
 		Where("claim_id = ? AND attachment_type = ?", claimID, attachmentType).

@@ -22,7 +22,8 @@ func NewOfficeRepository(db *gorm.DB) repository.OfficeRepository {
 func (o *officeRepository) Create(ctx context.Context, user *entity.Office) error {
 	if err := o.db.WithContext(ctx).Create(user).Error; err != nil {
 		if dup := getDuplicateKeyConstraint(err); dup != "" {
-			return apperror.ErrDuplicateKey.WithMessage(dup + " already existed").WithError(err)
+			return apperror.ErrDuplicateKey.WithMessage("Office with " + dup + " already existed").WithError(
+				err)
 		}
 		return apperror.ErrDBOperation.WithError(err)
 	}

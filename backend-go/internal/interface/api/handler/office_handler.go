@@ -66,7 +66,7 @@ func (h *officeHandler) Create(c *gin.Context) {
 	}
 
 	if !entity.IsValidOfficeType(req.OfficeType) {
-		handleError(h.log, c, apperror.ErrInvalidInput)
+		handleError(h.log, c, apperror.ErrInvalidInput.WithMessage("Invalid office type"))
 		return
 	}
 
@@ -112,7 +112,7 @@ func (h *officeHandler) GetByID(c *gin.Context) {
 	officeIDStr := c.Param("id")
 	officeID, err := uuid.Parse(officeIDStr)
 	if err != nil {
-		handleError(h.log, c, apperror.ErrInvalidParams)
+		handleError(h.log, c, apperror.ErrInvalidParams.WithMessage("Invalid office id"))
 		return
 	}
 
@@ -183,7 +183,7 @@ func (h *officeHandler) Update(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := uuid.Parse(idStr)
 	if err != nil {
-		handleError(h.log, c, apperror.ErrInvalidParams)
+		handleError(h.log, c, apperror.ErrInvalidParams.WithMessage("Invalid office id"))
 		return
 	}
 
@@ -241,7 +241,7 @@ func (h *officeHandler) Delete(c *gin.Context) {
 	officeIDStr := c.Param("id")
 	officeID, err := uuid.Parse(officeIDStr)
 	if err != nil {
-		handleError(h.log, c, apperror.ErrInvalidParams)
+		handleError(h.log, c, apperror.ErrInvalidParams.WithMessage("Invalid claim id"))
 		return
 	}
 

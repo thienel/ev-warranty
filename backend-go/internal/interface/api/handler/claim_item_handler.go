@@ -140,7 +140,7 @@ func (h *claimItemHandler) Create(c *gin.Context) {
 	}
 
 	if !entity.IsValidClaimItemType(req.Type) {
-		handleError(h.log, c, apperror.ErrInvalidJsonRequest)
+		handleError(h.log, c, apperror.ErrInvalidInput.WithMessage("Invalid claim item type"))
 		return
 	}
 
@@ -311,7 +311,7 @@ func parseItemIDParam(c *gin.Context) (uuid.UUID, error) {
 	itemIDStr := c.Param("itemID")
 	itemID, err := uuid.Parse(itemIDStr)
 	if err != nil {
-		return uuid.Nil, apperror.ErrInvalidParams
+		return uuid.Nil, apperror.ErrInvalidParams.WithMessage("Invalid item id")
 	}
 	return itemID, nil
 }
@@ -320,7 +320,7 @@ func parseClaimIDParam(c *gin.Context) (uuid.UUID, error) {
 	claimIDStr := c.Param("id")
 	claimID, err := uuid.Parse(claimIDStr)
 	if err != nil {
-		return uuid.Nil, apperror.ErrInvalidParams
+		return uuid.Nil, apperror.ErrInvalidParams.WithMessage("Invalid claim id")
 	}
 	return claimID, nil
 }

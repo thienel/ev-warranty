@@ -21,7 +21,8 @@ func NewTokenRepository(db *gorm.DB) repository.RefreshTokenRepository {
 func (t *refreshTokenRepository) Create(ctx context.Context, token *entity.RefreshToken) error {
 	if err := t.db.WithContext(ctx).Create(token).Error; err != nil {
 		if dup := getDuplicateKeyConstraint(err); dup != "" {
-			return apperror.ErrDuplicateKey.WithMessage(dup + " already existed").WithError(err)
+			return apperror.ErrDuplicateKey.WithMessage("Token with " + dup + " already existed").
+				WithError(err)
 		}
 		return apperror.ErrDBOperation.WithError(err)
 	}

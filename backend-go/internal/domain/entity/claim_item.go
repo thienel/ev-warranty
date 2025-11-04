@@ -14,8 +14,6 @@ const (
 
 	ClaimItemTypeReplacement = "REPLACEMENT"
 	ClaimItemTypeRepair      = "REPAIR"
-
-	ClaimItemRequirePerClaim = 1
 )
 
 type ClaimItem struct {
@@ -34,8 +32,10 @@ type ClaimItem struct {
 	DeletedAt         *gorm.DeletedAt `gorm:"index" json:"-"`
 }
 
-func NewClaimItem(claimID uuid.UUID, partCategoryID uuid.UUID, faultyPartID uuid.UUID, replacementPartID *uuid.UUID,
-	issueDescription, status, itemType string, cost float64) *ClaimItem {
+func NewClaimItem(claimID uuid.UUID, partCategoryID uuid.UUID, faultyPartID uuid.UUID,
+	replacementPartID *uuid.UUID,
+	issueDescription, status, itemType string, cost float64,
+) *ClaimItem {
 
 	return &ClaimItem{
 		ID:                uuid.New(),

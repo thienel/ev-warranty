@@ -26,6 +26,8 @@ var (
 	ErrInvalidInput         = New(http.StatusBadRequest, "API_INVALID_INPUT", "Invalid input")
 	ErrInvalidMultipartForm = New(http.StatusBadRequest, "API_INVALID_MULTIPART_FORM_REQUEST",
 		"Invalid multipart form request")
+	ErrInvalidFile = New(http.StatusBadRequest, "API_INVALID_FILE",
+		"Invalid or unreadable file")
 	ErrInvalidJsonRequest = New(http.StatusBadRequest, "API_INVALID_JSON_REQUEST",
 		"Invalid JSON request")
 

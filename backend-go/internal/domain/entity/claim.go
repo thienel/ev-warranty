@@ -18,6 +18,12 @@ const (
 	ClaimStatusCompleted         = "COMPLETED"
 )
 
+const (
+	MinItemPerClaim        = 1
+	MinAttachmentPerClaim  = 2
+	MaxClaimsPerTechnician = 3
+)
+
 type Claim struct {
 	ID          uuid.UUID       `gorm:"primaryKey;type:uuid;default:uuid_generate_v4()" json:"id"`
 	VehicleID   uuid.UUID       `gorm:"not null;type:uuid" json:"vehicle_id"`
@@ -45,7 +51,7 @@ func NewClaim(vehicleID, customerID uuid.UUID, description, status string, appro
 func IsValidClaimStatus(status string) bool {
 	switch status {
 	case ClaimStatusDraft, ClaimStatusSubmitted, ClaimStatusApproved, ClaimStatusPartiallyApproved,
-		ClaimStatusCancelled, ClaimStatusReviewing, ClaimStatusRejected:
+		ClaimStatusCancelled, ClaimStatusReviewing, ClaimStatusRejected, ClaimStatusCompleted:
 		return true
 	default:
 		return false
@@ -66,8 +72,8 @@ func IsValidClaimStatusTransition(currentStatus, newStatus string) bool {
 			ClaimStatusPartiallyApproved,
 			ClaimStatusRejected,
 		},
-		ClaimStatusApproved:          {},
-		ClaimStatusPartiallyApproved: {},
+		ClaimStatusApproved:          {ClaimStatusCompleted},
+		ClaimStatusPartiallyApproved: {ClaimStatusCompleted},
 		ClaimStatusRejected:          {},
 		ClaimStatusCancelled:         {},
 	}

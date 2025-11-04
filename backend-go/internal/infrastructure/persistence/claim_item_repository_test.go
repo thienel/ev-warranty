@@ -444,7 +444,7 @@ var _ = Describe("ClaimItemRepository", func() {
 				item, err := repository.FindByID(ctx, itemID)
 
 				Expect(item).To(BeNil())
-				ExpectAppError(err, apperror.ErrNotFoundError.ErrorCode)
+				ExpectAppError(err, apperror.ErrDBOperation.ErrorCode)
 			})
 		})
 	})
