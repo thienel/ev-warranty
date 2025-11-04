@@ -28,6 +28,7 @@ namespace Backend.Dotnet.Infrastructure
             services.AddScoped<IPartCategoryService, PartCategoryService>();
             services.AddScoped<IPartService, PartService>();
             services.AddScoped<IPolicyCoveragePartService, PolicyCoveragePartService>();
+            services.AddScoped<IWorkOrderService, WorkOrderService>();
 
 
 
