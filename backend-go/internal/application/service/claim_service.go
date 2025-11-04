@@ -2,7 +2,6 @@ package service
 
 import (
 	"context"
-	"errors"
 	"ev-warranty-go/internal/application"
 	"ev-warranty-go/internal/application/repository"
 	"ev-warranty-go/internal/domain/entity"
@@ -91,15 +90,26 @@ func (s *claimService) Create(tx application.Tx, cmd *CreateClaimCommand) (*enti
 	if err != nil {
 		return nil, err
 	}
-	technician, err := s.userRepo.FindByID(tx.GetCtx(), cmd.StaffID)
+
+	technician, err := s.userRepo.FindByID(tx.GetCtx(), cmd.TechnicianID)
 	if err != nil {
 		return nil, err
 	}
+
 	if staff.OfficeID != technician.OfficeID {
-		return nil, errors.New("Staff and technician must be same office")
+		return nil, apperror.ErrInvalidTechnician
 	}
 
-	claim := entity.NewClaim(cmd.VehicleID, cmd.CustomerID, cmd.Description, entity.ClaimStatusDraft, nil)
+	count, err := s.claimRepo.CountPendingByTechnician(tx.GetCtx(), cmd.TechnicianID)
+	if err != nil {
+		return nil, err
+	}
+	if count < entity.MaxClaimsPerTechnician {
+		return nil, apperror.ErrTechnicianWorkloadExceed
+	}
+
+	claim := entity.NewClaim(cmd.VehicleID, cmd.CustomerID, cmd.Description, entity.ClaimStatusDraft,
+		cmd.StaffID, cmd.TechnicianID)
 
 	if err := s.claimRepo.Create(tx, claim); err != nil {
 		return nil, err

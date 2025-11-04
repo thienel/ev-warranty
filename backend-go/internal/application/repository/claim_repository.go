@@ -18,7 +18,7 @@ type ClaimRepository interface {
 
 	FindByID(ctx context.Context, id uuid.UUID) (*entity.Claim, error)
 	FindAll(ctx context.Context) ([]*entity.Claim, error)
-	CountPendingClaimByTechnicianID(ctx context.Context, id uuid.UUID) (int64, error)
+	CountPendingByTechnician(ctx context.Context, id uuid.UUID) (int64, error)
 	FindByCustomerID(ctx context.Context, customerID uuid.UUID) ([]*entity.Claim, error)
 	FindByVehicleID(ctx context.Context, vehicleID uuid.UUID) ([]*entity.Claim, error)
 }
