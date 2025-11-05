@@ -2,12 +2,8 @@
 using Backend.Dotnet.Application.Interfaces;
 using Backend.Dotnet.Application.Interfaces.Data;
 using Backend.Dotnet.Application.Interfaces.External;
+using Backend.Dotnet.Domain.Entities;
 using Backend.Dotnet.Domain.Exceptions;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using static Backend.Dotnet.Application.DTOs.WorkOrderDto;
 
 namespace Backend.Dotnet.Application.Services
@@ -16,7 +12,7 @@ namespace Backend.Dotnet.Application.Services
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IExternalServiceClient _externalServiceClient;
-        public WorkOrderService(IUnitOfWork unitOfWork, IExternalServiceClient externalServiceClient) 
+        public WorkOrderService(IUnitOfWork unitOfWork, IExternalServiceClient externalServiceClient)
         {
             _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
             _externalServiceClient = externalServiceClient ?? throw new ArgumentNullException(nameof(externalServiceClient));
@@ -26,13 +22,13 @@ namespace Backend.Dotnet.Application.Services
             try
             {
                 var exists = await _unitOfWork.WorkOrderRepository.ClaimHasWorkOrderAsync(request.ClaimId);
-                if (!exists)
+                if (exists)
                 {
                     return new BaseResponseDto<WorkOrderResponse>
                     {
                         IsSuccess = false,
-                        Message = string.Empty,
-                        ErrorCode = ""
+                        Message = "Work order already exists for this claim",
+                        ErrorCode = "DUPLICATE_WORK_ORDER"
                     };
                 }
 
@@ -42,8 +38,8 @@ namespace Backend.Dotnet.Application.Services
                     return new BaseResponseDto<WorkOrderResponse>
                     {
                         IsSuccess = false,
-                        Message = string.Empty,
-                        ErrorCode = ""
+                        Message = $"Claim with ID '{request.ClaimId}' not found",
+                        ErrorCode = "CLAIM_NOT_FOUND"
                     };
                 }
 
@@ -53,8 +49,8 @@ namespace Backend.Dotnet.Application.Services
                     return new BaseResponseDto<WorkOrderResponse>
                     {
                         IsSuccess = false,
-                        Message = string.Empty,
-                        ErrorCode = ""
+                        Message = $"Technician with ID '{request.AssignedTechnicianId}' not found",
+                        ErrorCode = "TECHNICIAN_NOT_FOUND"
                     };
                 }
 
@@ -67,7 +63,7 @@ namespace Backend.Dotnet.Application.Services
                 return new BaseResponseDto<WorkOrderResponse>
                 {
                     IsSuccess = true,
-                    Message = string.Empty,
+                    Message = "Work order created successfully",
                     Data = workOrder.ToResponse()
                 };
             }
@@ -94,8 +90,8 @@ namespace Backend.Dotnet.Application.Services
                 return new BaseResponseDto<WorkOrderResponse>
                 {
                     IsSuccess = false,
-                    Message = ex.Message,
-                    ErrorCode = "INTERAL_ERROR"
+                    Message = "An error occurred while creating work order",
+                    ErrorCode = "INTERNAL_ERROR"
                 };
             }
         }
@@ -107,10 +103,12 @@ namespace Backend.Dotnet.Application.Services
                 var workOrders = await _unitOfWork.WorkOrderRepository.GetAllAsync();
                 var response = workOrders.Select(wo => wo.ToResponse()).ToList();
 
+                // + Null list error
+
                 return new BaseResponseDto<IEnumerable<WorkOrderResponse>>
                 {
                     IsSuccess = true,
-                    Message = string.Empty,
+                    Message = "Work orders retrieved successfully",
                     Data = response
                 };
             }
@@ -125,22 +123,50 @@ namespace Backend.Dotnet.Application.Services
             }
         }
 
-        public Task<BaseResponseDto<WorkOrderDto.WorkOrderResponse>> GetByIdAsync(Guid id)
+        public async Task<BaseResponseDto<WorkOrderResponse>> GetByIdAsync(Guid id)
+        {
+            try
+            {
+                var workOrder = await _unitOfWork.WorkOrderRepository.GetByIdAsync(id);
+                if (workOrder == null)
+                {
+                    return new BaseResponseDto<WorkOrderResponse>
+                    {
+                        IsSuccess = false,
+                        Message = $"Work order with ID '{id}' not found",
+                        ErrorCode = "NOT_FOUND"
+                    };
+                }
+
+                return new BaseResponseDto<WorkOrderResponse>
+                {
+                    IsSuccess = true,
+                    Message = "Work order retrieved successfully",
+                    Data = workOrder.ToResponse()
+                };
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponseDto<WorkOrderResponse>
+                {
+                    IsSuccess = false,
+                    Message = "An error occurred while retrieving work order",
+                    ErrorCode = "INTERNAL_ERROR"
+                };
+            }
+        }
+
+        public Task<BaseResponseDto<WorkOrderResponse>> GetByClaimIdAsync(Guid claimId)
         {
             throw new NotImplementedException();
         }
 
-        public Task<BaseResponseDto<WorkOrderDto.WorkOrderResponse>> GetByClaimIdAsync(Guid claimId)
+        public Task<BaseResponseDto<IEnumerable<WorkOrderResponse>>> GetByTechnicianIdAsync(Guid technicianId)
         {
             throw new NotImplementedException();
         }
 
-        public Task<BaseResponseDto<IEnumerable<WorkOrderDto.WorkOrderResponse>>> GetByTechnicianIdAsync(Guid technicianId)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<BaseResponseDto<WorkOrderDto.WorkOrderResponse>> UpdateStatusAsync(Guid id, WorkOrderDto.UpdateStatusRequest request)
+        public Task<BaseResponseDto<WorkOrderResponse>> UpdateStatusAsync(Guid id, UpdateStatusRequest request)
         {
             throw new NotImplementedException();
         }

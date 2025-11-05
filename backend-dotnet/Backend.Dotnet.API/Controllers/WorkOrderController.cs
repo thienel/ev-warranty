@@ -1,7 +1,9 @@
 ﻿using Backend.Dotnet.Application.Constants;
+using Backend.Dotnet.Application.DTOs;
 using Backend.Dotnet.Application.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using static Backend.Dotnet.Application.DTOs.WorkOrderDto;
 
 namespace Backend.Dotnet.API.Controllers
 {
@@ -41,6 +43,33 @@ namespace Backend.Dotnet.API.Controllers
             // No params - get all 
             var allResult = await _workOrderService.GetAllAsync();
             return allResult.IsSuccess ? Ok(allResult) : BadRequest(allResult);
+        }
+
+        [HttpGet("{id}")]
+        [ProducesResponseType(typeof(BaseResponseDto<WorkOrderResponse>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(BaseResponseDto), StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> GetById(Guid id)
+        {
+            var result = await _workOrderService.GetByIdAsync(id);
+            if (!result.IsSuccess)
+                return NotFound(result);
+
+            return Ok(result);
+        }
+
+        [HttpPost]
+        [ProducesResponseType(typeof(BaseResponseDto<WorkOrderResponse>), StatusCodes.Status201Created)]
+        [ProducesResponseType(typeof(BaseResponseDto), StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> Create([FromBody] CreateWorkOrderRequest request)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var result = await _workOrderService.CreateAsync(request);
+            if (!result.IsSuccess)
+                return BadRequest(result);
+
+            return CreatedAtAction(nameof(GetById), new { id = result.Data.Id }, result);
         }
     }
 }
