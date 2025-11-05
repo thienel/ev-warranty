@@ -156,14 +156,62 @@ namespace Backend.Dotnet.Application.Services
             }
         }
 
-        public Task<BaseResponseDto<WorkOrderResponse>> GetByClaimIdAsync(Guid claimId)
+        public async Task<BaseResponseDto<WorkOrderResponse>> GetByClaimIdAsync(Guid claimId)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var workOrder = await _unitOfWork.WorkOrderRepository.GetByClaimIdAsync(claimId);
+                if (workOrder == null)
+                {
+                    return new BaseResponseDto<WorkOrderResponse>
+                    {
+                        IsSuccess = false,
+                        Message = $"Work order for claim '{claimId}' not found",
+                        ErrorCode = "NOT_FOUND"
+                    };
+                }
+
+                return new BaseResponseDto<WorkOrderResponse>
+                {
+                    IsSuccess = true,
+                    Message = "Work order retrieved successfully",
+                    Data = workOrder.ToResponse()
+                };
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponseDto<WorkOrderResponse>
+                {
+                    IsSuccess = false,
+                    Message = "An error occurred while retrieving work order",
+                    ErrorCode = "INTERNAL_ERROR"
+                };
+            }
         }
 
-        public Task<BaseResponseDto<IEnumerable<WorkOrderResponse>>> GetByTechnicianIdAsync(Guid technicianId)
+        public async Task<BaseResponseDto<IEnumerable<WorkOrderResponse>>> GetByTechnicianIdAsync(Guid technicianId)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var workOrders = await _unitOfWork.WorkOrderRepository.GetByTechnicianIdAsync(technicianId);
+                var response = workOrders.Select(wo => wo.ToResponse()).ToList();
+
+                return new BaseResponseDto<IEnumerable<WorkOrderResponse>>
+                {
+                    IsSuccess = true,
+                    Message = "Work orders retrieved successfully",
+                    Data = response
+                };
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponseDto<IEnumerable<WorkOrderResponse>>
+                {
+                    IsSuccess = false,
+                    Message = "An error occurred while retrieving work orders",
+                    ErrorCode = "INTERNAL_ERROR"
+                };
+            }
         }
 
         public async Task<BaseResponseDto<WorkOrderDetailResponse>> GetDetailByIdAsync(Guid id)
@@ -213,14 +261,101 @@ namespace Backend.Dotnet.Application.Services
             }
         }
 
-        public Task<BaseResponseDto<WorkOrderResponse>> UpdateStatusAsync(Guid id, UpdateStatusRequest request)
+        public async Task<BaseResponseDto<WorkOrderResponse>> UpdateStatusAsync(Guid id, UpdateStatusRequest request)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var workOrder = await _unitOfWork.WorkOrderRepository.GetByIdAsync(id);
+                if (workOrder == null)
+                {
+                    return new BaseResponseDto<WorkOrderResponse>
+                    {
+                        IsSuccess = false,
+                        Message = $"Work order with ID '{id}' not found",
+                        ErrorCode = "NOT_FOUND"
+                    };
+                }
+
+                workOrder.ChangeStatus(request.Status);
+
+                // Complete claim if work order is completed
+                if (request.Status == WorkOrderStatus.Completed)
+                {
+                    await _externalServiceClient.CompleteClaimAsync(workOrder.ClaimId);
+                }
+
+                _unitOfWork.WorkOrderRepository.Update(workOrder);
+                await _unitOfWork.SaveChangesAsync();
+
+                return new BaseResponseDto<WorkOrderResponse>
+                {
+                    IsSuccess = true,
+                    Message = "Work order status updated successfully",
+                    Data = workOrder.ToResponse()
+                };
+            }
+            catch (BusinessRuleViolationException ex)
+            {
+                return new BaseResponseDto<WorkOrderResponse>
+                {
+                    IsSuccess = false,
+                    Message = ex.Message,
+                    ErrorCode = ex.ErrorCode
+                };
+            }
+            catch (InvalidOperationException ex)
+            {
+                return new BaseResponseDto<WorkOrderResponse>
+                {
+                    IsSuccess = false,
+                    Message = ex.Message,
+                    ErrorCode = "EXTERNAL_SERVICE_ERROR"
+                };
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponseDto<WorkOrderResponse>
+                {
+                    IsSuccess = false,
+                    Message = "An error occurred while updating work order status",
+                    ErrorCode = "INTERNAL_ERROR"
+                };
+            }
         }
 
-        public Task<BaseResponseDto> DeleteAsync(Guid id)
+        public async Task<BaseResponseDto> DeleteAsync(Guid id)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var workOrder = await _unitOfWork.WorkOrderRepository.GetByIdAsync(id);
+                if (workOrder == null)
+                {
+                    return new BaseResponseDto
+                    {
+                        IsSuccess = false,
+                        Message = $"Work order with ID '{id}' not found",
+                        ErrorCode = "NOT_FOUND"
+                    };
+                }
+
+                _unitOfWork.WorkOrderRepository.Remove(workOrder);
+                await _unitOfWork.SaveChangesAsync();
+
+                return new BaseResponseDto
+                {
+                    IsSuccess = true,
+                    Message = "Work order deleted successfully"
+                };
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponseDto
+                {
+                    IsSuccess = false,
+                    Message = "An error occurred while deleting work order",
+                    ErrorCode = "INTERNAL_ERROR"
+                };
+            }
         }
     }
 }

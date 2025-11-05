@@ -75,6 +75,7 @@ namespace Backend.Dotnet.API.Controllers
         [HttpPost]
         [ProducesResponseType(typeof(BaseResponseDto<WorkOrderResponse>), StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(BaseResponseDto), StatusCodes.Status400BadRequest)]
+        [Authorize(Roles = SystemRoles.UserRoleEvmStaff)]
         public async Task<IActionResult> Create([FromBody] CreateWorkOrderRequest request)
         {
             if (!ModelState.IsValid)
@@ -85,6 +86,35 @@ namespace Backend.Dotnet.API.Controllers
                 return BadRequest(result);
 
             return CreatedAtAction(nameof(GetById), new { id = result.Data.Id }, result);
+        }
+
+        [HttpPut("{id}/status")]
+        [ProducesResponseType(typeof(BaseResponseDto<WorkOrderResponse>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(BaseResponseDto), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(BaseResponseDto), StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> UpdateStatus(Guid id, [FromBody] UpdateStatusRequest request)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var result = await _workOrderService.UpdateStatusAsync(id, request);
+            if (!result.IsSuccess)
+                return result.ErrorCode == "NOT_FOUND" ? NotFound(result) : BadRequest(result);
+
+            return Ok(result);
+        }
+
+        [HttpDelete("{id}")]
+        [ProducesResponseType(typeof(BaseResponseDto), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(BaseResponseDto), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(BaseResponseDto), StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> Delete(Guid id)
+        {
+            var result = await _workOrderService.DeleteAsync(id);
+            if (!result.IsSuccess)
+                return result.ErrorCode == "NOT_FOUND" ? NotFound(result) : BadRequest(result);
+
+            return Ok(result);
         }
     }
 }
