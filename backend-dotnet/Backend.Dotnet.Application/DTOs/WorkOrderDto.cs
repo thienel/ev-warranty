@@ -128,5 +128,28 @@ namespace Backend.Dotnet.Application.DTOs
                 UpdatedAt = entity.UpdatedAt
             };
         }
+
+        public static WorkOrderDetailResponse ToDetailResponse(
+    this WorkOrder entity,
+    ClaimInfo claim,
+    TechnicianInfo technician,
+    List<ClaimItem> claimItems)
+        {
+            return new WorkOrderDetailResponse
+            {
+                Id = entity.Id,
+                ClaimId = entity.ClaimId,
+                AssignedTechnicianId = entity.AssignedTechnicianId,
+                Status = entity.Status.ToString(),
+                ScheduledDate = entity.ScheduledDate,
+                CompletedDate = entity.CompletedDate,
+                Note = entity.Note,
+                CreatedAt = entity.CreatedAt,
+                UpdatedAt = entity.UpdatedAt,
+                Claim = claim,
+                Technician = technician,
+                ClaimItems = claimItems
+            };
+        }
     }
 }
