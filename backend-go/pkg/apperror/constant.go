@@ -38,7 +38,6 @@ var (
 
 	ErrInvalidClaimAction       = New(http.StatusConflict, "CLAIM_INVALID_ACTION", "Invalid claim action")
 	ErrMissingInformationClaim  = New(http.StatusBadRequest, "CLAIM_MISSING_INFORMATION", "Claim does not have enough information to submit")
-	ErrInvalidTechnician        = New(http.StatusBadRequest, "CLAIM_INVALID_TECHNICIAN", "Staff and technician must be in the same office")
 	ErrTechnicianWorkloadExceed = New(http.StatusBadRequest, "CLAIM_TECH_WORKLOAD_EXCEED", "This technician has enough workload")
 
 	ErrFailedInitializeCloudinary = New(http.StatusInternalServerError, "CLOUDINARY_FAILED_INITIALIZE", "Failed to initialize Cloudinary")

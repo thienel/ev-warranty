@@ -90,14 +90,20 @@ func (s *claimService) Create(tx application.Tx, cmd *CreateClaimCommand) (*enti
 	if err != nil {
 		return nil, err
 	}
+	if staff.Role != entity.UserRoleScStaff {
+		return nil, apperror.ErrInvalidInput.WithMessage("Only staff can create claim")
+	}
 
 	technician, err := s.userRepo.FindByID(tx.GetCtx(), cmd.TechnicianID)
 	if err != nil {
 		return nil, err
 	}
+	if technician.Role != entity.UserRoleScTechnician {
+		return nil, apperror.ErrInvalidInput.WithMessage("Must assign to technician")
+	}
 
 	if staff.OfficeID != technician.OfficeID {
-		return nil, apperror.ErrInvalidTechnician
+		return nil, apperror.ErrInvalidInput.WithMessage("Staff and technician must be in the same office")
 	}
 
 	count, err := s.claimRepo.CountPendingByTechnician(tx.GetCtx(), cmd.TechnicianID)
