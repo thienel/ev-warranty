@@ -61,5 +61,45 @@ namespace Backend.Dotnet.Application.DTOs
             public DateTime? UpdatedAt { get; set; }
         }
 
+        public class WorkOrderDetailResponse
+        {
+            [JsonPropertyName("id")]
+            public Guid Id { get; set; }
+
+            [JsonPropertyName("claim_id")]
+            public Guid ClaimId { get; set; }
+
+            [JsonPropertyName("assigned_technician_id")]
+            public Guid AssignedTechnicianId { get; set; }
+
+            [JsonPropertyName("status")]
+            public string Status { get; set; }
+
+            [JsonPropertyName("scheduled_date")]
+            public DateTime ScheduledDate { get; set; }
+
+            [JsonPropertyName("completed_date")]
+            public DateTime? CompletedDate { get; set; }
+
+            [JsonPropertyName("note")]
+            public string Note { get; set; }
+
+            [JsonPropertyName("created_at")]
+            public DateTime CreatedAt { get; set; }
+
+            [JsonPropertyName("updated_at")]
+            public DateTime? UpdatedAt { get; set; }
+
+            // External data
+            [JsonPropertyName("claim_info")]
+            public ClaimInfo Claim { get; set; }
+
+            [JsonPropertyName("technician_info")]
+            public TechnicianInfo Technician { get; set; }
+
+            [JsonPropertyName("claim_items")]
+            public List<ClaimItem> ClaimItems { get; set; }
+        }
+
     }
 }
