@@ -166,6 +166,53 @@ namespace Backend.Dotnet.Application.Services
             throw new NotImplementedException();
         }
 
+        public async Task<BaseResponseDto<WorkOrderDetailResponse>> GetDetailByIdAsync(Guid id)
+        {
+            try
+            {
+                var workOrder = await _unitOfWork.WorkOrderRepository.GetByIdAsync(id);
+                if (workOrder == null)
+                {
+                    return new BaseResponseDto<WorkOrderDetailResponse>
+                    {
+                        IsSuccess = false,
+                        Message = $"Work order with ID '{id}' not found",
+                        ErrorCode = "NOT_FOUND"
+                    };
+                }
+
+                // Fetch external data
+                var claim = await _externalServiceClient.GetClaimAsync(workOrder.ClaimId);
+                var technician = await _externalServiceClient.GetTechnicianAsync(workOrder.AssignedTechnicianId);
+                var claimItems = await _externalServiceClient.GetClaimItemsAsync(workOrder.ClaimId);
+
+                return new BaseResponseDto<WorkOrderDetailResponse>
+                {
+                    IsSuccess = true,
+                    Message = "Work order details retrieved successfully",
+                    Data = workOrder.ToDetailResponse(claim, technician, claimItems)
+                };
+            }
+            catch (InvalidOperationException ex)
+            {
+                return new BaseResponseDto<WorkOrderDetailResponse>
+                {
+                    IsSuccess = false,
+                    Message = ex.Message,
+                    ErrorCode = "EXTERNAL_SERVICE_ERROR"
+                };
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponseDto<WorkOrderDetailResponse>
+                {
+                    IsSuccess = false,
+                    Message = "An error occurred while retrieving work order details",
+                    ErrorCode = "INTERNAL_ERROR"
+                };
+            }
+        }
+
         public Task<BaseResponseDto<WorkOrderResponse>> UpdateStatusAsync(Guid id, UpdateStatusRequest request)
         {
             throw new NotImplementedException();

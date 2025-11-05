@@ -22,6 +22,8 @@ namespace Backend.Dotnet.API.Controllers
         }
 
         [HttpGet]
+        [ProducesResponseType(typeof(BaseResponseDto<IEnumerable<WorkOrderResponse>>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(BaseResponseDto), StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> GetAll(
             [FromQuery] Guid? claimId = null,
             [FromQuery] Guid? technicianId = null)
@@ -51,6 +53,19 @@ namespace Backend.Dotnet.API.Controllers
         public async Task<IActionResult> GetById(Guid id)
         {
             var result = await _workOrderService.GetByIdAsync(id);
+            if (!result.IsSuccess)
+                return NotFound(result);
+
+            return Ok(result);
+        }
+
+
+        [HttpGet("{id}/details")]
+        [ProducesResponseType(typeof(BaseResponseDto<WorkOrderDetailResponse>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(BaseResponseDto), StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> GetDetailById(Guid id)
+        {
+            var result = await _workOrderService.GetDetailByIdAsync(id);
             if (!result.IsSuccess)
                 return NotFound(result);
 
