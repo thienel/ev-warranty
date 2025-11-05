@@ -100,15 +100,5 @@ namespace Backend.Dotnet.Infrastructure.External.Clients
                 throw new InvalidOperationException(ex.Message);
             }
         }
-
-        public async Task<bool> ValidateClaimStatusAsync(Guid claimId)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<bool> ValidateTechnicianRoleAsync(Guid technicianId)
-        {
-            throw new NotImplementedException();
-        }
     }
 }

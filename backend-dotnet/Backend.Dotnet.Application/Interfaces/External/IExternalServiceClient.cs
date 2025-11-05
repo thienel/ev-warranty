@@ -14,7 +14,5 @@ namespace Backend.Dotnet.Application.Interfaces.External
         Task<List<ClaimItem>> GetClaimItemsAsync(Guid claimId);
         Task<TechnicianInfo> GetTechnicianAsync(Guid technicianId);
         Task<bool> CompleteClaimAsync(Guid claimId);
-        Task<bool> ValidateClaimStatusAsync(Guid claimId);
-        Task<bool> ValidateTechnicianRoleAsync(Guid technicianId);
     }
 }
