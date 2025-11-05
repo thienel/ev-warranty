@@ -1,12 +1,22 @@
-﻿using System;
+﻿using Backend.Dotnet.Application.DTOs;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static Backend.Dotnet.Application.DTOs.WorkOrderDto;
 
 namespace Backend.Dotnet.Application.Interfaces
 {
     public interface IWorkOrderService
     {
+        Task<BaseResponseDto<WorkOrderResponse>> CreateAsync(CreateWorkOrderRequest request);
+        Task<BaseResponseDto<WorkOrderResponse>> GetByIdAsync(Guid id);
+        Task<BaseResponseDto<WorkOrderResponse>> GetByClaimIdAsync(Guid claimId);
+        Task<BaseResponseDto<IEnumerable<WorkOrderResponse>>> GetByTechnicianIdAsync(Guid technicianId);
+        Task<BaseResponseDto<IEnumerable<WorkOrderResponse>>> GetAllAsync();
+        Task<BaseResponseDto<WorkOrderResponse>> UpdateStatusAsync(Guid id, UpdateStatusRequest request);
+        Task<BaseResponseDto> DeleteAsync(Guid id);
+        //Task<BaseResponseDto<WorkOrderDetailResponse>> GetDetailByIdAsync(Guid id);
     }
 }
