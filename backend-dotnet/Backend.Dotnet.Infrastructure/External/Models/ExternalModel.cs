@@ -92,5 +92,52 @@ namespace Backend.Dotnet.Infrastructure.External.Models
         }
     }
 
-    
+    public static class ExternalToInternalMapper
+    {
+        public static ClaimInfo ToInternal(this ClaimInfoExternal external)
+        {
+            if (external == null) return null;
+
+            return new ClaimInfo
+            {
+                Id = external.Id,
+                VehicleId = external.VehicleId,
+                Status = external.Status,
+                Description = external.Description
+            };
+        }
+
+        public static TechnicianInfo ToInternal(this TechnicianInfoExternal external)
+        {
+            if (external == null) return null;
+
+            return new TechnicianInfo
+            {
+                Id = external.Id,
+                Name = external.Name,
+                Role = external.Role
+            };
+        }
+
+        public static ClaimItem ToInternal(this ClaimItemExternal external)
+        {
+            if (external == null) return null;
+
+            return new ClaimItem
+            {
+                Id = external.Id,
+                IssueDescription = external.IssueDescription,
+                PartCategoryId = external.PartCategoryId,
+                FaultyPartId = external.FaultyPartId,
+                ReplacementPartId = external.ReplacementPartId,
+                Status = external.Status
+            };
+        }
+
+        public static List<ClaimItem> ToInternal(this List<ClaimItemExternal> externals)
+        {
+            if (externals == null) return new();
+            return externals.Select(e => e.ToInternal()).ToList();
+        }
+    }
 }
