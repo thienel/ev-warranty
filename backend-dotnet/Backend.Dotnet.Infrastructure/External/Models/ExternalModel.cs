@@ -56,19 +56,19 @@ namespace Backend.Dotnet.Infrastructure.External.Models
         public class ClaimItemExternal
         {
             [JsonPropertyName("id")]
-            public string Id { get; set; }
+            public Guid Id { get; set; }
 
             [JsonPropertyName("issue_description")]
             public string IssueDescription { get; set; }
 
             [JsonPropertyName("part_category_id")]
-            public string PartCategoryId { get; set; }
+            public Guid PartCategoryId { get; set; }
 
             [JsonPropertyName("faulty_part_id")]
-            public string FaultyPartId { get; set; }
+            public Guid FaultyPartId { get; set; }
 
             [JsonPropertyName("replacement_part_id")]
-            public string ReplacementPartId { get; set; }
+            public Guid ReplacementPartId { get; set; }
 
             [JsonPropertyName("status")]
             public string Status { get; set; }
@@ -85,7 +85,7 @@ namespace Backend.Dotnet.Infrastructure.External.Models
             public Guid Id { get; set; }
 
             [JsonPropertyName("Name")]
-            public Guid Name { get; set; }
+            public string Name { get; set; }
 
             [JsonPropertyName("Role")]
             public string Role { get; set; }
