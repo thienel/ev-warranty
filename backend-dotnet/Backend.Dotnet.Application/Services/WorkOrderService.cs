@@ -4,6 +4,7 @@ using Backend.Dotnet.Application.Interfaces.Data;
 using Backend.Dotnet.Application.Interfaces.External;
 using Backend.Dotnet.Domain.Entities;
 using Backend.Dotnet.Domain.Exceptions;
+using static Backend.Dotnet.Application.DTOs.PartDto;
 using static Backend.Dotnet.Application.DTOs.WorkOrderDto;
 
 namespace Backend.Dotnet.Application.Services
@@ -279,10 +280,20 @@ namespace Backend.Dotnet.Application.Services
                     };
                 }
 
-                workOrder.ChangeStatus(request.Status);
+                if (!Enum.TryParse<WorkOrderStatus>(request.Status, true, out var statusEnum))
+                {
+                    return new BaseResponseDto<WorkOrderResponse>
+                    {
+                        IsSuccess = false,
+                        Message = "Invalid status value. Must be Available, Reserved, Installed, Defective, Obsolete, or Archived",
+                        ErrorCode = "INVALID_STATUS"
+                    };
+                }
+
+                workOrder.ChangeStatus(statusEnum);
 
                 // Complete claim if work order is completed
-                if (request.Status == WorkOrderStatus.Completed)
+                if (request.Status == WorkOrderStatus.Completed.ToString())
                 {
                     await _externalServiceClient.CompleteClaimAsync(workOrder.ClaimId);
                 }

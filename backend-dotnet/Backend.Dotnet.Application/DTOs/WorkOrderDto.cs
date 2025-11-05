@@ -28,8 +28,9 @@ namespace Backend.Dotnet.Application.DTOs
         {
             [JsonPropertyName("status")]
             [Required(ErrorMessage = "Status is required")]
-            [EnumDataType(typeof(WorkOrderStatus))]
-            public WorkOrderStatus Status { get; set; }
+            [RegularExpression("^(Pending|InProgress|Completed)$",
+                ErrorMessage = "Status must be Pending, InProgress, Completed")]
+            public string Status { get; set; }
         }
 
         public class WorkOrderResponse
