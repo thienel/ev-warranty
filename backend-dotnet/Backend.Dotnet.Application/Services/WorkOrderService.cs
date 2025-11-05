@@ -238,7 +238,10 @@ namespace Backend.Dotnet.Application.Services
                 {
                     IsSuccess = true,
                     Message = "Work order details retrieved successfully",
-                    Data = workOrder.ToDetailResponse(claim, technician, claimItems)
+                    Data = workOrder.ToDetailResponse(claim, technician,
+                        claimItems
+                        .Where(ci => ci.Status.ToString() == "APPROVED")
+                        .ToList())
                 };
             }
             catch (InvalidOperationException ex)
