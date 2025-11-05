@@ -7,6 +7,7 @@ using System.Text;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using static Backend.Dotnet.Application.DTOs.IntermediaryDto;
+using static Backend.Dotnet.Application.DTOs.WorkOrderDto;
 
 namespace Backend.Dotnet.Application.DTOs
 {
@@ -100,6 +101,32 @@ namespace Backend.Dotnet.Application.DTOs
             [JsonPropertyName("claim_items")]
             public List<ClaimItem> ClaimItems { get; set; }
         }
+    }
+    public static class WorkOrderMapper
+    {
+        public static WorkOrder ToEntity(this CreateWorkOrderRequest request, DateTime scheduledDate)
+        {
+            return new WorkOrder(
+                request.ClaimId,
+                request.AssignedTechnicianId,
+                scheduledDate
+            );
+        }
 
+        public static WorkOrderResponse ToResponse(this WorkOrder entity)
+        {
+            return new WorkOrderResponse
+            {
+                Id = entity.Id,
+                ClaimId = entity.ClaimId,
+                AssignedTechnicianId = entity.AssignedTechnicianId,
+                Status = entity.Status.ToString(),
+                ScheduledDate = entity.ScheduledDate,
+                CompletedDate = entity.CompletedDate,
+                Note = entity.Note,
+                CreatedAt = entity.CreatedAt,
+                UpdatedAt = entity.UpdatedAt
+            };
+        }
     }
 }
