@@ -7,6 +7,7 @@ namespace Backend.Dotnet.Domain.Entities
     {
         Pending,
         InProgress,
+        ToVerify,
         Completed
     }
     public class WorkOrder : BaseEntity, IStatus<WorkOrderStatus>
@@ -29,19 +30,32 @@ namespace Backend.Dotnet.Domain.Entities
             Status = WorkOrderStatus.Pending;
         }
 
+        public void Completed()
+        {
+            if (Status != WorkOrderStatus.ToVerify)
+                throw new BusinessRuleViolationException("Work order must be verification to completed.");
+
+            CompletedDate = DateTime.UtcNow;
+            Status = WorkOrderStatus.Completed;
+            SetUpdatedAt();
+        }
+
         public void ChangeStatus(WorkOrderStatus newStatus)
         {
             if (Status == WorkOrderStatus.Completed)
                 throw new BusinessRuleViolationException("Cannot change status of completed work order");
-            
-            if (Status == WorkOrderStatus.InProgress && newStatus == WorkOrderStatus.Pending)
-                throw new BusinessRuleViolationException("InProgress work order cannot revert to Pending");
-            
-            if (Status == WorkOrderStatus.Pending && newStatus == WorkOrderStatus.Completed)
-                throw new BusinessRuleViolationException("Must be InProgress before Completed");
 
-            if (newStatus == WorkOrderStatus.Completed)
-                CompletedDate = DateTime.UtcNow;
+            if (Status == WorkOrderStatus.ToVerify && newStatus == WorkOrderStatus.Completed)
+                throw new BusinessRuleViolationException("Action authorize by SC_STAFF only");
+
+            if (Status == WorkOrderStatus.ToVerify && newStatus != WorkOrderStatus.Completed)
+                throw new BusinessRuleViolationException("Work order awaiting verification can only be marked as completed.");
+
+            if (Status == WorkOrderStatus.InProgress && newStatus != WorkOrderStatus.ToVerify)
+                throw new BusinessRuleViolationException("InProgress work order can only be marked as ToVerify.");
+
+            if (Status == WorkOrderStatus.Pending && newStatus != WorkOrderStatus.InProgress)
+                throw new BusinessRuleViolationException("Must be turn to InProgress");
 
             Status = newStatus;
             SetUpdatedAt();
