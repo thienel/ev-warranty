@@ -80,7 +80,7 @@ namespace Backend.Dotnet.Domain.Entities
         {
             if (Status == newStatus)
                 return;
-
+            
             ValidateStatusTransition(Status, newStatus);
             Status = newStatus;
             SetUpdatedAt();

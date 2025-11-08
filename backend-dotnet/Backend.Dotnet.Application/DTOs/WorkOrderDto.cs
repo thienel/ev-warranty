@@ -28,8 +28,8 @@ namespace Backend.Dotnet.Application.DTOs
         {
             [JsonPropertyName("status")]
             [Required(ErrorMessage = "Status is required")]
-            [RegularExpression("^(Pending|InProgress|Completed)$",
-                ErrorMessage = "Status must be Pending, InProgress, Completed")]
+            [RegularExpression("^(Pending|InProgress|ToVerify)$",
+                ErrorMessage = "Status must be Pending, InProgress, ToVerify")]
             public string Status { get; set; }
         }
 
@@ -131,10 +131,10 @@ namespace Backend.Dotnet.Application.DTOs
         }
 
         public static WorkOrderDetailResponse ToDetailResponse(
-    this WorkOrder entity,
-    ClaimInfo claim,
-    TechnicianInfo technician,
-    List<ClaimItem> claimItems)
+            this WorkOrder entity,
+            ClaimInfo claim,
+            TechnicianInfo technician,
+            List<ClaimItem> claimItems)
         {
             return new WorkOrderDetailResponse
             {
