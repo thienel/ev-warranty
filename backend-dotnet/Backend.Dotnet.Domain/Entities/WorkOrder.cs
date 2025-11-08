@@ -45,18 +45,16 @@ namespace Backend.Dotnet.Domain.Entities
             if (Status == WorkOrderStatus.Completed)
                 throw new BusinessRuleViolationException("Cannot change status of completed work order");
 
-            if (Status == WorkOrderStatus.ToVerify && newStatus == WorkOrderStatus.Completed)
-                throw new BusinessRuleViolationException("Action authorize by SC_STAFF only");
+            if (Status == WorkOrderStatus.ToVerify)
+                throw new BusinessRuleViolationException("Work order awaiting verification cannot change status. Must be completed by staff.");
 
-            if (Status == WorkOrderStatus.ToVerify && newStatus != WorkOrderStatus.Completed)
-                throw new BusinessRuleViolationException("Work order awaiting verification can only be marked as completed.");
-
-            if (Status == WorkOrderStatus.InProgress && newStatus != WorkOrderStatus.ToVerify)
-                throw new BusinessRuleViolationException("InProgress work order can only be marked as ToVerify.");
 
             if (Status == WorkOrderStatus.Pending && newStatus != WorkOrderStatus.InProgress)
-                throw new BusinessRuleViolationException("Must be turn to InProgress");
+                throw new BusinessRuleViolationException("Pending work order can only transition to InProgress");
 
+            if (Status == WorkOrderStatus.InProgress && newStatus != WorkOrderStatus.ToVerify)
+                throw new BusinessRuleViolationException("InProgress work order can only transition to ToVerify.");
+            
             Status = newStatus;
             SetUpdatedAt();
         }
