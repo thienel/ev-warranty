@@ -59,10 +59,6 @@ export const claimsApi = {
     return api.post(API_ENDPOINTS.CLAIM_ACTIONS.REVIEW(id))
   },
 
-  requestInfo: (id: string): Promise<void> => {
-    return api.post(API_ENDPOINTS.CLAIM_ACTIONS.REQUEST_INFO(id))
-  },
-
   getHistory: (id: string): Promise<ApiSuccessResponse<ClaimHistory[]>> => {
     return api.get(API_ENDPOINTS.CLAIM_ACTIONS.HISTORY(id))
   },
