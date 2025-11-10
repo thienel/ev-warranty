@@ -2,7 +2,6 @@
 using Backend.Dotnet.Application.DTOs;
 using Backend.Dotnet.Application.Interfaces;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using static Backend.Dotnet.Application.DTOs.WarrantyPolicyDto;
 
@@ -11,7 +10,6 @@ namespace Backend.Dotnet.API.Controllers
     [ApiController]
     [Route("warranty-policies")]
     [Produces("application/json")]
-    [Authorize(Roles = SystemRoles.UserRoleAdmin + "," + SystemRoles.UserRoleEvmStaff)]
     public class WarrantyPoliciesController : ControllerBase
     {
         private readonly IWarrantyPolicyService _warrantyPolicyService;
@@ -74,6 +72,7 @@ namespace Backend.Dotnet.API.Controllers
         [HttpPost]
         [ProducesResponseType(typeof(BaseResponseDto<WarrantyPolicyResponse>), StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(BaseResponseDto), StatusCodes.Status400BadRequest)]
+        [Authorize(Roles = SystemRoles.UserRoleAdmin + "," + SystemRoles.UserRoleEvmStaff)]
         public async Task<IActionResult> Create([FromBody] CreateWarrantyPolicyRequest request)
         {
             if (!ModelState.IsValid)
@@ -90,6 +89,7 @@ namespace Backend.Dotnet.API.Controllers
         [ProducesResponseType(typeof(BaseResponseDto<WarrantyPolicyResponse>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BaseResponseDto), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(BaseResponseDto), StatusCodes.Status404NotFound)]
+        [Authorize(Roles = SystemRoles.UserRoleAdmin + "," + SystemRoles.UserRoleEvmStaff)]
         public async Task<IActionResult> Update(Guid id, [FromBody] UpdateWarrantyPolicyRequest request)
         {
             if (!ModelState.IsValid)
@@ -106,6 +106,7 @@ namespace Backend.Dotnet.API.Controllers
         [ProducesResponseType(typeof(BaseResponseDto<WarrantyPolicyResponse>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BaseResponseDto), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(BaseResponseDto), StatusCodes.Status404NotFound)]
+        [Authorize(Roles = SystemRoles.UserRoleAdmin + "," + SystemRoles.UserRoleEvmStaff)]
         public async Task<IActionResult> ChangeStatus(Guid id, [FromBody] ChangeStatusRequest request)
         {
             if (!ModelState.IsValid)
@@ -122,6 +123,7 @@ namespace Backend.Dotnet.API.Controllers
         [ProducesResponseType(typeof(BaseResponseDto), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BaseResponseDto), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(BaseResponseDto), StatusCodes.Status400BadRequest)]
+        [Authorize(Roles = SystemRoles.UserRoleAdmin + "," + SystemRoles.UserRoleEvmStaff)]
         public async Task<IActionResult> Delete(Guid id)
         {
             var result = await _warrantyPolicyService.DeleteAsync(id);

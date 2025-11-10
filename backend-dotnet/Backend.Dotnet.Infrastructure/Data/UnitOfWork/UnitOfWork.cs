@@ -23,6 +23,7 @@ namespace Backend.Dotnet.Infrastructure.Data.UnitOfWork
         private IPartCategoryRepository? _partCategories;
         private IPartRepository? _parts;
         private IPolicyCoveragePartRepository? _policyCoverageParts;
+        private IWorkOrderRepository? _workOrderRepository;
 
         public UnitOfWork(
             AppDbContext context,
@@ -92,6 +93,15 @@ namespace Backend.Dotnet.Infrastructure.Data.UnitOfWork
             {
                 _policyCoverageParts ??= new PolicyCoveragePartRepository(_context);
                 return _policyCoverageParts;
+            }
+        }
+
+        public IWorkOrderRepository WorkOrderRepository
+        {
+            get
+            {
+                _workOrderRepository ??= new WorkOrderRepository(_context);
+                return _workOrderRepository;
             }
         }
 
