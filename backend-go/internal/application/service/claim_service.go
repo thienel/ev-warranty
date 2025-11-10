@@ -38,6 +38,7 @@ type ClaimService interface {
 
 	UpdateStatus(tx application.Tx, id uuid.UUID, status string, changedBy uuid.UUID) error
 	Submit(tx application.Tx, id uuid.UUID, changedBy uuid.UUID) error
+	DoneReview(tx application.Tx, id uuid.UUID, changedBy uuid.UUID) error
 	Complete(tx application.Tx, id uuid.UUID, changedBy uuid.UUID) error
 
 	GetHistory(ctx context.Context, claimID uuid.UUID) ([]*entity.ClaimHistory, error)
@@ -272,7 +273,7 @@ func (s *claimService) Submit(tx application.Tx, id uuid.UUID, changedBy uuid.UU
 	return nil
 }
 
-func (s *claimService) Complete(tx application.Tx, id uuid.UUID, changedBy uuid.UUID) error {
+func (s *claimService) DoneReview(tx application.Tx, id uuid.UUID, changedBy uuid.UUID) error {
 	claim, err := s.claimRepo.FindByID(tx.GetCtx(), id)
 	if err != nil {
 		return err
@@ -311,6 +312,33 @@ func (s *claimService) Complete(tx application.Tx, id uuid.UUID, changedBy uuid.
 	}
 
 	history := entity.NewClaimHistory(claim.ID, newStatus, changedBy)
+	if err = s.historyRepo.Create(tx, history); err != nil {
+		return err
+	}
+
+	// TODO: create work order
+
+	return nil
+}
+
+func (s *claimService) Complete(tx application.Tx, id uuid.UUID, changedBy uuid.UUID) error {
+	claim, err := s.claimRepo.FindByID(tx.GetCtx(), id)
+	if err != nil {
+		return err
+	}
+
+	if !entity.IsValidClaimStatusTransition(claim.Status, entity.ClaimStatusCompleted) {
+		return apperror.ErrInvalidInput.WithMessage("This action are not allowed")
+	}
+
+	// TODO: check work order
+
+	err = s.claimRepo.UpdateStatus(tx, id, entity.ClaimStatusCompleted)
+	if err != nil {
+		return err
+	}
+
+	history := entity.NewClaimHistory(claim.ID, entity.ClaimStatusCompleted, changedBy)
 	if err = s.historyRepo.Create(tx, history); err != nil {
 		return err
 	}

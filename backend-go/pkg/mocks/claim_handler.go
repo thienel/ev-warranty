@@ -153,6 +153,39 @@ func (_c *ClaimHandler_Delete_Call) RunAndReturn(run func(*gin.Context)) *ClaimH
 	return _c
 }
 
+// DoneReview provides a mock function with given fields: c
+func (_m *ClaimHandler) DoneReview(c *gin.Context) {
+	_m.Called(c)
+}
+
+// ClaimHandler_DoneReview_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'DoneReview'
+type ClaimHandler_DoneReview_Call struct {
+	*mock.Call
+}
+
+// DoneReview is a helper method to define mock.On call
+//   - c *gin.Context
+func (_e *ClaimHandler_Expecter) DoneReview(c interface{}) *ClaimHandler_DoneReview_Call {
+	return &ClaimHandler_DoneReview_Call{Call: _e.mock.On("DoneReview", c)}
+}
+
+func (_c *ClaimHandler_DoneReview_Call) Run(run func(c *gin.Context)) *ClaimHandler_DoneReview_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(*gin.Context))
+	})
+	return _c
+}
+
+func (_c *ClaimHandler_DoneReview_Call) Return() *ClaimHandler_DoneReview_Call {
+	_c.Call.Return()
+	return _c
+}
+
+func (_c *ClaimHandler_DoneReview_Call) RunAndReturn(run func(*gin.Context)) *ClaimHandler_DoneReview_Call {
+	_c.Run(run)
+	return _c
+}
+
 // GetAll provides a mock function with given fields: c
 func (_m *ClaimHandler) GetAll(c *gin.Context) {
 	_m.Called(c)

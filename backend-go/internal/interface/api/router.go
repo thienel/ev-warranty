@@ -73,6 +73,7 @@ func NewRouter(db *database.Database, authHandler handler.AuthHandler,
 		claim.POST("/:id/submit", claimHandler.Submit)
 		claim.POST("/:id/review", claimHandler.Review)
 		claim.POST("/:id/cancel", claimHandler.Cancel)
+		claim.POST("/:id/done-review", claimHandler.DoneReview)
 		claim.POST("/:id/complete", claimHandler.Complete)
 		claim.GET("/:id/history", claimHandler.History)
 	}

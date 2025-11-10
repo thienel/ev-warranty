@@ -1029,7 +1029,7 @@ const docTemplate = `{
                 "tags": [
                     "claims"
                 ],
-                "summary": "Complete a claim",
+                "summary": "DoneReview a claim",
                 "parameters": [
                     {
                         "type": "string",

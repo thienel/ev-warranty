@@ -135,6 +135,54 @@ func (_c *ClaimService_Create_Call) RunAndReturn(run func(application.Tx, *servi
 	return _c
 }
 
+// DoneReview provides a mock function with given fields: tx, id, changedBy
+func (_m *ClaimService) DoneReview(tx application.Tx, id uuid.UUID, changedBy uuid.UUID) error {
+	ret := _m.Called(tx, id, changedBy)
+
+	if len(ret) == 0 {
+		panic("no return value specified for DoneReview")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(application.Tx, uuid.UUID, uuid.UUID) error); ok {
+		r0 = rf(tx, id, changedBy)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// ClaimService_DoneReview_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'DoneReview'
+type ClaimService_DoneReview_Call struct {
+	*mock.Call
+}
+
+// DoneReview is a helper method to define mock.On call
+//   - tx application.Tx
+//   - id uuid.UUID
+//   - changedBy uuid.UUID
+func (_e *ClaimService_Expecter) DoneReview(tx interface{}, id interface{}, changedBy interface{}) *ClaimService_DoneReview_Call {
+	return &ClaimService_DoneReview_Call{Call: _e.mock.On("DoneReview", tx, id, changedBy)}
+}
+
+func (_c *ClaimService_DoneReview_Call) Run(run func(tx application.Tx, id uuid.UUID, changedBy uuid.UUID)) *ClaimService_DoneReview_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(application.Tx), args[1].(uuid.UUID), args[2].(uuid.UUID))
+	})
+	return _c
+}
+
+func (_c *ClaimService_DoneReview_Call) Return(_a0 error) *ClaimService_DoneReview_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *ClaimService_DoneReview_Call) RunAndReturn(run func(application.Tx, uuid.UUID, uuid.UUID) error) *ClaimService_DoneReview_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // GetAll provides a mock function with given fields: ctx
 func (_m *ClaimService) GetAll(ctx context.Context) ([]*entity.Claim, error) {
 	ret := _m.Called(ctx)

@@ -25,6 +25,7 @@ type ClaimHandler interface {
 	Submit(c *gin.Context)
 	Review(c *gin.Context)
 	Cancel(c *gin.Context)
+	DoneReview(c *gin.Context)
 	Complete(c *gin.Context)
 
 	History(c *gin.Context)
@@ -392,6 +393,52 @@ func (h *claimHandler) Cancel(c *gin.Context) {
 	c.Status(http.StatusNoContent)
 }
 
+// DoneReview godoc
+// @Summary Complete a claim
+// @Description Mark a claim as completed (EVM Staff only)
+// @Tags claims
+// @Accept json
+// @Produce json
+// @Security Bearer
+// @Param id path string true "Claim ID"
+// @Success 204 "Claim completed successfully"
+// @Failure 400 {object} dto.APIResponse "Bad request"
+// @Failure 401 {object} dto.APIResponse "Unauthorized"
+// @Failure 403 {object} dto.APIResponse "Forbidden"
+// @Failure 404 {object} dto.APIResponse "Claim not found"
+// @Failure 500 {object} dto.APIResponse "Internal server error"
+// @Router /claims/{id}/complete [post]
+func (h *claimHandler) DoneReview(c *gin.Context) {
+	if err := allowedRoles(c, entity.UserRoleEvmStaff); err != nil {
+		writeErrorResponse(h.log, c, err)
+		return
+	}
+
+	idParam := c.Param("id")
+	id, err := uuid.Parse(idParam)
+	if err != nil {
+		writeErrorResponse(h.log, c, apperror.ErrInvalidParams.WithMessage("Invalid claim ID"))
+		return
+	}
+
+	userID, err := getUserIDFromHeader(c)
+	if err != nil {
+		writeErrorResponse(h.log, c, err)
+		return
+	}
+
+	err = h.txManager.Do(c.Request.Context(), func(tx application.Tx) error {
+		return h.service.DoneReview(tx, id, userID)
+	})
+
+	if err != nil {
+		writeErrorResponse(h.log, c, err)
+		return
+	}
+
+	c.Status(http.StatusNoContent)
+}
+
 // Complete godoc
 // @Summary Complete a claim
 // @Description Mark a claim as completed (EVM Staff only)
@@ -408,7 +455,7 @@ func (h *claimHandler) Cancel(c *gin.Context) {
 // @Failure 500 {object} dto.APIResponse "Internal server error"
 // @Router /claims/{id}/complete [post]
 func (h *claimHandler) Complete(c *gin.Context) {
-	if err := allowedRoles(c, entity.UserRoleEvmStaff); err != nil {
+	if err := allowedRoles(c, entity.UserRoleScStaff); err != nil {
 		writeErrorResponse(h.log, c, err)
 		return
 	}
