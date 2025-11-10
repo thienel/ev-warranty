@@ -16,6 +16,7 @@ import (
 type CreateClaimCommand struct {
 	VehicleID    uuid.UUID
 	CustomerID   uuid.UUID
+	Kilometers   int
 	StaffID      uuid.UUID
 	TechnicianID uuid.UUID
 	OfficeID     uuid.UUID
@@ -114,7 +115,7 @@ func (s *claimService) Create(tx application.Tx, cmd *CreateClaimCommand) (*enti
 		return nil, apperror.ErrTechnicianWorkloadExceed
 	}
 
-	claim := entity.NewClaim(cmd.VehicleID, cmd.CustomerID, cmd.Description, entity.ClaimStatusDraft,
+	claim := entity.NewClaim(cmd.VehicleID, cmd.CustomerID, cmd.Kilometers, cmd.Description,
 		cmd.StaffID, cmd.TechnicianID)
 
 	if err := s.claimRepo.Create(tx, claim); err != nil {

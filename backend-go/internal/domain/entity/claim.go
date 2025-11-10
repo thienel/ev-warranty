@@ -26,10 +26,11 @@ const (
 
 type Claim struct {
 	ID           uuid.UUID       `gorm:"primaryKey;type:uuid;default:uuid_generate_v4()" json:"id"`
-	VehicleID    uuid.UUID       `gorm:"not null;type:uuid" json:"vehicle_id"`
 	CustomerID   uuid.UUID       `gorm:"not null;type:uuid" json:"customer_id"`
+	VehicleID    uuid.UUID       `gorm:"not null;type:uuid" json:"vehicle_id"`
+	Kilometers   int             `gorm:"not null;" json:"kilometers"`
 	Description  string          `gorm:"not null;" json:"description"`
-	Status       string          `gorm:"not null;default:draft" json:"status"`
+	Status       string          `gorm:"not null;default:DRAFT" json:"status"`
 	TotalCost    float64         `json:"total_cost"`
 	StaffID      uuid.UUID       `gorm:"type:uuid" json:"staff_id"`
 	TechnicianID uuid.UUID       `gorm:"type:uuid" json:"technician_id"`
@@ -39,15 +40,14 @@ type Claim struct {
 	DeletedAt    *gorm.DeletedAt `gorm:"index" json:"-"`
 }
 
-func NewClaim(vehicleID, customerID uuid.UUID, description,
-	status string, staffID, technicianID uuid.UUID) *Claim {
+func NewClaim(vehicleID, customerID uuid.UUID, kilometers int, description string, staffID, technicianID uuid.UUID) *Claim {
 
 	return &Claim{
 		ID:           uuid.New(),
-		VehicleID:    vehicleID,
 		CustomerID:   customerID,
+		VehicleID:    vehicleID,
+		Kilometers:   kilometers,
 		Description:  description,
-		Status:       status,
 		StaffID:      staffID,
 		TechnicianID: technicianID,
 	}

@@ -26,7 +26,7 @@ func (_m *ClaimRepository) EXPECT() *ClaimRepository_Expecter {
 	return &ClaimRepository_Expecter{mock: &_m.Mock}
 }
 
-// CountPendingClaimByTechnicianID provides a mock function with given fields: ctx, id
+// CountPendingByTechnician provides a mock function with given fields: ctx, id
 func (_m *ClaimRepository) CountPendingByTechnician(ctx context.Context, id uuid.UUID) (int64, error) {
 	ret := _m.Called(ctx, id)
 
@@ -54,31 +54,31 @@ func (_m *ClaimRepository) CountPendingByTechnician(ctx context.Context, id uuid
 	return r0, r1
 }
 
-// ClaimRepository_CountPendingClaimByTechnicianID_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'CountPendingByTechnician'
-type ClaimRepository_CountPendingClaimByTechnicianID_Call struct {
+// ClaimRepository_CountPendingByTechnician_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'CountPendingByTechnician'
+type ClaimRepository_CountPendingByTechnician_Call struct {
 	*mock.Call
 }
 
-// CountPendingClaimByTechnicianID is a helper method to define mock.On call
+// CountPendingByTechnician is a helper method to define mock.On call
 //   - ctx context.Context
 //   - id uuid.UUID
-func (_e *ClaimRepository_Expecter) CountPendingClaimByTechnicianID(ctx interface{}, id interface{}) *ClaimRepository_CountPendingClaimByTechnicianID_Call {
-	return &ClaimRepository_CountPendingClaimByTechnicianID_Call{Call: _e.mock.On("CountPendingByTechnician", ctx, id)}
+func (_e *ClaimRepository_Expecter) CountPendingByTechnician(ctx interface{}, id interface{}) *ClaimRepository_CountPendingByTechnician_Call {
+	return &ClaimRepository_CountPendingByTechnician_Call{Call: _e.mock.On("CountPendingByTechnician", ctx, id)}
 }
 
-func (_c *ClaimRepository_CountPendingClaimByTechnicianID_Call) Run(run func(ctx context.Context, id uuid.UUID)) *ClaimRepository_CountPendingClaimByTechnicianID_Call {
+func (_c *ClaimRepository_CountPendingByTechnician_Call) Run(run func(ctx context.Context, id uuid.UUID)) *ClaimRepository_CountPendingByTechnician_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		run(args[0].(context.Context), args[1].(uuid.UUID))
 	})
 	return _c
 }
 
-func (_c *ClaimRepository_CountPendingClaimByTechnicianID_Call) Return(_a0 int64, _a1 error) *ClaimRepository_CountPendingClaimByTechnicianID_Call {
+func (_c *ClaimRepository_CountPendingByTechnician_Call) Return(_a0 int64, _a1 error) *ClaimRepository_CountPendingByTechnician_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
-func (_c *ClaimRepository_CountPendingClaimByTechnicianID_Call) RunAndReturn(run func(context.Context, uuid.UUID) (int64, error)) *ClaimRepository_CountPendingClaimByTechnicianID_Call {
+func (_c *ClaimRepository_CountPendingByTechnician_Call) RunAndReturn(run func(context.Context, uuid.UUID) (int64, error)) *ClaimRepository_CountPendingByTechnician_Call {
 	_c.Call.Return(run)
 	return _c
 }

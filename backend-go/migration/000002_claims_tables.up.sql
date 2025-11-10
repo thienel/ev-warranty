@@ -2,8 +2,9 @@ BEGIN;
 
 CREATE TABLE IF NOT EXISTS claims (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    vehicle_id UUID NOT NULL,
     customer_id UUID NOT NULL,
+    vehicle_id UUID NOT NULL,
+    kilometers INT NOT NULL,
     description TEXT NOT NULL,
     status TEXT NOT NULL DEFAULT 'DRAFT',
     total_cost DECIMAL(15, 2) DEFAULT 0,

@@ -190,6 +190,65 @@ func (_c *UserService_GetAll_Call) RunAndReturn(run func(context.Context) ([]*en
 	return _c
 }
 
+// GetAvailableTechnicianByOfficeID provides a mock function with given fields: ctx, officeID
+func (_m *UserService) GetAvailableTechnicianByOfficeID(ctx context.Context, officeID uuid.UUID) ([]*entity.User, error) {
+	ret := _m.Called(ctx, officeID)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetAvailableTechnicianByOfficeID")
+	}
+
+	var r0 []*entity.User
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID) ([]*entity.User, error)); ok {
+		return rf(ctx, officeID)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID) []*entity.User); ok {
+		r0 = rf(ctx, officeID)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]*entity.User)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, uuid.UUID) error); ok {
+		r1 = rf(ctx, officeID)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// UserService_GetAvailableTechnicianByOfficeID_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetAvailableTechnicianByOfficeID'
+type UserService_GetAvailableTechnicianByOfficeID_Call struct {
+	*mock.Call
+}
+
+// GetAvailableTechnicianByOfficeID is a helper method to define mock.On call
+//   - ctx context.Context
+//   - officeID uuid.UUID
+func (_e *UserService_Expecter) GetAvailableTechnicianByOfficeID(ctx interface{}, officeID interface{}) *UserService_GetAvailableTechnicianByOfficeID_Call {
+	return &UserService_GetAvailableTechnicianByOfficeID_Call{Call: _e.mock.On("GetAvailableTechnicianByOfficeID", ctx, officeID)}
+}
+
+func (_c *UserService_GetAvailableTechnicianByOfficeID_Call) Run(run func(ctx context.Context, officeID uuid.UUID)) *UserService_GetAvailableTechnicianByOfficeID_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(uuid.UUID))
+	})
+	return _c
+}
+
+func (_c *UserService_GetAvailableTechnicianByOfficeID_Call) Return(_a0 []*entity.User, _a1 error) *UserService_GetAvailableTechnicianByOfficeID_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *UserService_GetAvailableTechnicianByOfficeID_Call) RunAndReturn(run func(context.Context, uuid.UUID) ([]*entity.User, error)) *UserService_GetAvailableTechnicianByOfficeID_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // GetByID provides a mock function with given fields: ctx, id
 func (_m *UserService) GetByID(ctx context.Context, id uuid.UUID) (*entity.User, error) {
 	ret := _m.Called(ctx, id)

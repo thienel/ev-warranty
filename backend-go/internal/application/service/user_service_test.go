@@ -18,6 +18,7 @@ var _ = Describe("UserService", func() {
 	var (
 		mockUserRepo   *mocks.UserRepository
 		mockOfficeRepo *mocks.OfficeRepository
+		mockClaimRepo  *mocks.ClaimRepository
 		userService    service.UserService
 		ctx            context.Context
 	)
@@ -25,7 +26,8 @@ var _ = Describe("UserService", func() {
 	BeforeEach(func() {
 		mockUserRepo = mocks.NewUserRepository(GinkgoT())
 		mockOfficeRepo = mocks.NewOfficeRepository(GinkgoT())
-		userService = service.NewUserService(mockUserRepo, mockOfficeRepo)
+		mockClaimRepo = mocks.NewClaimRepository(GinkgoT())
+		userService = service.NewUserService(mockUserRepo, mockOfficeRepo, mockClaimRepo)
 		ctx = context.Background()
 	})
 

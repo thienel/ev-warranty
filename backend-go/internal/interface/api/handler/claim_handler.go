@@ -136,8 +136,9 @@ func (h *claimHandler) Create(c *gin.Context) {
 	}
 
 	cmd := &service.CreateClaimCommand{
-		VehicleID:    req.VehicleID,
 		CustomerID:   req.CustomerID,
+		VehicleID:    req.VehicleID,
+		Kilometers:   req.Kilometers,
 		StaffID:      userID,
 		TechnicianID: req.TechnicianID,
 		Description:  req.Description,

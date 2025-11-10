@@ -72,6 +72,7 @@ var _ = Describe("ClaimHandler", func() {
 		userID = uuid.New()
 		claimID = uuid.New()
 		vehicleID := uuid.New()
+		kilometers := 1
 		technicianID := uuid.New()
 		customerID := uuid.New()
 
@@ -86,8 +87,7 @@ var _ = Describe("ClaimHandler", func() {
 			Description: "Updated claim description for warranty issue",
 		}
 
-		sampleClaim = entity.NewClaim(vehicleID, customerID, validCreateReq.Description,
-			entity.ClaimStatusDraft, nil)
+		sampleClaim = entity.NewClaim(vehicleID, customerID, kilometers, validCreateReq.Description, userID, technicianID)
 		sampleClaim.ID = claimID
 	})
 

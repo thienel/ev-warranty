@@ -9,6 +9,7 @@ import (
 type CreateClaimRequest struct {
 	VehicleID    uuid.UUID `json:"vehicle_id" binding:"required"`
 	CustomerID   uuid.UUID `json:"customer_id" binding:"required"`
+	Kilometers   int       `json:"kilometers" binding:"required"`
 	TechnicianID uuid.UUID `json:"technician_id" binding:"required"`
 	Description  string    `json:"description" binding:"required,min=10,max=1000"`
 }
