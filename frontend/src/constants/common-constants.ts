@@ -84,7 +84,7 @@ export const API_ENDPOINTS = {
   CLAIM_ACTIONS: {
     SUBMIT: (id: string) => `/api/v1/claims/${id}/submit`,
     CANCEL: (id: string) => `/api/v1/claims/${id}/cancel`,
-    COMPLETE: (id: string) => `/api/v1/claims/${id}/complete`,
+    DONE_REVIEW: (id: string) => `/api/v1/claims/${id}/done-review`,
     REVIEW: (id: string) => `/api/v1/claims/${id}/review`,
     HISTORY: (id: string) => `/api/v1/claims/${id}/history`,
     ITEMS: (id: string) => `/api/v1/claims/${id}/items`,

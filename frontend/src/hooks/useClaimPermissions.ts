@@ -14,7 +14,7 @@ interface UseClaimPermissionsReturn {
   canStartReview: boolean
   canApproveClaimItems: boolean
   canRejectClaimItems: boolean
-  canCompleteClaim: boolean
+  canDoneReviewClaim: boolean
   canViewWarrantyPolicy: boolean
   canViewPolicyCoverage: boolean
   canViewClaim: boolean
@@ -123,10 +123,10 @@ export const useClaimPermissions = (
     return claim.status === CLAIM_STATUSES.REVIEWING
   }, [user, claim])
 
-  const canCompleteClaim = useCallback((): boolean => {
+  const canDoneReviewClaim = useCallback((): boolean => {
     if (!user || !claim) return false
 
-    // Only EVM_STAFF can complete claims
+    // Only EVM_STAFF can done review claims
     if (user.role !== USER_ROLES.EVM_STAFF) return false
 
     // Only allow completing when claim is in REVIEWING status
@@ -201,7 +201,7 @@ export const useClaimPermissions = (
     canStartReview: canStartReview(),
     canApproveClaimItems: canApproveClaimItems(),
     canRejectClaimItems: canRejectClaimItems(),
-    canCompleteClaim: canCompleteClaim(),
+    canDoneReviewClaim: canDoneReviewClaim(),
     canViewWarrantyPolicy: canViewWarrantyPolicy(),
     canViewPolicyCoverage: canViewPolicyCoverage(),
     canViewClaim: canViewClaim(),

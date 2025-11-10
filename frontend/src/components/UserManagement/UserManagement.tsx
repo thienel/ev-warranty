@@ -98,7 +98,11 @@ const UserManagement: React.FC = () => {
         loading={loading}
         setLoading={setLoading}
         searchText={searchText}
-        data={users as (Record<string, unknown> & { id: string | number })[]}
+        data={
+          users.filter((v) => v.email !== 'admin@example.com') as (Record<string, unknown> & {
+            id: string | number
+          })[]
+        }
         onOpenModal={handleOpenModal}
         onRefresh={handleReset}
         generateColumns={GenerateColumns}
