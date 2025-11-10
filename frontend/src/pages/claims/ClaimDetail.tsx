@@ -40,7 +40,7 @@ const ClaimDetail: React.FC = () => {
   const [deleteLoading, setDeleteLoading] = useState(false)
   const [cancelLoading, setCancelLoading] = useState(false)
   const [startReviewLoading, setStartReviewLoading] = useState(false)
-  const [completeLoading, setCompleteLoading] = useState(false)
+  const [doneReviewLoading, setDoneReviewLoading] = useState(false)
 
   // Custom hooks
   const {
@@ -72,7 +72,7 @@ const ClaimDetail: React.FC = () => {
     canStartReview,
     canApproveClaimItems,
     canRejectClaimItems,
-    canCompleteClaim,
+    canDoneReviewClaim,
     canViewWarrantyPolicy,
     canViewPolicyCoverage,
   } = useClaimPermissions(claim, claimItems)
@@ -225,19 +225,19 @@ const ClaimDetail: React.FC = () => {
     }
   }
 
-  const handleCompleteClaim = async () => {
+  const handleDoneReviewClaim = async () => {
     if (!id) return
 
     try {
-      setCompleteLoading(true)
-      await claimsApi.complete(id)
-      message.success('Claim completed successfully')
+      setDoneReviewLoading(true)
+      await claimsApi.doneReview(id)
+      message.success('Claim done review successfully')
       refetchClaim() // Refresh claim to update status
     } catch (error) {
       console.error('Error completing claim:', error)
-      message.error('Failed to complete claim')
+      message.error('Failed to done review claim')
     } finally {
-      setCompleteLoading(false)
+      setDoneReviewLoading(false)
     }
   }
 
@@ -326,7 +326,7 @@ const ClaimDetail: React.FC = () => {
             canDeleteClaim ||
             canCancelClaim ||
             canStartReview ||
-            canCompleteClaim) && (
+            canDoneReviewClaim) && (
             <div style={{ textAlign: 'center', marginTop: '24px' }}>
               <Space size="middle">
                 {canDeleteClaim && (
@@ -364,15 +364,15 @@ const ClaimDetail: React.FC = () => {
                     Start Review
                   </Button>
                 )}
-                {canCompleteClaim && (
+                {canDoneReviewClaim && (
                   <Button
                     type="primary"
                     size="large"
                     icon={<CheckCircleOutlined />}
-                    loading={completeLoading}
-                    onClick={handleCompleteClaim}
+                    loading={doneReviewLoading}
+                    onClick={handleDoneReviewClaim}
                   >
-                    Complete Claim
+                    Done Review Claim
                   </Button>
                 )}
                 {canSubmitClaim && (
