@@ -285,7 +285,7 @@ namespace Backend.Dotnet.Application.Services
                     return new BaseResponseDto<WorkOrderResponse>
                     {
                         IsSuccess = false,
-                        Message = "Invalid status value. Must be Available, Reserved, Installed, Defective, Obsolete, or Archived",
+                        Message = "Invalid status value. Must be Pending | InProgress | Completed",
                         ErrorCode = "INVALID_STATUS"
                     };
                 }
