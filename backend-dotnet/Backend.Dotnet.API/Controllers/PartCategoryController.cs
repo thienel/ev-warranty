@@ -2,7 +2,6 @@
 using Backend.Dotnet.Application.DTOs;
 using Backend.Dotnet.Application.Interfaces;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using static Backend.Dotnet.Application.DTOs.PartCategoryDto;
 
@@ -11,7 +10,6 @@ namespace Backend.Dotnet.API.Controllers
     [ApiController]
     [Route("part-categories")]
     [Produces("application/json")]
-    [Authorize(Roles = SystemRoles.UserRoleAdmin + "," + SystemRoles.UserRoleEvmStaff)]
     public class PartCategoriesController : ControllerBase
     {
         private readonly IPartCategoryService _partCategoryService;
@@ -81,6 +79,7 @@ namespace Backend.Dotnet.API.Controllers
         [HttpPost]
         [ProducesResponseType(typeof(BaseResponseDto<PartCategoryResponse>), StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(BaseResponseDto), StatusCodes.Status400BadRequest)]
+        [Authorize(Roles = SystemRoles.UserRoleAdmin + "," + SystemRoles.UserRoleEvmStaff)]
         public async Task<IActionResult> Create([FromBody] CreatePartCategoryRequest request)
         {
             if (!ModelState.IsValid)
@@ -97,6 +96,7 @@ namespace Backend.Dotnet.API.Controllers
         [ProducesResponseType(typeof(BaseResponseDto<PartCategoryResponse>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BaseResponseDto), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(BaseResponseDto), StatusCodes.Status404NotFound)]
+        [Authorize(Roles = SystemRoles.UserRoleAdmin + "," + SystemRoles.UserRoleEvmStaff)]
         public async Task<IActionResult> Update(Guid id, [FromBody] UpdatePartCategoryRequest request)
         {
             if (!ModelState.IsValid)
@@ -114,6 +114,7 @@ namespace Backend.Dotnet.API.Controllers
         [ProducesResponseType(typeof(BaseResponseDto), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BaseResponseDto), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(BaseResponseDto), StatusCodes.Status400BadRequest)]
+        [Authorize(Roles = SystemRoles.UserRoleAdmin + "," + SystemRoles.UserRoleEvmStaff)]
         public async Task<IActionResult> Delete(Guid id)
         {
             var result = await _partCategoryService.DeleteAsync(id);

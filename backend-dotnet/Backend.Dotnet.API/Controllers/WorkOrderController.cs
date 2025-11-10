@@ -10,7 +10,6 @@ namespace Backend.Dotnet.API.Controllers
     [ApiController]
     [Route("work-orders")]
     [Produces("application/json")]
-    [Authorize(Roles = SystemRoles.UserRoleScTechnician + "," + SystemRoles.UserRoleScStaff)]
 
     public class WorkOrderController : Controller
     {
@@ -75,7 +74,7 @@ namespace Backend.Dotnet.API.Controllers
         [HttpPost]
         [ProducesResponseType(typeof(BaseResponseDto<WorkOrderResponse>), StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(BaseResponseDto), StatusCodes.Status400BadRequest)]
-        [Authorize(Roles = SystemRoles.UserRoleEvmStaff)]
+        [Authorize(Roles = SystemRoles.UserRoleScStaff +","+ SystemRoles.UserRoleEvmStaff)]
         public async Task<IActionResult> Create([FromBody] CreateWorkOrderRequest request)
         {
             if (!ModelState.IsValid)
@@ -92,6 +91,7 @@ namespace Backend.Dotnet.API.Controllers
         [ProducesResponseType(typeof(BaseResponseDto<WorkOrderResponse>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BaseResponseDto), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(BaseResponseDto), StatusCodes.Status404NotFound)]
+        [Authorize(Roles = SystemRoles.UserRoleScStaff + "," + SystemRoles.UserRoleScTechnician)]
         public async Task<IActionResult> UpdateStatus(Guid id, [FromBody] UpdateStatusRequest request)
         {
             if (!ModelState.IsValid)
@@ -108,6 +108,7 @@ namespace Backend.Dotnet.API.Controllers
         [ProducesResponseType(typeof(BaseResponseDto), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BaseResponseDto), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(BaseResponseDto), StatusCodes.Status400BadRequest)]
+        [Authorize(Roles = SystemRoles.UserRoleScStaff + "," + SystemRoles.UserRoleScTechnician)]
         public async Task<IActionResult> Delete(Guid id)
         {
             var result = await _workOrderService.DeleteAsync(id);
