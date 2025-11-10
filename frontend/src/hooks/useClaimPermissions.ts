@@ -12,7 +12,6 @@ interface UseClaimPermissionsReturn {
   canApproveClaim: boolean
   canRejectClaim: boolean
   canStartReview: boolean
-  canRequestMoreInfo: boolean
   canApproveClaimItems: boolean
   canRejectClaimItems: boolean
   canCompleteClaim: boolean
@@ -36,8 +35,8 @@ export const useClaimPermissions = (
     const allowedRoles = [USER_ROLES.SC_STAFF, USER_ROLES.SC_TECHNICIAN] as const
     if (!allowedRoles.includes(user.role as (typeof allowedRoles)[number])) return false
 
-    // Only allow adding items when claim is in DRAFT or REQUEST_INFO status
-    const allowedStatuses = [CLAIM_STATUSES.DRAFT, CLAIM_STATUSES.REQUEST_INFO] as const
+    // Only allow adding items when claim is in DRAFT status
+    const allowedStatuses = [CLAIM_STATUSES.DRAFT] as const
     return allowedStatuses.includes(claim.status as (typeof allowedStatuses)[number])
   }, [user, claim])
 
@@ -48,8 +47,8 @@ export const useClaimPermissions = (
     const allowedRoles = [USER_ROLES.SC_STAFF, USER_ROLES.SC_TECHNICIAN] as const
     if (!allowedRoles.includes(user.role as (typeof allowedRoles)[number])) return false
 
-    // Only allow editing when claim is in DRAFT or REQUEST_INFO status
-    const allowedStatuses = [CLAIM_STATUSES.DRAFT, CLAIM_STATUSES.REQUEST_INFO] as const
+    // Only allow editing when claim is in DRAFT status
+    const allowedStatuses = [CLAIM_STATUSES.DRAFT] as const
     return allowedStatuses.includes(claim.status as (typeof allowedStatuses)[number])
   }, [user, claim])
 
@@ -69,8 +68,8 @@ export const useClaimPermissions = (
     // Only SC_STAFF can cancel claims
     if (user.role !== USER_ROLES.SC_STAFF) return false
 
-    // Only allow canceling when claim is in SUBMITTED or REQUEST_INFO status
-    const allowedStatuses = [CLAIM_STATUSES.SUBMITTED, CLAIM_STATUSES.REQUEST_INFO] as const
+    // Only allow canceling when claim is in SUBMITTED status
+    const allowedStatuses = [CLAIM_STATUSES.SUBMITTED] as const
     return allowedStatuses.includes(claim.status as (typeof allowedStatuses)[number])
   }, [user, claim])
 
@@ -103,27 +102,6 @@ export const useClaimPermissions = (
     // Only allow starting review when claim is in SUBMITTED status
     return claim.status === CLAIM_STATUSES.SUBMITTED
   }, [user, claim])
-
-  const canRequestMoreInfo = useCallback((): boolean => {
-    if (!user || !claim) return false
-
-    // Only EVM_STAFF can request more info
-    if (user.role !== USER_ROLES.EVM_STAFF) return false
-
-    // Only allow requesting more info when claim is in REVIEWING status
-    if (claim.status !== CLAIM_STATUSES.REVIEWING) return false
-
-    // Don't allow requesting more info if all claim items have been processed
-    if (claimItems.length > 0) {
-      const allItemsProcessed = claimItems.every(
-        (item) => item.status === 'APPROVED' || item.status === 'REJECTED',
-      )
-
-      if (allItemsProcessed) return false
-    }
-
-    return true
-  }, [user, claim, claimItems])
 
   const canApproveClaimItems = useCallback((): boolean => {
     if (!user || !claim) return false
@@ -197,8 +175,8 @@ export const useClaimPermissions = (
     // Only SC_TECHNICIAN can add attachments
     if (user.role !== USER_ROLES.SC_TECHNICIAN) return false
 
-    // Only allow adding attachments when claim is in DRAFT or REQUEST_INFO status
-    const allowedStatuses = [CLAIM_STATUSES.DRAFT, CLAIM_STATUSES.REQUEST_INFO] as const
+    // Only allow adding attachments when claim is in DRAFT status
+    const allowedStatuses = [CLAIM_STATUSES.DRAFT] as const
     return allowedStatuses.includes(claim.status as (typeof allowedStatuses)[number])
   }, [user, claim])
 
@@ -208,8 +186,8 @@ export const useClaimPermissions = (
     // Only SC_STAFF can submit claims
     if (user.role !== USER_ROLES.SC_STAFF) return false
 
-    // Only allow submitting when claim is in DRAFT or REQUEST_INFO status
-    const allowedStatuses = [CLAIM_STATUSES.DRAFT, CLAIM_STATUSES.REQUEST_INFO] as const
+    // Only allow submitting when claim is in DRAFT status
+    const allowedStatuses = [CLAIM_STATUSES.DRAFT] as const
     return allowedStatuses.includes(claim.status as (typeof allowedStatuses)[number])
   }, [user, claim])
 
@@ -221,7 +199,6 @@ export const useClaimPermissions = (
     canApproveClaim: canApproveClaim(),
     canRejectClaim: canRejectClaim(),
     canStartReview: canStartReview(),
-    canRequestMoreInfo: canRequestMoreInfo(),
     canApproveClaimItems: canApproveClaimItems(),
     canRejectClaimItems: canRejectClaimItems(),
     canCompleteClaim: canCompleteClaim(),

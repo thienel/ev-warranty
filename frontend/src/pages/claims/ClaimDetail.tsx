@@ -7,7 +7,6 @@ import {
   DeleteOutlined,
   StopOutlined,
   PlayCircleOutlined,
-  QuestionCircleOutlined,
   CheckCircleOutlined,
 } from '@ant-design/icons'
 import AppLayout from '@components/Layout/Layout'
@@ -41,7 +40,6 @@ const ClaimDetail: React.FC = () => {
   const [deleteLoading, setDeleteLoading] = useState(false)
   const [cancelLoading, setCancelLoading] = useState(false)
   const [startReviewLoading, setStartReviewLoading] = useState(false)
-  const [requestInfoLoading, setRequestInfoLoading] = useState(false)
   const [completeLoading, setCompleteLoading] = useState(false)
 
   // Custom hooks
@@ -72,7 +70,6 @@ const ClaimDetail: React.FC = () => {
     canDeleteClaim,
     canCancelClaim,
     canStartReview,
-    canRequestMoreInfo,
     canApproveClaimItems,
     canRejectClaimItems,
     canCompleteClaim,
@@ -197,22 +194,6 @@ const ClaimDetail: React.FC = () => {
       message.error('Failed to start review')
     } finally {
       setStartReviewLoading(false)
-    }
-  }
-
-  const handleRequestMoreInfo = async () => {
-    if (!id) return
-
-    try {
-      setRequestInfoLoading(true)
-      await claimsApi.requestInfo(id)
-      message.success('More information requested successfully')
-      refetchClaim() // Refresh claim to update status
-    } catch (error) {
-      console.error('Error requesting more info:', error)
-      message.error('Failed to request more information')
-    } finally {
-      setRequestInfoLoading(false)
     }
   }
 
@@ -345,7 +326,6 @@ const ClaimDetail: React.FC = () => {
             canDeleteClaim ||
             canCancelClaim ||
             canStartReview ||
-            canRequestMoreInfo ||
             canCompleteClaim) && (
             <div style={{ textAlign: 'center', marginTop: '24px' }}>
               <Space size="middle">
@@ -371,17 +351,6 @@ const ClaimDetail: React.FC = () => {
                     onClick={handleCancelClaim}
                   >
                     Cancel Claim
-                  </Button>
-                )}
-                {canRequestMoreInfo && (
-                  <Button
-                    type="default"
-                    size="large"
-                    icon={<QuestionCircleOutlined />}
-                    loading={requestInfoLoading}
-                    onClick={handleRequestMoreInfo}
-                  >
-                    Request More Info
                   </Button>
                 )}
                 {canStartReview && (
