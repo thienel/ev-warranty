@@ -4,7 +4,6 @@ using Backend.Dotnet.Application.Interfaces.Data;
 using Backend.Dotnet.Application.Interfaces.External;
 using Backend.Dotnet.Domain.Entities;
 using Backend.Dotnet.Domain.Exceptions;
-using static Backend.Dotnet.Application.DTOs.PartDto;
 using static Backend.Dotnet.Application.DTOs.WorkOrderDto;
 
 namespace Backend.Dotnet.Application.Services
@@ -285,18 +284,12 @@ namespace Backend.Dotnet.Application.Services
                     return new BaseResponseDto<WorkOrderResponse>
                     {
                         IsSuccess = false,
-                        Message = "Invalid status value. Must be Pending | InProgress | Completed",
+                        Message = "Invalid status value. Must be Pending | InProgress | ToVerify | Completed",
                         ErrorCode = "INVALID_STATUS"
                     };
                 }
 
                 workOrder.ChangeStatus(statusEnum);
-
-                // Complete claim if work order is completed
-                if (request.Status == WorkOrderStatus.Completed.ToString())
-                {
-                    await _externalServiceClient.CompleteClaimAsync(workOrder.ClaimId);
-                }
 
                 _unitOfWork.WorkOrderRepository.Update(workOrder);
                 await _unitOfWork.SaveChangesAsync();
@@ -367,6 +360,64 @@ namespace Backend.Dotnet.Application.Services
                 {
                     IsSuccess = false,
                     Message = "An error occurred while deleting work order",
+                    ErrorCode = "INTERNAL_ERROR"
+                };
+            }
+        }
+
+        public async Task<BaseResponseDto<WorkOrderResponse>> CompleteAsync(Guid id)
+        {
+            try
+            {
+                var workOrder = await _unitOfWork.WorkOrderRepository.GetByIdAsync(id);
+                if (workOrder == null)
+                {
+                    return new BaseResponseDto<WorkOrderResponse>
+                    {
+                        IsSuccess = false,
+                        Message = $"Work order with ID {id} not found",
+                        ErrorCode = "NOT_FOUND"
+                    };
+                }
+
+                workOrder.Completed();
+                await _externalServiceClient.CompleteClaimAsync(workOrder.ClaimId);
+
+                _unitOfWork.WorkOrderRepository.Update(workOrder);
+                await _unitOfWork.SaveChangesAsync();
+
+                return new BaseResponseDto<WorkOrderResponse>
+                {
+                    IsSuccess = true,
+                    Message = "Work order completed successfully",
+                    Data = workOrder.ToResponse()
+                };
+
+            }
+            catch (BusinessRuleViolationException ex)
+            {
+                return new BaseResponseDto<WorkOrderResponse>
+                {
+                    IsSuccess = false,
+                    Message = ex.Message,
+                    ErrorCode = ex.ErrorCode
+                };
+            }
+            catch (InvalidOperationException ex)
+            {
+                return new BaseResponseDto<WorkOrderResponse>
+                {
+                    IsSuccess = false,
+                    Message = ex.Message,
+                    ErrorCode = "EXTERNAL_SERVICE_ERROR"
+                };
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponseDto<WorkOrderResponse>
+                {
+                    IsSuccess = false,
+                    Message = "An error occurred while completing work order",
                     ErrorCode = "INTERNAL_ERROR"
                 };
             }
