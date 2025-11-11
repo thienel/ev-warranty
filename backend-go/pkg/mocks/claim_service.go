@@ -6,11 +6,11 @@ import (
 	context "context"
 	application "ev-warranty-go/internal/application"
 
-	entities "ev-warranty-go/internal/domain/entities"
+	entity "ev-warranty-go/internal/domain/entity"
 
 	mock "github.com/stretchr/testify/mock"
 
-	services "ev-warranty-go/internal/application/services"
+	service "ev-warranty-go/internal/application/service"
 
 	uuid "github.com/google/uuid"
 )
@@ -77,27 +77,27 @@ func (_c *ClaimService_Complete_Call) RunAndReturn(run func(application.Tx, uuid
 }
 
 // Create provides a mock function with given fields: tx, cmd
-func (_m *ClaimService) Create(tx application.Tx, cmd *services.CreateClaimCommand) (*entities.Claim, error) {
+func (_m *ClaimService) Create(tx application.Tx, cmd *service.CreateClaimCommand) (*entity.Claim, error) {
 	ret := _m.Called(tx, cmd)
 
 	if len(ret) == 0 {
 		panic("no return value specified for Create")
 	}
 
-	var r0 *entities.Claim
+	var r0 *entity.Claim
 	var r1 error
-	if rf, ok := ret.Get(0).(func(application.Tx, *services.CreateClaimCommand) (*entities.Claim, error)); ok {
+	if rf, ok := ret.Get(0).(func(application.Tx, *service.CreateClaimCommand) (*entity.Claim, error)); ok {
 		return rf(tx, cmd)
 	}
-	if rf, ok := ret.Get(0).(func(application.Tx, *services.CreateClaimCommand) *entities.Claim); ok {
+	if rf, ok := ret.Get(0).(func(application.Tx, *service.CreateClaimCommand) *entity.Claim); ok {
 		r0 = rf(tx, cmd)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*entities.Claim)
+			r0 = ret.Get(0).(*entity.Claim)
 		}
 	}
 
-	if rf, ok := ret.Get(1).(func(application.Tx, *services.CreateClaimCommand) error); ok {
+	if rf, ok := ret.Get(1).(func(application.Tx, *service.CreateClaimCommand) error); ok {
 		r1 = rf(tx, cmd)
 	} else {
 		r1 = ret.Error(1)
@@ -113,46 +113,94 @@ type ClaimService_Create_Call struct {
 
 // Create is a helper method to define mock.On call
 //   - tx application.Tx
-//   - cmd *services.CreateClaimCommand
+//   - cmd *service.CreateClaimCommand
 func (_e *ClaimService_Expecter) Create(tx interface{}, cmd interface{}) *ClaimService_Create_Call {
 	return &ClaimService_Create_Call{Call: _e.mock.On("Create", tx, cmd)}
 }
 
-func (_c *ClaimService_Create_Call) Run(run func(tx application.Tx, cmd *services.CreateClaimCommand)) *ClaimService_Create_Call {
+func (_c *ClaimService_Create_Call) Run(run func(tx application.Tx, cmd *service.CreateClaimCommand)) *ClaimService_Create_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(application.Tx), args[1].(*services.CreateClaimCommand))
+		run(args[0].(application.Tx), args[1].(*service.CreateClaimCommand))
 	})
 	return _c
 }
 
-func (_c *ClaimService_Create_Call) Return(_a0 *entities.Claim, _a1 error) *ClaimService_Create_Call {
+func (_c *ClaimService_Create_Call) Return(_a0 *entity.Claim, _a1 error) *ClaimService_Create_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
-func (_c *ClaimService_Create_Call) RunAndReturn(run func(application.Tx, *services.CreateClaimCommand) (*entities.Claim, error)) *ClaimService_Create_Call {
+func (_c *ClaimService_Create_Call) RunAndReturn(run func(application.Tx, *service.CreateClaimCommand) (*entity.Claim, error)) *ClaimService_Create_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// DoneReview provides a mock function with given fields: tx, id, changedBy
+func (_m *ClaimService) DoneReview(tx application.Tx, id uuid.UUID, changedBy uuid.UUID) error {
+	ret := _m.Called(tx, id, changedBy)
+
+	if len(ret) == 0 {
+		panic("no return value specified for DoneReview")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(application.Tx, uuid.UUID, uuid.UUID) error); ok {
+		r0 = rf(tx, id, changedBy)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// ClaimService_DoneReview_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'DoneReview'
+type ClaimService_DoneReview_Call struct {
+	*mock.Call
+}
+
+// DoneReview is a helper method to define mock.On call
+//   - tx application.Tx
+//   - id uuid.UUID
+//   - changedBy uuid.UUID
+func (_e *ClaimService_Expecter) DoneReview(tx interface{}, id interface{}, changedBy interface{}) *ClaimService_DoneReview_Call {
+	return &ClaimService_DoneReview_Call{Call: _e.mock.On("DoneReview", tx, id, changedBy)}
+}
+
+func (_c *ClaimService_DoneReview_Call) Run(run func(tx application.Tx, id uuid.UUID, changedBy uuid.UUID)) *ClaimService_DoneReview_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(application.Tx), args[1].(uuid.UUID), args[2].(uuid.UUID))
+	})
+	return _c
+}
+
+func (_c *ClaimService_DoneReview_Call) Return(_a0 error) *ClaimService_DoneReview_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *ClaimService_DoneReview_Call) RunAndReturn(run func(application.Tx, uuid.UUID, uuid.UUID) error) *ClaimService_DoneReview_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
 // GetAll provides a mock function with given fields: ctx
-func (_m *ClaimService) GetAll(ctx context.Context) ([]*entities.Claim, error) {
+func (_m *ClaimService) GetAll(ctx context.Context) ([]*entity.Claim, error) {
 	ret := _m.Called(ctx)
 
 	if len(ret) == 0 {
 		panic("no return value specified for GetAll")
 	}
 
-	var r0 []*entities.Claim
+	var r0 []*entity.Claim
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context) ([]*entities.Claim, error)); ok {
+	if rf, ok := ret.Get(0).(func(context.Context) ([]*entity.Claim, error)); ok {
 		return rf(ctx)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context) []*entities.Claim); ok {
+	if rf, ok := ret.Get(0).(func(context.Context) []*entity.Claim); ok {
 		r0 = rf(ctx)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).([]*entities.Claim)
+			r0 = ret.Get(0).([]*entity.Claim)
 		}
 	}
 
@@ -183,34 +231,34 @@ func (_c *ClaimService_GetAll_Call) Run(run func(ctx context.Context)) *ClaimSer
 	return _c
 }
 
-func (_c *ClaimService_GetAll_Call) Return(_a0 []*entities.Claim, _a1 error) *ClaimService_GetAll_Call {
+func (_c *ClaimService_GetAll_Call) Return(_a0 []*entity.Claim, _a1 error) *ClaimService_GetAll_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
-func (_c *ClaimService_GetAll_Call) RunAndReturn(run func(context.Context) ([]*entities.Claim, error)) *ClaimService_GetAll_Call {
+func (_c *ClaimService_GetAll_Call) RunAndReturn(run func(context.Context) ([]*entity.Claim, error)) *ClaimService_GetAll_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
 // GetByID provides a mock function with given fields: ctx, id
-func (_m *ClaimService) GetByID(ctx context.Context, id uuid.UUID) (*entities.Claim, error) {
+func (_m *ClaimService) GetByID(ctx context.Context, id uuid.UUID) (*entity.Claim, error) {
 	ret := _m.Called(ctx, id)
 
 	if len(ret) == 0 {
 		panic("no return value specified for GetByID")
 	}
 
-	var r0 *entities.Claim
+	var r0 *entity.Claim
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID) (*entities.Claim, error)); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID) (*entity.Claim, error)); ok {
 		return rf(ctx, id)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID) *entities.Claim); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID) *entity.Claim); ok {
 		r0 = rf(ctx, id)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*entities.Claim)
+			r0 = ret.Get(0).(*entity.Claim)
 		}
 	}
 
@@ -242,34 +290,34 @@ func (_c *ClaimService_GetByID_Call) Run(run func(ctx context.Context, id uuid.U
 	return _c
 }
 
-func (_c *ClaimService_GetByID_Call) Return(_a0 *entities.Claim, _a1 error) *ClaimService_GetByID_Call {
+func (_c *ClaimService_GetByID_Call) Return(_a0 *entity.Claim, _a1 error) *ClaimService_GetByID_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
-func (_c *ClaimService_GetByID_Call) RunAndReturn(run func(context.Context, uuid.UUID) (*entities.Claim, error)) *ClaimService_GetByID_Call {
+func (_c *ClaimService_GetByID_Call) RunAndReturn(run func(context.Context, uuid.UUID) (*entity.Claim, error)) *ClaimService_GetByID_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
 // GetHistory provides a mock function with given fields: ctx, claimID
-func (_m *ClaimService) GetHistory(ctx context.Context, claimID uuid.UUID) ([]*entities.ClaimHistory, error) {
+func (_m *ClaimService) GetHistory(ctx context.Context, claimID uuid.UUID) ([]*entity.ClaimHistory, error) {
 	ret := _m.Called(ctx, claimID)
 
 	if len(ret) == 0 {
 		panic("no return value specified for GetHistory")
 	}
 
-	var r0 []*entities.ClaimHistory
+	var r0 []*entity.ClaimHistory
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID) ([]*entities.ClaimHistory, error)); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID) ([]*entity.ClaimHistory, error)); ok {
 		return rf(ctx, claimID)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID) []*entities.ClaimHistory); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID) []*entity.ClaimHistory); ok {
 		r0 = rf(ctx, claimID)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).([]*entities.ClaimHistory)
+			r0 = ret.Get(0).([]*entity.ClaimHistory)
 		}
 	}
 
@@ -301,12 +349,12 @@ func (_c *ClaimService_GetHistory_Call) Run(run func(ctx context.Context, claimI
 	return _c
 }
 
-func (_c *ClaimService_GetHistory_Call) Return(_a0 []*entities.ClaimHistory, _a1 error) *ClaimService_GetHistory_Call {
+func (_c *ClaimService_GetHistory_Call) Return(_a0 []*entity.ClaimHistory, _a1 error) *ClaimService_GetHistory_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
-func (_c *ClaimService_GetHistory_Call) RunAndReturn(run func(context.Context, uuid.UUID) ([]*entities.ClaimHistory, error)) *ClaimService_GetHistory_Call {
+func (_c *ClaimService_GetHistory_Call) RunAndReturn(run func(context.Context, uuid.UUID) ([]*entity.ClaimHistory, error)) *ClaimService_GetHistory_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -454,7 +502,7 @@ func (_c *ClaimService_Submit_Call) RunAndReturn(run func(application.Tx, uuid.U
 }
 
 // Update provides a mock function with given fields: tx, id, cmd
-func (_m *ClaimService) Update(tx application.Tx, id uuid.UUID, cmd *services.UpdateClaimCommand) error {
+func (_m *ClaimService) Update(tx application.Tx, id uuid.UUID, cmd *service.UpdateClaimCommand) error {
 	ret := _m.Called(tx, id, cmd)
 
 	if len(ret) == 0 {
@@ -462,7 +510,7 @@ func (_m *ClaimService) Update(tx application.Tx, id uuid.UUID, cmd *services.Up
 	}
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(application.Tx, uuid.UUID, *services.UpdateClaimCommand) error); ok {
+	if rf, ok := ret.Get(0).(func(application.Tx, uuid.UUID, *service.UpdateClaimCommand) error); ok {
 		r0 = rf(tx, id, cmd)
 	} else {
 		r0 = ret.Error(0)
@@ -479,14 +527,14 @@ type ClaimService_Update_Call struct {
 // Update is a helper method to define mock.On call
 //   - tx application.Tx
 //   - id uuid.UUID
-//   - cmd *services.UpdateClaimCommand
+//   - cmd *service.UpdateClaimCommand
 func (_e *ClaimService_Expecter) Update(tx interface{}, id interface{}, cmd interface{}) *ClaimService_Update_Call {
 	return &ClaimService_Update_Call{Call: _e.mock.On("Update", tx, id, cmd)}
 }
 
-func (_c *ClaimService_Update_Call) Run(run func(tx application.Tx, id uuid.UUID, cmd *services.UpdateClaimCommand)) *ClaimService_Update_Call {
+func (_c *ClaimService_Update_Call) Run(run func(tx application.Tx, id uuid.UUID, cmd *service.UpdateClaimCommand)) *ClaimService_Update_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(application.Tx), args[1].(uuid.UUID), args[2].(*services.UpdateClaimCommand))
+		run(args[0].(application.Tx), args[1].(uuid.UUID), args[2].(*service.UpdateClaimCommand))
 	})
 	return _c
 }
@@ -496,7 +544,7 @@ func (_c *ClaimService_Update_Call) Return(_a0 error) *ClaimService_Update_Call 
 	return _c
 }
 
-func (_c *ClaimService_Update_Call) RunAndReturn(run func(application.Tx, uuid.UUID, *services.UpdateClaimCommand) error) *ClaimService_Update_Call {
+func (_c *ClaimService_Update_Call) RunAndReturn(run func(application.Tx, uuid.UUID, *service.UpdateClaimCommand) error) *ClaimService_Update_Call {
 	_c.Call.Return(run)
 	return _c
 }

@@ -4,7 +4,7 @@ package mocks
 
 import (
 	context "context"
-	entities "ev-warranty-go/internal/domain/entities"
+	entity "ev-warranty-go/internal/domain/entity"
 
 	mock "github.com/stretchr/testify/mock"
 )
@@ -23,7 +23,7 @@ func (_m *RefreshTokenRepository) EXPECT() *RefreshTokenRepository_Expecter {
 }
 
 // Create provides a mock function with given fields: ctx, token
-func (_m *RefreshTokenRepository) Create(ctx context.Context, token *entities.RefreshToken) error {
+func (_m *RefreshTokenRepository) Create(ctx context.Context, token *entity.RefreshToken) error {
 	ret := _m.Called(ctx, token)
 
 	if len(ret) == 0 {
@@ -31,7 +31,7 @@ func (_m *RefreshTokenRepository) Create(ctx context.Context, token *entities.Re
 	}
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(context.Context, *entities.RefreshToken) error); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, *entity.RefreshToken) error); ok {
 		r0 = rf(ctx, token)
 	} else {
 		r0 = ret.Error(0)
@@ -47,14 +47,14 @@ type RefreshTokenRepository_Create_Call struct {
 
 // Create is a helper method to define mock.On call
 //   - ctx context.Context
-//   - token *entities.RefreshToken
+//   - token *entity.RefreshToken
 func (_e *RefreshTokenRepository_Expecter) Create(ctx interface{}, token interface{}) *RefreshTokenRepository_Create_Call {
 	return &RefreshTokenRepository_Create_Call{Call: _e.mock.On("Create", ctx, token)}
 }
 
-func (_c *RefreshTokenRepository_Create_Call) Run(run func(ctx context.Context, token *entities.RefreshToken)) *RefreshTokenRepository_Create_Call {
+func (_c *RefreshTokenRepository_Create_Call) Run(run func(ctx context.Context, token *entity.RefreshToken)) *RefreshTokenRepository_Create_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(*entities.RefreshToken))
+		run(args[0].(context.Context), args[1].(*entity.RefreshToken))
 	})
 	return _c
 }
@@ -64,29 +64,29 @@ func (_c *RefreshTokenRepository_Create_Call) Return(_a0 error) *RefreshTokenRep
 	return _c
 }
 
-func (_c *RefreshTokenRepository_Create_Call) RunAndReturn(run func(context.Context, *entities.RefreshToken) error) *RefreshTokenRepository_Create_Call {
+func (_c *RefreshTokenRepository_Create_Call) RunAndReturn(run func(context.Context, *entity.RefreshToken) error) *RefreshTokenRepository_Create_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
 // Find provides a mock function with given fields: ctx, tokenStr
-func (_m *RefreshTokenRepository) Find(ctx context.Context, tokenStr string) (*entities.RefreshToken, error) {
+func (_m *RefreshTokenRepository) Find(ctx context.Context, tokenStr string) (*entity.RefreshToken, error) {
 	ret := _m.Called(ctx, tokenStr)
 
 	if len(ret) == 0 {
 		panic("no return value specified for Find")
 	}
 
-	var r0 *entities.RefreshToken
+	var r0 *entity.RefreshToken
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, string) (*entities.RefreshToken, error)); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, string) (*entity.RefreshToken, error)); ok {
 		return rf(ctx, tokenStr)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, string) *entities.RefreshToken); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, string) *entity.RefreshToken); ok {
 		r0 = rf(ctx, tokenStr)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*entities.RefreshToken)
+			r0 = ret.Get(0).(*entity.RefreshToken)
 		}
 	}
 
@@ -118,12 +118,12 @@ func (_c *RefreshTokenRepository_Find_Call) Run(run func(ctx context.Context, to
 	return _c
 }
 
-func (_c *RefreshTokenRepository_Find_Call) Return(_a0 *entities.RefreshToken, _a1 error) *RefreshTokenRepository_Find_Call {
+func (_c *RefreshTokenRepository_Find_Call) Return(_a0 *entity.RefreshToken, _a1 error) *RefreshTokenRepository_Find_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
-func (_c *RefreshTokenRepository_Find_Call) RunAndReturn(run func(context.Context, string) (*entities.RefreshToken, error)) *RefreshTokenRepository_Find_Call {
+func (_c *RefreshTokenRepository_Find_Call) RunAndReturn(run func(context.Context, string) (*entity.RefreshToken, error)) *RefreshTokenRepository_Find_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -176,7 +176,7 @@ func (_c *RefreshTokenRepository_Revoke_Call) RunAndReturn(run func(context.Cont
 }
 
 // Update provides a mock function with given fields: ctx, token
-func (_m *RefreshTokenRepository) Update(ctx context.Context, token *entities.RefreshToken) error {
+func (_m *RefreshTokenRepository) Update(ctx context.Context, token *entity.RefreshToken) error {
 	ret := _m.Called(ctx, token)
 
 	if len(ret) == 0 {
@@ -184,7 +184,7 @@ func (_m *RefreshTokenRepository) Update(ctx context.Context, token *entities.Re
 	}
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(context.Context, *entities.RefreshToken) error); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, *entity.RefreshToken) error); ok {
 		r0 = rf(ctx, token)
 	} else {
 		r0 = ret.Error(0)
@@ -200,14 +200,14 @@ type RefreshTokenRepository_Update_Call struct {
 
 // Update is a helper method to define mock.On call
 //   - ctx context.Context
-//   - token *entities.RefreshToken
+//   - token *entity.RefreshToken
 func (_e *RefreshTokenRepository_Expecter) Update(ctx interface{}, token interface{}) *RefreshTokenRepository_Update_Call {
 	return &RefreshTokenRepository_Update_Call{Call: _e.mock.On("Update", ctx, token)}
 }
 
-func (_c *RefreshTokenRepository_Update_Call) Run(run func(ctx context.Context, token *entities.RefreshToken)) *RefreshTokenRepository_Update_Call {
+func (_c *RefreshTokenRepository_Update_Call) Run(run func(ctx context.Context, token *entity.RefreshToken)) *RefreshTokenRepository_Update_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(*entities.RefreshToken))
+		run(args[0].(context.Context), args[1].(*entity.RefreshToken))
 	})
 	return _c
 }
@@ -217,7 +217,7 @@ func (_c *RefreshTokenRepository_Update_Call) Return(_a0 error) *RefreshTokenRep
 	return _c
 }
 
-func (_c *RefreshTokenRepository_Update_Call) RunAndReturn(run func(context.Context, *entities.RefreshToken) error) *RefreshTokenRepository_Update_Call {
+func (_c *RefreshTokenRepository_Update_Call) RunAndReturn(run func(context.Context, *entity.RefreshToken) error) *RefreshTokenRepository_Update_Call {
 	_c.Call.Return(run)
 	return _c
 }

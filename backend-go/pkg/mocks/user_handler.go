@@ -120,6 +120,39 @@ func (_c *UserHandler_GetAll_Call) RunAndReturn(run func(*gin.Context)) *UserHan
 	return _c
 }
 
+// GetAvailableTechnician provides a mock function with given fields: c
+func (_m *UserHandler) GetAvailableTechnician(c *gin.Context) {
+	_m.Called(c)
+}
+
+// UserHandler_GetAvailableTechnician_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetAvailableTechnician'
+type UserHandler_GetAvailableTechnician_Call struct {
+	*mock.Call
+}
+
+// GetAvailableTechnician is a helper method to define mock.On call
+//   - c *gin.Context
+func (_e *UserHandler_Expecter) GetAvailableTechnician(c interface{}) *UserHandler_GetAvailableTechnician_Call {
+	return &UserHandler_GetAvailableTechnician_Call{Call: _e.mock.On("GetAvailableTechnician", c)}
+}
+
+func (_c *UserHandler_GetAvailableTechnician_Call) Run(run func(c *gin.Context)) *UserHandler_GetAvailableTechnician_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(*gin.Context))
+	})
+	return _c
+}
+
+func (_c *UserHandler_GetAvailableTechnician_Call) Return() *UserHandler_GetAvailableTechnician_Call {
+	_c.Call.Return()
+	return _c
+}
+
+func (_c *UserHandler_GetAvailableTechnician_Call) RunAndReturn(run func(*gin.Context)) *UserHandler_GetAvailableTechnician_Call {
+	_c.Run(run)
+	return _c
+}
+
 // GetByID provides a mock function with given fields: c
 func (_m *UserHandler) GetByID(c *gin.Context) {
 	_m.Called(c)

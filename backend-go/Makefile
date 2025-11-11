@@ -20,26 +20,26 @@ db/psql:
 .PHONY: db/migrations/new
 db/migrations/new:
 	@echo 'Creating migration files for ${name}'
-	migrate create -seq -ext .sql -dir ./migrations ${name}
+	migrate create -seq -ext .sql -dir ./migration ${name}
 
 .PHONY: db/migrations/up
 db/migrations/up: confirm
 	@echo 'running up migrations...'
-	migrate -path ./migrations -database ${DATABASE_URL} up
+	migrate -path ./migration -database ${DATABASE_URL} up
 
 .PHONY: db/migrations/down
 db/migrations/down: confirm
 	@echo 'running down migrations...'
-	migrate -path ./migrations -database ${DATABASE_URL} down
+	migrate -path ./migration -database ${DATABASE_URL} down
 
 .PHONY: db/migrations/force
 db/migrations/force: confirm
 	@echo 'forcing migration version to ${version}...'
-	migrate -path ./migrations -database ${DATABASE_URL} force ${version}
+	migrate -path ./migration -database ${DATABASE_URL} force ${version}
 
 .PHONY: db/migrations/version
 db/migrations/version:
-	migrate -path ./migrations -database ${DATABASE_URL} version
+	migrate -path ./migration -database ${DATABASE_URL} version
 
 .PHONY: audit
 audit:

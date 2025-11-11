@@ -1,0 +1,1081 @@
+package service_test
+
+import (
+	"context"
+	"errors"
+	"ev-warranty-go/pkg/apperror"
+
+	"github.com/google/uuid"
+	. "github.com/onsi/ginkgo/v2"
+	. "github.com/onsi/gomega"
+	"github.com/stretchr/testify/mock"
+
+	"ev-warranty-go/internal/application/service"
+	"ev-warranty-go/internal/domain/entity"
+	"ev-warranty-go/pkg/mocks"
+)
+
+var _ = Describe("ClaimService", func() {
+	var (
+		mockLogger     *mocks.Logger
+		mockClaimRepo  *mocks.ClaimRepository
+		mockUserRepo   *mocks.UserRepository
+		mockItemRepo   *mocks.ClaimItemRepository
+		mockAttachRepo *mocks.ClaimAttachmentRepository
+		mockHistRepo   *mocks.ClaimHistoryRepository
+		mockCloudServ  *mocks.CloudinaryService
+		mockTx         *mocks.Tx
+		claimService   service.ClaimService
+		ctx            context.Context
+	)
+
+	BeforeEach(func() {
+		mockLogger = mocks.NewLogger(GinkgoT())
+		mockClaimRepo = mocks.NewClaimRepository(GinkgoT())
+		mockUserRepo = mocks.NewUserRepository(GinkgoT())
+		mockItemRepo = mocks.NewClaimItemRepository(GinkgoT())
+		mockAttachRepo = mocks.NewClaimAttachmentRepository(GinkgoT())
+		mockHistRepo = mocks.NewClaimHistoryRepository(GinkgoT())
+		mockCloudServ = mocks.NewCloudinaryService(GinkgoT())
+		mockTx = mocks.NewTx(GinkgoT())
+		claimService = service.NewClaimService(mockLogger, mockClaimRepo, mockUserRepo, mockItemRepo, mockAttachRepo,
+			mockHistRepo, mockCloudServ)
+		ctx = context.Background()
+	})
+
+	Describe("GetByID", func() {
+		var claimID uuid.UUID
+
+		BeforeEach(func() {
+			claimID = uuid.New()
+		})
+
+		Context("when claim is found", func() {
+			It("should return the claim", func() {
+				expectedClaim := &entity.Claim{
+					ID:          claimID,
+					VehicleID:   uuid.New(),
+					CustomerID:  uuid.New(),
+					Description: "Test claim",
+					Status:      entity.ClaimStatusDraft,
+				}
+
+				mockClaimRepo.EXPECT().FindByID(ctx, claimID).Return(expectedClaim, nil).Once()
+
+				claim, err := claimService.GetByID(ctx, claimID)
+
+				Expect(err).NotTo(HaveOccurred())
+				Expect(claim).NotTo(BeNil())
+				Expect(claim.ID).To(Equal(expectedClaim.ID))
+				Expect(claim.Description).To(Equal(expectedClaim.Description))
+			})
+		})
+
+		Context("when claim is not found", func() {
+			It("should return ClaimNotFound error", func() {
+				notFoundErr := apperror.ErrNotFoundError
+				mockClaimRepo.EXPECT().FindByID(ctx, claimID).Return(nil, notFoundErr).Once()
+
+				claim, err := claimService.GetByID(ctx, claimID)
+
+				Expect(claim).To(BeNil())
+				ExpectAppError(err, apperror.ErrNotFoundError.ErrorCode)
+			})
+		})
+	})
+
+	Describe("GetAll", func() {
+		Context("when claims are found", func() {
+			It("should return all claims", func() {
+				expectedClaims := []*entity.Claim{
+					{ID: uuid.New(), Status: entity.ClaimStatusDraft},
+					{ID: uuid.New(), Status: entity.ClaimStatusSubmitted},
+				}
+
+				mockClaimRepo.EXPECT().FindAll(ctx).Return(expectedClaims, nil).Once()
+
+				claims, err := claimService.GetAll(ctx)
+
+				Expect(err).NotTo(HaveOccurred())
+				Expect(claims).NotTo(BeNil())
+				Expect(claims).To(HaveLen(2))
+			})
+		})
+
+		Context("when no claims are found", func() {
+			It("should return empty slice", func() {
+				mockClaimRepo.EXPECT().FindAll(ctx).Return([]*entity.Claim{}, nil).Once()
+
+				claims, err := claimService.GetAll(ctx)
+
+				Expect(err).NotTo(HaveOccurred())
+				Expect(claims).To(BeEmpty())
+			})
+		})
+
+		Context("when repository returns error", func() {
+			It("should return the error", func() {
+				dbErr := apperror.ErrDBOperation
+
+				mockClaimRepo.EXPECT().FindAll(ctx).Return(nil, dbErr).Once()
+
+				claims, err := claimService.GetAll(ctx)
+
+				Expect(err).To(HaveOccurred())
+				Expect(claims).To(BeNil())
+				Expect(err).To(Equal(dbErr))
+			})
+		})
+	})
+
+	Describe("Create", func() {
+		var cmd *service.CreateClaimCommand
+
+		BeforeEach(func() {
+			cmd = &service.CreateClaimCommand{
+				VehicleID:    uuid.New(),
+				CustomerID:   uuid.New(),
+				StaffID:      uuid.New(),
+				TechnicianID: uuid.New(),
+				OfficeID:     uuid.New(),
+				Description:  "Test claim",
+			}
+			mockTx.EXPECT().GetCtx().Return(ctx).Maybe()
+		})
+
+		Context("when claim is created successfully", func() {
+			It("should create claim and history", func() {
+				mockClaimRepo.EXPECT().Create(mockTx, mock.MatchedBy(func(c *entity.Claim) bool {
+					return c.VehicleID == cmd.VehicleID &&
+						c.CustomerID == cmd.CustomerID &&
+						c.Description == cmd.Description &&
+						c.Status == entity.ClaimStatusDraft
+				})).Return(nil).Once()
+
+				mockHistRepo.EXPECT().Create(mockTx, mock.MatchedBy(func(h *entity.ClaimHistory) bool {
+					return h.Status == entity.ClaimStatusDraft &&
+						h.ChangedBy == cmd.StaffID
+				})).Return(nil).Once()
+
+				claim, err := claimService.Create(mockTx, cmd)
+
+				Expect(err).NotTo(HaveOccurred())
+				Expect(claim).NotTo(BeNil())
+				Expect(claim.VehicleID).To(Equal(cmd.VehicleID))
+				Expect(claim.CustomerID).To(Equal(cmd.CustomerID))
+				Expect(claim.Status).To(Equal(entity.ClaimStatusDraft))
+			})
+		})
+
+		Context("when claim repository fails", func() {
+			It("should return error", func() {
+				dbErr := apperror.ErrDBOperation
+				mockClaimRepo.EXPECT().Create(mockTx, mock.AnythingOfType("*entity.Claim")).Return(dbErr).Once()
+
+				claim, err := claimService.Create(mockTx, cmd)
+
+				Expect(err).To(HaveOccurred())
+				Expect(claim).To(BeNil())
+				Expect(err).To(Equal(dbErr))
+			})
+		})
+
+		Context("when history creation fails", func() {
+			It("should return error", func() {
+				dbErr := apperror.ErrDBOperation
+				mockClaimRepo.EXPECT().Create(mockTx, mock.AnythingOfType("*entity.Claim")).Return(nil).Once()
+				mockHistRepo.EXPECT().Create(mockTx, mock.AnythingOfType("*entity.ClaimHistory")).Return(dbErr).Once()
+
+				claim, err := claimService.Create(mockTx, cmd)
+
+				Expect(err).To(HaveOccurred())
+				Expect(claim).To(BeNil())
+				Expect(err).To(Equal(dbErr))
+			})
+		})
+	})
+
+	Describe("Update", func() {
+		var (
+			claimID uuid.UUID
+			cmd     *service.UpdateClaimCommand
+		)
+
+		BeforeEach(func() {
+			claimID = uuid.New()
+			cmd = &service.UpdateClaimCommand{
+				Description: "Updated description",
+			}
+			mockTx.EXPECT().GetCtx().Return(ctx).Maybe()
+		})
+
+		Context("when claim is updated successfully", func() {
+			It("should update claim description", func() {
+				claim := &entity.Claim{
+					ID:     claimID,
+					Status: entity.ClaimStatusDraft,
+				}
+
+				mockClaimRepo.EXPECT().FindByID(ctx, claimID).Return(claim, nil).Once()
+				mockClaimRepo.EXPECT().Update(mockTx, mock.MatchedBy(func(c *entity.Claim) bool {
+					return c.ID == claimID && c.Description == cmd.Description
+				})).Return(nil).Once()
+
+				err := claimService.Update(mockTx, claimID, cmd)
+
+				Expect(err).NotTo(HaveOccurred())
+			})
+		})
+
+		Context("when claim status is not draft or request_info", func() {
+			It("should return NotAllowUpdateClaim error", func() {
+				claim := &entity.Claim{
+					ID:     claimID,
+					Status: entity.ClaimStatusSubmitted,
+				}
+
+				mockClaimRepo.EXPECT().FindByID(ctx, claimID).Return(claim, nil).Once()
+
+				err := claimService.Update(mockTx, claimID, cmd)
+
+				ExpectAppError(err, apperror.ErrInvalidClaimAction.ErrorCode)
+			})
+		})
+
+		Context("when claim is not found", func() {
+			It("should return ClaimNotFound error", func() {
+				notFoundErr := apperror.ErrNotFoundError
+				mockClaimRepo.EXPECT().FindByID(ctx, claimID).Return(nil, notFoundErr).Once()
+
+				err := claimService.Update(mockTx, claimID, cmd)
+
+				Expect(err).To(HaveOccurred())
+				Expect(err).To(Equal(notFoundErr))
+			})
+		})
+
+		Context("when repository update fails", func() {
+			It("should return the error", func() {
+				claim := &entity.Claim{
+					ID:     claimID,
+					Status: entity.ClaimStatusDraft,
+				}
+				dbErr := apperror.ErrDBOperation
+
+				mockClaimRepo.EXPECT().FindByID(ctx, claimID).Return(claim, nil).Once()
+				mockClaimRepo.EXPECT().Update(mockTx, mock.AnythingOfType("*entity.Claim")).Return(dbErr).Once()
+
+				err := claimService.Update(mockTx, claimID, cmd)
+
+				Expect(err).To(HaveOccurred())
+				Expect(err).To(Equal(dbErr))
+			})
+		})
+	})
+
+	Describe("HardDelete", func() {
+		var claimID uuid.UUID
+
+		BeforeEach(func() {
+			claimID = uuid.New()
+			mockTx.EXPECT().GetCtx().Return(ctx).Maybe()
+		})
+
+		Context("when claim is deleted successfully", func() {
+			It("should delete claim and cloud files", func() {
+				claim := &entity.Claim{
+					ID:     claimID,
+					Status: entity.ClaimStatusDraft,
+				}
+				attachments := []*entity.ClaimAttachment{
+					{ID: uuid.New(), URL: "https://example.com/file1.jpg"},
+					{ID: uuid.New(), URL: "https://example.com/file2.jpg"},
+				}
+
+				mockClaimRepo.EXPECT().FindByID(ctx, claimID).Return(claim, nil).Once()
+				mockAttachRepo.EXPECT().FindByClaimID(ctx, claimID).Return(attachments, nil).Once()
+				mockClaimRepo.EXPECT().HardDelete(mockTx, claimID).Return(nil).Once()
+				mockCloudServ.EXPECT().DeleteFileByURL(mock.Anything, mock.Anything).Return(nil).Maybe()
+				mockLogger.EXPECT().Error(mock.Anything, mock.Anything, mock.Anything).Maybe()
+
+				err := claimService.HardDelete(mockTx, claimID)
+
+				Expect(err).NotTo(HaveOccurred())
+			})
+		})
+
+		Context("when claim status is not draft", func() {
+			It("should return NotAllowDeleteClaim error", func() {
+				claim := &entity.Claim{
+					ID:     claimID,
+					Status: entity.ClaimStatusSubmitted,
+				}
+
+				mockClaimRepo.EXPECT().FindByID(ctx, claimID).Return(claim, nil).Once()
+
+				err := claimService.HardDelete(mockTx, claimID)
+
+				ExpectAppError(err, apperror.ErrInvalidClaimAction.ErrorCode)
+			})
+		})
+
+		Context("when claim is not found", func() {
+			It("should return ClaimNotFound error", func() {
+				notFoundErr := apperror.ErrNotFoundError
+				mockClaimRepo.EXPECT().FindByID(ctx, claimID).Return(nil, notFoundErr).Once()
+
+				err := claimService.HardDelete(mockTx, claimID)
+
+				Expect(err).To(HaveOccurred())
+				Expect(err).To(Equal(notFoundErr))
+			})
+		})
+
+		Context("when finding attachments fails", func() {
+			It("should return the error", func() {
+				claim := &entity.Claim{
+					ID:     claimID,
+					Status: entity.ClaimStatusDraft,
+				}
+				dbErr := apperror.ErrDBOperation
+
+				mockClaimRepo.EXPECT().FindByID(ctx, claimID).Return(claim, nil).Once()
+				mockAttachRepo.EXPECT().FindByClaimID(ctx, claimID).Return(nil, dbErr).Once()
+
+				err := claimService.HardDelete(mockTx, claimID)
+
+				Expect(err).To(HaveOccurred())
+				Expect(err).To(Equal(dbErr))
+			})
+		})
+
+		Context("when hard delete fails", func() {
+			It("should return the error", func() {
+				claim := &entity.Claim{
+					ID:     claimID,
+					Status: entity.ClaimStatusDraft,
+				}
+				dbErr := apperror.ErrDBOperation
+
+				mockClaimRepo.EXPECT().FindByID(ctx, claimID).Return(claim, nil).Once()
+				mockAttachRepo.EXPECT().FindByClaimID(ctx, claimID).Return([]*entity.ClaimAttachment{}, nil).Once()
+				mockClaimRepo.EXPECT().HardDelete(mockTx, claimID).Return(dbErr).Once()
+
+				err := claimService.HardDelete(mockTx, claimID)
+
+				Expect(err).To(HaveOccurred())
+				Expect(err).To(Equal(dbErr))
+			})
+		})
+
+		Context("when cloud claimService delete fails", func() {
+			It("should log the error", func() {
+				claim := &entity.Claim{
+					ID:     claimID,
+					Status: entity.ClaimStatusDraft,
+				}
+				attachments := []*entity.ClaimAttachment{
+					{ID: uuid.New(), URL: "https://example.com/file1.jpg"},
+					{ID: uuid.New(), URL: "https://example.com/file2.jpg"},
+				}
+
+				mockClaimRepo.EXPECT().FindByID(ctx, claimID).Return(claim, nil).Once()
+				mockAttachRepo.EXPECT().FindByClaimID(ctx, claimID).Return(attachments, nil).Once()
+				mockClaimRepo.EXPECT().HardDelete(mockTx, claimID).Return(nil).Once()
+				mockCloudServ.EXPECT().DeleteFileByURL(ctx, attachments[0].URL).Return(errors.New("cloud error")).Once()
+				mockCloudServ.EXPECT().DeleteFileByURL(ctx, attachments[1].URL).Return(errors.New("cloud error")).Once()
+				mockLogger.EXPECT().Error(mock.Anything, mock.Anything, mock.Anything).Return().Times(2)
+
+				err := claimService.HardDelete(mockTx, claimID)
+
+				Expect(err).NotTo(HaveOccurred())
+			})
+		})
+	})
+
+	Describe("SoftDelete", func() {
+		var claimID uuid.UUID
+
+		BeforeEach(func() {
+			claimID = uuid.New()
+			mockTx.EXPECT().GetCtx().Return(ctx).Maybe()
+		})
+
+		Context("when claim is soft deleted successfully", func() {
+			It("should soft delete claim and related records", func() {
+				claim := &entity.Claim{
+					ID:     claimID,
+					Status: entity.ClaimStatusCancelled,
+				}
+
+				mockClaimRepo.EXPECT().FindByID(ctx, claimID).Return(claim, nil).Once()
+				mockClaimRepo.EXPECT().SoftDelete(mockTx, claimID).Return(nil).Once()
+				mockItemRepo.EXPECT().SoftDeleteByClaimID(mockTx, claimID).Return(nil).Once()
+				mockAttachRepo.EXPECT().SoftDeleteByClaimID(mockTx, claimID).Return(nil).Once()
+				mockHistRepo.EXPECT().SoftDeleteByClaimID(mockTx, claimID).Return(nil).Once()
+
+				err := claimService.SoftDelete(mockTx, claimID)
+
+				Expect(err).NotTo(HaveOccurred())
+			})
+		})
+
+		Context("when claim status is not cancelled", func() {
+			It("should return NotAllowDeleteClaim error", func() {
+				claim := &entity.Claim{
+					ID:     claimID,
+					Status: entity.ClaimStatusDraft,
+				}
+
+				mockClaimRepo.EXPECT().FindByID(ctx, claimID).Return(claim, nil).Once()
+
+				err := claimService.SoftDelete(mockTx, claimID)
+
+				ExpectAppError(err, apperror.ErrInvalidClaimAction.ErrorCode)
+			})
+		})
+
+		Context("when claim is not found", func() {
+			It("should return ClaimNotFound error", func() {
+				notFoundErr := apperror.ErrNotFoundError
+				mockClaimRepo.EXPECT().FindByID(ctx, claimID).Return(nil, notFoundErr).Once()
+
+				err := claimService.SoftDelete(mockTx, claimID)
+
+				Expect(err).To(HaveOccurred())
+				Expect(err).To(Equal(notFoundErr))
+			})
+		})
+
+		Context("when soft deleting claim fails", func() {
+			It("should return the error", func() {
+				claim := &entity.Claim{
+					ID:     claimID,
+					Status: entity.ClaimStatusCancelled,
+				}
+				dbErr := apperror.ErrDBOperation
+
+				mockClaimRepo.EXPECT().FindByID(ctx, claimID).Return(claim, nil).Once()
+				mockClaimRepo.EXPECT().SoftDelete(mockTx, claimID).Return(dbErr).Once()
+
+				err := claimService.SoftDelete(mockTx, claimID)
+
+				Expect(err).To(HaveOccurred())
+				Expect(err).To(Equal(dbErr))
+			})
+		})
+
+		Context("when soft deleting items fails", func() {
+			It("should return the error", func() {
+				claim := &entity.Claim{
+					ID:     claimID,
+					Status: entity.ClaimStatusCancelled,
+				}
+				dbErr := apperror.ErrDBOperation
+
+				mockClaimRepo.EXPECT().FindByID(ctx, claimID).Return(claim, nil).Once()
+				mockClaimRepo.EXPECT().SoftDelete(mockTx, claimID).Return(nil).Once()
+				mockItemRepo.EXPECT().SoftDeleteByClaimID(mockTx, claimID).Return(dbErr).Once()
+
+				err := claimService.SoftDelete(mockTx, claimID)
+
+				Expect(err).To(HaveOccurred())
+				Expect(err).To(Equal(dbErr))
+			})
+		})
+
+		Context("when soft deleting attachments fails", func() {
+			It("should return the error", func() {
+				claim := &entity.Claim{
+					ID:     claimID,
+					Status: entity.ClaimStatusCancelled,
+				}
+				dbErr := apperror.ErrDBOperation
+
+				mockClaimRepo.EXPECT().FindByID(ctx, claimID).Return(claim, nil).Once()
+				mockClaimRepo.EXPECT().SoftDelete(mockTx, claimID).Return(nil).Once()
+				mockItemRepo.EXPECT().SoftDeleteByClaimID(mockTx, claimID).Return(nil).Once()
+				mockAttachRepo.EXPECT().SoftDeleteByClaimID(mockTx, claimID).Return(dbErr).Once()
+
+				err := claimService.SoftDelete(mockTx, claimID)
+
+				Expect(err).To(HaveOccurred())
+				Expect(err).To(Equal(dbErr))
+			})
+		})
+
+		Context("when soft deleting history fails", func() {
+			It("should return the error", func() {
+				claim := &entity.Claim{
+					ID:     claimID,
+					Status: entity.ClaimStatusCancelled,
+				}
+				dbErr := apperror.ErrDBOperation
+
+				mockClaimRepo.EXPECT().FindByID(ctx, claimID).Return(claim, nil).Once()
+				mockClaimRepo.EXPECT().SoftDelete(mockTx, claimID).Return(nil).Once()
+				mockItemRepo.EXPECT().SoftDeleteByClaimID(mockTx, claimID).Return(nil).Once()
+				mockAttachRepo.EXPECT().SoftDeleteByClaimID(mockTx, claimID).Return(nil).Once()
+				mockHistRepo.EXPECT().SoftDeleteByClaimID(mockTx, claimID).Return(dbErr).Once()
+
+				err := claimService.SoftDelete(mockTx, claimID)
+
+				Expect(err).To(HaveOccurred())
+				Expect(err).To(Equal(dbErr))
+			})
+		})
+	})
+
+	Describe("UpdateStatus", func() {
+		var (
+			claimID   uuid.UUID
+			changedBy uuid.UUID
+		)
+
+		BeforeEach(func() {
+			claimID = uuid.New()
+			changedBy = uuid.New()
+			mockTx.EXPECT().GetCtx().Return(ctx).Maybe()
+		})
+
+		Context("when status is updated successfully", func() {
+			It("should update status and create history", func() {
+				claim := &entity.Claim{
+					ID:     claimID,
+					Status: entity.ClaimStatusDraft,
+				}
+
+				mockClaimRepo.EXPECT().FindByID(ctx, claimID).Return(claim, nil).Once()
+				mockClaimRepo.EXPECT().UpdateStatus(mockTx, claimID, entity.ClaimStatusSubmitted).Return(nil).Once()
+				mockHistRepo.EXPECT().Create(mockTx, mock.MatchedBy(func(h *entity.ClaimHistory) bool {
+					return h.ClaimID == claimID &&
+						h.Status == entity.ClaimStatusSubmitted &&
+						h.ChangedBy == changedBy
+				})).Return(nil).Once()
+
+				err := claimService.UpdateStatus(mockTx, claimID, entity.ClaimStatusSubmitted, changedBy)
+
+				Expect(err).NotTo(HaveOccurred())
+			})
+		})
+
+		Context("when status is invalid", func() {
+			It("should return InvalidClaimStatus error", func() {
+				err := claimService.UpdateStatus(mockTx, claimID, "INVALID_STATUS", changedBy)
+
+				ExpectAppError(err, apperror.ErrInvalidInput.ErrorCode)
+			})
+		})
+
+		Context("when status transition is invalid", func() {
+			It("should return InvalidClaimAction error", func() {
+				claim := &entity.Claim{
+					ID:     claimID,
+					Status: entity.ClaimStatusApproved,
+				}
+
+				mockClaimRepo.EXPECT().FindByID(ctx, claimID).Return(claim, nil).Once()
+
+				err := claimService.UpdateStatus(mockTx, claimID, entity.ClaimStatusDraft, changedBy)
+
+				ExpectAppError(err, apperror.ErrInvalidClaimAction.ErrorCode)
+			})
+		})
+
+		Context("when claim is not found", func() {
+			It("should return ClaimNotFound error", func() {
+				notFoundErr := apperror.ErrNotFoundError
+				mockClaimRepo.EXPECT().FindByID(ctx, claimID).Return(nil, notFoundErr).Once()
+
+				err := claimService.UpdateStatus(mockTx, claimID, entity.ClaimStatusSubmitted, changedBy)
+
+				Expect(err).To(HaveOccurred())
+				Expect(err).To(Equal(notFoundErr))
+			})
+		})
+
+		Context("when updating status fails", func() {
+			It("should return the error", func() {
+				claim := &entity.Claim{
+					ID:     claimID,
+					Status: entity.ClaimStatusDraft,
+				}
+				dbErr := apperror.ErrDBOperation
+
+				mockClaimRepo.EXPECT().FindByID(ctx, claimID).Return(claim, nil).Once()
+				mockClaimRepo.EXPECT().UpdateStatus(mockTx, claimID, entity.ClaimStatusSubmitted).Return(dbErr).Once()
+
+				err := claimService.UpdateStatus(mockTx, claimID, entity.ClaimStatusSubmitted, changedBy)
+
+				Expect(err).To(HaveOccurred())
+				Expect(err).To(Equal(dbErr))
+			})
+		})
+
+		Context("when creating history fails", func() {
+			It("should return the error", func() {
+				claim := &entity.Claim{
+					ID:     claimID,
+					Status: entity.ClaimStatusDraft,
+				}
+				dbErr := apperror.ErrDBOperation
+
+				mockClaimRepo.EXPECT().FindByID(ctx, claimID).Return(claim, nil).Once()
+				mockClaimRepo.EXPECT().UpdateStatus(mockTx, claimID, entity.ClaimStatusSubmitted).Return(nil).Once()
+				mockHistRepo.EXPECT().Create(mockTx, mock.AnythingOfType("*entity.ClaimHistory")).Return(dbErr).Once()
+
+				err := claimService.UpdateStatus(mockTx, claimID, entity.ClaimStatusSubmitted, changedBy)
+
+				Expect(err).To(HaveOccurred())
+				Expect(err).To(Equal(dbErr))
+			})
+		})
+	})
+
+	Describe("Submit", func() {
+		var (
+			claimID   uuid.UUID
+			changedBy uuid.UUID
+		)
+
+		BeforeEach(func() {
+			claimID = uuid.New()
+			changedBy = uuid.New()
+			mockTx.EXPECT().GetCtx().Return(ctx).Maybe()
+		})
+
+		Context("when claim is submitted successfully", func() {
+			It("should update status to submitted", func() {
+				claim := &entity.Claim{
+					ID:     claimID,
+					Status: entity.ClaimStatusDraft,
+				}
+				items := []*entity.ClaimItem{
+					{ID: uuid.New(), ClaimID: claimID},
+				}
+				attachments := []*entity.ClaimAttachment{
+					{ID: uuid.New(), ClaimID: claimID},
+					{ID: uuid.New(), ClaimID: claimID},
+					{ID: uuid.New(), ClaimID: claimID},
+				}
+
+				mockClaimRepo.EXPECT().FindByID(ctx, claimID).Return(claim, nil).Once()
+				mockItemRepo.EXPECT().FindByClaimID(ctx, claimID).Return(items, nil).Once()
+				mockAttachRepo.EXPECT().FindByClaimID(ctx, claimID).Return(attachments, nil).Once()
+				mockClaimRepo.EXPECT().UpdateStatus(mockTx, claimID, entity.ClaimStatusSubmitted).Return(nil).Once()
+				mockHistRepo.EXPECT().Create(mockTx, mock.AnythingOfType("*entity.ClaimHistory")).Return(nil).Once()
+
+				err := claimService.Submit(mockTx, claimID, changedBy)
+
+				Expect(err).NotTo(HaveOccurred())
+			})
+		})
+
+		Context("when claim has insufficient items", func() {
+			It("should return MissingInformationClaim error", func() {
+				claim := &entity.Claim{
+					ID:     claimID,
+					Status: entity.ClaimStatusDraft,
+				}
+				attachments := []*entity.ClaimAttachment{
+					{ID: uuid.New(), ClaimID: claimID},
+				}
+
+				mockClaimRepo.EXPECT().FindByID(ctx, claimID).Return(claim, nil).Once()
+				mockItemRepo.EXPECT().FindByClaimID(ctx, claimID).Return([]*entity.ClaimItem{}, nil).Once()
+				mockAttachRepo.EXPECT().FindByClaimID(ctx, claimID).Return(attachments, nil).Once()
+
+				err := claimService.Submit(mockTx, claimID, changedBy)
+
+				ExpectAppError(err, apperror.ErrMissingInformationClaim.ErrorCode)
+			})
+		})
+
+		Context("when claim has insufficient attachments", func() {
+			It("should return MissingInformationClaim error", func() {
+				claim := &entity.Claim{
+					ID:     claimID,
+					Status: entity.ClaimStatusDraft,
+				}
+				items := []*entity.ClaimItem{
+					{ID: uuid.New(), ClaimID: claimID},
+				}
+
+				mockClaimRepo.EXPECT().FindByID(ctx, claimID).Return(claim, nil).Once()
+				mockItemRepo.EXPECT().FindByClaimID(ctx, claimID).Return(items, nil).Once()
+				mockAttachRepo.EXPECT().FindByClaimID(ctx, claimID).Return([]*entity.ClaimAttachment{}, nil).Once()
+
+				err := claimService.Submit(mockTx, claimID, changedBy)
+
+				ExpectAppError(err, apperror.ErrMissingInformationClaim.ErrorCode)
+			})
+		})
+
+		Context("when claim is not found", func() {
+			It("should return ClaimNotFound error", func() {
+				notFoundErr := apperror.ErrNotFoundError
+				mockClaimRepo.EXPECT().FindByID(ctx, claimID).Return(nil, notFoundErr).Once()
+
+				err := claimService.Submit(mockTx, claimID, changedBy)
+
+				Expect(err).To(HaveOccurred())
+				Expect(err).To(Equal(notFoundErr))
+			})
+		})
+
+		Context("when status transition is invalid", func() {
+			It("should return InvalidClaimAction error", func() {
+				claim := &entity.Claim{
+					ID:     claimID,
+					Status: entity.ClaimStatusApproved,
+				}
+
+				mockClaimRepo.EXPECT().FindByID(ctx, claimID).Return(claim, nil).Once()
+
+				err := claimService.Submit(mockTx, claimID, changedBy)
+
+				ExpectAppError(err, apperror.ErrInvalidClaimAction.ErrorCode)
+			})
+		})
+
+		Context("when finding items fails", func() {
+			It("should return the error", func() {
+				claim := &entity.Claim{
+					ID:     claimID,
+					Status: entity.ClaimStatusDraft,
+				}
+				dbErr := apperror.ErrDBOperation
+
+				mockClaimRepo.EXPECT().FindByID(ctx, claimID).Return(claim, nil).Once()
+				mockItemRepo.EXPECT().FindByClaimID(ctx, claimID).Return(nil, dbErr).Once()
+
+				err := claimService.Submit(mockTx, claimID, changedBy)
+
+				Expect(err).To(HaveOccurred())
+				Expect(err).To(Equal(dbErr))
+			})
+		})
+
+		Context("when finding attachments fails", func() {
+			It("should return the error", func() {
+				claim := &entity.Claim{
+					ID:     claimID,
+					Status: entity.ClaimStatusDraft,
+				}
+				items := []*entity.ClaimItem{{ID: uuid.New()}}
+				dbErr := apperror.ErrDBOperation
+
+				mockClaimRepo.EXPECT().FindByID(ctx, claimID).Return(claim, nil).Once()
+				mockItemRepo.EXPECT().FindByClaimID(ctx, claimID).Return(items, nil).Once()
+				mockAttachRepo.EXPECT().FindByClaimID(ctx, claimID).Return(nil, dbErr).Once()
+
+				err := claimService.Submit(mockTx, claimID, changedBy)
+
+				Expect(err).To(HaveOccurred())
+				Expect(err).To(Equal(dbErr))
+			})
+		})
+
+		Context("when updating status fails", func() {
+			It("should return the error", func() {
+				claim := &entity.Claim{
+					ID:     claimID,
+					Status: entity.ClaimStatusDraft,
+				}
+				items := []*entity.ClaimItem{{ID: uuid.New()}}
+				attachments := []*entity.ClaimAttachment{
+					{ID: uuid.New()}, {ID: uuid.New()}, {ID: uuid.New()},
+				}
+				dbErr := apperror.ErrDBOperation
+
+				mockClaimRepo.EXPECT().FindByID(ctx, claimID).Return(claim, nil).Once()
+				mockItemRepo.EXPECT().FindByClaimID(ctx, claimID).Return(items, nil).Once()
+				mockAttachRepo.EXPECT().FindByClaimID(ctx, claimID).Return(attachments, nil).Once()
+				mockClaimRepo.EXPECT().UpdateStatus(mockTx, claimID, entity.ClaimStatusSubmitted).Return(dbErr).Once()
+
+				err := claimService.Submit(mockTx, claimID, changedBy)
+
+				Expect(err).To(HaveOccurred())
+				Expect(err).To(Equal(dbErr))
+			})
+		})
+
+		Context("when creating history fails", func() {
+			It("should return the error", func() {
+				claim := &entity.Claim{
+					ID:     claimID,
+					Status: entity.ClaimStatusDraft,
+				}
+				items := []*entity.ClaimItem{{ID: uuid.New()}}
+				attachments := []*entity.ClaimAttachment{
+					{ID: uuid.New()}, {ID: uuid.New()}, {ID: uuid.New()},
+				}
+				dbErr := apperror.ErrDBOperation
+
+				mockClaimRepo.EXPECT().FindByID(ctx, claimID).Return(claim, nil).Once()
+				mockItemRepo.EXPECT().FindByClaimID(ctx, claimID).Return(items, nil).Once()
+				mockAttachRepo.EXPECT().FindByClaimID(ctx, claimID).Return(attachments, nil).Once()
+				mockClaimRepo.EXPECT().UpdateStatus(mockTx, claimID, entity.ClaimStatusSubmitted).Return(nil).Once()
+				mockHistRepo.EXPECT().Create(mockTx, mock.AnythingOfType("*entity.ClaimHistory")).Return(dbErr).Once()
+
+				err := claimService.Submit(mockTx, claimID, changedBy)
+
+				Expect(err).To(HaveOccurred())
+				Expect(err).To(Equal(dbErr))
+			})
+		})
+	})
+
+	Describe("DoneReview", func() {
+		var (
+			claimID   uuid.UUID
+			changedBy uuid.UUID
+		)
+
+		BeforeEach(func() {
+			claimID = uuid.New()
+			changedBy = uuid.New()
+			mockTx.EXPECT().GetCtx().Return(ctx).Maybe()
+		})
+
+		Context("when all items are approved", func() {
+			It("should set status to approved", func() {
+				claim := &entity.Claim{
+					ID:     claimID,
+					Status: entity.ClaimStatusReviewing,
+				}
+				items := []*entity.ClaimItem{
+					{ID: uuid.New(), Status: entity.ClaimItemStatusApproved},
+					{ID: uuid.New(), Status: entity.ClaimItemStatusApproved},
+				}
+
+				mockClaimRepo.EXPECT().FindByID(ctx, claimID).Return(claim, nil).Once()
+				mockItemRepo.EXPECT().FindByClaimID(ctx, claimID).Return(items, nil).Once()
+				mockClaimRepo.EXPECT().UpdateStatus(mockTx, claimID, entity.ClaimStatusApproved).Return(nil).Once()
+				mockHistRepo.EXPECT().Create(mockTx, mock.AnythingOfType("*entity.ClaimHistory")).Return(nil).Once()
+
+				err := claimService.DoneReview(mockTx, claimID, changedBy)
+
+				Expect(err).NotTo(HaveOccurred())
+			})
+		})
+
+		Context("when all items are rejected", func() {
+			It("should set status to rejected", func() {
+				claim := &entity.Claim{
+					ID:     claimID,
+					Status: entity.ClaimStatusReviewing,
+				}
+				items := []*entity.ClaimItem{
+					{ID: uuid.New(), Status: entity.ClaimItemStatusRejected},
+					{ID: uuid.New(), Status: entity.ClaimItemStatusRejected},
+				}
+
+				mockClaimRepo.EXPECT().FindByID(ctx, claimID).Return(claim, nil).Once()
+				mockItemRepo.EXPECT().FindByClaimID(ctx, claimID).Return(items, nil).Once()
+				mockClaimRepo.EXPECT().UpdateStatus(mockTx, claimID, entity.ClaimStatusRejected).Return(nil).Once()
+				mockHistRepo.EXPECT().Create(mockTx, mock.AnythingOfType("*entity.ClaimHistory")).Return(nil).Once()
+
+				err := claimService.DoneReview(mockTx, claimID, changedBy)
+
+				Expect(err).NotTo(HaveOccurred())
+			})
+		})
+
+		Context("when some items are rejected", func() {
+			It("should set status to partially approved", func() {
+				claim := &entity.Claim{
+					ID:     claimID,
+					Status: entity.ClaimStatusReviewing,
+				}
+				items := []*entity.ClaimItem{
+					{ID: uuid.New(), Status: entity.ClaimItemStatusApproved},
+					{ID: uuid.New(), Status: entity.ClaimItemStatusRejected},
+				}
+
+				mockClaimRepo.EXPECT().FindByID(ctx, claimID).Return(claim, nil).Once()
+				mockItemRepo.EXPECT().FindByClaimID(ctx, claimID).Return(items, nil).Once()
+				mockClaimRepo.EXPECT().UpdateStatus(mockTx, claimID,
+					entity.ClaimStatusPartiallyApproved).Return(nil).Once()
+				mockHistRepo.EXPECT().Create(mockTx, mock.AnythingOfType("*entity.ClaimHistory")).Return(nil).Once()
+
+				err := claimService.DoneReview(mockTx, claimID, changedBy)
+
+				Expect(err).NotTo(HaveOccurred())
+			})
+		})
+
+		Context("when items have pending status", func() {
+			It("should return InvalidClaimAction error", func() {
+				claim := &entity.Claim{
+					ID:     claimID,
+					Status: entity.ClaimStatusReviewing,
+				}
+				items := []*entity.ClaimItem{
+					{ID: uuid.New(), Status: entity.ClaimItemStatusPending},
+				}
+
+				mockClaimRepo.EXPECT().FindByID(ctx, claimID).Return(claim, nil).Once()
+				mockItemRepo.EXPECT().FindByClaimID(ctx, claimID).Return(items, nil).Once()
+
+				err := claimService.DoneReview(mockTx, claimID, changedBy)
+
+				ExpectAppError(err, apperror.ErrInvalidClaimAction.ErrorCode)
+			})
+		})
+
+		Context("when claim is not found", func() {
+			It("should return ClaimNotFound error", func() {
+				notFoundErr := apperror.ErrNotFoundError
+				mockClaimRepo.EXPECT().FindByID(ctx, claimID).Return(nil, notFoundErr).Once()
+
+				err := claimService.DoneReview(mockTx, claimID, changedBy)
+
+				Expect(err).To(HaveOccurred())
+				Expect(err).To(Equal(notFoundErr))
+			})
+		})
+
+		Context("when finding items fails", func() {
+			It("should return the error", func() {
+				claim := &entity.Claim{
+					ID:     claimID,
+					Status: entity.ClaimStatusReviewing,
+				}
+				dbErr := apperror.ErrDBOperation
+
+				mockClaimRepo.EXPECT().FindByID(ctx, claimID).Return(claim, nil).Once()
+				mockItemRepo.EXPECT().FindByClaimID(ctx, claimID).Return(nil, dbErr).Once()
+
+				err := claimService.DoneReview(mockTx, claimID, changedBy)
+
+				Expect(err).To(HaveOccurred())
+				Expect(err).To(Equal(dbErr))
+			})
+		})
+
+		Context("when status transition is invalid", func() {
+			It("should return InvalidClaimAction error", func() {
+				claim := &entity.Claim{
+					ID:     claimID,
+					Status: entity.ClaimStatusDraft,
+				}
+				items := []*entity.ClaimItem{
+					{ID: uuid.New(), Status: entity.ClaimItemStatusApproved},
+				}
+
+				mockClaimRepo.EXPECT().FindByID(ctx, claimID).Return(claim, nil).Once()
+				mockItemRepo.EXPECT().FindByClaimID(ctx, claimID).Return(items, nil).Once()
+
+				err := claimService.DoneReview(mockTx, claimID, changedBy)
+
+				ExpectAppError(err, apperror.ErrInvalidClaimAction.ErrorCode)
+			})
+		})
+
+		Context("when updating status fails", func() {
+			It("should return the error", func() {
+				claim := &entity.Claim{
+					ID:     claimID,
+					Status: entity.ClaimStatusReviewing,
+				}
+				items := []*entity.ClaimItem{
+					{ID: uuid.New(), Status: entity.ClaimItemStatusApproved},
+				}
+				dbErr := apperror.ErrDBOperation
+
+				mockClaimRepo.EXPECT().FindByID(ctx, claimID).Return(claim, nil).Once()
+				mockItemRepo.EXPECT().FindByClaimID(ctx, claimID).Return(items, nil).Once()
+				mockClaimRepo.EXPECT().UpdateStatus(mockTx, claimID, entity.ClaimStatusApproved).Return(dbErr).Once()
+
+				err := claimService.DoneReview(mockTx, claimID, changedBy)
+
+				Expect(err).To(HaveOccurred())
+				Expect(err).To(Equal(dbErr))
+			})
+		})
+
+		Context("when creating history fails", func() {
+			It("should return the error", func() {
+				claim := &entity.Claim{
+					ID:     claimID,
+					Status: entity.ClaimStatusReviewing,
+				}
+				items := []*entity.ClaimItem{
+					{ID: uuid.New(), Status: entity.ClaimItemStatusApproved},
+				}
+				dbErr := apperror.ErrDBOperation
+
+				mockClaimRepo.EXPECT().FindByID(ctx, claimID).Return(claim, nil).Once()
+				mockItemRepo.EXPECT().FindByClaimID(ctx, claimID).Return(items, nil).Once()
+				mockClaimRepo.EXPECT().UpdateStatus(mockTx, claimID, entity.ClaimStatusApproved).Return(nil).Once()
+				mockHistRepo.EXPECT().Create(mockTx, mock.AnythingOfType("*entity.ClaimHistory")).Return(dbErr).Once()
+
+				err := claimService.DoneReview(mockTx, claimID, changedBy)
+
+				Expect(err).To(HaveOccurred())
+				Expect(err).To(Equal(dbErr))
+			})
+		})
+	})
+
+	Describe("GetHistory", func() {
+		var claimID uuid.UUID
+
+		BeforeEach(func() {
+			claimID = uuid.New()
+		})
+
+		Context("when history is found", func() {
+			It("should return claim histories", func() {
+				expectedHistories := []*entity.ClaimHistory{
+					{
+						ID:        uuid.New(),
+						ClaimID:   claimID,
+						Status:    entity.ClaimStatusDraft,
+						ChangedBy: uuid.New(),
+					},
+					{
+						ID:        uuid.New(),
+						ClaimID:   claimID,
+						Status:    entity.ClaimStatusSubmitted,
+						ChangedBy: uuid.New(),
+					},
+				}
+
+				mockHistRepo.EXPECT().FindByClaimID(ctx, claimID).Return(expectedHistories, nil).Once()
+
+				histories, err := claimService.GetHistory(ctx, claimID)
+
+				Expect(err).NotTo(HaveOccurred())
+				Expect(histories).NotTo(BeNil())
+				Expect(histories).To(HaveLen(2))
+			})
+		})
+
+		Context("when no history is found", func() {
+			It("should return an empty slice", func() {
+				mockHistRepo.EXPECT().FindByClaimID(ctx, claimID).Return([]*entity.ClaimHistory{}, nil).Once()
+
+				histories, err := claimService.GetHistory(ctx, claimID)
+
+				Expect(err).NotTo(HaveOccurred())
+				Expect(histories).NotTo(BeNil())
+				Expect(histories).To(BeEmpty())
+			})
+		})
+
+		Context("when repository returns error", func() {
+			It("should return the error", func() {
+				dbErr := apperror.ErrDBOperation
+				mockHistRepo.EXPECT().FindByClaimID(ctx, claimID).Return(nil, dbErr).Once()
+
+				histories, err := claimService.GetHistory(ctx, claimID)
+
+				Expect(err).To(HaveOccurred())
+				Expect(histories).To(BeNil())
+				Expect(err).To(Equal(dbErr))
+			})
+		})
+	})
+})

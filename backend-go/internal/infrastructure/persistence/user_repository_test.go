@@ -3,6 +3,7 @@ package persistence_test
 import (
 	"context"
 	"errors"
+	"ev-warranty-go/pkg/apperror"
 	"regexp"
 	"time"
 
@@ -12,9 +13,8 @@ import (
 	. "github.com/onsi/gomega"
 	"gorm.io/gorm"
 
-	"ev-warranty-go/internal/apperrors"
-	"ev-warranty-go/internal/application/repositories"
-	"ev-warranty-go/internal/domain/entities"
+	"ev-warranty-go/internal/application/repository"
+	"ev-warranty-go/internal/domain/entity"
 	"ev-warranty-go/internal/infrastructure/persistence"
 )
 
@@ -22,7 +22,7 @@ var _ = Describe("UserRepository", func() {
 	var (
 		mock       sqlmock.Sqlmock
 		db         *gorm.DB
-		repository repositories.UserRepository
+		repository repository.UserRepository
 		ctx        context.Context
 	)
 
@@ -37,7 +37,7 @@ var _ = Describe("UserRepository", func() {
 	})
 
 	Describe("Create", func() {
-		var user *entities.User
+		var user *entity.User
 
 		BeforeEach(func() {
 			user = newUser()
@@ -59,7 +59,7 @@ var _ = Describe("UserRepository", func() {
 
 				err := repository.Create(ctx, user)
 
-				ExpectAppError(err, apperrors.ErrorCodeDuplicateKey)
+				ExpectAppError(err, apperror.ErrDuplicateKey.ErrorCode)
 			})
 		})
 
@@ -69,7 +69,7 @@ var _ = Describe("UserRepository", func() {
 
 				err := repository.Create(ctx, user)
 
-				ExpectAppError(err, apperrors.ErrorCodeDBOperation)
+				ExpectAppError(err, apperror.ErrDBOperation.ErrorCode)
 			})
 		})
 	})
@@ -116,7 +116,7 @@ var _ = Describe("UserRepository", func() {
 				user, err := repository.FindByID(ctx, userID)
 
 				Expect(user).To(BeNil())
-				ExpectAppError(err, apperrors.ErrorCodeUserNotFound)
+				ExpectAppError(err, apperror.ErrNotFoundError.ErrorCode)
 			})
 		})
 
@@ -127,7 +127,7 @@ var _ = Describe("UserRepository", func() {
 				user, err := repository.FindByID(ctx, userID)
 
 				Expect(user).To(BeNil())
-				ExpectAppError(err, apperrors.ErrorCodeDBOperation)
+				ExpectAppError(err, apperror.ErrDBOperation.ErrorCode)
 			})
 		})
 	})
@@ -174,7 +174,7 @@ var _ = Describe("UserRepository", func() {
 				user, err := repository.FindByEmail(ctx, email)
 
 				Expect(user).To(BeNil())
-				ExpectAppError(err, apperrors.ErrorCodeUserNotFound)
+				ExpectAppError(err, apperror.ErrNotFoundError.ErrorCode)
 			})
 		})
 
@@ -187,7 +187,7 @@ var _ = Describe("UserRepository", func() {
 				user, err := repository.FindByEmail(ctx, email)
 
 				Expect(user).To(BeNil())
-				ExpectAppError(err, apperrors.ErrorCodeDBOperation)
+				ExpectAppError(err, apperror.ErrDBOperation.ErrorCode)
 			})
 		})
 
@@ -227,10 +227,10 @@ var _ = Describe("UserRepository", func() {
 					"id", "name", "email", "role", "password_hash", "is_active",
 					"office_id", "oauth_provider", "oauth_id", "created_at", "updated_at", "deleted_at",
 				}).AddRow(
-					userID1, "User 1", "user1@test.com", entities.UserRoleAdmin,
+					userID1, "User 1", "user1@test.com", entity.UserRoleAdmin,
 					"hash1", true, officeID, nil, nil, time.Now(), time.Now(), nil,
 				).AddRow(
-					userID2, "User 2", "user2@test.com", entities.UserRoleEvmStaff,
+					userID2, "User 2", "user2@test.com", entity.UserRoleEvmStaff,
 					"hash2", false, officeID, nil, nil, time.Now(), time.Now(), nil,
 				)
 
@@ -270,13 +270,13 @@ var _ = Describe("UserRepository", func() {
 				users, err := repository.FindAll(ctx)
 
 				Expect(users).To(BeNil())
-				ExpectAppError(err, apperrors.ErrorCodeDBOperation)
+				ExpectAppError(err, apperror.ErrDBOperation.ErrorCode)
 			})
 		})
 	})
 
 	Describe("Update", func() {
-		var user *entities.User
+		var user *entity.User
 
 		BeforeEach(func() {
 			user = newUser()
@@ -300,7 +300,7 @@ var _ = Describe("UserRepository", func() {
 
 				err := repository.Update(ctx, user)
 
-				ExpectAppError(err, apperrors.ErrorCodeDBOperation)
+				ExpectAppError(err, apperror.ErrDBOperation.ErrorCode)
 			})
 		})
 
@@ -315,7 +315,7 @@ var _ = Describe("UserRepository", func() {
 			})
 
 			It("should handle updating role", func() {
-				user.Role = entities.UserRoleScTechnician
+				user.Role = entity.UserRoleScTechnician
 				MockSuccessfulUpdate(mock, "users")
 
 				err := repository.Update(ctx, user)
@@ -348,7 +348,7 @@ var _ = Describe("UserRepository", func() {
 
 				err := repository.SoftDelete(ctx, userID)
 
-				ExpectAppError(err, apperrors.ErrorCodeDBOperation)
+				ExpectAppError(err, apperror.ErrDBOperation.ErrorCode)
 			})
 		})
 	})
@@ -396,7 +396,7 @@ var _ = Describe("UserRepository", func() {
 				user, err := repository.FindByOAuth(ctx, provider, oauthID)
 
 				Expect(user).To(BeNil())
-				ExpectAppError(err, apperrors.ErrorCodeUserNotFound)
+				ExpectAppError(err, apperror.ErrNotFoundError.ErrorCode)
 			})
 		})
 
@@ -409,7 +409,7 @@ var _ = Describe("UserRepository", func() {
 				user, err := repository.FindByOAuth(ctx, provider, oauthID)
 
 				Expect(user).To(BeNil())
-				ExpectAppError(err, apperrors.ErrorCodeDBOperation)
+				ExpectAppError(err, apperror.ErrDBOperation.ErrorCode)
 			})
 		})
 
@@ -422,7 +422,7 @@ var _ = Describe("UserRepository", func() {
 				user, err := repository.FindByOAuth(ctx, "", oauthID)
 
 				Expect(user).To(BeNil())
-				ExpectAppError(err, apperrors.ErrorCodeUserNotFound)
+				ExpectAppError(err, apperror.ErrNotFoundError.ErrorCode)
 			})
 
 			It("should handle empty oauth_id", func() {
@@ -433,19 +433,19 @@ var _ = Describe("UserRepository", func() {
 				user, err := repository.FindByOAuth(ctx, provider, "")
 
 				Expect(user).To(BeNil())
-				ExpectAppError(err, apperrors.ErrorCodeUserNotFound)
+				ExpectAppError(err, apperror.ErrNotFoundError.ErrorCode)
 			})
 		})
 	})
 })
 
-func newUser() *entities.User {
+func newUser() *entity.User {
 	officeID := uuid.New()
-	return &entities.User{
+	return &entity.User{
 		ID:           uuid.New(),
 		Name:         "Test User",
 		Email:        "test@example.com",
-		Role:         entities.UserRoleAdmin,
+		Role:         entity.UserRoleAdmin,
 		PasswordHash: "hashedpassword",
 		IsActive:     true,
 		OfficeID:     officeID,
@@ -455,7 +455,7 @@ func newUser() *entities.User {
 	}
 }
 
-func newUserWithOAuth(provider, oauthID string) *entities.User {
+func newUserWithOAuth(provider, oauthID string) *entity.User {
 	user := newUser()
 	user.OAuthProvider = &provider
 	user.OAuthID = &oauthID

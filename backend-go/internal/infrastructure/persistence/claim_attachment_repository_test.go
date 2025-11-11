@@ -3,6 +3,7 @@ package persistence_test
 import (
 	"context"
 	"errors"
+	"ev-warranty-go/pkg/apperror"
 	"ev-warranty-go/pkg/mocks"
 	"regexp"
 	"time"
@@ -13,9 +14,8 @@ import (
 	. "github.com/onsi/gomega"
 	"gorm.io/gorm"
 
-	"ev-warranty-go/internal/apperrors"
-	"ev-warranty-go/internal/application/repositories"
-	"ev-warranty-go/internal/domain/entities"
+	"ev-warranty-go/internal/application/repository"
+	"ev-warranty-go/internal/domain/entity"
 	"ev-warranty-go/internal/infrastructure/persistence"
 )
 
@@ -23,7 +23,7 @@ var _ = Describe("ClaimAttachmentRepository", func() {
 	var (
 		mock       sqlmock.Sqlmock
 		db         *gorm.DB
-		repository repositories.ClaimAttachmentRepository
+		repository repository.ClaimAttachmentRepository
 		ctx        context.Context
 	)
 
@@ -38,7 +38,7 @@ var _ = Describe("ClaimAttachmentRepository", func() {
 	})
 
 	Describe("Create", func() {
-		var attachment *entities.ClaimAttachment
+		var attachment *entity.ClaimAttachment
 
 		BeforeEach(func() {
 			attachment = newClaimAttachment()
@@ -64,7 +64,7 @@ var _ = Describe("ClaimAttachmentRepository", func() {
 
 				err := repository.Create(mockTx, attachment)
 
-				ExpectAppError(err, apperrors.ErrorCodeDuplicateKey)
+				ExpectAppError(err, apperror.ErrDuplicateKey.ErrorCode)
 			})
 		})
 
@@ -76,7 +76,7 @@ var _ = Describe("ClaimAttachmentRepository", func() {
 
 				err := repository.Create(mockTx, attachment)
 
-				ExpectAppError(err, apperrors.ErrorCodeDBOperation)
+				ExpectAppError(err, apperror.ErrDBOperation.ErrorCode)
 			})
 		})
 
@@ -84,7 +84,7 @@ var _ = Describe("ClaimAttachmentRepository", func() {
 			It("should handle image type", func() {
 				mockTx := mocks.NewTx(GinkgoT())
 				mockTx.EXPECT().GetTx().Return(db)
-				attachment.Type = entities.AttachmentTypeImage
+				attachment.Type = entity.AttachmentTypeImage
 				MockSuccessfulInsert(mock, "claim_attachments", attachment.ID)
 
 				err := repository.Create(mockTx, attachment)
@@ -95,7 +95,7 @@ var _ = Describe("ClaimAttachmentRepository", func() {
 			It("should handle video type", func() {
 				mockTx := mocks.NewTx(GinkgoT())
 				mockTx.EXPECT().GetTx().Return(db)
-				attachment.Type = entities.AttachmentTypeVideo
+				attachment.Type = entity.AttachmentTypeVideo
 				MockSuccessfulInsert(mock, "claim_attachments", attachment.ID)
 
 				err := repository.Create(mockTx, attachment)
@@ -164,7 +164,7 @@ var _ = Describe("ClaimAttachmentRepository", func() {
 
 				err := repository.HardDelete(mockTx, attachmentID)
 
-				ExpectAppError(err, apperrors.ErrorCodeDBOperation)
+				ExpectAppError(err, apperror.ErrDBOperation.ErrorCode)
 			})
 		})
 	})
@@ -204,7 +204,7 @@ var _ = Describe("ClaimAttachmentRepository", func() {
 
 				err := repository.SoftDeleteByClaimID(mockTx, claimID)
 
-				ExpectAppError(err, apperrors.ErrorCodeDBOperation)
+				ExpectAppError(err, apperror.ErrDBOperation.ErrorCode)
 			})
 		})
 	})
@@ -247,7 +247,7 @@ var _ = Describe("ClaimAttachmentRepository", func() {
 				attachment, err := repository.FindByID(ctx, attachmentID)
 
 				Expect(attachment).To(BeNil())
-				ExpectAppError(err, apperrors.ErrorCodeClaimAttachmentNotFound)
+				ExpectAppError(err, apperror.ErrNotFoundError.ErrorCode)
 			})
 		})
 
@@ -258,7 +258,7 @@ var _ = Describe("ClaimAttachmentRepository", func() {
 				attachment, err := repository.FindByID(ctx, attachmentID)
 
 				Expect(attachment).To(BeNil())
-				ExpectAppError(err, apperrors.ErrorCodeDBOperation)
+				ExpectAppError(err, apperror.ErrDBOperation.ErrorCode)
 			})
 		})
 	})
@@ -278,10 +278,10 @@ var _ = Describe("ClaimAttachmentRepository", func() {
 				rows := sqlmock.NewRows([]string{
 					"id", "claim_id", "type", "url", "created_at", "deleted_at",
 				}).AddRow(
-					attachmentID1, claimID, entities.AttachmentTypeImage,
+					attachmentID1, claimID, entity.AttachmentTypeImage,
 					"https://example.com/image1.jpg", time.Now(), nil,
 				).AddRow(
-					attachmentID2, claimID, entities.AttachmentTypeVideo,
+					attachmentID2, claimID, entity.AttachmentTypeVideo,
 					"https://example.com/video1.mp4", time.Now(), nil,
 				)
 
@@ -324,7 +324,7 @@ var _ = Describe("ClaimAttachmentRepository", func() {
 				attachments, err := repository.FindByClaimID(ctx, claimID)
 
 				Expect(attachments).To(BeNil())
-				ExpectAppError(err, apperrors.ErrorCodeDBOperation)
+				ExpectAppError(err, apperror.ErrDBOperation.ErrorCode)
 			})
 		})
 	})
@@ -375,7 +375,7 @@ var _ = Describe("ClaimAttachmentRepository", func() {
 				count, err := repository.CountByClaimID(ctx, claimID)
 
 				Expect(count).To(Equal(int64(0)))
-				ExpectAppError(err, apperrors.ErrorCodeDBOperation)
+				ExpectAppError(err, apperror.ErrDBOperation.ErrorCode)
 			})
 		})
 
@@ -401,7 +401,7 @@ var _ = Describe("ClaimAttachmentRepository", func() {
 
 		BeforeEach(func() {
 			claimID = uuid.New()
-			attachmentType = entities.AttachmentTypeImage
+			attachmentType = entity.AttachmentTypeImage
 		})
 
 		Context("when attachments of type are found", func() {
@@ -412,10 +412,10 @@ var _ = Describe("ClaimAttachmentRepository", func() {
 				rows := sqlmock.NewRows([]string{
 					"id", "claim_id", "type", "url", "created_at", "deleted_at",
 				}).AddRow(
-					attachmentID1, claimID, entities.AttachmentTypeImage,
+					attachmentID1, claimID, entity.AttachmentTypeImage,
 					"https://example.com/image1.jpg", time.Now(), nil,
 				).AddRow(
-					attachmentID2, claimID, entities.AttachmentTypeImage,
+					attachmentID2, claimID, entity.AttachmentTypeImage,
 					"https://example.com/image2.jpg", time.Now(), nil,
 				)
 
@@ -427,8 +427,8 @@ var _ = Describe("ClaimAttachmentRepository", func() {
 
 				Expect(err).NotTo(HaveOccurred())
 				Expect(attachments).To(HaveLen(2))
-				Expect(attachments[0].Type).To(Equal(entities.AttachmentTypeImage))
-				Expect(attachments[1].Type).To(Equal(entities.AttachmentTypeImage))
+				Expect(attachments[0].Type).To(Equal(entity.AttachmentTypeImage))
+				Expect(attachments[1].Type).To(Equal(entity.AttachmentTypeImage))
 			})
 		})
 
@@ -458,19 +458,19 @@ var _ = Describe("ClaimAttachmentRepository", func() {
 				attachments, err := repository.FindByType(ctx, claimID, attachmentType)
 
 				Expect(attachments).To(BeNil())
-				ExpectAppError(err, apperrors.ErrorCodeDBOperation)
+				ExpectAppError(err, apperror.ErrDBOperation.ErrorCode)
 			})
 		})
 
 		Context("boundary cases for attachment type", func() {
 			It("should filter by video type", func() {
-				attachmentType = entities.AttachmentTypeVideo
+				attachmentType = entity.AttachmentTypeVideo
 				attachmentID := uuid.New()
 
 				rows := sqlmock.NewRows([]string{
 					"id", "claim_id", "type", "url", "created_at", "deleted_at",
 				}).AddRow(
-					attachmentID, claimID, entities.AttachmentTypeVideo,
+					attachmentID, claimID, entity.AttachmentTypeVideo,
 					"https://example.com/video.mp4", time.Now(), nil,
 				)
 
@@ -482,7 +482,7 @@ var _ = Describe("ClaimAttachmentRepository", func() {
 
 				Expect(err).NotTo(HaveOccurred())
 				Expect(attachments).To(HaveLen(1))
-				Expect(attachments[0].Type).To(Equal(entities.AttachmentTypeVideo))
+				Expect(attachments[0].Type).To(Equal(entity.AttachmentTypeVideo))
 			})
 
 			It("should handle empty type string", func() {
@@ -504,11 +504,11 @@ var _ = Describe("ClaimAttachmentRepository", func() {
 	})
 })
 
-func newClaimAttachment() *entities.ClaimAttachment {
-	return &entities.ClaimAttachment{
+func newClaimAttachment() *entity.ClaimAttachment {
+	return &entity.ClaimAttachment{
 		ID:        uuid.New(),
 		ClaimID:   uuid.New(),
-		Type:      entities.AttachmentTypeImage,
+		Type:      entity.AttachmentTypeImage,
 		URL:       "https://example.com/test-image.jpg",
 		CreatedAt: time.Now(),
 		DeletedAt: nil,

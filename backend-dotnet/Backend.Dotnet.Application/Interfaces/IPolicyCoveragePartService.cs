@@ -22,6 +22,10 @@ namespace Backend.Dotnet.Application.Interfaces
         Task<BaseResponseDto<PolicyCoveragePartResponse>> GetByPolicyAndCategoryAsync(
             Guid policyId, Guid partCategoryId);
 
+        Task<BaseResponseDto<CoverageDetailsResponse>> GetCoverageDetailsAsync(
+            Guid policyId, Guid partCategoryId);
+
+
         Task<BaseResponseDto<PolicyCoveragePartResponse>> UpdateAsync(
             Guid id, UpdatePolicyCoveragePartRequest request);
 

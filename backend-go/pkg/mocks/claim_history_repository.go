@@ -6,7 +6,7 @@ import (
 	context "context"
 	application "ev-warranty-go/internal/application"
 
-	entities "ev-warranty-go/internal/domain/entities"
+	entity "ev-warranty-go/internal/domain/entity"
 
 	mock "github.com/stretchr/testify/mock"
 
@@ -29,7 +29,7 @@ func (_m *ClaimHistoryRepository) EXPECT() *ClaimHistoryRepository_Expecter {
 }
 
 // Create provides a mock function with given fields: tx, history
-func (_m *ClaimHistoryRepository) Create(tx application.Tx, history *entities.ClaimHistory) error {
+func (_m *ClaimHistoryRepository) Create(tx application.Tx, history *entity.ClaimHistory) error {
 	ret := _m.Called(tx, history)
 
 	if len(ret) == 0 {
@@ -37,7 +37,7 @@ func (_m *ClaimHistoryRepository) Create(tx application.Tx, history *entities.Cl
 	}
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(application.Tx, *entities.ClaimHistory) error); ok {
+	if rf, ok := ret.Get(0).(func(application.Tx, *entity.ClaimHistory) error); ok {
 		r0 = rf(tx, history)
 	} else {
 		r0 = ret.Error(0)
@@ -53,14 +53,14 @@ type ClaimHistoryRepository_Create_Call struct {
 
 // Create is a helper method to define mock.On call
 //   - tx application.Tx
-//   - history *entities.ClaimHistory
+//   - history *entity.ClaimHistory
 func (_e *ClaimHistoryRepository_Expecter) Create(tx interface{}, history interface{}) *ClaimHistoryRepository_Create_Call {
 	return &ClaimHistoryRepository_Create_Call{Call: _e.mock.On("Create", tx, history)}
 }
 
-func (_c *ClaimHistoryRepository_Create_Call) Run(run func(tx application.Tx, history *entities.ClaimHistory)) *ClaimHistoryRepository_Create_Call {
+func (_c *ClaimHistoryRepository_Create_Call) Run(run func(tx application.Tx, history *entity.ClaimHistory)) *ClaimHistoryRepository_Create_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(application.Tx), args[1].(*entities.ClaimHistory))
+		run(args[0].(application.Tx), args[1].(*entity.ClaimHistory))
 	})
 	return _c
 }
@@ -70,29 +70,29 @@ func (_c *ClaimHistoryRepository_Create_Call) Return(_a0 error) *ClaimHistoryRep
 	return _c
 }
 
-func (_c *ClaimHistoryRepository_Create_Call) RunAndReturn(run func(application.Tx, *entities.ClaimHistory) error) *ClaimHistoryRepository_Create_Call {
+func (_c *ClaimHistoryRepository_Create_Call) RunAndReturn(run func(application.Tx, *entity.ClaimHistory) error) *ClaimHistoryRepository_Create_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
 // FindByClaimID provides a mock function with given fields: ctx, claimID
-func (_m *ClaimHistoryRepository) FindByClaimID(ctx context.Context, claimID uuid.UUID) ([]*entities.ClaimHistory, error) {
+func (_m *ClaimHistoryRepository) FindByClaimID(ctx context.Context, claimID uuid.UUID) ([]*entity.ClaimHistory, error) {
 	ret := _m.Called(ctx, claimID)
 
 	if len(ret) == 0 {
 		panic("no return value specified for FindByClaimID")
 	}
 
-	var r0 []*entities.ClaimHistory
+	var r0 []*entity.ClaimHistory
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID) ([]*entities.ClaimHistory, error)); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID) ([]*entity.ClaimHistory, error)); ok {
 		return rf(ctx, claimID)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID) []*entities.ClaimHistory); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID) []*entity.ClaimHistory); ok {
 		r0 = rf(ctx, claimID)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).([]*entities.ClaimHistory)
+			r0 = ret.Get(0).([]*entity.ClaimHistory)
 		}
 	}
 
@@ -124,34 +124,34 @@ func (_c *ClaimHistoryRepository_FindByClaimID_Call) Run(run func(ctx context.Co
 	return _c
 }
 
-func (_c *ClaimHistoryRepository_FindByClaimID_Call) Return(_a0 []*entities.ClaimHistory, _a1 error) *ClaimHistoryRepository_FindByClaimID_Call {
+func (_c *ClaimHistoryRepository_FindByClaimID_Call) Return(_a0 []*entity.ClaimHistory, _a1 error) *ClaimHistoryRepository_FindByClaimID_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
-func (_c *ClaimHistoryRepository_FindByClaimID_Call) RunAndReturn(run func(context.Context, uuid.UUID) ([]*entities.ClaimHistory, error)) *ClaimHistoryRepository_FindByClaimID_Call {
+func (_c *ClaimHistoryRepository_FindByClaimID_Call) RunAndReturn(run func(context.Context, uuid.UUID) ([]*entity.ClaimHistory, error)) *ClaimHistoryRepository_FindByClaimID_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
 // FindByDateRange provides a mock function with given fields: ctx, claimID, startDate, endDate
-func (_m *ClaimHistoryRepository) FindByDateRange(ctx context.Context, claimID uuid.UUID, startDate time.Time, endDate time.Time) ([]*entities.ClaimHistory, error) {
+func (_m *ClaimHistoryRepository) FindByDateRange(ctx context.Context, claimID uuid.UUID, startDate time.Time, endDate time.Time) ([]*entity.ClaimHistory, error) {
 	ret := _m.Called(ctx, claimID, startDate, endDate)
 
 	if len(ret) == 0 {
 		panic("no return value specified for FindByDateRange")
 	}
 
-	var r0 []*entities.ClaimHistory
+	var r0 []*entity.ClaimHistory
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID, time.Time, time.Time) ([]*entities.ClaimHistory, error)); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID, time.Time, time.Time) ([]*entity.ClaimHistory, error)); ok {
 		return rf(ctx, claimID, startDate, endDate)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID, time.Time, time.Time) []*entities.ClaimHistory); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID, time.Time, time.Time) []*entity.ClaimHistory); ok {
 		r0 = rf(ctx, claimID, startDate, endDate)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).([]*entities.ClaimHistory)
+			r0 = ret.Get(0).([]*entity.ClaimHistory)
 		}
 	}
 
@@ -185,34 +185,34 @@ func (_c *ClaimHistoryRepository_FindByDateRange_Call) Run(run func(ctx context.
 	return _c
 }
 
-func (_c *ClaimHistoryRepository_FindByDateRange_Call) Return(_a0 []*entities.ClaimHistory, _a1 error) *ClaimHistoryRepository_FindByDateRange_Call {
+func (_c *ClaimHistoryRepository_FindByDateRange_Call) Return(_a0 []*entity.ClaimHistory, _a1 error) *ClaimHistoryRepository_FindByDateRange_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
-func (_c *ClaimHistoryRepository_FindByDateRange_Call) RunAndReturn(run func(context.Context, uuid.UUID, time.Time, time.Time) ([]*entities.ClaimHistory, error)) *ClaimHistoryRepository_FindByDateRange_Call {
+func (_c *ClaimHistoryRepository_FindByDateRange_Call) RunAndReturn(run func(context.Context, uuid.UUID, time.Time, time.Time) ([]*entity.ClaimHistory, error)) *ClaimHistoryRepository_FindByDateRange_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
 // FindLatestByClaimID provides a mock function with given fields: ctx, claimID
-func (_m *ClaimHistoryRepository) FindLatestByClaimID(ctx context.Context, claimID uuid.UUID) (*entities.ClaimHistory, error) {
+func (_m *ClaimHistoryRepository) FindLatestByClaimID(ctx context.Context, claimID uuid.UUID) (*entity.ClaimHistory, error) {
 	ret := _m.Called(ctx, claimID)
 
 	if len(ret) == 0 {
 		panic("no return value specified for FindLatestByClaimID")
 	}
 
-	var r0 *entities.ClaimHistory
+	var r0 *entity.ClaimHistory
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID) (*entities.ClaimHistory, error)); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID) (*entity.ClaimHistory, error)); ok {
 		return rf(ctx, claimID)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID) *entities.ClaimHistory); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID) *entity.ClaimHistory); ok {
 		r0 = rf(ctx, claimID)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*entities.ClaimHistory)
+			r0 = ret.Get(0).(*entity.ClaimHistory)
 		}
 	}
 
@@ -244,12 +244,12 @@ func (_c *ClaimHistoryRepository_FindLatestByClaimID_Call) Run(run func(ctx cont
 	return _c
 }
 
-func (_c *ClaimHistoryRepository_FindLatestByClaimID_Call) Return(_a0 *entities.ClaimHistory, _a1 error) *ClaimHistoryRepository_FindLatestByClaimID_Call {
+func (_c *ClaimHistoryRepository_FindLatestByClaimID_Call) Return(_a0 *entity.ClaimHistory, _a1 error) *ClaimHistoryRepository_FindLatestByClaimID_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
-func (_c *ClaimHistoryRepository_FindLatestByClaimID_Call) RunAndReturn(run func(context.Context, uuid.UUID) (*entities.ClaimHistory, error)) *ClaimHistoryRepository_FindLatestByClaimID_Call {
+func (_c *ClaimHistoryRepository_FindLatestByClaimID_Call) RunAndReturn(run func(context.Context, uuid.UUID) (*entity.ClaimHistory, error)) *ClaimHistoryRepository_FindLatestByClaimID_Call {
 	_c.Call.Return(run)
 	return _c
 }
