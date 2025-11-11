@@ -45,4 +45,8 @@ var (
 	ErrFailedUploadCloudinary     = New(http.StatusServiceUnavailable, "CLOUDINARY_FAILED_UPLOAD", "Failed to upload to Cloudinary")
 	ErrFailedDeleteCloudinary     = New(http.StatusServiceUnavailable, "CLOUDINARY_FAILED_DELETE", "Failed to delete from Cloudinary")
 	ErrEmptyCloudinaryParameter   = New(http.StatusBadRequest, "CLOUDINARY_EMPTY_PARAMETER", "Empty Cloudinary parameter")
+
+	ErrExternalServiceUnavailable = New(http.StatusServiceUnavailable, "EXTERNAL_SERVICE_UNAVAILABLE", "External service is unavailable")
+	ErrExternalServiceError       = New(http.StatusBadGateway, "EXTERNAL_SERVICE_ERROR", "External service returned an error")
+	ErrInternal                   = New(http.StatusInternalServerError, "INTERNAL_ERROR", "Internal processing error")
 )
