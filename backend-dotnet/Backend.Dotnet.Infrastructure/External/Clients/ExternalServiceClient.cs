@@ -1,5 +1,7 @@
 ﻿using Backend.Dotnet.Application.Interfaces.External;
 using Backend.Dotnet.Infrastructure.External.Models;
+using Microsoft.AspNetCore.Http;
+using System.Net.Http.Headers;
 using System.Text.Json;
 using static Backend.Dotnet.Application.DTOs.IntermediaryDto;
 using static Backend.Dotnet.Infrastructure.External.Models.ExternalModel;
@@ -9,18 +11,29 @@ namespace Backend.Dotnet.Infrastructure.External.Clients
     public class ExternalServiceClient : IExternalServiceClient
     {
         private readonly HttpClient _httpClient;
-        private const string ExternalServiceBaseUrl = "http://localhost:8080";
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public ExternalServiceClient(HttpClient httpClient)
+        private const string ExternalServiceBaseUrl = "http://localhost";
+
+        public ExternalServiceClient(HttpClient httpClient, IHttpContextAccessor httpContextAccessor)
         {
             _httpClient = httpClient;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         public async Task<bool> CompleteClaimAsync(Guid claimId)
         {
             try
             {
-                var response = await _httpClient.PostAsync($"{ExternalServiceBaseUrl}/claims/{claimId}/complete", null);
+                var token = _httpContextAccessor.HttpContext?.Request.Headers["Authorization"].ToString();
+
+                if (string.IsNullOrEmpty(token))
+                    throw new InvalidOperationException("Missing Authorization header in request");
+                // Replace() for clean jwt token
+                var jwtToken = token.Replace("Bearer ", "");
+                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwtToken);
+                
+                var response = await _httpClient.PostAsync($"{ExternalServiceBaseUrl}/api/v1/claims/{claimId}/complete", null);
 
                 if (!response.IsSuccessStatusCode)
                 {
@@ -40,7 +53,7 @@ namespace Backend.Dotnet.Infrastructure.External.Clients
         {
             try
             {
-                var response = await _httpClient.GetAsync($"{ExternalServiceBaseUrl}/claims/{claimId}");
+                var response = await _httpClient.GetAsync($"{ExternalServiceBaseUrl}/api/v1/claims/{claimId}");
                 if (!response.IsSuccessStatusCode)
                 {
                     throw new InvalidOperationException($"Failed to fetch claim {claimId}. Status: {response.StatusCode}");
@@ -61,7 +74,7 @@ namespace Backend.Dotnet.Infrastructure.External.Clients
         {
             try
             {
-                var response = await _httpClient.GetAsync($"{ExternalServiceBaseUrl}/claims/{claimId}/items");
+                var response = await _httpClient.GetAsync($"{ExternalServiceBaseUrl}/api/v1/claims/{claimId}/items");
 
                 if (!response.IsSuccessStatusCode)
                 {
@@ -83,7 +96,7 @@ namespace Backend.Dotnet.Infrastructure.External.Clients
         {
             try
             {
-                var response = await _httpClient.GetAsync($"{ExternalServiceBaseUrl}/users/{technicianId}");
+                var response = await _httpClient.GetAsync($"{ExternalServiceBaseUrl}/api/v1/users/{technicianId}");
 
                 if (!response.IsSuccessStatusCode)
                 {

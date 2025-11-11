@@ -16,7 +16,13 @@ namespace Backend.Dotnet.Application.Interfaces
         Task<BaseResponseDto<WorkOrderResponse>> GetByClaimIdAsync(Guid claimId);
         Task<BaseResponseDto<IEnumerable<WorkOrderResponse>>> GetByTechnicianIdAsync(Guid technicianId);
         Task<BaseResponseDto<WorkOrderDetailResponse>> GetDetailByIdAsync(Guid id);
+
+        // Technician operations
         Task<BaseResponseDto<WorkOrderResponse>> UpdateStatusAsync(Guid id, UpdateStatusRequest request);
+
+        // Staff operations
+        Task<BaseResponseDto<WorkOrderResponse>> CompleteAsync(Guid id);
+
         Task<BaseResponseDto> DeleteAsync(Guid id);
     }
 }

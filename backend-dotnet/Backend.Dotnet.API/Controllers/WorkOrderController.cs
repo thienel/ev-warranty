@@ -87,6 +87,20 @@ namespace Backend.Dotnet.API.Controllers
             return CreatedAtAction(nameof(GetById), new { id = result.Data.Id }, result);
         }
 
+        [HttpPost("{id}/complete")]
+        [ProducesResponseType(typeof(BaseResponseDto<WorkOrderResponse>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(BaseResponseDto), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(BaseResponseDto), StatusCodes.Status404NotFound)]
+        [Authorize(Roles = SystemRoles.UserRoleEvmStaff)]
+        public async Task<IActionResult> Complete(Guid id)
+        {
+            var result = await _workOrderService.CompleteAsync(id);
+            if (!result.IsSuccess)
+                return result.ErrorCode == "NOT_FOUND" ? NotFound(result) : BadRequest(result);
+
+            return Ok(result);
+        }
+
         [HttpPut("{id}/status")]
         [ProducesResponseType(typeof(BaseResponseDto<WorkOrderResponse>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BaseResponseDto), StatusCodes.Status400BadRequest)]
