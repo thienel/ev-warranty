@@ -6,6 +6,7 @@ import (
 	"ev-warranty-go/internal/application/repository"
 	"ev-warranty-go/internal/domain/entity"
 	"ev-warranty-go/internal/infrastructure/cloudinary"
+	"ev-warranty-go/internal/infrastructure/external"
 	"ev-warranty-go/pkg/apperror"
 	"ev-warranty-go/pkg/logger"
 	"fmt"
@@ -52,6 +53,7 @@ type claimService struct {
 	attachmentRepo repository.ClaimAttachmentRepository
 	historyRepo    repository.ClaimHistoryRepository
 	cloudService   cloudinary.CloudinaryService
+	dotnetClient   external.DotnetClient
 }
 
 func NewClaimService(
@@ -62,6 +64,7 @@ func NewClaimService(
 	attachmentRepo repository.ClaimAttachmentRepository,
 	historyRepo repository.ClaimHistoryRepository,
 	cloudService cloudinary.CloudinaryService,
+	dotnetClient external.DotnetClient,
 ) ClaimService {
 	return &claimService{
 		log:            log,
@@ -71,6 +74,7 @@ func NewClaimService(
 		attachmentRepo: attachmentRepo,
 		historyRepo:    historyRepo,
 		cloudService:   cloudService,
+		dotnetClient:   dotnetClient,
 	}
 }
 
@@ -316,7 +320,17 @@ func (s *claimService) DoneReview(tx application.Tx, id uuid.UUID, changedBy uui
 		return err
 	}
 
-	// TODO: create work order
+	// Create work order via .NET backend
+	workOrderReq := &external.CreateWorkOrderRequest{
+		ClaimID:              id,
+		AssignedTechnicianID: claim.TechnicianID,
+	}
+
+	_, err = s.dotnetClient.CreateWorkOrder(tx.GetCtx(), workOrderReq)
+	if err != nil {
+		s.log.Error("Failed to create work order via .NET backend", "error", err, "claimId", id)
+		return err
+	}
 
 	return nil
 }
