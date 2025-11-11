@@ -75,6 +75,29 @@ namespace Backend.Dotnet.API.Controllers
             return Ok(result);
         }
 
+        [HttpGet("coverage-details")]
+        [ProducesResponseType(typeof(BaseResponseDto<CoverageDetailsResponse>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(BaseResponseDto), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(BaseResponseDto), StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> GetCoverageDetails(
+            [FromQuery] Guid policyId,
+            [FromQuery] Guid partCategoryId)
+        {
+            if (policyId == Guid.Empty || partCategoryId == Guid.Empty)
+            {
+                return BadRequest(new BaseResponseDto
+                {
+                    IsSuccess = false,
+                    Message = "Both policyId and partCategoryId are required",
+                    ErrorCode = "INVALID_PARAMETERS"
+                });
+            }
+
+            var result = await _policyCoveragePartService.GetCoverageDetailsAsync(policyId, partCategoryId);
+            return result.IsSuccess ? Ok(result) : NotFound(result);
+        }
+
+        // Remove later due to low usage - useless api
         [HttpGet("{id}/details")]
         [ProducesResponseType(typeof(BaseResponseDto<PolicyCoveragePartDetailResponse>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BaseResponseDto), StatusCodes.Status404NotFound)]

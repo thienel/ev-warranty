@@ -2,11 +2,7 @@
 using Backend.Dotnet.Application.Interfaces;
 using Backend.Dotnet.Application.Interfaces.Data;
 using Backend.Dotnet.Domain.Exceptions;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Microsoft.IdentityModel.Tokens;
 using static Backend.Dotnet.Application.DTOs.PolicyCoveragePartDto;
 
 namespace Backend.Dotnet.Application.Services
@@ -276,7 +272,7 @@ namespace Backend.Dotnet.Application.Services
                     {
                         IsSuccess = false,
                         Message = "Coverage not found for the specified policy and part category",
-                        ErrorCode = "NOT_FOUND"
+                        ErrorCode = "COVERAGE_NOT_FOUND"
                     };
                 }
 
@@ -393,9 +389,65 @@ namespace Backend.Dotnet.Application.Services
             }
         }
 
-        public Task<BaseResponseDto<CoverageDetailsResponse>> GetCoverageDetailsAsync(Guid policyId, Guid partCategoryId)
+        public async Task<BaseResponseDto<CoverageDetailsResponse>> GetCoverageDetailsAsync(Guid policyId, Guid partCategoryId)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var currentCategory = await _unitOfWork.PartCategories.GetByIdAsync(partCategoryId);
+
+                if (currentCategory == null)
+                {
+                    return new BaseResponseDto<CoverageDetailsResponse>
+                    {
+                        IsSuccess = false,
+                        Message = $"Part category with ID '{partCategoryId}' not found",
+                        ErrorCode = "CATEGORY_NOT_FOUND"
+                    };
+                }
+
+                Guid? currentCategoryId = partCategoryId;
+                while (currentCategory != null)
+                {
+                    var coverage = await _unitOfWork.PolicyCoverageParts
+                        .GetByPolicyAndCategoryAsync(policyId, currentCategory.Id);
+
+                    if (coverage != null && !coverage.CoverageConditions.IsNullOrEmpty())
+                    {
+                        return new BaseResponseDto<CoverageDetailsResponse>
+                        {
+                            IsSuccess = true,
+                            Message = "Coverage details retrieved successfully",
+                            //Data = coverage.ToCoverageDetailsResponse(partCategoryId, requestedCategory.CategoryName)
+                            Data = coverage.ToCoverageDetailsResponse()
+                        };
+                    }
+
+                    if (currentCategory.ParentCategoryId.HasValue)
+                    {
+                        currentCategory = await _unitOfWork.PartCategories.GetByIdAsync(currentCategory.ParentCategoryId.Value);
+                    }
+                    else
+                    {
+                        currentCategory = null; // Touch the Root - end loop
+                    }
+                }
+
+                return new BaseResponseDto<CoverageDetailsResponse>
+                {
+                    IsSuccess = false,
+                    Message = "No coverage found for this part category or its parent categories",
+                    ErrorCode = "COVERAGE_NOT_FOUND"
+                };
+            }
+            catch (Exception)
+            {
+                return new BaseResponseDto<CoverageDetailsResponse>
+                {
+                    IsSuccess = false,
+                    Message = "An error occurred while retrieving coverage details",
+                    ErrorCode = "INTERNAL_ERROR"
+                };
+            }
         }
     }
 }
