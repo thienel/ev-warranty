@@ -9,7 +9,7 @@ namespace Backend.Dotnet.Infrastructure.External.Clients
     public class ExternalServiceClient : IExternalServiceClient
     {
         private readonly HttpClient _httpClient;
-        private const string ExternalServiceBaseUrl = "http://localhost:8080";
+        private const string ExternalServiceBaseUrl = "http://localhost";
 
         public ExternalServiceClient(HttpClient httpClient)
         {
@@ -20,7 +20,7 @@ namespace Backend.Dotnet.Infrastructure.External.Clients
         {
             try
             {
-                var response = await _httpClient.PostAsync($"{ExternalServiceBaseUrl}/claims/{claimId}/complete", null);
+                var response = await _httpClient.PostAsync($"{ExternalServiceBaseUrl}/api/v1/claims/{claimId}/complete", null);
 
                 if (!response.IsSuccessStatusCode)
                 {
@@ -40,7 +40,7 @@ namespace Backend.Dotnet.Infrastructure.External.Clients
         {
             try
             {
-                var response = await _httpClient.GetAsync($"{ExternalServiceBaseUrl}/claims/{claimId}");
+                var response = await _httpClient.GetAsync($"{ExternalServiceBaseUrl}/api/v1/claims/{claimId}");
                 if (!response.IsSuccessStatusCode)
                 {
                     throw new InvalidOperationException($"Failed to fetch claim {claimId}. Status: {response.StatusCode}");
@@ -61,7 +61,7 @@ namespace Backend.Dotnet.Infrastructure.External.Clients
         {
             try
             {
-                var response = await _httpClient.GetAsync($"{ExternalServiceBaseUrl}/claims/{claimId}/items");
+                var response = await _httpClient.GetAsync($"{ExternalServiceBaseUrl}/api/v1/claims/{claimId}/items");
 
                 if (!response.IsSuccessStatusCode)
                 {
@@ -83,7 +83,7 @@ namespace Backend.Dotnet.Infrastructure.External.Clients
         {
             try
             {
-                var response = await _httpClient.GetAsync($"{ExternalServiceBaseUrl}/users/{technicianId}");
+                var response = await _httpClient.GetAsync($"{ExternalServiceBaseUrl}/api/v1/users/{technicianId}");
 
                 if (!response.IsSuccessStatusCode)
                 {
