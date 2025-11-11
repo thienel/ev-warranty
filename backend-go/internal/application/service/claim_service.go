@@ -331,8 +331,6 @@ func (s *claimService) Complete(tx application.Tx, id uuid.UUID, changedBy uuid.
 		return apperror.ErrInvalidInput.WithMessage("This action are not allowed")
 	}
 
-	// TODO: check work order
-
 	err = s.claimRepo.UpdateStatus(tx, id, entity.ClaimStatusCompleted)
 	if err != nil {
 		return err
