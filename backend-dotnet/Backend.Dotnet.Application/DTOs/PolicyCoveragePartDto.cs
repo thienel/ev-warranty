@@ -122,6 +122,9 @@ namespace Backend.Dotnet.Application.DTOs
             [JsonPropertyName("coverage_conditions")]
             public string CoverageConditions { get; set; }
 
+            [JsonPropertyName("is_inherited")]
+            public bool IsInherited { get; set; } = false;
+
             [JsonPropertyName("created_at")]
             public DateTime CreatedAt { get; set; }
 
