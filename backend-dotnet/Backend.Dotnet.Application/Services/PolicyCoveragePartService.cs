@@ -392,5 +392,10 @@ namespace Backend.Dotnet.Application.Services
                 };
             }
         }
+
+        public Task<BaseResponseDto<CoverageDetailsResponse>> GetCoverageDetailsAsync(Guid policyId, Guid partCategoryId)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
