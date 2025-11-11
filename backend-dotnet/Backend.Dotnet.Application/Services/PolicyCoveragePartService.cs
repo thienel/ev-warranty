@@ -413,12 +413,17 @@ namespace Backend.Dotnet.Application.Services
 
                     if (coverage != null && !coverage.CoverageConditions.IsNullOrEmpty())
                     {
+                        var response = coverage.ToCoverageDetailsResponse();
+                        if (response.PartCategoryId != partCategoryId)
+                            response.IsInherited = true;
+
                         return new BaseResponseDto<CoverageDetailsResponse>
                         {
+                            
                             IsSuccess = true,
                             Message = "Coverage details retrieved successfully",
                             //Data = coverage.ToCoverageDetailsResponse(partCategoryId, requestedCategory.CategoryName)
-                            Data = coverage.ToCoverageDetailsResponse()
+                            Data = response
                         };
                     }
 
