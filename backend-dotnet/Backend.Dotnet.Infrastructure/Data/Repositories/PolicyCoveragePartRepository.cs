@@ -26,6 +26,7 @@ namespace Backend.Dotnet.Infrastructure.Data.Repositories
         {
             return await _dbSet
                 .Include(cp => cp.PartCategory)
+                .Include(cp => cp.Policy)
                 .FirstOrDefaultAsync(cp =>
                     cp.PolicyId == policyId &&
                     cp.PartCategoryId == partCategoryId);

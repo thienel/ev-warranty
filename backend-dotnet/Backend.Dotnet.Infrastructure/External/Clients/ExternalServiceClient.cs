@@ -1,5 +1,7 @@
 ﻿using Backend.Dotnet.Application.Interfaces.External;
 using Backend.Dotnet.Infrastructure.External.Models;
+using Microsoft.AspNetCore.Http;
+using System.Net.Http.Headers;
 using System.Text.Json;
 using static Backend.Dotnet.Application.DTOs.IntermediaryDto;
 using static Backend.Dotnet.Infrastructure.External.Models.ExternalModel;

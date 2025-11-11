@@ -6,7 +6,7 @@ import (
 	context "context"
 	application "ev-warranty-go/internal/application"
 
-	entities "ev-warranty-go/internal/domain/entities"
+	entity "ev-warranty-go/internal/domain/entity"
 
 	mock "github.com/stretchr/testify/mock"
 
@@ -84,7 +84,7 @@ func (_c *ClaimAttachmentRepository_CountByClaimID_Call) RunAndReturn(run func(c
 }
 
 // Create provides a mock function with given fields: tx, attachment
-func (_m *ClaimAttachmentRepository) Create(tx application.Tx, attachment *entities.ClaimAttachment) error {
+func (_m *ClaimAttachmentRepository) Create(tx application.Tx, attachment *entity.ClaimAttachment) error {
 	ret := _m.Called(tx, attachment)
 
 	if len(ret) == 0 {
@@ -92,7 +92,7 @@ func (_m *ClaimAttachmentRepository) Create(tx application.Tx, attachment *entit
 	}
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(application.Tx, *entities.ClaimAttachment) error); ok {
+	if rf, ok := ret.Get(0).(func(application.Tx, *entity.ClaimAttachment) error); ok {
 		r0 = rf(tx, attachment)
 	} else {
 		r0 = ret.Error(0)
@@ -108,14 +108,14 @@ type ClaimAttachmentRepository_Create_Call struct {
 
 // Create is a helper method to define mock.On call
 //   - tx application.Tx
-//   - attachment *entities.ClaimAttachment
+//   - attachment *entity.ClaimAttachment
 func (_e *ClaimAttachmentRepository_Expecter) Create(tx interface{}, attachment interface{}) *ClaimAttachmentRepository_Create_Call {
 	return &ClaimAttachmentRepository_Create_Call{Call: _e.mock.On("Create", tx, attachment)}
 }
 
-func (_c *ClaimAttachmentRepository_Create_Call) Run(run func(tx application.Tx, attachment *entities.ClaimAttachment)) *ClaimAttachmentRepository_Create_Call {
+func (_c *ClaimAttachmentRepository_Create_Call) Run(run func(tx application.Tx, attachment *entity.ClaimAttachment)) *ClaimAttachmentRepository_Create_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(application.Tx), args[1].(*entities.ClaimAttachment))
+		run(args[0].(application.Tx), args[1].(*entity.ClaimAttachment))
 	})
 	return _c
 }
@@ -125,29 +125,29 @@ func (_c *ClaimAttachmentRepository_Create_Call) Return(_a0 error) *ClaimAttachm
 	return _c
 }
 
-func (_c *ClaimAttachmentRepository_Create_Call) RunAndReturn(run func(application.Tx, *entities.ClaimAttachment) error) *ClaimAttachmentRepository_Create_Call {
+func (_c *ClaimAttachmentRepository_Create_Call) RunAndReturn(run func(application.Tx, *entity.ClaimAttachment) error) *ClaimAttachmentRepository_Create_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
 // FindByClaimID provides a mock function with given fields: ctx, claimID
-func (_m *ClaimAttachmentRepository) FindByClaimID(ctx context.Context, claimID uuid.UUID) ([]*entities.ClaimAttachment, error) {
+func (_m *ClaimAttachmentRepository) FindByClaimID(ctx context.Context, claimID uuid.UUID) ([]*entity.ClaimAttachment, error) {
 	ret := _m.Called(ctx, claimID)
 
 	if len(ret) == 0 {
 		panic("no return value specified for FindByClaimID")
 	}
 
-	var r0 []*entities.ClaimAttachment
+	var r0 []*entity.ClaimAttachment
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID) ([]*entities.ClaimAttachment, error)); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID) ([]*entity.ClaimAttachment, error)); ok {
 		return rf(ctx, claimID)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID) []*entities.ClaimAttachment); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID) []*entity.ClaimAttachment); ok {
 		r0 = rf(ctx, claimID)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).([]*entities.ClaimAttachment)
+			r0 = ret.Get(0).([]*entity.ClaimAttachment)
 		}
 	}
 
@@ -179,34 +179,34 @@ func (_c *ClaimAttachmentRepository_FindByClaimID_Call) Run(run func(ctx context
 	return _c
 }
 
-func (_c *ClaimAttachmentRepository_FindByClaimID_Call) Return(_a0 []*entities.ClaimAttachment, _a1 error) *ClaimAttachmentRepository_FindByClaimID_Call {
+func (_c *ClaimAttachmentRepository_FindByClaimID_Call) Return(_a0 []*entity.ClaimAttachment, _a1 error) *ClaimAttachmentRepository_FindByClaimID_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
-func (_c *ClaimAttachmentRepository_FindByClaimID_Call) RunAndReturn(run func(context.Context, uuid.UUID) ([]*entities.ClaimAttachment, error)) *ClaimAttachmentRepository_FindByClaimID_Call {
+func (_c *ClaimAttachmentRepository_FindByClaimID_Call) RunAndReturn(run func(context.Context, uuid.UUID) ([]*entity.ClaimAttachment, error)) *ClaimAttachmentRepository_FindByClaimID_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
 // FindByID provides a mock function with given fields: ctx, id
-func (_m *ClaimAttachmentRepository) FindByID(ctx context.Context, id uuid.UUID) (*entities.ClaimAttachment, error) {
+func (_m *ClaimAttachmentRepository) FindByID(ctx context.Context, id uuid.UUID) (*entity.ClaimAttachment, error) {
 	ret := _m.Called(ctx, id)
 
 	if len(ret) == 0 {
 		panic("no return value specified for FindByID")
 	}
 
-	var r0 *entities.ClaimAttachment
+	var r0 *entity.ClaimAttachment
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID) (*entities.ClaimAttachment, error)); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID) (*entity.ClaimAttachment, error)); ok {
 		return rf(ctx, id)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID) *entities.ClaimAttachment); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID) *entity.ClaimAttachment); ok {
 		r0 = rf(ctx, id)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*entities.ClaimAttachment)
+			r0 = ret.Get(0).(*entity.ClaimAttachment)
 		}
 	}
 
@@ -238,34 +238,34 @@ func (_c *ClaimAttachmentRepository_FindByID_Call) Run(run func(ctx context.Cont
 	return _c
 }
 
-func (_c *ClaimAttachmentRepository_FindByID_Call) Return(_a0 *entities.ClaimAttachment, _a1 error) *ClaimAttachmentRepository_FindByID_Call {
+func (_c *ClaimAttachmentRepository_FindByID_Call) Return(_a0 *entity.ClaimAttachment, _a1 error) *ClaimAttachmentRepository_FindByID_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
-func (_c *ClaimAttachmentRepository_FindByID_Call) RunAndReturn(run func(context.Context, uuid.UUID) (*entities.ClaimAttachment, error)) *ClaimAttachmentRepository_FindByID_Call {
+func (_c *ClaimAttachmentRepository_FindByID_Call) RunAndReturn(run func(context.Context, uuid.UUID) (*entity.ClaimAttachment, error)) *ClaimAttachmentRepository_FindByID_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
 // FindByType provides a mock function with given fields: ctx, claimID, attachmentType
-func (_m *ClaimAttachmentRepository) FindByType(ctx context.Context, claimID uuid.UUID, attachmentType string) ([]*entities.ClaimAttachment, error) {
+func (_m *ClaimAttachmentRepository) FindByType(ctx context.Context, claimID uuid.UUID, attachmentType string) ([]*entity.ClaimAttachment, error) {
 	ret := _m.Called(ctx, claimID, attachmentType)
 
 	if len(ret) == 0 {
 		panic("no return value specified for FindByType")
 	}
 
-	var r0 []*entities.ClaimAttachment
+	var r0 []*entity.ClaimAttachment
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID, string) ([]*entities.ClaimAttachment, error)); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID, string) ([]*entity.ClaimAttachment, error)); ok {
 		return rf(ctx, claimID, attachmentType)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID, string) []*entities.ClaimAttachment); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID, string) []*entity.ClaimAttachment); ok {
 		r0 = rf(ctx, claimID, attachmentType)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).([]*entities.ClaimAttachment)
+			r0 = ret.Get(0).([]*entity.ClaimAttachment)
 		}
 	}
 
@@ -298,12 +298,12 @@ func (_c *ClaimAttachmentRepository_FindByType_Call) Run(run func(ctx context.Co
 	return _c
 }
 
-func (_c *ClaimAttachmentRepository_FindByType_Call) Return(_a0 []*entities.ClaimAttachment, _a1 error) *ClaimAttachmentRepository_FindByType_Call {
+func (_c *ClaimAttachmentRepository_FindByType_Call) Return(_a0 []*entity.ClaimAttachment, _a1 error) *ClaimAttachmentRepository_FindByType_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
-func (_c *ClaimAttachmentRepository_FindByType_Call) RunAndReturn(run func(context.Context, uuid.UUID, string) ([]*entities.ClaimAttachment, error)) *ClaimAttachmentRepository_FindByType_Call {
+func (_c *ClaimAttachmentRepository_FindByType_Call) RunAndReturn(run func(context.Context, uuid.UUID, string) ([]*entity.ClaimAttachment, error)) *ClaimAttachmentRepository_FindByType_Call {
 	_c.Call.Return(run)
 	return _c
 }

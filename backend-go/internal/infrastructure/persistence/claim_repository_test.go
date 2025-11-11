@@ -3,6 +3,7 @@ package persistence_test
 import (
 	"context"
 	"errors"
+	"ev-warranty-go/pkg/apperror"
 	"ev-warranty-go/pkg/mocks"
 	"regexp"
 	"time"
@@ -13,9 +14,8 @@ import (
 	. "github.com/onsi/gomega"
 	"gorm.io/gorm"
 
-	"ev-warranty-go/internal/apperrors"
-	"ev-warranty-go/internal/application/repositories"
-	"ev-warranty-go/internal/domain/entities"
+	"ev-warranty-go/internal/application/repository"
+	"ev-warranty-go/internal/domain/entity"
 	"ev-warranty-go/internal/infrastructure/persistence"
 )
 
@@ -23,7 +23,7 @@ var _ = Describe("ClaimRepository", func() {
 	var (
 		mock       sqlmock.Sqlmock
 		db         *gorm.DB
-		repository repositories.ClaimRepository
+		repository repository.ClaimRepository
 		ctx        context.Context
 	)
 
@@ -38,7 +38,7 @@ var _ = Describe("ClaimRepository", func() {
 	})
 
 	Describe("Create", func() {
-		var claim *entities.Claim
+		var claim *entity.Claim
 
 		BeforeEach(func() {
 			claim = newClaim()
@@ -64,7 +64,7 @@ var _ = Describe("ClaimRepository", func() {
 
 				err := repository.Create(mockTx, claim)
 
-				ExpectAppError(err, apperrors.ErrorCodeDuplicateKey)
+				ExpectAppError(err, apperror.ErrDuplicateKey.ErrorCode)
 			})
 		})
 
@@ -76,18 +76,18 @@ var _ = Describe("ClaimRepository", func() {
 
 				err := repository.Create(mockTx, claim)
 
-				ExpectAppError(err, apperrors.ErrorCodeDBOperation)
+				ExpectAppError(err, apperror.ErrDBOperation.ErrorCode)
 			})
 		})
 	})
 
 	Describe("Update", func() {
-		var claim *entities.Claim
+		var claim *entity.Claim
 
 		BeforeEach(func() {
 			claim = newClaim()
 			claim.Description = "Updated description"
-			claim.Status = entities.ClaimStatusApproved
+			claim.Status = entity.ClaimStatusApproved
 		})
 
 		Context("when claim is updated successfully", func() {
@@ -110,7 +110,7 @@ var _ = Describe("ClaimRepository", func() {
 
 				err := repository.Update(mockTx, claim)
 
-				ExpectAppError(err, apperrors.ErrorCodeDBOperation)
+				ExpectAppError(err, apperror.ErrDBOperation.ErrorCode)
 			})
 		})
 	})
@@ -150,7 +150,7 @@ var _ = Describe("ClaimRepository", func() {
 
 				err := repository.HardDelete(mockTx, claimID)
 
-				ExpectAppError(err, apperrors.ErrorCodeDBOperation)
+				ExpectAppError(err, apperror.ErrDBOperation.ErrorCode)
 			})
 		})
 	})
@@ -182,7 +182,7 @@ var _ = Describe("ClaimRepository", func() {
 
 				err := repository.SoftDelete(mockTx, claimID)
 
-				ExpectAppError(err, apperrors.ErrorCodeDBOperation)
+				ExpectAppError(err, apperror.ErrDBOperation.ErrorCode)
 			})
 		})
 	})
@@ -193,7 +193,7 @@ var _ = Describe("ClaimRepository", func() {
 
 		BeforeEach(func() {
 			claimID = uuid.New()
-			status = entities.ClaimStatusApproved
+			status = entity.ClaimStatusApproved
 		})
 
 		Context("when status is updated successfully", func() {
@@ -224,19 +224,19 @@ var _ = Describe("ClaimRepository", func() {
 
 				err := repository.UpdateStatus(mockTx, claimID, status)
 
-				ExpectAppError(err, apperrors.ErrorCodeDBOperation)
+				ExpectAppError(err, apperror.ErrDBOperation.ErrorCode)
 			})
 		})
 
 		Context("boundary cases for status", func() {
 			It("should handle all valid status values", func() {
 				statuses := []string{
-					entities.ClaimStatusDraft,
-					entities.ClaimStatusSubmitted,
-					entities.ClaimStatusReviewing,
-					entities.ClaimStatusApproved,
-					entities.ClaimStatusRejected,
-					entities.ClaimStatusCancelled,
+					entity.ClaimStatusDraft,
+					entity.ClaimStatusSubmitted,
+					entity.ClaimStatusReviewing,
+					entity.ClaimStatusApproved,
+					entity.ClaimStatusRejected,
+					entity.ClaimStatusCancelled,
 				}
 
 				for _, s := range statuses {
@@ -296,7 +296,7 @@ var _ = Describe("ClaimRepository", func() {
 				claim, err := repository.FindByID(ctx, claimID)
 
 				Expect(claim).To(BeNil())
-				ExpectAppError(err, apperrors.ErrorCodeClaimNotFound)
+				ExpectAppError(err, apperror.ErrNotFoundError.ErrorCode)
 			})
 		})
 
@@ -307,7 +307,7 @@ var _ = Describe("ClaimRepository", func() {
 				claim, err := repository.FindByID(ctx, claimID)
 
 				Expect(claim).To(BeNil())
-				ExpectAppError(err, apperrors.ErrorCodeDBOperation)
+				ExpectAppError(err, apperror.ErrDBOperation.ErrorCode)
 			})
 		})
 	})
@@ -324,10 +324,10 @@ var _ = Describe("ClaimRepository", func() {
 					"id", "vehicle_id", "customer_id", "description", "status",
 					"total_cost", "approved_by", "created_at", "updated_at", "deleted_at",
 				}).AddRow(
-					claimID1, vehicleID, customerID, "Claim 1", entities.ClaimStatusDraft,
+					claimID1, vehicleID, customerID, "Claim 1", entity.ClaimStatusDraft,
 					1000.0, nil, time.Now(), time.Now(), nil,
 				).AddRow(
-					claimID2, vehicleID, customerID, "Claim 2", entities.ClaimStatusSubmitted,
+					claimID2, vehicleID, customerID, "Claim 2", entity.ClaimStatusSubmitted,
 					2000.0, nil, time.Now(), time.Now(), nil,
 				)
 
@@ -366,7 +366,7 @@ var _ = Describe("ClaimRepository", func() {
 				claims, err := repository.FindAll(ctx)
 
 				Expect(claims).To(BeNil())
-				ExpectAppError(err, apperrors.ErrorCodeDBOperation)
+				ExpectAppError(err, apperror.ErrDBOperation.ErrorCode)
 			})
 		})
 	})
@@ -387,10 +387,10 @@ var _ = Describe("ClaimRepository", func() {
 					"id", "vehicle_id", "customer_id", "description", "status",
 					"total_cost", "approved_by", "created_at", "updated_at", "deleted_at",
 				}).AddRow(
-					claimID1, vehicleID, customerID, "Claim 1", entities.ClaimStatusDraft,
+					claimID1, vehicleID, customerID, "Claim 1", entity.ClaimStatusDraft,
 					1000.0, nil, time.Now(), time.Now(), nil,
 				).AddRow(
-					claimID2, vehicleID, customerID, "Claim 2", entities.ClaimStatusSubmitted,
+					claimID2, vehicleID, customerID, "Claim 2", entity.ClaimStatusSubmitted,
 					2000.0, nil, time.Now(), time.Now(), nil,
 				)
 
@@ -434,7 +434,7 @@ var _ = Describe("ClaimRepository", func() {
 				claims, err := repository.FindByCustomerID(ctx, customerID)
 
 				Expect(claims).To(BeNil())
-				ExpectAppError(err, apperrors.ErrorCodeDBOperation)
+				ExpectAppError(err, apperror.ErrDBOperation.ErrorCode)
 			})
 		})
 	})
@@ -455,10 +455,10 @@ var _ = Describe("ClaimRepository", func() {
 					"id", "vehicle_id", "customer_id", "description", "status",
 					"total_cost", "approved_by", "created_at", "updated_at", "deleted_at",
 				}).AddRow(
-					claimID1, vehicleID, customerID, "Claim 1", entities.ClaimStatusDraft,
+					claimID1, vehicleID, customerID, "Claim 1", entity.ClaimStatusDraft,
 					1000.0, nil, time.Now(), time.Now(), nil,
 				).AddRow(
-					claimID2, vehicleID, customerID, "Claim 2", entities.ClaimStatusSubmitted,
+					claimID2, vehicleID, customerID, "Claim 2", entity.ClaimStatusSubmitted,
 					2000.0, nil, time.Now(), time.Now(), nil,
 				)
 
@@ -502,19 +502,19 @@ var _ = Describe("ClaimRepository", func() {
 				claims, err := repository.FindByVehicleID(ctx, vehicleID)
 
 				Expect(claims).To(BeNil())
-				ExpectAppError(err, apperrors.ErrorCodeDBOperation)
+				ExpectAppError(err, apperror.ErrDBOperation.ErrorCode)
 			})
 		})
 	})
 })
 
-func newClaim() *entities.Claim {
-	return &entities.Claim{
+func newClaim() *entity.Claim {
+	return &entity.Claim{
 		ID:          uuid.New(),
 		VehicleID:   uuid.New(),
 		CustomerID:  uuid.New(),
 		Description: "Test claim description",
-		Status:      entities.ClaimStatusDraft,
+		Status:      entity.ClaimStatusDraft,
 		TotalCost:   1000.0,
 		ApprovedBy:  nil,
 		CreatedAt:   time.Now(),

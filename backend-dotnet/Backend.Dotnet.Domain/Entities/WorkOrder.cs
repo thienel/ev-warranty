@@ -7,6 +7,7 @@ namespace Backend.Dotnet.Domain.Entities
     {
         Pending,
         InProgress,
+        ToVerify,
         Completed
     }
     public class WorkOrder : BaseEntity, IStatus<WorkOrderStatus>
@@ -29,19 +30,29 @@ namespace Backend.Dotnet.Domain.Entities
             Status = WorkOrderStatus.Pending;
         }
 
+        public void Completed()
+        {
+            if (Status != WorkOrderStatus.ToVerify)
+                throw new BusinessRuleViolationException("Work order must be verification to completed.");
+
+            CompletedDate = DateTime.UtcNow;
+            Status = WorkOrderStatus.Completed;
+            SetUpdatedAt();
+        }
+
         public void ChangeStatus(WorkOrderStatus newStatus)
         {
             if (Status == WorkOrderStatus.Completed)
                 throw new BusinessRuleViolationException("Cannot change status of completed work order");
-            
-            if (Status == WorkOrderStatus.InProgress && newStatus == WorkOrderStatus.Pending)
-                throw new BusinessRuleViolationException("InProgress work order cannot revert to Pending");
-            
-            if (Status == WorkOrderStatus.Pending && newStatus == WorkOrderStatus.Completed)
-                throw new BusinessRuleViolationException("Must be InProgress before Completed");
 
-            if (newStatus == WorkOrderStatus.Completed)
-                CompletedDate = DateTime.UtcNow;
+            if (Status == WorkOrderStatus.ToVerify)
+                throw new BusinessRuleViolationException("Work order awaiting verification cannot change status. Must be completed by staff.");
+
+            if (Status == WorkOrderStatus.Pending && newStatus != WorkOrderStatus.InProgress)
+                throw new BusinessRuleViolationException("Pending work order can only transition to InProgress");
+
+            if (Status == WorkOrderStatus.InProgress && newStatus != WorkOrderStatus.ToVerify)
+                throw new BusinessRuleViolationException("InProgress work order can only transition to ToVerify.");
 
             Status = newStatus;
             SetUpdatedAt();

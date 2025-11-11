@@ -1,21 +1,21 @@
 package main
 
 import (
-	"ev-warranty-go/internal/domain/entities"
-	"ev-warranty-go/internal/security"
+	"ev-warranty-go/internal/domain/entity"
+	"ev-warranty-go/pkg/security"
 	"os"
 )
 
 func (app *App) seedDbData() {
-	office := entities.Office{}
+	office := entity.Office{}
 	if err := app.DB.DB.
-		Where(entities.Office{
+		Where(entity.Office{
 			OfficeName: "Head Office",
-			OfficeType: entities.OfficeTypeEVM,
+			OfficeType: entity.OfficeTypeEVM,
 		}).
-		FirstOrCreate(&office, entities.Office{
+		FirstOrCreate(&office, entity.Office{
 			OfficeName: "Head Office",
-			OfficeType: entities.OfficeTypeEVM,
+			OfficeType: entity.OfficeTypeEVM,
 			Address:    "Main Street",
 			IsActive:   true,
 		}).Error; err != nil {
@@ -40,12 +40,12 @@ func (app *App) seedDbData() {
 		os.Exit(1)
 	}
 
-	admin := entities.User{}
+	admin := entity.User{}
 	if err := app.DB.DB.
-		Where(&entities.User{Email: email}).
-		Attrs(entities.User{
+		Where(&entity.User{Email: email}).
+		Attrs(entity.User{
 			Name:         "System Admin",
-			Role:         entities.UserRoleAdmin,
+			Role:         entity.UserRoleAdmin,
 			PasswordHash: hashed,
 			IsActive:     true,
 			OfficeID:     office.ID,

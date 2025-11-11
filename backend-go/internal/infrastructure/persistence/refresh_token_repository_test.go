@@ -3,6 +3,7 @@ package persistence_test
 import (
 	"context"
 	"errors"
+	"ev-warranty-go/pkg/apperror"
 	"regexp"
 	"time"
 
@@ -12,9 +13,8 @@ import (
 	. "github.com/onsi/gomega"
 	"gorm.io/gorm"
 
-	"ev-warranty-go/internal/apperrors"
-	"ev-warranty-go/internal/application/repositories"
-	"ev-warranty-go/internal/domain/entities"
+	"ev-warranty-go/internal/application/repository"
+	"ev-warranty-go/internal/domain/entity"
 	"ev-warranty-go/internal/infrastructure/persistence"
 )
 
@@ -22,7 +22,7 @@ var _ = Describe("RefreshTokenRepository", func() {
 	var (
 		mock       sqlmock.Sqlmock
 		db         *gorm.DB
-		repository repositories.RefreshTokenRepository
+		repository repository.RefreshTokenRepository
 		ctx        context.Context
 	)
 
@@ -37,7 +37,7 @@ var _ = Describe("RefreshTokenRepository", func() {
 	})
 
 	Describe("Create", func() {
-		var token *entities.RefreshToken
+		var token *entity.RefreshToken
 
 		BeforeEach(func() {
 			token = newRefreshToken()
@@ -59,7 +59,7 @@ var _ = Describe("RefreshTokenRepository", func() {
 
 				err := repository.Create(ctx, token)
 
-				ExpectAppError(err, apperrors.ErrorCodeDuplicateKey)
+				ExpectAppError(err, apperror.ErrDuplicateKey.ErrorCode)
 			})
 		})
 
@@ -69,7 +69,7 @@ var _ = Describe("RefreshTokenRepository", func() {
 
 				err := repository.Create(ctx, token)
 
-				ExpectAppError(err, apperrors.ErrorCodeDBOperation)
+				ExpectAppError(err, apperror.ErrDBOperation.ErrorCode)
 			})
 		})
 
@@ -115,7 +115,7 @@ var _ = Describe("RefreshTokenRepository", func() {
 	})
 
 	Describe("Update", func() {
-		var token *entities.RefreshToken
+		var token *entity.RefreshToken
 
 		BeforeEach(func() {
 			token = newRefreshToken()
@@ -138,7 +138,7 @@ var _ = Describe("RefreshTokenRepository", func() {
 
 				err := repository.Update(ctx, token)
 
-				ExpectAppError(err, apperrors.ErrorCodeDBOperation)
+				ExpectAppError(err, apperror.ErrDBOperation.ErrorCode)
 			})
 		})
 
@@ -203,7 +203,7 @@ var _ = Describe("RefreshTokenRepository", func() {
 				token, err := repository.Find(ctx, tokenStr)
 
 				Expect(token).To(BeNil())
-				ExpectAppError(err, apperrors.ErrorCodeRefreshTokenNotFound)
+				ExpectAppError(err, apperror.ErrNotFoundError.ErrorCode)
 			})
 		})
 
@@ -216,7 +216,7 @@ var _ = Describe("RefreshTokenRepository", func() {
 				token, err := repository.Find(ctx, tokenStr)
 
 				Expect(token).To(BeNil())
-				ExpectAppError(err, apperrors.ErrorCodeDBOperation)
+				ExpectAppError(err, apperror.ErrDBOperation.ErrorCode)
 			})
 		})
 
@@ -375,7 +375,7 @@ var _ = Describe("RefreshTokenRepository", func() {
 
 				err := repository.Revoke(ctx, tokenStr)
 
-				ExpectAppError(err, apperrors.ErrorCodeDBOperation)
+				ExpectAppError(err, apperror.ErrDBOperation.ErrorCode)
 			})
 		})
 
@@ -419,8 +419,8 @@ var _ = Describe("RefreshTokenRepository", func() {
 	})
 })
 
-func newRefreshToken() *entities.RefreshToken {
-	return &entities.RefreshToken{
+func newRefreshToken() *entity.RefreshToken {
+	return &entity.RefreshToken{
 		ID:        uuid.New(),
 		UserID:    uuid.New(),
 		Token:     "test-refresh-token-" + uuid.New().String(),

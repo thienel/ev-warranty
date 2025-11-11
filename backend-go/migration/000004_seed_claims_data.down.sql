@@ -1,0 +1,46 @@
+BEGIN;
+
+-- Delete in reverse order of creation to respect foreign key constraints
+DELETE FROM claim_histories WHERE claim_id IN (
+    'a50e8400-e29b-41d4-a716-446655440001',
+    'a50e8400-e29b-41d4-a716-446655440002', 
+    'a50e8400-e29b-41d4-a716-446655440003',
+    'a50e8400-e29b-41d4-a716-446655440004',
+    'a50e8400-e29b-41d4-a716-446655440005',
+    'a50e8400-e29b-41d4-a716-446655440006',
+    'a50e8400-e29b-41d4-a716-446655440007'
+);
+
+DELETE FROM claim_attachments WHERE claim_id IN (
+    'a50e8400-e29b-41d4-a716-446655440001',
+    'a50e8400-e29b-41d4-a716-446655440002',
+    'a50e8400-e29b-41d4-a716-446655440003', 
+    'a50e8400-e29b-41d4-a716-446655440004',
+    'a50e8400-e29b-41d4-a716-446655440005',
+    'a50e8400-e29b-41d4-a716-446655440006',
+    'a50e8400-e29b-41d4-a716-446655440007'
+);
+
+DELETE FROM claim_items WHERE claim_id IN (
+    'a50e8400-e29b-41d4-a716-446655440001',
+    'a50e8400-e29b-41d4-a716-446655440002',
+    'a50e8400-e29b-41d4-a716-446655440003',
+    'a50e8400-e29b-41d4-a716-446655440004', 
+    'a50e8400-e29b-41d4-a716-446655440005',
+    'a50e8400-e29b-41d4-a716-446655440006',
+    'a50e8400-e29b-41d4-a716-446655440007'
+);
+
+DELETE FROM claims WHERE id IN (
+    'a50e8400-e29b-41d4-a716-446655440001',
+    'a50e8400-e29b-41d4-a716-446655440002',
+    'a50e8400-e29b-41d4-a716-446655440003',
+    'a50e8400-e29b-41d4-a716-446655440004',
+    'a50e8400-e29b-41d4-a716-446655440005',
+    'a50e8400-e29b-41d4-a716-446655440006',
+    'a50e8400-e29b-41d4-a716-446655440007'
+);
+
+-- Note: We don't delete users and offices since they belong to migration 3
+
+COMMIT;
