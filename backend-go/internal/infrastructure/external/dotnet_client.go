@@ -38,7 +38,7 @@ type WorkOrderResponseDto struct {
 }
 
 type DotnetClient interface {
-	CreateWorkOrder(ctx context.Context, req *CreateWorkOrderRequest) (*WorkOrderResponse, error)
+	CreateWorkOrder(ctx context.Context, req *CreateWorkOrderRequest, authToken string) (*WorkOrderResponse, error)
 }
 
 type dotnetClient struct {
@@ -55,8 +55,8 @@ func NewDotnetClient(baseURL string) DotnetClient {
 	}
 }
 
-func (c *dotnetClient) CreateWorkOrder(ctx context.Context, req *CreateWorkOrderRequest) (*WorkOrderResponse, error) {
-	url := fmt.Sprintf("%s/api/v1/work-orders", c.baseURL)
+func (c *dotnetClient) CreateWorkOrder(ctx context.Context, req *CreateWorkOrderRequest, authToken string) (*WorkOrderResponse, error) {
+	url := fmt.Sprintf("%s/work-orders", c.baseURL)
 
 	jsonData, err := json.Marshal(req)
 	if err != nil {
@@ -70,6 +70,11 @@ func (c *dotnetClient) CreateWorkOrder(ctx context.Context, req *CreateWorkOrder
 
 	httpReq.Header.Set("Content-Type", "application/json")
 	httpReq.Header.Set("Accept", "application/json")
+
+	// Add Authorization header if provided
+	if authToken != "" {
+		httpReq.Header.Set("Authorization", authToken)
+	}
 
 	resp, err := c.httpClient.Do(httpReq)
 	if err != nil {

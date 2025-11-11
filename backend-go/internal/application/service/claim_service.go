@@ -39,7 +39,7 @@ type ClaimService interface {
 
 	UpdateStatus(tx application.Tx, id uuid.UUID, status string, changedBy uuid.UUID) error
 	Submit(tx application.Tx, id uuid.UUID, changedBy uuid.UUID) error
-	DoneReview(tx application.Tx, id uuid.UUID, changedBy uuid.UUID) error
+	DoneReview(tx application.Tx, id uuid.UUID, changedBy uuid.UUID, authToken string) error
 	Complete(tx application.Tx, id uuid.UUID, changedBy uuid.UUID) error
 
 	GetHistory(ctx context.Context, claimID uuid.UUID) ([]*entity.ClaimHistory, error)
@@ -277,7 +277,7 @@ func (s *claimService) Submit(tx application.Tx, id uuid.UUID, changedBy uuid.UU
 	return nil
 }
 
-func (s *claimService) DoneReview(tx application.Tx, id uuid.UUID, changedBy uuid.UUID) error {
+func (s *claimService) DoneReview(tx application.Tx, id uuid.UUID, changedBy uuid.UUID, authToken string) error {
 	claim, err := s.claimRepo.FindByID(tx.GetCtx(), id)
 	if err != nil {
 		return err
@@ -326,7 +326,7 @@ func (s *claimService) DoneReview(tx application.Tx, id uuid.UUID, changedBy uui
 		AssignedTechnicianID: claim.TechnicianID,
 	}
 
-	_, err = s.dotnetClient.CreateWorkOrder(tx.GetCtx(), workOrderReq)
+	_, err = s.dotnetClient.CreateWorkOrder(tx.GetCtx(), workOrderReq, authToken)
 	if err != nil {
 		s.log.Error("Failed to create work order via .NET backend", "error", err, "claimId", id)
 		return err
