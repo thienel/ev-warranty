@@ -76,6 +76,9 @@ FRONTEND_BASE_URL=http://localhost:3000
 CLOUDINARY_URL=cloudinary://api_key:api_secret@cloud_name
 CLOUDINARY_UPLOAD_FOLDER=ev-warranty-claim-attachment
 
+# Backend .NET Integration
+DOTNET_BACKEND_URL=http://localhost:5000
+
 # Admin Setup
 ADMIN_EMAIL=admin@example.com
 ADMIN_PASSWORD=Admin@123
@@ -244,6 +247,7 @@ make confirm
 | `FRONTEND_BASE_URL` | Frontend application URL | `http://localhost:3000` |
 | `CLOUDINARY_URL` | Cloudinary connection URL | - |
 | `CLOUDINARY_UPLOAD_FOLDER` | Upload folder name in Cloudinary | `ev-warranty-claim-attachment` |
+| `DOTNET_BACKEND_URL` | Backend .NET API base URL | `http://localhost:5000` |
 
 ## 📁 Project Structure
 
