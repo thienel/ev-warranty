@@ -10,7 +10,6 @@ namespace Backend.Dotnet.API.Controllers
     [ApiController]
     [Route("customers")]
     [Produces("application/json")]
-    //[Authorize(Roles = SystemRoles.UserRoleScStaff)]
     public class CustomersController : ControllerBase
     {
         private readonly ICustomerService _customerService;
@@ -24,7 +23,6 @@ namespace Backend.Dotnet.API.Controllers
         /// Get customers with optional filtering
         /// </summary>
         [HttpGet]
-        //[Authorize(Roles = SystemRoles.UserRoleScTechnician)]
         [ProducesResponseType(typeof(BaseResponseDto<IEnumerable<CustomerResponse>>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BaseResponseDto), StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> GetAll(
@@ -74,6 +72,7 @@ namespace Backend.Dotnet.API.Controllers
         [HttpPost]
         [ProducesResponseType(typeof(BaseResponseDto<CustomerResponse>), StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(BaseResponseDto), StatusCodes.Status400BadRequest)]
+        [Authorize(Roles = SystemRoles.UserRoleScStaff)]
         public async Task<IActionResult> Create([FromBody] CreateCustomerRequest request)
         {
             if (!ModelState.IsValid)
@@ -90,6 +89,7 @@ namespace Backend.Dotnet.API.Controllers
         [ProducesResponseType(typeof(BaseResponseDto<CustomerResponse>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BaseResponseDto), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(BaseResponseDto), StatusCodes.Status404NotFound)]
+        [Authorize(Roles = SystemRoles.UserRoleScStaff)]
         public async Task<IActionResult> Update(Guid id, [FromBody] UpdateCustomerRequest request)
         {
             if (!ModelState.IsValid)
@@ -110,6 +110,7 @@ namespace Backend.Dotnet.API.Controllers
         [ProducesResponseType(typeof(BaseResponseDto<CustomerResponse>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BaseResponseDto), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(BaseResponseDto), StatusCodes.Status400BadRequest)]
+        [Authorize(Roles = SystemRoles.UserRoleScStaff)]
         public async Task<IActionResult> SoftDelete(Guid id)
         {
             var result = await _customerService.SoftDeleteAsync(id);
@@ -123,6 +124,7 @@ namespace Backend.Dotnet.API.Controllers
         [ProducesResponseType(typeof(BaseResponseDto<CustomerResponse>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BaseResponseDto), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(BaseResponseDto), StatusCodes.Status400BadRequest)]
+        [Authorize(Roles = SystemRoles.UserRoleScStaff)]
         public async Task<IActionResult> Restore(Guid id)
         {
             var result = await _customerService.RestoreAsync(id);

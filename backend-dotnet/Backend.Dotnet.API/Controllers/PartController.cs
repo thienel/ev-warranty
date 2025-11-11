@@ -1,6 +1,7 @@
-﻿using Backend.Dotnet.Application.DTOs;
+﻿using Backend.Dotnet.Application.Constants;
+using Backend.Dotnet.Application.DTOs;
 using Backend.Dotnet.Application.Interfaces;
-using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using static Backend.Dotnet.Application.DTOs.PartDto;
 
@@ -80,6 +81,34 @@ namespace Backend.Dotnet.API.Controllers
             return Ok(result);
         }
 
+
+        [HttpPost("reserve")]
+        [ProducesResponseType(typeof(BaseResponseDto<PartResponse>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(BaseResponseDto), StatusCodes.Status404NotFound)]
+        [Authorize(Roles = SystemRoles.UserRoleAdmin + "," + SystemRoles.UserRoleEvmStaff)]
+        public async Task<IActionResult> ReserveByOfficeIdAndCategoryId([FromBody] ReservePartRequest request)
+        {
+            var result = await _partService.
+                ReserveByOfficeIdAndCategoryIdAsync(request.OfficeLocationId, request.CategoryId);
+            if (!result.IsSuccess)
+                return NotFound(result);
+
+            return Ok(result);
+        }
+
+        [HttpPost("{id}/unreserve")]
+        [ProducesResponseType(typeof(BaseResponseDto<PartResponse>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(BaseResponseDto), StatusCodes.Status404NotFound)]
+        [Authorize(Roles = SystemRoles.UserRoleAdmin + "," + SystemRoles.UserRoleEvmStaff)]
+        public async Task<IActionResult> Unreserve(Guid id)
+        {
+            var result = await _partService.Unreserve(id);
+            if (!result.IsSuccess)
+                return BadRequest(result);
+
+            return NoContent();
+        }
+
         [HttpGet("{id}/details")]
         [ProducesResponseType(typeof(BaseResponseDto<PartWithDetailsResponse>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BaseResponseDto), StatusCodes.Status404NotFound)]
@@ -95,6 +124,7 @@ namespace Backend.Dotnet.API.Controllers
         [HttpPost]
         [ProducesResponseType(typeof(BaseResponseDto<PartResponse>), StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(BaseResponseDto), StatusCodes.Status400BadRequest)]
+        [Authorize(Roles = SystemRoles.UserRoleAdmin + "," + SystemRoles.UserRoleEvmStaff)]
         public async Task<IActionResult> Create([FromBody] CreatePartRequest request)
         {
             if (!ModelState.IsValid)
@@ -111,6 +141,7 @@ namespace Backend.Dotnet.API.Controllers
         [ProducesResponseType(typeof(BaseResponseDto<PartResponse>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BaseResponseDto), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(BaseResponseDto), StatusCodes.Status404NotFound)]
+        [Authorize(Roles = SystemRoles.UserRoleAdmin + "," + SystemRoles.UserRoleEvmStaff)]
         public async Task<IActionResult> Update(Guid id, [FromBody] UpdatePartRequest request)
         {
             if (!ModelState.IsValid)
@@ -127,6 +158,7 @@ namespace Backend.Dotnet.API.Controllers
         [ProducesResponseType(typeof(BaseResponseDto<PartResponse>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BaseResponseDto), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(BaseResponseDto), StatusCodes.Status404NotFound)]
+        [Authorize(Roles = SystemRoles.UserRoleAdmin + "," + SystemRoles.UserRoleEvmStaff)]
         public async Task<IActionResult> ChangeCategory(Guid id, [FromBody] ChangePartCategoryRequest request)
         {
             if (!ModelState.IsValid)
@@ -145,6 +177,7 @@ namespace Backend.Dotnet.API.Controllers
         [ProducesResponseType(typeof(BaseResponseDto<PartResponse>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BaseResponseDto), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(BaseResponseDto), StatusCodes.Status404NotFound)]
+        [Authorize(Roles = SystemRoles.UserRoleAdmin + "," + SystemRoles.UserRoleEvmStaff)]
         public async Task<IActionResult> ChangeStatus(Guid id, [FromBody] PartChangeStatusRequest request)
         {
             if (!ModelState.IsValid)
@@ -161,6 +194,7 @@ namespace Backend.Dotnet.API.Controllers
         [ProducesResponseType(typeof(BaseResponseDto), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BaseResponseDto), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(BaseResponseDto), StatusCodes.Status400BadRequest)]
+        [Authorize(Roles = SystemRoles.UserRoleAdmin + "," + SystemRoles.UserRoleEvmStaff)]
         public async Task<IActionResult> Delete(Guid id)
         {
             var result = await _partService.DeleteAsync(id);

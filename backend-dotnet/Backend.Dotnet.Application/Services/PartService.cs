@@ -112,6 +112,82 @@ namespace Backend.Dotnet.Application.Services
             }
         }
 
+
+        public async Task<BaseResponseDto<PartResponse>> ReserveByOfficeIdAndCategoryIdAsync(Guid officeId, Guid categoryId)
+        {
+            try
+            {
+                var part = await _unitOfWork.Parts.GetByOfficeIdAndCategoryId(officeId, categoryId);
+                if (part == null)
+                {
+                    return new BaseResponseDto<PartResponse>
+                    {
+                        IsSuccess = false,
+                        Message = $"Part with office id '{officeId}' and category id '{categoryId}' not found",
+                        ErrorCode = "NOT_FOUND"
+                    };
+                }
+
+                part.ChangeStatus(PartStatus.Reserved);
+                _unitOfWork.Parts.Update(part);
+
+                return new BaseResponseDto<PartResponse>
+                {
+                    IsSuccess = true,
+                    Message = "Part reserved successfully",
+                    Data = part.ToResponse()
+                };
+            }
+            catch (Exception)
+            {
+                return new BaseResponseDto<PartResponse>
+                {
+                    IsSuccess = false,
+                    Message = "An error occurred while retrieving part",
+                    ErrorCode = "INTERNAL_ERROR"
+                };
+            }
+        }
+        
+        public async Task<BaseResponseDto> Unreserve(Guid id)
+        {
+            try
+            {
+                var part = await _unitOfWork.Parts.GetByIdAsync(id);
+                if (part == null)
+                {
+                    return new BaseResponseDto
+                    {
+                        IsSuccess = false,
+                        Message = $"Part with id '{id}' not found",
+                        ErrorCode = "NOT_FOUND"
+                    };
+                }
+
+                if (part.Status == PartStatus.Reserved)
+                {
+                    part.ChangeStatus(PartStatus.Available);
+                    _unitOfWork.Parts.Update(part);
+                }
+                
+                return new BaseResponseDto
+                {
+                    IsSuccess = true,
+                    Message = "Part unreserved successfully",
+                };
+            }
+            catch (Exception)
+            {
+                return new BaseResponseDto
+                {
+                    IsSuccess = false,
+                    Message = "An error occurred while retrieving part",
+                    ErrorCode = "INTERNAL_ERROR"
+                };
+            }
+        }
+        
+        
         public async Task<BaseResponseDto<IEnumerable<PartResponse>>> GetAllAsync()
         {
             try

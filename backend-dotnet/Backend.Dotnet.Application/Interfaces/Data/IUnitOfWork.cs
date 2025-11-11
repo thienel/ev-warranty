@@ -9,6 +9,7 @@
         IPartCategoryRepository PartCategories { get; }
         IPartRepository Parts { get; }
         IPolicyCoveragePartRepository PolicyCoverageParts { get; }
+        IWorkOrderRepository WorkOrderRepository { get; }
 
         Task<int> SaveChangesAsync();
         int SaveChanges();

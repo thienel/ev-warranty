@@ -14,6 +14,7 @@ namespace Backend.Dotnet.Infrastructure.Data.Context
         public DbSet<Part> Parts { get; set; }
         public DbSet<WarrantyPolicy> WarrantyPolicys { get; set; }
         public DbSet<PolicyCoveragePart> PolicyCoverageParts { get; set; }
+        public DbSet<WorkOrder> WorkOrders { get; set; }
 
         public AppDbContext(DbContextOptions<AppDbContext> options)
             : base(options)

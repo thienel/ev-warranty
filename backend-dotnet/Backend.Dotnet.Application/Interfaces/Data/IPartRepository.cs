@@ -18,6 +18,7 @@ namespace Backend.Dotnet.Application.Interfaces.Data
         Task<IEnumerable<Part>> GetByStatusAsync(PartStatus status);
 
         Task<Part?> GetWithDetailsAsync(Guid partId);
+        Task<Part?> GetByOfficeIdAndCategoryId(Guid officeId, Guid categoryId);
         Task<IEnumerable<Part>> GetAllWithDetailsAsync();
         Task<IEnumerable<Part>> SearchAsync(string searchTerm);
 
