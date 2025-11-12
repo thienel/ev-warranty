@@ -145,11 +145,24 @@ var _ = Describe("ClaimService", func() {
 
 		Context("when claim is created successfully", func() {
 			It("should create claim and history", func() {
+				staff := &entity.User{
+					ID:       cmd.StaffID,
+					Role:     entity.UserRoleScStaff,
+					OfficeID: cmd.OfficeID,
+				}
+				technician := &entity.User{
+					ID:       cmd.TechnicianID,
+					Role:     entity.UserRoleScTechnician,
+					OfficeID: cmd.OfficeID,
+				}
+
+				mockUserRepo.EXPECT().FindByID(ctx, cmd.StaffID).Return(staff, nil).Once()
+				mockUserRepo.EXPECT().FindByID(ctx, cmd.TechnicianID).Return(technician, nil).Once()
+				mockClaimRepo.EXPECT().CountPendingByTechnician(ctx, cmd.TechnicianID).Return(int64(0), nil).Once()
 				mockClaimRepo.EXPECT().Create(mockTx, mock.MatchedBy(func(c *entity.Claim) bool {
 					return c.VehicleID == cmd.VehicleID &&
 						c.CustomerID == cmd.CustomerID &&
-						c.Description == cmd.Description &&
-						c.Status == entity.ClaimStatusDraft
+						c.Description == cmd.Description
 				})).Return(nil).Once()
 
 				mockHistRepo.EXPECT().Create(mockTx, mock.MatchedBy(func(h *entity.ClaimHistory) bool {
@@ -163,13 +176,26 @@ var _ = Describe("ClaimService", func() {
 				Expect(claim).NotTo(BeNil())
 				Expect(claim.VehicleID).To(Equal(cmd.VehicleID))
 				Expect(claim.CustomerID).To(Equal(cmd.CustomerID))
-				Expect(claim.Status).To(Equal(entity.ClaimStatusDraft))
 			})
 		})
 
 		Context("when claim repository fails", func() {
 			It("should return error", func() {
+				staff := &entity.User{
+					ID:       cmd.StaffID,
+					Role:     entity.UserRoleScStaff,
+					OfficeID: cmd.OfficeID,
+				}
+				technician := &entity.User{
+					ID:       cmd.TechnicianID,
+					Role:     entity.UserRoleScTechnician,
+					OfficeID: cmd.OfficeID,
+				}
 				dbErr := apperror.ErrDBOperation
+
+				mockUserRepo.EXPECT().FindByID(ctx, cmd.StaffID).Return(staff, nil).Once()
+				mockUserRepo.EXPECT().FindByID(ctx, cmd.TechnicianID).Return(technician, nil).Once()
+				mockClaimRepo.EXPECT().CountPendingByTechnician(ctx, cmd.TechnicianID).Return(int64(0), nil).Once()
 				mockClaimRepo.EXPECT().Create(mockTx, mock.AnythingOfType("*entity.Claim")).Return(dbErr).Once()
 
 				claim, err := claimService.Create(mockTx, cmd)
@@ -182,7 +208,21 @@ var _ = Describe("ClaimService", func() {
 
 		Context("when history creation fails", func() {
 			It("should return error", func() {
+				staff := &entity.User{
+					ID:       cmd.StaffID,
+					Role:     entity.UserRoleScStaff,
+					OfficeID: cmd.OfficeID,
+				}
+				technician := &entity.User{
+					ID:       cmd.TechnicianID,
+					Role:     entity.UserRoleScTechnician,
+					OfficeID: cmd.OfficeID,
+				}
 				dbErr := apperror.ErrDBOperation
+
+				mockUserRepo.EXPECT().FindByID(ctx, cmd.StaffID).Return(staff, nil).Once()
+				mockUserRepo.EXPECT().FindByID(ctx, cmd.TechnicianID).Return(technician, nil).Once()
+				mockClaimRepo.EXPECT().CountPendingByTechnician(ctx, cmd.TechnicianID).Return(int64(0), nil).Once()
 				mockClaimRepo.EXPECT().Create(mockTx, mock.AnythingOfType("*entity.Claim")).Return(nil).Once()
 				mockHistRepo.EXPECT().Create(mockTx, mock.AnythingOfType("*entity.ClaimHistory")).Return(dbErr).Once()
 

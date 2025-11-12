@@ -119,7 +119,7 @@ func (s *claimItemService) Update(tx application.Tx, claimID, itemID uuid.UUID, 
 	}
 
 	if !entity.IsValidClaimItemType(cmd.Type) {
-		return apperror.ErrInvalidInput.WithMessage("Invalid claim item type")
+		return apperror.ErrInvalidClaimAction.WithMessage("Invalid claim item type")
 	}
 	item.IssueDescription = cmd.IssueDescription
 	item.Type = cmd.Type

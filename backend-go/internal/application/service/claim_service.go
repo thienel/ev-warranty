@@ -291,7 +291,7 @@ func (s *claimService) DoneReview(tx application.Tx, id uuid.UUID, changedBy uui
 			approvedCount++
 		case entity.ClaimItemStatusRejected:
 		default:
-			return apperror.ErrInvalidInput.WithMessage("Can only complete when all item are approved or rejected")
+			return apperror.ErrInvalidClaimAction.WithMessage("Can only complete when all item are approved or rejected")
 		}
 	}
 
@@ -303,7 +303,7 @@ func (s *claimService) DoneReview(tx application.Tx, id uuid.UUID, changedBy uui
 	}
 
 	if !entity.IsValidClaimStatusTransition(claim.Status, newStatus) {
-		return apperror.ErrInvalidInput.WithMessage("This action are not allowed")
+		return apperror.ErrInvalidClaimAction.WithMessage("This action are not allowed")
 	}
 
 	err = s.claimRepo.UpdateStatus(tx, id, newStatus)
