@@ -40,7 +40,7 @@ namespace Backend.Dotnet.API.Controllers
                 {
                     IsSuccess = true,
                     Message = result.Message,
-                    Data = new List<PolicyCoveragePartResponse> { result.Data }
+                    Data = new List<PolicyCoveragePartResponse> { result.Data! }
                 });
             }
 
@@ -123,7 +123,7 @@ namespace Backend.Dotnet.API.Controllers
             if (!result.IsSuccess)
                 return BadRequest(result);
 
-            return CreatedAtAction(nameof(GetById), new { id = result.Data.Id }, result);
+            return CreatedAtAction(nameof(GetById), new { id = result.Data!.Id }, result);
         }
 
         [HttpPut("{id}")]

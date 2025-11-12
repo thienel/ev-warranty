@@ -23,11 +23,11 @@ namespace Backend.Dotnet.API.Controllers
         [ProducesResponseType(typeof(BaseResponseDto<IEnumerable<PartResponse>>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BaseResponseDto), StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> GetAll(
-            [FromQuery] string serialNumber = null,
-            [FromQuery] string status = null,
+            [FromQuery] string? serialNumber = null,
+            [FromQuery] string? status = null,
             [FromQuery] Guid? categoryId = null,
             [FromQuery] Guid? officeLocationId = null,
-            [FromQuery] string search = null)
+            [FromQuery] string? search = null)
         {
             // Serial number - absolute
             if (!string.IsNullOrWhiteSpace(serialNumber))
@@ -134,7 +134,7 @@ namespace Backend.Dotnet.API.Controllers
             if (!result.IsSuccess)
                 return BadRequest(result);
 
-            return CreatedAtAction(nameof(GetById), new { id = result.Data.Id }, result);
+            return CreatedAtAction(nameof(GetById), new { id = result.Data!.Id }, result);
         }
 
         [HttpPut("{id}")]

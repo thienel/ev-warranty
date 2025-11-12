@@ -27,8 +27,8 @@ namespace Backend.Dotnet.API.Controllers
         [ProducesResponseType(typeof(BaseResponseDto<IEnumerable<VehicleResponse>>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BaseResponseDto), StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> GetAll(
-            [FromQuery] string vin = null,
-            [FromQuery] string licensePlate = null,
+            [FromQuery] string? vin = null,
+            [FromQuery] string? licensePlate = null,
             [FromQuery] Guid? customerId = null,
             [FromQuery] Guid? modelId = null)
         {
@@ -90,7 +90,7 @@ namespace Backend.Dotnet.API.Controllers
             if (!result.IsSuccess)
                 return BadRequest(result);
 
-            return CreatedAtAction(nameof(GetById), new { id = result.Data.Id }, result);
+            return CreatedAtAction(nameof(GetById), new { id = result.Data!.Id }, result);
         }
 
         [HttpPut("{id}")]

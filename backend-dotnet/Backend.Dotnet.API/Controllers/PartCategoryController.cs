@@ -24,7 +24,7 @@ namespace Backend.Dotnet.API.Controllers
         [ProducesResponseType(typeof(BaseResponseDto), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(BaseResponseDto), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetAll(
-            [FromQuery] string name = null,
+            [FromQuery] string? name = null,
             [FromQuery] Guid? parentId = null)
         {
             if (!string.IsNullOrWhiteSpace(name))
@@ -89,7 +89,7 @@ namespace Backend.Dotnet.API.Controllers
             if (!result.IsSuccess)
                 return BadRequest(result);
 
-            return CreatedAtAction(nameof(GetById), new { id = result.Data.Id }, result);
+            return CreatedAtAction(nameof(GetById), new { id = result.Data!.Id }, result);
         }
 
         [HttpPut("{id}")]
