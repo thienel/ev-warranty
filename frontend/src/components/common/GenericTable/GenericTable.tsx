@@ -3,7 +3,7 @@ import { message, Table } from 'antd'
 import type { TableProps } from 'antd'
 import api from '@services/api'
 import useHandleApiError from '@/hooks/useHandleApiError'
-import type { ErrorResponse } from '@/constants/error-messages'
+import type { ErrorResponse } from '@/utils/errorHandler'
 
 type ColumnType<T> = NonNullable<TableProps<T>['columns']>[number]
 

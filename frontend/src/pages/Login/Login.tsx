@@ -10,7 +10,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom'
 import LoginForm from './LoginForm/LoginForm'
 import { ThunderboltOutlined } from '@ant-design/icons'
 import useHandleApiError from '@/hooks/useHandleApiError'
-import type { ErrorResponse } from '@/constants/error-messages'
+import type { ErrorResponse } from '@/utils/errorHandler'
 
 const { Title } = Typography
 
