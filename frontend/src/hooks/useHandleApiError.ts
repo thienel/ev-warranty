@@ -5,22 +5,20 @@ import { message } from 'antd'
 import { logout } from '@/redux/authSlice'
 import { persistor } from '@/redux/store'
 import {
-  getErrorMessageFromResponse,
+  getErrorMessage,
   isAuthError,
   shouldRedirectToLogin,
   type ErrorResponse,
-  type ErrorCode,
-} from '@/constants/error-messages'
+} from '@/utils/errorHandler'
 
 interface HandleApiErrorOptions {
   showNotification?: boolean
   duration?: number
-  onAuthError?: (error: ErrorResponse, errorCode: ErrorCode) => void
-  onError?: (error: ErrorResponse, errorCode?: ErrorCode) => void
+  onAuthError?: (error: ErrorResponse) => void
+  onError?: (error: ErrorResponse) => void
 }
 
 interface ErrorResult {
-  errorCode?: ErrorCode
   message: string
   status?: number
   isAuthError: boolean
@@ -42,19 +40,14 @@ const useHandleApiError = () => {
   const dispatch = useDispatch()
 
   const handleAuthError = useCallback(
-    async (
-      error: ErrorResponse,
-      errorCode: ErrorCode,
-      errorMessage: string,
-      options: HandleApiErrorOptions,
-    ) => {
+    async (error: ErrorResponse, errorMessage: string, options: HandleApiErrorOptions) => {
       const { showNotification, duration, onAuthError } = options
 
       if (showNotification) {
         message.error(errorMessage, duration)
       }
 
-      if (shouldRedirectToLogin(errorCode)) {
+      if (shouldRedirectToLogin(error)) {
         dispatch(logout())
         await persistor.purge()
 
@@ -66,7 +59,7 @@ const useHandleApiError = () => {
         }, 1000)
       }
 
-      onAuthError?.(error, errorCode)
+      onAuthError?.(error)
     },
     [navigate, dispatch],
   )
@@ -84,31 +77,31 @@ const useHandleApiError = () => {
       const mergedOptions = { ...DEFAULT_OPTIONS, ...options }
       const { onError } = mergedOptions
 
-      const errorCode = error?.response?.data?.error
-      const errorMessage = getErrorMessageFromResponse(error)
+      const errorMessage = getErrorMessage(error)
       const errorStatus = error?.response?.status
 
       console.error('API Error:', {
-        errorCode,
         message: errorMessage,
         status: errorStatus,
         data: error?.response?.data,
       })
 
-      if (errorCode && isAuthError(errorCode)) {
-        await handleAuthError(error, errorCode, errorMessage, mergedOptions)
+      const isAuth = isAuthError(error)
+      const shouldRedirect = shouldRedirectToLogin(error)
+
+      if (isAuth) {
+        await handleAuthError(error, errorMessage, mergedOptions)
       } else {
         handleGeneralError(errorMessage, mergedOptions)
       }
 
-      onError?.(error, errorCode)
+      onError?.(error)
 
       return {
-        errorCode,
         message: errorMessage,
         status: errorStatus,
-        isAuthError: errorCode ? isAuthError(errorCode) : false,
-        shouldRedirect: errorCode ? shouldRedirectToLogin(errorCode) : false,
+        isAuthError: isAuth,
+        shouldRedirect,
       }
     },
     [handleAuthError, handleGeneralError],
