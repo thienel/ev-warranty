@@ -16,6 +16,7 @@ import type {
   ClaimDetail,
   ClaimItem,
   ClaimAttachment,
+  ClaimHistory,
   Customer,
   VehicleDetail,
   VehicleModel,
@@ -31,6 +32,7 @@ interface UseClaimDataReturn {
   vehicle: VehicleDetail | null
   claimItems: ClaimItem[]
   attachments: ClaimAttachment[]
+  claimHistory: ClaimHistory[]
   partCategories: PartCategory[]
   parts: Part[]
   warrantyPolicy: WarrantyPolicy | null
@@ -41,12 +43,14 @@ interface UseClaimDataReturn {
   vehicleLoading: boolean
   itemsLoading: boolean
   attachmentsLoading: boolean
+  historyLoading: boolean
   warrantyPolicyLoading: boolean
 
   // Refetch functions
   refetchClaim: () => Promise<void>
   refetchClaimItems: () => Promise<void>
   refetchAttachments: () => Promise<void>
+  refetchHistory: () => Promise<void>
 }
 
 export const useClaimData = (claimId?: string): UseClaimDataReturn => {
@@ -58,6 +62,7 @@ export const useClaimData = (claimId?: string): UseClaimDataReturn => {
   const [vehicle, setVehicle] = useState<VehicleDetail | null>(null)
   const [claimItems, setClaimItems] = useState<ClaimItem[]>([])
   const [attachments, setAttachments] = useState<ClaimAttachment[]>([])
+  const [claimHistory, setClaimHistory] = useState<ClaimHistory[]>([])
   const [partCategories, setPartCategories] = useState<PartCategory[]>([])
   const [parts, setParts] = useState<Part[]>([])
   const [warrantyPolicy, setWarrantyPolicy] = useState<WarrantyPolicy | null>(null)
@@ -68,6 +73,7 @@ export const useClaimData = (claimId?: string): UseClaimDataReturn => {
   const [vehicleLoading, setVehicleLoading] = useState(false)
   const [itemsLoading, setItemsLoading] = useState(false)
   const [attachmentsLoading, setAttachmentsLoading] = useState(false)
+  const [historyLoading, setHistoryLoading] = useState(false)
   const [warrantyPolicyLoading, setWarrantyPolicyLoading] = useState(false)
 
   // Fetch claim details
@@ -271,6 +277,36 @@ export const useClaimData = (claimId?: string): UseClaimDataReturn => {
     }
   }, [claimId, handleError])
 
+  // Fetch claim history
+  const fetchHistory = useCallback(async () => {
+    if (!claimId) return
+
+    try {
+      setHistoryLoading(true)
+      const response = await claimsApi.getHistory(claimId)
+      const historyData: unknown = response.data
+
+      // Backend returns: { data: ClaimHistory[] }
+      if (historyData && typeof historyData === 'object' && 'data' in historyData) {
+        const nestedData = (historyData as { data: unknown }).data
+        if (Array.isArray(nestedData)) {
+          setClaimHistory(nestedData)
+        } else {
+          setClaimHistory([])
+        }
+      } else if (Array.isArray(historyData)) {
+        setClaimHistory(historyData)
+      } else {
+        setClaimHistory([])
+      }
+    } catch (error) {
+      handleError(error as Error)
+      setClaimHistory([])
+    } finally {
+      setHistoryLoading(false)
+    }
+  }, [claimId, handleError])
+
   // Fetch part categories
   const fetchPartCategories = useCallback(async () => {
     try {
@@ -313,10 +349,11 @@ export const useClaimData = (claimId?: string): UseClaimDataReturn => {
       fetchClaim()
       fetchClaimItems()
       fetchAttachments()
+      fetchHistory()
     }
     // Fetch part categories for displaying category names
     fetchPartCategories()
-  }, [claimId, fetchClaim, fetchClaimItems, fetchAttachments, fetchPartCategories])
+  }, [claimId, fetchClaim, fetchClaimItems, fetchAttachments, fetchHistory, fetchPartCategories])
 
   // Fetch customer and vehicle when claim is loaded
   useEffect(() => {
@@ -346,6 +383,7 @@ export const useClaimData = (claimId?: string): UseClaimDataReturn => {
     vehicle,
     claimItems,
     attachments,
+    claimHistory,
     partCategories,
     parts,
     warrantyPolicy,
@@ -356,12 +394,14 @@ export const useClaimData = (claimId?: string): UseClaimDataReturn => {
     vehicleLoading,
     itemsLoading,
     attachmentsLoading,
+    historyLoading,
     warrantyPolicyLoading,
 
     // Refetch functions
     refetchClaim: fetchClaim,
     refetchClaimItems: fetchClaimItems,
     refetchAttachments: fetchAttachments,
+    refetchHistory: fetchHistory,
   }
 }
 

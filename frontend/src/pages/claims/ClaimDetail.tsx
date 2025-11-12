@@ -18,6 +18,7 @@ import ClaimInfo from '@/components/ClaimDetail/ClaimInfo'
 import ClaimItemsTable from '@/components/ClaimDetail/ClaimItemsTable'
 import ClaimAttachments from '@/components/ClaimDetail/ClaimAttachments'
 import WarrantyPolicyCard from '@/components/ClaimDetail/WarrantyPolicyCard'
+import ClaimHistory from '@/components/ClaimDetail/ClaimHistory'
 import PolicyCoverageModal from '@/components/ClaimDetail/PolicyCoverageModal'
 import useClaimData from '@/hooks/useClaimData'
 import useClaimPermissions from '@/hooks/useClaimPermissions'
@@ -49,6 +50,7 @@ const ClaimDetail: React.FC = () => {
     vehicle,
     claimItems,
     attachments,
+    claimHistory,
     partCategories,
     parts,
     warrantyPolicy,
@@ -57,10 +59,12 @@ const ClaimDetail: React.FC = () => {
     vehicleLoading,
     itemsLoading,
     attachmentsLoading,
+    historyLoading,
     warrantyPolicyLoading,
     refetchClaim,
     refetchClaimItems,
     refetchAttachments,
+    refetchHistory,
   } = useClaimData(id)
 
   const {
@@ -123,6 +127,7 @@ const ClaimDetail: React.FC = () => {
       await claimsApi.submit(id)
       message.success('Claim submitted successfully')
       refetchClaim() // Refresh claim to update status
+      refetchHistory() // Refresh history to show new entry
     } catch (error) {
       console.error('Error submitting claim:', error)
       message.error('Failed to submit claim')
@@ -171,6 +176,7 @@ const ClaimDetail: React.FC = () => {
           await claimsApi.cancel(id)
           message.success('Claim cancelled successfully')
           refetchClaim() // Refresh claim to update status
+          refetchHistory() // Refresh history to show new entry
         } catch (error) {
           console.error('Error cancelling claim:', error)
           message.error('Failed to cancel claim')
@@ -189,6 +195,7 @@ const ClaimDetail: React.FC = () => {
       await claimsApi.review(id)
       message.success('Review started successfully')
       refetchClaim() // Refresh claim to update status
+      refetchHistory() // Refresh history to show new entry
     } catch (error) {
       console.error('Error starting review:', error)
       message.error('Failed to start review')
@@ -205,6 +212,7 @@ const ClaimDetail: React.FC = () => {
       message.success('Claim item approved successfully')
       refetchClaimItems() // Refresh claim items
       refetchClaim() // Refresh claim to update status if needed
+      refetchHistory() // Refresh history in case status changed
     } catch (error) {
       console.error('Error approving claim item:', error)
       message.error('Failed to approve claim item')
@@ -219,6 +227,7 @@ const ClaimDetail: React.FC = () => {
       message.success('Claim item rejected successfully')
       refetchClaimItems() // Refresh claim items
       refetchClaim() // Refresh claim to update status if needed
+      refetchHistory() // Refresh history in case status changed
     } catch (error) {
       console.error('Error rejecting claim item:', error)
       message.error('Failed to reject claim item')
@@ -233,6 +242,7 @@ const ClaimDetail: React.FC = () => {
       await claimsApi.doneReview(id)
       message.success('Claim done review successfully')
       refetchClaim() // Refresh claim to update status
+      refetchHistory() // Refresh history to show new entry
     } catch (error) {
       console.error('Error completing claim:', error)
       message.error('Failed to done review claim')
@@ -320,6 +330,9 @@ const ClaimDetail: React.FC = () => {
             canAddAttachments={canAddAttachments}
             onAddAttachment={handleOpenAddAttachmentModal}
           />
+
+          {/* Claim History */}
+          <ClaimHistory history={claimHistory} loading={historyLoading} />
 
           {/* Action Buttons */}
           {(canSubmitClaim ||
