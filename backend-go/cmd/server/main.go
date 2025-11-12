@@ -7,7 +7,6 @@ import (
 	"ev-warranty-go/internal/infrastructure/cloudinary"
 	"ev-warranty-go/internal/infrastructure/config"
 	"ev-warranty-go/internal/infrastructure/database"
-	"ev-warranty-go/internal/infrastructure/external"
 	"ev-warranty-go/internal/infrastructure/oauth"
 	"ev-warranty-go/internal/infrastructure/oauth/providers"
 	"ev-warranty-go/internal/infrastructure/persistence"
@@ -101,8 +100,6 @@ func main() {
 		os.Exit(1)
 	}
 
-	dotnetClient := external.NewDotnetClient(cfg.ExternalService.DotnetBackendURL)
-
 	officeService := service.NewOfficeService(officeRepo)
 	tokenService := service.NewTokenService(tokenRepo,
 		cfg.AccessTokenTTL, cfg.RefreshTokenTTL, security.PrivateKey(), security.PublicKey())
@@ -110,7 +107,7 @@ func main() {
 	userService := service.NewUserService(userRepo, officeRepo, claimRepo)
 	oauthService := oauth.NewOAuthService(googleProvider, userRepo)
 	claimService := service.NewClaimService(log, claimRepo, userRepo, claimItemRepo, claimAttachmentRepo,
-		claimHistoryRepo, cloudinaryService, dotnetClient)
+		claimHistoryRepo, cloudinaryService)
 	claimItemService := service.NewClaimItemService(claimRepo, claimItemRepo)
 	claimAttachmentService := service.NewClaimAttachmentService(log, claimRepo, claimAttachmentRepo,
 		cloudinaryService)

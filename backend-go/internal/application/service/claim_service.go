@@ -6,7 +6,6 @@ import (
 	"ev-warranty-go/internal/application/repository"
 	"ev-warranty-go/internal/domain/entity"
 	"ev-warranty-go/internal/infrastructure/cloudinary"
-	"ev-warranty-go/internal/infrastructure/external"
 	"ev-warranty-go/pkg/apperror"
 	"ev-warranty-go/pkg/logger"
 	"fmt"
@@ -39,7 +38,7 @@ type ClaimService interface {
 
 	UpdateStatus(tx application.Tx, id uuid.UUID, status string, changedBy uuid.UUID) error
 	Submit(tx application.Tx, id uuid.UUID, changedBy uuid.UUID) error
-	DoneReview(tx application.Tx, id uuid.UUID, changedBy uuid.UUID, authToken string) error
+	DoneReview(tx application.Tx, id uuid.UUID, changedBy uuid.UUID) error
 	Complete(tx application.Tx, id uuid.UUID, changedBy uuid.UUID) error
 
 	GetHistory(ctx context.Context, claimID uuid.UUID) ([]*entity.ClaimHistory, error)
@@ -53,7 +52,6 @@ type claimService struct {
 	attachmentRepo repository.ClaimAttachmentRepository
 	historyRepo    repository.ClaimHistoryRepository
 	cloudService   cloudinary.CloudinaryService
-	dotnetClient   external.DotnetClient
 }
 
 func NewClaimService(
@@ -64,7 +62,6 @@ func NewClaimService(
 	attachmentRepo repository.ClaimAttachmentRepository,
 	historyRepo repository.ClaimHistoryRepository,
 	cloudService cloudinary.CloudinaryService,
-	dotnetClient external.DotnetClient,
 ) ClaimService {
 	return &claimService{
 		log:            log,
@@ -74,7 +71,6 @@ func NewClaimService(
 		attachmentRepo: attachmentRepo,
 		historyRepo:    historyRepo,
 		cloudService:   cloudService,
-		dotnetClient:   dotnetClient,
 	}
 }
 
@@ -277,7 +273,7 @@ func (s *claimService) Submit(tx application.Tx, id uuid.UUID, changedBy uuid.UU
 	return nil
 }
 
-func (s *claimService) DoneReview(tx application.Tx, id uuid.UUID, changedBy uuid.UUID, authToken string) error {
+func (s *claimService) DoneReview(tx application.Tx, id uuid.UUID, changedBy uuid.UUID) error {
 	claim, err := s.claimRepo.FindByID(tx.GetCtx(), id)
 	if err != nil {
 		return err
@@ -317,18 +313,6 @@ func (s *claimService) DoneReview(tx application.Tx, id uuid.UUID, changedBy uui
 
 	history := entity.NewClaimHistory(claim.ID, newStatus, changedBy)
 	if err = s.historyRepo.Create(tx, history); err != nil {
-		return err
-	}
-
-	// Create work order via .NET backend
-	workOrderReq := &external.CreateWorkOrderRequest{
-		ClaimID:              id,
-		AssignedTechnicianID: claim.TechnicianID,
-	}
-
-	_, err = s.dotnetClient.CreateWorkOrder(tx.GetCtx(), workOrderReq, authToken)
-	if err != nil {
-		s.log.Error("Failed to create work order via .NET backend", "error", err, "claimId", id)
 		return err
 	}
 

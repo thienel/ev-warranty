@@ -427,11 +427,8 @@ func (h *claimHandler) DoneReview(c *gin.Context) {
 		return
 	}
 
-	// Get Authorization header to pass to .NET backend
-	authToken := c.GetHeader("Authorization")
-
 	err = h.txManager.Do(c.Request.Context(), func(tx application.Tx) error {
-		return h.service.DoneReview(tx, id, userID, authToken)
+		return h.service.DoneReview(tx, id, userID)
 	})
 
 	if err != nil {

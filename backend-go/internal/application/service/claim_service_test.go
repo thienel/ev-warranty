@@ -24,7 +24,6 @@ var _ = Describe("ClaimService", func() {
 		mockAttachRepo *mocks.ClaimAttachmentRepository
 		mockHistRepo   *mocks.ClaimHistoryRepository
 		mockCloudServ  *mocks.CloudinaryService
-		mockDotnetCli  *mocks.DotnetClient
 		mockTx         *mocks.Tx
 		claimService   service.ClaimService
 		ctx            context.Context
@@ -38,10 +37,9 @@ var _ = Describe("ClaimService", func() {
 		mockAttachRepo = mocks.NewClaimAttachmentRepository(GinkgoT())
 		mockHistRepo = mocks.NewClaimHistoryRepository(GinkgoT())
 		mockCloudServ = mocks.NewCloudinaryService(GinkgoT())
-		mockDotnetCli = mocks.NewDotnetClient(GinkgoT())
 		mockTx = mocks.NewTx(GinkgoT())
 		claimService = service.NewClaimService(mockLogger, mockClaimRepo, mockUserRepo, mockItemRepo, mockAttachRepo,
-			mockHistRepo, mockCloudServ, mockDotnetCli)
+			mockHistRepo, mockCloudServ)
 		ctx = context.Background()
 	})
 
