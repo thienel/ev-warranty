@@ -33,18 +33,6 @@ export interface User {
   name: string
   role: UserRole
   office_id: string
-  is_active?: boolean
-}
-
-export interface Technician {
-  id: string
-  office_id: string
-  full_name: string
-  email: string
-  role: string
-  is_active: boolean
-  created_at?: string
-  updated_at?: string
 }
 
 export interface UserFormData {
@@ -143,6 +131,8 @@ export interface Claim {
   description: string
   status: ClaimStatus
   total_cost: number
+  kilometers: number
+  technician_id: string
   approved_by?: string
   created_at?: string
   updated_at?: string

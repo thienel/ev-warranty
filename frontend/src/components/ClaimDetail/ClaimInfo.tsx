@@ -17,8 +17,6 @@ const getStatusColor = (status: string) => {
       return 'gray'
     case CLAIM_STATUSES.SUBMITTED:
       return 'blue'
-    case CLAIM_STATUSES.REQUEST_INFO:
-      return 'orange'
     case CLAIM_STATUSES.REVIEWING:
       return 'processing'
     case CLAIM_STATUSES.APPROVED:
@@ -52,6 +50,9 @@ const ClaimInfo: React.FC<ClaimInfoProps> = ({ claim, loading }) => {
           </Descriptions.Item>
           <Descriptions.Item label="Description">
             <Text>{claim.description}</Text>
+          </Descriptions.Item>
+          <Descriptions.Item label="Kilometers">
+            <Text strong>{claim.kilometers.toLocaleString()} km</Text>
           </Descriptions.Item>
           {claim.created_at && (
             <Descriptions.Item label="Created At">

@@ -34,7 +34,7 @@ import { useClaimSubmission } from './hooks/useClaimSubmission'
 import { getClaimsBasePath } from '@/utils/navigationHelpers'
 import { getClaimSteps, isStepValid, getStepStatus } from './utils/claimSteps'
 import { techniciansApi } from '@/services'
-import type { Technician } from '@/types'
+import type { User } from '@/types'
 import './ClaimCreate.less'
 
 const { Text } = Typography
@@ -53,7 +53,7 @@ const ClaimCreate: React.FC = () => {
   const location = useLocation()
 
   // State for available technicians
-  const [technicians, setTechnicians] = useState<Technician[]>([])
+  const [technicians, setTechnicians] = useState<User[]>([])
   const [loadingTechnicians, setLoadingTechnicians] = useState(false)
 
   // Custom hooks for state management
@@ -81,7 +81,7 @@ const ClaimCreate: React.FC = () => {
 
         // Handle nested data structure
         if (techData && typeof techData === 'object' && 'data' in techData) {
-          techData = (techData as { data: unknown }).data as Technician[]
+          techData = (techData as { data: unknown }).data as User[]
         }
 
         setTechnicians(Array.isArray(techData) ? techData : [])
@@ -283,9 +283,9 @@ const ClaimCreate: React.FC = () => {
                           <Option
                             key={tech.id}
                             value={tech.id}
-                            label={`${tech.full_name} (${tech.email})`}
+                            label={`${tech.name} (${tech.email})`}
                           >
-                            {tech.full_name} ({tech.email})
+                            {tech.name} ({tech.email})
                           </Option>
                         ))}
                       </Select>

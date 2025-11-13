@@ -14,6 +14,7 @@ import AddClaimItemModal from '@/components/AddClaimItemModal/AddClaimItemModal'
 import AddAttachmentModal from '@/components/AddAttachmentModal/AddAttachmentModal'
 import CustomerInfo from '@/components/ClaimDetail/CustomerInfo'
 import VehicleInfo from '@/components/ClaimDetail/VehicleInfo'
+import TechnicianInfo from '@/components/ClaimDetail/TechnicianInfo'
 import ClaimInfo from '@/components/ClaimDetail/ClaimInfo'
 import ClaimItemsTable from '@/components/ClaimDetail/ClaimItemsTable'
 import ClaimAttachments from '@/components/ClaimDetail/ClaimAttachments'
@@ -48,6 +49,7 @@ const ClaimDetail: React.FC = () => {
     claim,
     customer,
     vehicle,
+    technician,
     claimItems,
     attachments,
     claimHistory,
@@ -57,6 +59,7 @@ const ClaimDetail: React.FC = () => {
     claimLoading,
     customerLoading,
     vehicleLoading,
+    technicianLoading,
     itemsLoading,
     attachmentsLoading,
     historyLoading,
@@ -299,6 +302,9 @@ const ClaimDetail: React.FC = () => {
 
           {/* Vehicle Information */}
           <VehicleInfo vehicle={vehicle} loading={vehicleLoading} />
+
+          {/* Technician Information */}
+          <TechnicianInfo technician={technician} loading={technicianLoading} />
 
           {/* Warranty Policy Information - Only for EVM Staff during review */}
           {canViewWarrantyPolicy && (

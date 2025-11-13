@@ -11,6 +11,7 @@ import {
   partsApi,
   warrantyPoliciesApi,
 } from '@services/index'
+import { usersApi } from '@/services/usersApi'
 import useHandleApiError from '@/hooks/useHandleApiError'
 import type {
   ClaimDetail,
@@ -23,6 +24,7 @@ import type {
   PartCategory,
   Part,
   WarrantyPolicy,
+  User,
 } from '@/types/index'
 
 interface UseClaimDataReturn {
@@ -30,6 +32,7 @@ interface UseClaimDataReturn {
   claim: ClaimDetail | null
   customer: Customer | null
   vehicle: VehicleDetail | null
+  technician: User | null
   claimItems: ClaimItem[]
   attachments: ClaimAttachment[]
   claimHistory: ClaimHistory[]
@@ -41,6 +44,7 @@ interface UseClaimDataReturn {
   claimLoading: boolean
   customerLoading: boolean
   vehicleLoading: boolean
+  technicianLoading: boolean
   itemsLoading: boolean
   attachmentsLoading: boolean
   historyLoading: boolean
@@ -60,6 +64,7 @@ export const useClaimData = (claimId?: string): UseClaimDataReturn => {
   const [claim, setClaim] = useState<ClaimDetail | null>(null)
   const [customer, setCustomer] = useState<Customer | null>(null)
   const [vehicle, setVehicle] = useState<VehicleDetail | null>(null)
+  const [technician, setTechnician] = useState<User | null>(null)
   const [claimItems, setClaimItems] = useState<ClaimItem[]>([])
   const [attachments, setAttachments] = useState<ClaimAttachment[]>([])
   const [claimHistory, setClaimHistory] = useState<ClaimHistory[]>([])
@@ -71,6 +76,7 @@ export const useClaimData = (claimId?: string): UseClaimDataReturn => {
   const [claimLoading, setClaimLoading] = useState(false)
   const [customerLoading, setCustomerLoading] = useState(false)
   const [vehicleLoading, setVehicleLoading] = useState(false)
+  const [technicianLoading, setTechnicianLoading] = useState(false)
   const [itemsLoading, setItemsLoading] = useState(false)
   const [attachmentsLoading, setAttachmentsLoading] = useState(false)
   const [historyLoading, setHistoryLoading] = useState(false)
@@ -150,6 +156,26 @@ export const useClaimData = (claimId?: string): UseClaimDataReturn => {
         handleError(error as Error)
       } finally {
         setVehicleLoading(false)
+      }
+    },
+    [handleError],
+  )
+
+  // Fetch technician details
+  const fetchTechnician = useCallback(
+    async (technicianId: string) => {
+      try {
+        setTechnicianLoading(true)
+        const response = await usersApi.getById(technicianId)
+        let userData = response.data
+        if (userData && typeof userData === 'object' && 'data' in userData) {
+          userData = (userData as { data: unknown }).data as User
+        }
+        setTechnician(userData as User)
+      } catch (error) {
+        handleError(error as Error)
+      } finally {
+        setTechnicianLoading(false)
       }
     },
     [handleError],
@@ -364,8 +390,11 @@ export const useClaimData = (claimId?: string): UseClaimDataReturn => {
       if (claim.vehicle_id) {
         fetchVehicle(claim.vehicle_id)
       }
+      if (claim.technician_id) {
+        fetchTechnician(claim.technician_id)
+      }
     }
-  }, [claim, fetchCustomer, fetchVehicle])
+  }, [claim, fetchCustomer, fetchVehicle, fetchTechnician])
 
   // Fetch warranty policy when vehicle is loaded and has policy_id
   useEffect(() => {
@@ -381,6 +410,7 @@ export const useClaimData = (claimId?: string): UseClaimDataReturn => {
     claim,
     customer,
     vehicle,
+    technician,
     claimItems,
     attachments,
     claimHistory,
@@ -392,6 +422,7 @@ export const useClaimData = (claimId?: string): UseClaimDataReturn => {
     claimLoading,
     customerLoading,
     vehicleLoading,
+    technicianLoading,
     itemsLoading,
     attachmentsLoading,
     historyLoading,
