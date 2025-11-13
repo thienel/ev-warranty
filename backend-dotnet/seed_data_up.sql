@@ -11,16 +11,12 @@ SET ANSI_WARNINGS ON;
 SET CONCAT_NULL_YIELDS_NULL ON;
 SET ARITHABORT ON;
 
--- Check if seed data already exists
-IF EXISTS (SELECT 1 FROM vehicle_models WHERE id = '650e8400-e29b-41d4-a716-446655440101')
-BEGIN
-    PRINT 'Seed data already exists. Skipping insertion.';
-    RETURN;
-END
-
 BEGIN TRANSACTION;
 
-INSERT INTO warranty_policies (id, policy_name, warranty_duration_months, kilometer_limit, terms_and_conditions, created_at)
+-- Insert warranty policies only if they don't exist
+IF NOT EXISTS (SELECT 1 FROM warranty_policies WHERE id = '050e8400-e29b-41d4-a716-446655440003')
+BEGIN
+    INSERT INTO warranty_policies (id, policy_name, warranty_duration_months, kilometer_limit, terms_and_conditions, created_at)
 VALUES
     -- VinFast Models
     ('050e8400-e29b-41d4-a716-446655440003', 'VF8_2025_WARRANTY', 120, 200000, N'Bảo hành 10 năm hoặc 200,000 km (tùy điều kiện nào đến trước). Pin và động cơ điện được bảo hành trọn đời theo điều kiện sử dụng. Bảo dưỡng định kỳ theo khuyến cáo nhà sản xuất. Không áp dụng cho xe sử dụng vào mục đích thương mại.', GETDATE()),
@@ -28,6 +24,7 @@ VALUES
 
     -- BYD Atto 3
     ('050e8400-e29b-41d4-a716-446655440020', 'BYD_ATTO3_2022_WARRANTY', 72, 150000, N'Bảo hành 6 năm hoặc 150,000 km (tùy điều kiện nào đến trước). Pin và hệ thống điện được bảo hành 8 năm hoặc 150,000 km. Bảo dưỡng định kỳ theo khuyến cáo. Áp dụng cho xe sử dụng cá nhân.', GETDATE());
+END
     
 -- Insert Vehicle Models (EV models from VinFast, BYD, and Mercedes-Benz available in Vietnam)
 
@@ -48,7 +45,10 @@ DECLARE
 -- * INSERT DATA (VinFast / BYD / Mercedes-Benz)
 -- =========================================================
 
-INSERT INTO vehicle_models (id, brand, model_name, year, created_at, policy_id)
+-- Insert vehicle models only if they don't exist
+IF NOT EXISTS (SELECT 1 FROM vehicle_models WHERE id = @vf8_2025)
+BEGIN
+    INSERT INTO vehicle_models (id, brand, model_name, year, created_at, policy_id)
 VALUES
     -- VinFast
     
@@ -57,9 +57,13 @@ VALUES
 
     -- BYD
     (@byd_atto3_2022, 'BYD', 'Atto 3', 2022, GETDATE(), '050e8400-e29b-41d4-a716-446655440020');
+END
    
 
-INSERT INTO customers (id, first_name, last_name, phone_number, email, address, created_at) VALUES
+-- Insert customers only if they don't exist
+IF NOT EXISTS (SELECT 1 FROM customers WHERE id = '850e8400-e29b-41d4-a716-446655440001')
+BEGIN
+    INSERT INTO customers (id, first_name, last_name, phone_number, email, address, created_at) VALUES
     ('850e8400-e29b-41d4-a716-446655440001', N'Minh', N'Nguyễn Văn', '0901234567', 'minh.nv@gmail.com', N'123 Nguyễn Huệ, Quận 1, TP.HCM', GETDATE()),
     ('850e8400-e29b-41d4-a716-446655440002', N'Lan', N'Trần Thị', '0902345678', 'lan.tt@gmail.com', N'456 Lê Lợi, Quận 1, TP.HCM', GETDATE()),
     ('850e8400-e29b-41d4-a716-446655440003', N'Hùng', N'Lê Văn', '0903456789', 'hung.lv@gmail.com', N'789 Hai Bà Trưng, Quận 3, TP.HCM', GETDATE()),
@@ -70,8 +74,12 @@ INSERT INTO customers (id, first_name, last_name, phone_number, email, address, 
     ('850e8400-e29b-41d4-a716-446655440008', N'Mai', N'Bùi Thị', '0908901234', 'mai.bt@gmail.com', N'753 Cách Mạng Tháng 8, Quận Tân Bình, TP.HCM', GETDATE()),
     ('850e8400-e29b-41d4-a716-446655440009', N'Nam', N'Võ Văn', '0909012345', 'nam.vv@gmail.com', N'852 Lạc Long Quân, Quận 11, TP.HCM', GETDATE()),
     ('850e8400-e29b-41d4-a716-44665544000a', N'Thảo', N'Đinh Thị', '0900123456', 'thao.dt@gmail.com', N'246 Âu Cơ, Quận Tân Phú, TP.HCM', GETDATE());
+END
 
-INSERT INTO vehicles (id, vin, license_plate, customer_id, model_id, purchase_date, created_at)
+-- Insert vehicles only if they don't exist
+IF NOT EXISTS (SELECT 1 FROM vehicles WHERE id = '750e8400-e29b-41d4-a716-446655440001')
+BEGIN
+    INSERT INTO vehicles (id, vin, license_plate, customer_id, model_id, purchase_date, created_at)
 VALUES
     ('750e8400-e29b-41d4-a716-446655440001', 'VF8ABC123XYZ45678', '51K-55555', '850e8400-e29b-41d4-a716-446655440001', @vf8_2025, '2023-03-15', GETDATE()),
     ('750e8400-e29b-41d4-a716-446655440002', 'RL4VF8S23RF123456', '51K-12345', '850e8400-e29b-41d4-a716-446655440001', @vf8_2025, '2025-01-20', GETDATE()),
@@ -82,6 +90,7 @@ VALUES
     ('750e8400-e29b-41d4-a716-446655440007', 'RL4VF8S23RF123461', '51L-67890', '850e8400-e29b-41d4-a716-446655440006', @vf8_2025, '2025-06-11', GETDATE()),
     ('750e8400-e29b-41d4-a716-446655440008', 'RL4VF3S22RE123462', '51L-78901', '850e8400-e29b-41d4-a716-446655440006', @vf3_2024, '2024-07-15', GETDATE()),
     ('750e8400-e29b-41d4-a716-446655440009', 'L1BAT3S20RD123463', '51L-89012', '850e8400-e29b-41d4-a716-446655440006', @byd_atto3_2022, '2022-08-25', GETDATE());
+END
 
 -- Declare parent category IDs for readability
 DECLARE @electric_drivetrain_id UNIQUEIDENTIFIER = '150e8400-e29b-41d4-a716-446655440001';
@@ -99,7 +108,10 @@ DECLARE @electronics_sensors_id UNIQUEIDENTIFIER = '150e8400-e29b-41d4-a716-4466
 DECLARE @charging_system_id UNIQUEIDENTIFIER = '150e8400-e29b-41d4-a716-44665544000d';
 
 
-INSERT INTO part_categories (id, category_name, description, parent_category_id, created_at)
+-- Insert part categories only if they don't exist
+IF NOT EXISTS (SELECT 1 FROM part_categories WHERE id = @electric_drivetrain_id)
+BEGIN
+    INSERT INTO part_categories (id, category_name, description, parent_category_id, created_at)
 VALUES
     -- Cấp 1 Categories
     (@electric_drivetrain_id, N'Hệ thống Truyền động Điện', N'Electric Drivetrain', NULL, GETDATE()),
@@ -199,12 +211,11 @@ VALUES
     ('150e8400-e29b-41d4-a716-4466554400d1', N'Bộ Sạc embarqué (On-Board Charger)', N'On-Board Charger', @charging_system_id, GETDATE()),
     ('150e8400-e29b-41d4-a716-4466554400d2', N'Cổng Sạc', N'Charging Port', @charging_system_id, GETDATE()),
     ('150e8400-e29b-41d4-a716-4466554400d3', N'Dây Sạc Di động', N'Portable Charging Cable', @charging_system_id, GETDATE());
+END
 
 -- Khai báo biến cho các Office ID để dễ quản lý
--- Ghi chú: Giả định rằng bạn có hai văn phòng khác nhau để phân phối phụ tùng.
--- phân phối nhầm về số lượng | DUNG > of1: 1 part - of2: 3 parts | nên tạm thời đổi guid
-DECLARE @office_id_1 UNIQUEIDENTIFIER = '550e8400-e29b-41d4-a716-446655440002';
-DECLARE @office_id_2 UNIQUEIDENTIFIER = '550e8400-e29b-41d4-a716-446655440001';
+-- Ghi chú: Tất cả parts sử dụng cùng một office location
+DECLARE @office_id UNIQUEIDENTIFIER = '550e8400-e29b-41d4-a716-446655440002';
 
 
 -- Khai báo ID của các danh mục để dễ đọc và quản lý
@@ -269,115 +280,123 @@ DECLARE @charging_port_cat_id UNIQUEIDENTIFIER = '150e8400-e29b-41d4-a716-446655
 DECLARE @portable_cable_cat_id UNIQUEIDENTIFIER = '150e8400-e29b-41d4-a716-4466554400d3';
 
 
-INSERT INTO parts (id, serial_number, part_name, unit_price, category_id, office_location_id, created_at)
+-- Insert parts only if they don't exist
+IF NOT EXISTS (SELECT 1 FROM parts WHERE serial_number = 'VF8-PMSM-STD-001')
+BEGIN
+    INSERT INTO parts (id, serial_number, part_name, unit_price, category_id, office_location_id, created_at)
 VALUES
     -- 1. Hệ thống Truyền động Điện -> Động cơ PMSM
     --    Biến thể 1: Loại tiêu chuẩn
-    (NEWID(), 'VF8-PMSM-STD-001', N'Động cơ PMSM VF8 2025 - Loại Tiêu chuẩn', 45000000, @pmsm_motor_cat_id, @office_id_1, GETDATE()),
-    (NEWID(), 'VF8-PMSM-STD-002', N'Động cơ PMSM VF8 2025 - Loại Tiêu chuẩn', 45000000, @pmsm_motor_cat_id, @office_id_1, GETDATE()),
-    (NEWID(), 'VF8-PMSM-STD-003', N'Động cơ PMSM VF8 2025 - Loại Tiêu chuẩn', 45000000, @pmsm_motor_cat_id, @office_id_1, GETDATE()),
-    (NEWID(), 'VF8-PMSM-STD-004', N'Động cơ PMSM VF8 2025 - Loại Tiêu chuẩn', 45000000, @pmsm_motor_cat_id, @office_id_2, GETDATE()),
+    (NEWID(), 'VF8-PMSM-STD-001', N'Động cơ PMSM VF8 2025 - Loại Tiêu chuẩn', 45000000.0, @pmsm_motor_cat_id, @office_id, GETDATE()),
+    (NEWID(), 'VF8-PMSM-STD-002', N'Động cơ PMSM VF8 2025 - Loại Tiêu chuẩn', 45000000.0, @pmsm_motor_cat_id, @office_id, GETDATE()),
+    (NEWID(), 'VF8-PMSM-STD-003', N'Động cơ PMSM VF8 2025 - Loại Tiêu chuẩn', 45000000.0, @pmsm_motor_cat_id, @office_id, GETDATE()),
+    (NEWID(), 'VF8-PMSM-STD-004', N'Động cơ PMSM VF8 2025 - Loại Tiêu chuẩn', 45000000.0, @pmsm_motor_cat_id, @office_id, GETDATE()),
     --    Biến thể 2: Hiệu suất cao
-    (NEWID(), 'VF8-PMSM-PERF-001', N'Động cơ PMSM VF8 2025 - Loại Hiệu suất cao', 65000000, @pmsm_motor_cat_id, @office_id_1, GETDATE()),
-    (NEWID(), 'VF8-PMSM-PERF-002', N'Động cơ PMSM VF8 2025 - Loại Hiệu suất cao', 65000000, @pmsm_motor_cat_id, @office_id_1, GETDATE()),
-    (NEWID(), 'VF8-PMSM-PERF-003', N'Động cơ PMSM VF8 2025 - Loại Hiệu suất cao', 65000000, @pmsm_motor_cat_id, @office_id_1, GETDATE()),
-    (NEWID(), 'VF8-PMSM-PERF-004', N'Động cơ PMSM VF8 2025 - Loại Hiệu suất cao', 65000000, @pmsm_motor_cat_id, @office_id_2, GETDATE()),
+    (NEWID(), 'VF8-PMSM-PERF-001', N'Động cơ PMSM VF8 2025 - Loại Hiệu suất cao', 65000000.0, @pmsm_motor_cat_id, @office_id, GETDATE()),
+    (NEWID(), 'VF8-PMSM-PERF-002', N'Động cơ PMSM VF8 2025 - Loại Hiệu suất cao', 65000000.0, @pmsm_motor_cat_id, @office_id, GETDATE()),
+    (NEWID(), 'VF8-PMSM-PERF-003', N'Động cơ PMSM VF8 2025 - Loại Hiệu suất cao', 65000000.0, @pmsm_motor_cat_id, @office_id, GETDATE()),
+    (NEWID(), 'VF8-PMSM-PERF-004', N'Động cơ PMSM VF8 2025 - Loại Hiệu suất cao', 65000000.0, @pmsm_motor_cat_id, @office_id, GETDATE()),
     --    Biến thể 3: Nhà cung cấp B
-    (NEWID(), 'VF8-PMSM-BOSCH-001', N'Động cơ PMSM VF8 2025 - Nhà cung cấp Bosch', 48000000, @pmsm_motor_cat_id, @office_id_1, GETDATE()),
-    (NEWID(), 'VF8-PMSM-BOSCH-002', N'Động cơ PMSM VF8 2025 - Nhà cung cấp Bosch', 48000000, @pmsm_motor_cat_id, @office_id_1, GETDATE()),
-    (NEWID(), 'VF8-PMSM-BOSCH-003', N'Động cơ PMSM VF8 2025 - Nhà cung cấp Bosch', 48000000, @pmsm_motor_cat_id, @office_id_1, GETDATE()),
-    (NEWID(), 'VF8-PMSM-BOSCH-004', N'Động cơ PMSM VF8 2025 - Nhà cung cấp Bosch', 48000000, @pmsm_motor_cat_id, @office_id_2, GETDATE()),
+    (NEWID(), 'VF8-PMSM-BOSCH-001', N'Động cơ PMSM VF8 2025 - Nhà cung cấp Bosch', 48000000.0, @pmsm_motor_cat_id, @office_id, GETDATE()),
+    (NEWID(), 'VF8-PMSM-BOSCH-002', N'Động cơ PMSM VF8 2025 - Nhà cung cấp Bosch', 48000000.0, @pmsm_motor_cat_id, @office_id, GETDATE()),
+    (NEWID(), 'VF8-PMSM-BOSCH-003', N'Động cơ PMSM VF8 2025 - Nhà cung cấp Bosch', 48000000.0, @pmsm_motor_cat_id, @office_id, GETDATE()),
+    (NEWID(), 'VF8-PMSM-BOSCH-004', N'Động cơ PMSM VF8 2025 - Nhà cung cấp Bosch', 48000000.0, @pmsm_motor_cat_id, @office_id, GETDATE()),
 
     -- 2. Hệ thống Pin Cao áp -> Pin Lithium-ion (NMC)
     --    Biến thể 1: 92kWh
-    (NEWID(), 'VF8-BAT-NMC92-001', N'Khối pin NMC VF8 2025 - 92kWh', 250000000, @nmc_battery_cat_id, @office_id_1, GETDATE()),
-    (NEWID(), 'VF8-BAT-NMC92-002', N'Khối pin NMC VF8 2025 - 92kWh', 250000000, @nmc_battery_cat_id, @office_id_1, GETDATE()),
-    (NEWID(), 'VF8-BAT-NMC92-003', N'Khối pin NMC VF8 2025 - 92kWh', 250000000, @nmc_battery_cat_id, @office_id_1, GETDATE()),
-    (NEWID(), 'VF8-BAT-NMC92-004', N'Khối pin NMC VF8 2025 - 92kWh', 250000000, @nmc_battery_cat_id, @office_id_2, GETDATE()),
+    (NEWID(), 'VF8-BAT-NMC92-001', N'Khối pin NMC VF8 2025 - 92kWh', 250000000, @nmc_battery_cat_id, @office_id, GETDATE()),
+    (NEWID(), 'VF8-BAT-NMC92-002', N'Khối pin NMC VF8 2025 - 92kWh', 250000000, @nmc_battery_cat_id, @office_id, GETDATE()),
+    (NEWID(), 'VF8-BAT-NMC92-003', N'Khối pin NMC VF8 2025 - 92kWh', 250000000, @nmc_battery_cat_id, @office_id, GETDATE()),
+    (NEWID(), 'VF8-BAT-NMC92-004', N'Khối pin NMC VF8 2025 - 92kWh', 250000000, @nmc_battery_cat_id, @office_id, GETDATE()),
     --    Biến thể 2: 105kWh
-    (NEWID(), 'VF8-BAT-NMC105-001', N'Khối pin NMC VF8 2025 - 105kWh (Tầm xa)', 320000000, @nmc_battery_cat_id, @office_id_1, GETDATE()),
-    (NEWID(), 'VF8-BAT-NMC105-002', N'Khối pin NMC VF8 2025 - 105kWh (Tầm xa)', 320000000, @nmc_battery_cat_id, @office_id_1, GETDATE()),
-    (NEWID(), 'VF8-BAT-NMC105-003', N'Khối pin NMC VF8 2025 - 105kWh (Tầm xa)', 320000000, @nmc_battery_cat_id, @office_id_1, GETDATE()),
-    (NEWID(), 'VF8-BAT-NMC105-004', N'Khối pin NMC VF8 2025 - 105kWh (Tầm xa)', 320000000, @nmc_battery_cat_id, @office_id_2, GETDATE()),
+    (NEWID(), 'VF8-BAT-NMC105-001', N'Khối pin NMC VF8 2025 - 105kWh (Tầm xa)', 320000000, @nmc_battery_cat_id, @office_id, GETDATE()),
+    (NEWID(), 'VF8-BAT-NMC105-002', N'Khối pin NMC VF8 2025 - 105kWh (Tầm xa)', 320000000, @nmc_battery_cat_id, @office_id, GETDATE()),
+    (NEWID(), 'VF8-BAT-NMC105-003', N'Khối pin NMC VF8 2025 - 105kWh (Tầm xa)', 320000000, @nmc_battery_cat_id, @office_id, GETDATE()),
+    (NEWID(), 'VF8-BAT-NMC105-004', N'Khối pin NMC VF8 2025 - 105kWh (Tầm xa)', 320000000, @nmc_battery_cat_id, @office_id, GETDATE()),
     --    Biến thể 3: Nhà cung cấp CATL
-    (NEWID(), 'VF8-BAT-CATL-001', N'Khối pin NMC VF8 2025 - Nhà cung cấp CATL', 260000000, @nmc_battery_cat_id, @office_id_1, GETDATE()),
-    (NEWID(), 'VF8-BAT-CATL-002', N'Khối pin NMC VF8 2025 - Nhà cung cấp CATL', 260000000, @nmc_battery_cat_id, @office_id_1, GETDATE()),
-    (NEWID(), 'VF8-BAT-CATL-003', N'Khối pin NMC VF8 2025 - Nhà cung cấp CATL', 260000000, @nmc_battery_cat_id, @office_id_1, GETDATE()),
-    (NEWID(), 'VF8-BAT-CATL-004', N'Khối pin NMC VF8 2025 - Nhà cung cấp CATL', 260000000, @nmc_battery_cat_id, @office_id_2, GETDATE()),
+    (NEWID(), 'VF8-BAT-CATL-001', N'Khối pin NMC VF8 2025 - Nhà cung cấp CATL', 260000000, @nmc_battery_cat_id, @office_id, GETDATE()),
+    (NEWID(), 'VF8-BAT-CATL-002', N'Khối pin NMC VF8 2025 - Nhà cung cấp CATL', 260000000, @nmc_battery_cat_id, @office_id, GETDATE()),
+    (NEWID(), 'VF8-BAT-CATL-003', N'Khối pin NMC VF8 2025 - Nhà cung cấp CATL', 260000000, @nmc_battery_cat_id, @office_id, GETDATE()),
+    (NEWID(), 'VF8-BAT-CATL-004', N'Khối pin NMC VF8 2025 - Nhà cung cấp CATL', 260000000, @nmc_battery_cat_id, @office_id, GETDATE()),
 
     -- 3. Hệ thống Khung gầm & Treo -> Giảm xóc Thích ứng
     --    Biến thể 1: Loại tiêu chuẩn
-    (NEWID(), 'VF8-ADAPTIVEDMP-STD-001', N'Giảm xóc Thích ứng VF8 2025 - Loại Tiêu chuẩn', 7500000, @adaptive_damper_cat_id, @office_id_1, GETDATE()),
-    (NEWID(), 'VF8-ADAPTIVEDMP-STD-002', N'Giảm xóc Thích ứng VF8 2025 - Loại Tiêu chuẩn', 7500000, @adaptive_damper_cat_id, @office_id_1, GETDATE()),
-    (NEWID(), 'VF8-ADAPTIVEDMP-STD-003', N'Giảm xóc Thích ứng VF8 2025 - Loại Tiêu chuẩn', 7500000, @adaptive_damper_cat_id, @office_id_1, GETDATE()),
-    (NEWID(), 'VF8-ADAPTIVEDMP-STD-004', N'Giảm xóc Thích ứng VF8 2025 - Loại Tiêu chuẩn', 7500000, @adaptive_damper_cat_id, @office_id_2, GETDATE()),
+    (NEWID(), 'VF8-ADAPTIVEDMP-STD-001', N'Giảm xóc Thích ứng VF8 2025 - Loại Tiêu chuẩn', 7500000, @adaptive_damper_cat_id, @office_id, GETDATE()),
+    (NEWID(), 'VF8-ADAPTIVEDMP-STD-002', N'Giảm xóc Thích ứng VF8 2025 - Loại Tiêu chuẩn', 7500000, @adaptive_damper_cat_id, @office_id, GETDATE()),
+    (NEWID(), 'VF8-ADAPTIVEDMP-STD-003', N'Giảm xóc Thích ứng VF8 2025 - Loại Tiêu chuẩn', 7500000, @adaptive_damper_cat_id, @office_id, GETDATE()),
+    (NEWID(), 'VF8-ADAPTIVEDMP-STD-004', N'Giảm xóc Thích ứng VF8 2025 - Loại Tiêu chuẩn', 7500000, @adaptive_damper_cat_id, @office_id, GETDATE()),
     --    Biến thể 2: Loại thể thao
-    (NEWID(), 'VF8-ADAPTIVEDMP-SPORT-001', N'Giảm xóc Thích ứng VF8 2025 - Loại Thể thao', 9800000, @adaptive_damper_cat_id, @office_id_1, GETDATE()),
-    (NEWID(), 'VF8-ADAPTIVEDMP-SPORT-002', N'Giảm xóc Thích ứng VF8 2025 - Loại Thể thao', 9800000, @adaptive_damper_cat_id, @office_id_1, GETDATE()),
-    (NEWID(), 'VF8-ADAPTIVEDMP-SPORT-003', N'Giảm xóc Thích ứng VF8 2025 - Loại Thể thao', 9800000, @adaptive_damper_cat_id, @office_id_1, GETDATE()),
-    (NEWID(), 'VF8-ADAPTIVEDMP-SPORT-004', N'Giảm xóc Thích ứng VF8 2025 - Loại Thể thao', 9800000, @adaptive_damper_cat_id, @office_id_2, GETDATE()),
+    (NEWID(), 'VF8-ADAPTIVEDMP-SPORT-001', N'Giảm xóc Thích ứng VF8 2025 - Loại Thể thao', 9800000, @adaptive_damper_cat_id, @office_id, GETDATE()),
+    (NEWID(), 'VF8-ADAPTIVEDMP-SPORT-002', N'Giảm xóc Thích ứng VF8 2025 - Loại Thể thao', 9800000, @adaptive_damper_cat_id, @office_id, GETDATE()),
+    (NEWID(), 'VF8-ADAPTIVEDMP-SPORT-003', N'Giảm xóc Thích ứng VF8 2025 - Loại Thể thao', 9800000, @adaptive_damper_cat_id, @office_id, GETDATE()),
+    (NEWID(), 'VF8-ADAPTIVEDMP-SPORT-004', N'Giảm xóc Thích ứng VF8 2025 - Loại Thể thao', 9800000, @adaptive_damper_cat_id, @office_id, GETDATE()),
     --    Biến thể 3: Nhà cung cấp ZF
-    (NEWID(), 'VF8-ADAPTIVEDMP-ZF-001', N'Giảm xóc Thích ứng VF8 2025 - Nhà cung cấp ZF', 8200000, @adaptive_damper_cat_id, @office_id_1, GETDATE()),
-    (NEWID(), 'VF8-ADAPTIVEDMP-ZF-002', N'Giảm xóc Thích ứng VF8 2025 - Nhà cung cấp ZF', 8200000, @adaptive_damper_cat_id, @office_id_1, GETDATE()),
-    (NEWID(), 'VF8-ADAPTIVEDMP-ZF-003', N'Giảm xóc Thích ứng VF8 2025 - Nhà cung cấp ZF', 8200000, @adaptive_damper_cat_id, @office_id_1, GETDATE()),
-    (NEWID(), 'VF8-ADAPTIVEDMP-ZF-004', N'Giảm xóc Thích ứng VF8 2025 - Nhà cung cấp ZF', 8200000, @adaptive_damper_cat_id, @office_id_2, GETDATE()),
+    (NEWID(), 'VF8-ADAPTIVEDMP-ZF-001', N'Giảm xóc Thích ứng VF8 2025 - Nhà cung cấp ZF', 8200000, @adaptive_damper_cat_id, @office_id, GETDATE()),
+    (NEWID(), 'VF8-ADAPTIVEDMP-ZF-002', N'Giảm xóc Thích ứng VF8 2025 - Nhà cung cấp ZF', 8200000, @adaptive_damper_cat_id, @office_id, GETDATE()),
+    (NEWID(), 'VF8-ADAPTIVEDMP-ZF-003', N'Giảm xóc Thích ứng VF8 2025 - Nhà cung cấp ZF', 8200000, @adaptive_damper_cat_id, @office_id, GETDATE()),
+    (NEWID(), 'VF8-ADAPTIVEDMP-ZF-004', N'Giảm xóc Thích ứng VF8 2025 - Nhà cung cấp ZF', 8200000, @adaptive_damper_cat_id, @office_id, GETDATE()),
 
     -- 5. Hệ thống Phanh -> Ngàm Phanh
     --    Biến thể 1: 2 Piston
-    (NEWID(), 'VF8-CALIPER-2P-001', N'Ngàm Phanh VF8 2025 - 2 Piston', 3200000, @brake_caliper_cat_id, @office_id_1, GETDATE()),
-    (NEWID(), 'VF8-CALIPER-2P-002', N'Ngàm Phanh VF8 2025 - 2 Piston', 3200000, @brake_caliper_cat_id, @office_id_1, GETDATE()),
-    (NEWID(), 'VF8-CALIPER-2P-003', N'Ngàm Phanh VF8 2025 - 2 Piston', 3200000, @brake_caliper_cat_id, @office_id_1, GETDATE()),
-    (NEWID(), 'VF8-CALIPER-2P-004', N'Ngàm Phanh VF8 2025 - 2 Piston', 3200000, @brake_caliper_cat_id, @office_id_2, GETDATE()),
+    (NEWID(), 'VF8-CALIPER-2P-001', N'Ngàm Phanh VF8 2025 - 2 Piston', 3200000, @brake_caliper_cat_id, @office_id, GETDATE()),
+    (NEWID(), 'VF8-CALIPER-2P-002', N'Ngàm Phanh VF8 2025 - 2 Piston', 3200000, @brake_caliper_cat_id, @office_id, GETDATE()),
+    (NEWID(), 'VF8-CALIPER-2P-003', N'Ngàm Phanh VF8 2025 - 2 Piston', 3200000, @brake_caliper_cat_id, @office_id, GETDATE()),
+    (NEWID(), 'VF8-CALIPER-2P-004', N'Ngàm Phanh VF8 2025 - 2 Piston', 3200000, @brake_caliper_cat_id, @office_id, GETDATE()),
     --    Biến thể 2: 4 Piston
-    (NEWID(), 'VF8-CALIPER-4P-001', N'Ngàm Phanh VF8 2025 - 4 Piston (Hiệu suất cao)', 5500000, @brake_caliper_cat_id, @office_id_1, GETDATE()),
-    (NEWID(), 'VF8-CALIPER-4P-002', N'Ngàm Phanh VF8 2025 - 4 Piston (Hiệu suất cao)', 5500000, @brake_caliper_cat_id, @office_id_1, GETDATE()),
-    (NEWID(), 'VF8-CALIPER-4P-003', N'Ngàm Phanh VF8 2025 - 4 Piston (Hiệu suất cao)', 5500000, @brake_caliper_cat_id, @office_id_1, GETDATE()),
-    (NEWID(), 'VF8-CALIPER-4P-004', N'Ngàm Phanh VF8 2025 - 4 Piston (Hiệu suất cao)', 5500000, @brake_caliper_cat_id, @office_id_2, GETDATE()),
+    (NEWID(), 'VF8-CALIPER-4P-001', N'Ngàm Phanh VF8 2025 - 4 Piston (Hiệu suất cao)', 5500000, @brake_caliper_cat_id, @office_id, GETDATE()),
+    (NEWID(), 'VF8-CALIPER-4P-002', N'Ngàm Phanh VF8 2025 - 4 Piston (Hiệu suất cao)', 5500000, @brake_caliper_cat_id, @office_id, GETDATE()),
+    (NEWID(), 'VF8-CALIPER-4P-003', N'Ngàm Phanh VF8 2025 - 4 Piston (Hiệu suất cao)', 5500000, @brake_caliper_cat_id, @office_id, GETDATE()),
+    (NEWID(), 'VF8-CALIPER-4P-004', N'Ngàm Phanh VF8 2025 - 4 Piston (Hiệu suất cao)', 5500000, @brake_caliper_cat_id, @office_id, GETDATE()),
     --    Biến thể 3: Nhà cung cấp Brembo
-    (NEWID(), 'VF8-CALIPER-BREMBO-001', N'Ngàm Phanh VF8 2025 - Nhà cung cấp Brembo', 6100000, @brake_caliper_cat_id, @office_id_1, GETDATE()),
-    (NEWID(), 'VF8-CALIPER-BREMBO-002', N'Ngàm Phanh VF8 2025 - Nhà cung cấp Brembo', 6100000, @brake_caliper_cat_id, @office_id_1, GETDATE()),
-    (NEWID(), 'VF8-CALIPER-BREMBO-003', N'Ngàm Phanh VF8 2025 - Nhà cung cấp Brembo', 6100000, @brake_caliper_cat_id, @office_id_1, GETDATE()),
-    (NEWID(), 'VF8-CALIPER-BREMBO-004', N'Ngàm Phanh VF8 2025 - Nhà cung cấp Brembo', 6100000, @brake_caliper_cat_id, @office_id_2, GETDATE()),
+    (NEWID(), 'VF8-CALIPER-BREMBO-001', N'Ngàm Phanh VF8 2025 - Nhà cung cấp Brembo', 6100000, @brake_caliper_cat_id, @office_id, GETDATE()),
+    (NEWID(), 'VF8-CALIPER-BREMBO-002', N'Ngàm Phanh VF8 2025 - Nhà cung cấp Brembo', 6100000, @brake_caliper_cat_id, @office_id, GETDATE()),
+    (NEWID(), 'VF8-CALIPER-BREMBO-003', N'Ngàm Phanh VF8 2025 - Nhà cung cấp Brembo', 6100000, @brake_caliper_cat_id, @office_id, GETDATE()),
+    (NEWID(), 'VF8-CALIPER-BREMBO-004', N'Ngàm Phanh VF8 2025 - Nhà cung cấp Brembo', 6100000, @brake_caliper_cat_id, @office_id, GETDATE()),
     
     -- 7. Thân vỏ - Tấm ốp Ngoài -> Cản Trước
     --    Biến thể 1: Tiêu chuẩn
-    (NEWID(), 'VF8-FBUMPER-STD-001', N'Cản Trước VF8 2025 - Tiêu chuẩn', 4500000, @front_bumper_cat_id, @office_id_1, GETDATE()),
-    (NEWID(), 'VF8-FBUMPER-STD-002', N'Cản Trước VF8 2025 - Tiêu chuẩn', 4500000, @front_bumper_cat_id, @office_id_1, GETDATE()),
-    (NEWID(), 'VF8-FBUMPER-STD-003', N'Cản Trước VF8 2025 - Tiêu chuẩn', 4500000, @front_bumper_cat_id, @office_id_1, GETDATE()),
-    (NEWID(), 'VF8-FBUMPER-STD-004', N'Cản Trước VF8 2025 - Tiêu chuẩn', 4500000, @front_bumper_cat_id, @office_id_2, GETDATE()),
+    (NEWID(), 'VF8-FBUMPER-STD-001', N'Cản Trước VF8 2025 - Tiêu chuẩn', 4500000, @front_bumper_cat_id, @office_id, GETDATE()),
+    (NEWID(), 'VF8-FBUMPER-STD-002', N'Cản Trước VF8 2025 - Tiêu chuẩn', 4500000, @front_bumper_cat_id, @office_id, GETDATE()),
+    (NEWID(), 'VF8-FBUMPER-STD-003', N'Cản Trước VF8 2025 - Tiêu chuẩn', 4500000, @front_bumper_cat_id, @office_id, GETDATE()),
+    (NEWID(), 'VF8-FBUMPER-STD-004', N'Cản Trước VF8 2025 - Tiêu chuẩn', 4500000, @front_bumper_cat_id, @office_id, GETDATE()),
     --    Biến thể 2: Plus
-    (NEWID(), 'VF8-FBUMPER-PLUS-001', N'Cản Trước VF8 2025 - Plus (Có cảm biến)', 6200000, @front_bumper_cat_id, @office_id_1, GETDATE()),
-    (NEWID(), 'VF8-FBUMPER-PLUS-002', N'Cản Trước VF8 2025 - Plus (Có cảm biến)', 6200000, @front_bumper_cat_id, @office_id_1, GETDATE()),
-    (NEWID(), 'VF8-FBUMPER-PLUS-003', N'Cản Trước VF8 2025 - Plus (Có cảm biến)', 6200000, @front_bumper_cat_id, @office_id_1, GETDATE()),
-    (NEWID(), 'VF8-FBUMPER-PLUS-004', N'Cản Trước VF8 2025 - Plus (Có cảm biến)', 6200000, @front_bumper_cat_id, @office_id_2, GETDATE()),
+    (NEWID(), 'VF8-FBUMPER-PLUS-001', N'Cản Trước VF8 2025 - Plus (Có cảm biến)', 6200000, @front_bumper_cat_id, @office_id, GETDATE()),
+    (NEWID(), 'VF8-FBUMPER-PLUS-002', N'Cản Trước VF8 2025 - Plus (Có cảm biến)', 6200000, @front_bumper_cat_id, @office_id, GETDATE()),
+    (NEWID(), 'VF8-FBUMPER-PLUS-003', N'Cản Trước VF8 2025 - Plus (Có cảm biến)', 6200000, @front_bumper_cat_id, @office_id, GETDATE()),
+    (NEWID(), 'VF8-FBUMPER-PLUS-004', N'Cản Trước VF8 2025 - Plus (Có cảm biến)', 6200000, @front_bumper_cat_id, @office_id, GETDATE()),
     --    Biến thể 3: Thể thao
-    (NEWID(), 'VF8-FBUMPER-SPORT-001', N'Cản Trước VF8 2025 - Gói Thể thao', 7100000, @front_bumper_cat_id, @office_id_1, GETDATE()),
-    (NEWID(), 'VF8-FBUMPER-SPORT-002', N'Cản Trước VF8 2025 - Gói Thể thao', 7100000, @front_bumper_cat_id, @office_id_1, GETDATE()),
-    (NEWID(), 'VF8-FBUMPER-SPORT-003', N'Cản Trước VF8 2025 - Gói Thể thao', 7100000, @front_bumper_cat_id, @office_id_1, GETDATE()),
-    (NEWID(), 'VF8-FBUMPER-SPORT-004', N'Cản Trước VF8 2025 - Gói Thể thao', 7100000, @front_bumper_cat_id, @office_id_2, GETDATE()),
+    (NEWID(), 'VF8-FBUMPER-SPORT-001', N'Cản Trước VF8 2025 - Gói Thể thao', 7100000, @front_bumper_cat_id, @office_id, GETDATE()),
+    (NEWID(), 'VF8-FBUMPER-SPORT-002', N'Cản Trước VF8 2025 - Gói Thể thao', 7100000, @front_bumper_cat_id, @office_id, GETDATE()),
+    (NEWID(), 'VF8-FBUMPER-SPORT-003', N'Cản Trước VF8 2025 - Gói Thể thao', 7100000, @front_bumper_cat_id, @office_id, GETDATE()),
+    (NEWID(), 'VF8-FBUMPER-SPORT-004', N'Cản Trước VF8 2025 - Gói Thể thao', 7100000, @front_bumper_cat_id, @office_id, GETDATE()),
     
     -- 12. Điện tử & Cảm biến -> Cảm biến Radar
     --    Biến thể 1: Tầm ngắn
-    (NEWID(), 'VF8-RADAR-SR-001', N'Cảm biến Radar VF8 2025 - Tầm ngắn (Góc)', 1800000, @radar_sensor_cat_id, @office_id_1, GETDATE()),
-    (NEWID(), 'VF8-RADAR-SR-002', N'Cảm biến Radar VF8 2025 - Tầm ngắn (Góc)', 1800000, @radar_sensor_cat_id, @office_id_1, GETDATE()),
-    (NEWID(), 'VF8-RADAR-SR-003', N'Cảm biến Radar VF8 2025 - Tầm ngắn (Góc)', 1800000, @radar_sensor_cat_id, @office_id_1, GETDATE()),
-    (NEWID(), 'VF8-RADAR-SR-004', N'Cảm biến Radar VF8 2025 - Tầm ngắn (Góc)', 1800000, @radar_sensor_cat_id, @office_id_2, GETDATE()),
+    (NEWID(), 'VF8-RADAR-SR-001', N'Cảm biến Radar VF8 2025 - Tầm ngắn (Góc)', 1800000, @radar_sensor_cat_id, @office_id, GETDATE()),
+    (NEWID(), 'VF8-RADAR-SR-002', N'Cảm biến Radar VF8 2025 - Tầm ngắn (Góc)', 1800000, @radar_sensor_cat_id, @office_id, GETDATE()),
+    (NEWID(), 'VF8-RADAR-SR-003', N'Cảm biến Radar VF8 2025 - Tầm ngắn (Góc)', 1800000, @radar_sensor_cat_id, @office_id, GETDATE()),
+    (NEWID(), 'VF8-RADAR-SR-004', N'Cảm biến Radar VF8 2025 - Tầm ngắn (Góc)', 1800000, @radar_sensor_cat_id, @office_id, GETDATE()),
     --    Biến thể 2: Tầm xa
-    (NEWID(), 'VF8-RADAR-LR-001', N'Cảm biến Radar VF8 2025 - Tầm xa (Phía trước)', 4500000, @radar_sensor_cat_id, @office_id_1, GETDATE()),
-    (NEWID(), 'VF8-RADAR-LR-002', N'Cảm biến Radar VF8 2025 - Tầm xa (Phía trước)', 4500000, @radar_sensor_cat_id, @office_id_1, GETDATE()),
-    (NEWID(), 'VF8-RADAR-LR-003', N'Cảm biến Radar VF8 2025 - Tầm xa (Phía trước)', 4500000, @radar_sensor_cat_id, @office_id_1, GETDATE()),
-    (NEWID(), 'VF8-RADAR-LR-004', N'Cảm biến Radar VF8 2025 - Tầm xa (Phía trước)', 4500000, @radar_sensor_cat_id, @office_id_2, GETDATE()),
+    (NEWID(), 'VF8-RADAR-LR-001', N'Cảm biến Radar VF8 2025 - Tầm xa (Phía trước)', 4500000, @radar_sensor_cat_id, @office_id, GETDATE()),
+    (NEWID(), 'VF8-RADAR-LR-002', N'Cảm biến Radar VF8 2025 - Tầm xa (Phía trước)', 4500000, @radar_sensor_cat_id, @office_id, GETDATE()),
+    (NEWID(), 'VF8-RADAR-LR-003', N'Cảm biến Radar VF8 2025 - Tầm xa (Phía trước)', 4500000, @radar_sensor_cat_id, @office_id, GETDATE()),
+    (NEWID(), 'VF8-RADAR-LR-004', N'Cảm biến Radar VF8 2025 - Tầm xa (Phía trước)', 4500000, @radar_sensor_cat_id, @office_id, GETDATE()),
     --    Biến thể 3: Nhà cung cấp Continental
-    (NEWID(), 'VF8-RADAR-CONTI-001', N'Cảm biến Radar VF8 2025 - Nhà cung cấp Continental', 4900000, @radar_sensor_cat_id, @office_id_1, GETDATE()),
-    (NEWID(), 'VF8-RADAR-CONTI-002', N'Cảm biến Radar VF8 2025 - Nhà cung cấp Continental', 4900000, @radar_sensor_cat_id, @office_id_1, GETDATE()),
-    (NEWID(), 'VF8-RADAR-CONTI-003', N'Cảm biến Radar VF8 2025 - Nhà cung cấp Continental', 4900000, @radar_sensor_cat_id, @office_id_1, GETDATE()),
-    (NEWID(), 'VF8-RADAR-CONTI-004', N'Cảm biến Radar VF8 2025 - Nhà cung cấp Continental', 4900000, @radar_sensor_cat_id, @office_id_2, GETDATE());
-    -- Khai báo Policy ID chung để sử dụng lại
+    (NEWID(), 'VF8-RADAR-CONTI-001', N'Cảm biến Radar VF8 2025 - Nhà cung cấp Continental', 4900000, @radar_sensor_cat_id, @office_id, GETDATE()),
+    (NEWID(), 'VF8-RADAR-CONTI-002', N'Cảm biến Radar VF8 2025 - Nhà cung cấp Continental', 4900000, @radar_sensor_cat_id, @office_id, GETDATE()),
+    (NEWID(), 'VF8-RADAR-CONTI-003', N'Cảm biến Radar VF8 2025 - Nhà cung cấp Continental', 4900000, @radar_sensor_cat_id, @office_id, GETDATE()),
+    (NEWID(), 'VF8-RADAR-CONTI-004', N'Cảm biến Radar VF8 2025 - Nhà cung cấp Continental', 4900000, @radar_sensor_cat_id, @office_id, GETDATE());
+END
+
+-- Khai báo Policy ID chung để sử dụng lại
 DECLARE @vf8_policy_id UNIQUEIDENTIFIER = '050e8400-e29b-41d4-a716-446655440003';
 
 
 
-INSERT INTO policy_coverage_parts (id, policy_id, part_category_id, coverage_conditions, created_at)
+-- Insert policy coverage parts only if they don't exist
+IF NOT EXISTS (SELECT 1 FROM policy_coverage_parts WHERE id = '050e8400-e29b-41d4-a716-446655440101')
+BEGIN
+    INSERT INTO policy_coverage_parts (id, policy_id, part_category_id, coverage_conditions, created_at)
 VALUES
     -- Cấp 1: General Systems
     ('050e8400-e29b-41d4-a716-446655440101', @vf8_policy_id, @electric_drivetrain_id, N'Lỗi vận hành gây mất công suất đột ngột, tiếng kêu lạ từ động cơ hoặc hộp số, không thể vào số (D/R).', GETDATE()),
@@ -478,6 +497,7 @@ VALUES
     ('050e8400-e29b-41d4-a716-446655440169', @vf8_policy_id, @onboard_charger_cat_id, N'Lỗi phần cứng không thể chuyển đổi dòng điện AC thành DC để sạc pin.', GETDATE()),
     ('050e8400-e29b-41d4-a716-446655440170', @vf8_policy_id, @charging_port_cat_id, N'Lỗi cơ cấu khóa chốt sạc, hoặc lỗi chân tín hiệu giao tiếp với trụ sạc.', GETDATE()),
     ('050e8400-e29b-41d4-a716-446655440171', @vf8_policy_id, @portable_cable_cat_id, N'Bộ sạc báo lỗi, không thể cấp nguồn cho xe dù nguồn điện dân dụng ổn định.', GETDATE());
+END
 
 COMMIT TRANSACTION;
 

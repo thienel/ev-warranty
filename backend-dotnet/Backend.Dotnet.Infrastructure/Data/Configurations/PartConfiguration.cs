@@ -34,7 +34,7 @@ namespace Backend.Dotnet.Infrastructure.Data.Configurations
 
             builder.Property(p => p.UnitPrice)
                 .HasColumnName("unit_price")
-                .HasColumnType("decimal(10,2)")
+                .HasColumnType("decimal(18,2)")
                 .IsRequired();
 
             builder.Property(p => p.CategoryId)
