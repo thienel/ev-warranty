@@ -10,7 +10,6 @@ import {
   InboxOutlined,
   AppstoreOutlined,
   ToolOutlined,
-  OrderedListOutlined,
   TeamOutlined,
   HomeOutlined,
 } from '@ant-design/icons'
@@ -183,12 +182,6 @@ const MENU_ITEMS: Record<UserRole, MenuItemData[]> = {
       path: '/sc-staff/claims',
     },
     {
-      key: 'work-orders',
-      icon: <OrderedListOutlined />,
-      label: 'Work Orders',
-      path: '/sc-staff/work-orders',
-    },
-    {
       key: 'customers',
       icon: <TeamOutlined />,
       label: 'Customers',
@@ -196,12 +189,6 @@ const MENU_ITEMS: Record<UserRole, MenuItemData[]> = {
     },
   ],
   [USER_ROLES.SC_TECHNICIAN]: [
-    {
-      key: 'work-orders',
-      icon: <OrderedListOutlined />,
-      label: 'Work Orders',
-      path: '/sc-technician/work-orders',
-    },
     {
       key: 'claims',
       icon: <FileTextOutlined />,
