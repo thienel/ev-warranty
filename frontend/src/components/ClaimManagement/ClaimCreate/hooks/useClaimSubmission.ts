@@ -8,6 +8,8 @@ import { getClaimsBasePath } from '@/utils/navigationHelpers'
 
 interface ClaimFormValues {
   description: string
+  kilometers: number
+  technician_id: string
 }
 
 export const useClaimSubmission = () => {
@@ -36,6 +38,16 @@ export const useClaimSubmission = () => {
       return { success: false, shouldNavigateToStep: 2 }
     }
 
+    if (!values.kilometers || values.kilometers <= 0) {
+      message.error('Please enter valid vehicle kilometers')
+      return { success: false, shouldNavigateToStep: 2 }
+    }
+
+    if (!values.technician_id?.trim()) {
+      message.error('Please select a technician')
+      return { success: false, shouldNavigateToStep: 2 }
+    }
+
     try {
       setLoading(true)
 
@@ -43,6 +55,8 @@ export const useClaimSubmission = () => {
         customer_id: selectedCustomer.id,
         vehicle_id: selectedVehicle.id,
         description: values.description.trim(),
+        kilometers: values.kilometers,
+        technician_id: values.technician_id,
       }
 
       await claimsApi.create(claimData)

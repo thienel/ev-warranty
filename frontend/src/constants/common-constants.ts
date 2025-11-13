@@ -80,6 +80,7 @@ export const API_ENDPOINTS = {
   PARTS: '/api/v1/parts',
   WARRANTY_POLICIES: '/api/v1/warranty-policies',
   POLICY_COVERAGE_PARTS: '/api/v1/policy-coverage-parts',
+  AVAILABLE_TECHNICIANS: '/api/v1/users/technicians/available',
 
   CLAIM_ACTIONS: {
     SUBMIT: (id: string) => `/api/v1/claims/${id}/submit`,

@@ -36,6 +36,17 @@ export interface User {
   is_active?: boolean
 }
 
+export interface Technician {
+  id: string
+  office_id: string
+  full_name: string
+  email: string
+  role: string
+  is_active: boolean
+  created_at?: string
+  updated_at?: string
+}
+
 export interface UserFormData {
   name: string
   email: string
@@ -157,6 +168,8 @@ export interface CreateClaimRequest {
   customer_id: string
   vehicle_id: string
   description: string
+  kilometers: number
+  technician_id: string
 }
 
 export interface UpdateClaimRequest {

@@ -1,11 +1,27 @@
-import React from 'react'
-import { Card, Form, Input, Button, Space, Typography, Divider, Row, Col, Steps } from 'antd'
+import React, { useState, useEffect } from 'react'
+import {
+  Card,
+  Form,
+  Input,
+  Button,
+  Space,
+  Typography,
+  Divider,
+  Row,
+  Col,
+  Steps,
+  InputNumber,
+  Select,
+  Spin,
+} from 'antd'
 import {
   SaveOutlined,
   CheckCircleOutlined,
   UserOutlined,
   CarOutlined,
   FileTextOutlined,
+  DashboardOutlined,
+  TeamOutlined,
 } from '@ant-design/icons'
 import { useNavigate, useLocation } from 'react-router-dom'
 import CustomerSearch from './components/CustomerSearch'
@@ -17,19 +33,28 @@ import { useClaimFormState } from './hooks/useClaimFormState'
 import { useClaimSubmission } from './hooks/useClaimSubmission'
 import { getClaimsBasePath } from '@/utils/navigationHelpers'
 import { getClaimSteps, isStepValid, getStepStatus } from './utils/claimSteps'
+import { techniciansApi } from '@/services'
+import type { Technician } from '@/types'
 import './ClaimCreate.less'
 
 const { Text } = Typography
 const { TextArea } = Input
+const { Option } = Select
 
 interface ClaimFormValues {
   description: string
+  kilometers: number
+  technician_id: string
 }
 
 const ClaimCreate: React.FC = () => {
   const [form] = Form.useForm<ClaimFormValues>()
   const navigate = useNavigate()
   const location = useLocation()
+
+  // State for available technicians
+  const [technicians, setTechnicians] = useState<Technician[]>([])
+  const [loadingTechnicians, setLoadingTechnicians] = useState(false)
 
   // Custom hooks for state management
   const {
@@ -45,6 +70,31 @@ const ClaimCreate: React.FC = () => {
 
   // Get steps configuration
   const steps = getClaimSteps()
+
+  // Fetch available technicians
+  useEffect(() => {
+    const fetchTechnicians = async () => {
+      try {
+        setLoadingTechnicians(true)
+        const response = await techniciansApi.getAvailable()
+        let techData = response.data
+
+        // Handle nested data structure
+        if (techData && typeof techData === 'object' && 'data' in techData) {
+          techData = (techData as { data: unknown }).data as Technician[]
+        }
+
+        setTechnicians(Array.isArray(techData) ? techData : [])
+      } catch (error) {
+        console.error('Failed to fetch technicians:', error)
+        setTechnicians([])
+      } finally {
+        setLoadingTechnicians(false)
+      }
+    }
+
+    fetchTechnicians()
+  }, [])
 
   // Handle form submission
   const handleSubmit = async (values: ClaimFormValues) => {
@@ -164,6 +214,84 @@ const ClaimCreate: React.FC = () => {
                     maxLength={1000}
                   />
                 </Form.Item>
+
+                <Row gutter={[16, 16]}>
+                  {/* Kilometers Field */}
+                  <Col xs={24} md={12}>
+                    <Form.Item
+                      name="kilometers"
+                      label={
+                        <div className="form-label">
+                          <DashboardOutlined style={{ marginRight: 4 }} />
+                          <span>Vehicle Kilometers</span>
+                        </div>
+                      }
+                      rules={[
+                        {
+                          required: true,
+                          message: 'Please enter vehicle kilometers',
+                        },
+                        {
+                          type: 'number',
+                          min: 0,
+                          message: 'Kilometers must be a positive number',
+                        },
+                      ]}
+                    >
+                      <InputNumber
+                        style={{ width: '100%' }}
+                        placeholder="Enter current kilometers"
+                        disabled={!selectedCustomer || !selectedVehicle}
+                        min={0}
+                        formatter={(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                      />
+                    </Form.Item>
+                  </Col>
+
+                  {/* Technician Selection */}
+                  <Col xs={24} md={12}>
+                    <Form.Item
+                      name="technician_id"
+                      label={
+                        <div className="form-label">
+                          <TeamOutlined style={{ marginRight: 4 }} />
+                          <span>Assign Technician</span>
+                        </div>
+                      }
+                      rules={[
+                        {
+                          required: true,
+                          message: 'Please select a technician',
+                        },
+                      ]}
+                    >
+                      <Select
+                        placeholder="Select a technician"
+                        disabled={!selectedCustomer || !selectedVehicle}
+                        loading={loadingTechnicians}
+                        showSearch
+                        optionFilterProp="children"
+                        filterOption={(input, option) => {
+                          const label = (option?.label as string) || ''
+                          return label.toLowerCase().includes(input.toLowerCase())
+                        }}
+                        notFoundContent={
+                          loadingTechnicians ? <Spin size="small" /> : 'No technicians available'
+                        }
+                      >
+                        {technicians.map((tech) => (
+                          <Option
+                            key={tech.id}
+                            value={tech.id}
+                            label={`${tech.full_name} (${tech.email})`}
+                          >
+                            {tech.full_name} ({tech.email})
+                          </Option>
+                        ))}
+                      </Select>
+                    </Form.Item>
+                  </Col>
+                </Row>
               </StepCard>
             </Col>
           </Row>
