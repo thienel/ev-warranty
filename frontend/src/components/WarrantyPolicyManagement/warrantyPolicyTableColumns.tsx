@@ -18,7 +18,7 @@ const GenerateColumns = (
   const navigate = useNavigate()
 
   const handleViewDetails = (id: string) => {
-    navigate(`/evm-staff/policies/${id}`)
+    navigate(`/admin/policies/${id}`)
   }
 
   return [
