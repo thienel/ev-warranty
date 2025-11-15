@@ -1,9 +1,9 @@
 import api from './api'
 import { API_ENDPOINTS } from '@constants/common-constants'
-import type { ApiSuccessResponse, Technician } from '@/types'
+import type { ApiSuccessResponse, User } from '@/types'
 
 export const techniciansApi = {
-  getAvailable: (): Promise<ApiSuccessResponse<Technician[]>> => {
+  getAvailable: (): Promise<ApiSuccessResponse<User[]>> => {
     return api.get(API_ENDPOINTS.AVAILABLE_TECHNICIANS)
   },
 }

@@ -33,6 +33,7 @@ export interface User {
   name: string
   role: UserRole
   office_id: string
+  is_active: boolean
 }
 
 export interface UserFormData {

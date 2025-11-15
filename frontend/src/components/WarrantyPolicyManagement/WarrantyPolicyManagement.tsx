@@ -20,8 +20,9 @@ const WarrantyPolicyManagement: React.FC = () => {
     updateItem: updatePolicy,
     isUpdate,
     isOpenModal,
+    setIsOpenModal,
+    setUpdateItem,
     handleOpenModal,
-    handleReset,
   } = useManagement<WarrantyPolicy>(API_ENDPOINTS.WARRANTY_POLICIES)
 
   const handleError = useHandleApiError()
@@ -76,6 +77,15 @@ const WarrantyPolicyManagement: React.FC = () => {
       setPolicies([])
     }
   }, [handleError, setPolicies])
+
+  const handleReset = useCallback(async () => {
+    setLoading(true)
+    setSearchText('')
+    setIsOpenModal(false)
+    setUpdateItem(null)
+    await enrichPoliciesWithVehicleModels()
+    setLoading(false)
+  }, [setLoading, setSearchText, setIsOpenModal, setUpdateItem, enrichPoliciesWithVehicleModels])
 
   useEffect(() => {
     enrichPoliciesWithVehicleModels()

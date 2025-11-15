@@ -40,7 +40,11 @@ const OfficeManagement: React.FC = () => {
         loading={loading}
         setLoading={setLoading}
         searchText={searchText}
-        data={offices as (Record<string, unknown> & { id: string | number })[]}
+        data={
+          offices.filter((v) => v.office_name !== 'Head Office') as (Record<string, unknown> & {
+            id: string | number
+          })[]
+        }
         onOpenModal={handleOpenModal}
         onRefresh={handleReset}
         generateColumns={GenerateColumns}
