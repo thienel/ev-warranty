@@ -5,25 +5,23 @@ import (
 	"ev-warranty-go/internal/application"
 	"ev-warranty-go/internal/application/repository"
 	"ev-warranty-go/internal/domain/entity"
+	"ev-warranty-go/internal/infrastructure/client/dotnet"
 	"ev-warranty-go/pkg/apperror"
 
 	"github.com/google/uuid"
 )
 
 type CreateClaimItemCommand struct {
-	PartCategoryID    uuid.UUID
-	FaultyPartID      uuid.UUID
-	ReplacementPartID *uuid.UUID
-	IssueDescription  string
-	Status            string
-	Type              string
-	Cost              float64
+	PartCategoryID   uuid.UUID
+	FaultyPartID     uuid.UUID
+	IssueDescription string
+	Status           string
+	Type             string
 }
 
 type UpdateClaimItemCommand struct {
 	IssueDescription string
 	Type             string
-	Cost             float64
 }
 
 type UpdateClaimItemStatusCommand struct {
@@ -42,14 +40,18 @@ type ClaimItemService interface {
 }
 
 type claimItemService struct {
-	claimRepo repository.ClaimRepository
-	itemRepo  repository.ClaimItemRepository
+	claimRepo    repository.ClaimRepository
+	itemRepo     repository.ClaimItemRepository
+	userRepo     repository.UserRepository
+	dotnetClient dotnet.Client
 }
 
-func NewClaimItemService(claimRepo repository.ClaimRepository, itemRepo repository.ClaimItemRepository) ClaimItemService {
+func NewClaimItemService(claimRepo repository.ClaimRepository, itemRepo repository.ClaimItemRepository, userRepo repository.UserRepository, dotnetClient dotnet.Client) ClaimItemService {
 	return &claimItemService{
-		claimRepo: claimRepo,
-		itemRepo:  itemRepo,
+		claimRepo:    claimRepo,
+		itemRepo:     itemRepo,
+		userRepo:     userRepo,
+		dotnetClient: dotnetClient,
 	}
 }
 
@@ -73,7 +75,7 @@ func (s *claimItemService) GetByClaimID(ctx context.Context, claimID uuid.UUID) 
 
 func (s *claimItemService) Create(tx application.Tx, claimID uuid.UUID,
 	cmd *CreateClaimItemCommand) (*entity.ClaimItem, error) {
-	_, err := s.claimRepo.FindByID(tx.GetCtx(), claimID)
+	claim, err := s.claimRepo.FindByID(tx.GetCtx(), claimID)
 	if err != nil {
 		return nil, err
 	}
@@ -85,8 +87,29 @@ func (s *claimItemService) Create(tx application.Tx, claimID uuid.UUID,
 		return nil, apperror.ErrInvalidInput.WithMessage("Invalid claim item type")
 	}
 
-	item := entity.NewClaimItem(claimID, cmd.PartCategoryID, cmd.FaultyPartID, cmd.ReplacementPartID,
-		cmd.IssueDescription, cmd.Status, cmd.Type, cmd.Cost)
+	var cost float64
+	var replacementPartID *uuid.UUID
+
+	if cmd.Type == entity.ClaimItemTypeReplacement {
+		technician, err := s.userRepo.FindByID(tx.GetCtx(), claim.TechnicianID)
+		if err != nil {
+			return nil, apperror.ErrNotFoundError.WithMessage("Technician not found")
+		}
+
+		reservedPart, err := s.dotnetClient.ReservePart(tx.GetCtx(), technician.OfficeID, cmd.PartCategoryID)
+		if err != nil {
+			return nil, apperror.ErrExternalServiceError.WithMessage("Failed to reserve part: " + err.Error())
+		}
+
+		replacementPartID = &reservedPart.ID
+		cost = reservedPart.UnitPrice
+	} else {
+		replacementPartID = nil
+		cost = 0
+	}
+
+	item := entity.NewClaimItem(claimID, cmd.PartCategoryID, cmd.FaultyPartID, replacementPartID,
+		cmd.IssueDescription, cmd.Status, cmd.Type, cost)
 	err = s.itemRepo.Create(tx, item)
 	if err != nil {
 		return nil, err
@@ -121,9 +144,47 @@ func (s *claimItemService) Update(tx application.Tx, claimID, itemID uuid.UUID, 
 	if !entity.IsValidClaimItemType(cmd.Type) {
 		return apperror.ErrInvalidClaimAction.WithMessage("Invalid claim item type")
 	}
+
+	var cost float64
+	var replacementPartID *uuid.UUID
+
+	oldType := item.Type
+	newType := cmd.Type
+
+	if oldType == entity.ClaimItemTypeReplacement && newType == entity.ClaimItemTypeRepair {
+		if item.ReplacementPartID != nil {
+			err := s.dotnetClient.UnreservePart(tx.GetCtx(), *item.ReplacementPartID)
+			if err != nil {
+				return apperror.ErrExternalServiceError.WithMessage("Failed to unreserve part: " + err.Error())
+			}
+		}
+		replacementPartID = nil
+		cost = 0
+	} else if oldType == entity.ClaimItemTypeRepair && newType == entity.ClaimItemTypeReplacement {
+		technician, err := s.userRepo.FindByID(tx.GetCtx(), claim.TechnicianID)
+		if err != nil {
+			return apperror.ErrNotFoundError.WithMessage("Technician not found")
+		}
+
+		reservedPart, err := s.dotnetClient.ReservePart(tx.GetCtx(), technician.OfficeID, item.PartCategoryID)
+		if err != nil {
+			return apperror.ErrExternalServiceError.WithMessage("Failed to reserve part: " + err.Error())
+		}
+
+		replacementPartID = &reservedPart.ID
+		cost = reservedPart.UnitPrice
+	} else if newType == entity.ClaimItemTypeReplacement {
+		replacementPartID = item.ReplacementPartID
+		cost = item.Cost
+	} else {
+		replacementPartID = nil
+		cost = 0
+	}
+
 	item.IssueDescription = cmd.IssueDescription
 	item.Type = cmd.Type
-	item.Cost = cmd.Cost
+	item.ReplacementPartID = replacementPartID
+	item.Cost = cost
 
 	err = s.itemRepo.Update(tx, item)
 	if err != nil {
@@ -151,6 +212,18 @@ func (s *claimItemService) HardDelete(tx application.Tx, claimID, itemID uuid.UU
 
 	if claim.Status != entity.ClaimStatusDraft {
 		return apperror.ErrInvalidClaimAction.WithMessage("Can only hard delete when claim status is draft")
+	}
+
+	item, err := s.itemRepo.FindByID(tx.GetCtx(), itemID)
+	if err != nil {
+		return err
+	}
+
+	if item.Type == entity.ClaimItemTypeReplacement && item.ReplacementPartID != nil {
+		err := s.dotnetClient.UnreservePart(tx.GetCtx(), *item.ReplacementPartID)
+		if err != nil {
+			return apperror.ErrExternalServiceError.WithMessage("Failed to unreserve part: " + err.Error())
+		}
 	}
 
 	err = s.itemRepo.HardDelete(tx, itemID)
@@ -207,6 +280,18 @@ func (s *claimItemService) Reject(tx application.Tx, claimID, itemID uuid.UUID) 
 
 	if claim.Status != entity.ClaimStatusReviewing {
 		return apperror.ErrInvalidClaimAction.WithMessage("Can only reject when claim status is reviewing")
+	}
+
+	item, err := s.itemRepo.FindByID(tx.GetCtx(), itemID)
+	if err != nil {
+		return err
+	}
+
+	if item.Type == entity.ClaimItemTypeReplacement && item.ReplacementPartID != nil {
+		err := s.dotnetClient.UnreservePart(tx.GetCtx(), *item.ReplacementPartID)
+		if err != nil {
+			return apperror.ErrExternalServiceError.WithMessage("Failed to unreserve part: " + err.Error())
+		}
 	}
 
 	err = s.itemRepo.UpdateStatus(tx, itemID, entity.ClaimItemStatusRejected)

@@ -145,13 +145,11 @@ func (h *claimItemHandler) Create(c *gin.Context) {
 	}
 
 	cmd := &service.CreateClaimItemCommand{
-		PartCategoryID:    req.PartCategoryID,
-		FaultyPartID:      req.FaultyPartID,
-		ReplacementPartID: req.ReplacementPartID,
-		IssueDescription:  req.IssueDescription,
-		Status:            entity.ClaimItemStatusPending,
-		Type:              req.Type,
-		Cost:              req.Cost,
+		PartCategoryID:   req.PartCategoryID,
+		FaultyPartID:     req.FaultyPartID,
+		IssueDescription: req.IssueDescription,
+		Status:           entity.ClaimItemStatusPending,
+		Type:             req.Type,
 	}
 
 	var item *entity.ClaimItem
