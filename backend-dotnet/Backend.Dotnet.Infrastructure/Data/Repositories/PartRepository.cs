@@ -69,7 +69,8 @@ namespace Backend.Dotnet.Infrastructure.Data.Repositories
         public async Task<Part?> GetByOfficeIdAndCategoryId(Guid officeId, Guid categoryId)
         {
             return await _dbSet
-                .FirstOrDefaultAsync(p => p.OfficeLocationId == officeId && p.CategoryId == categoryId);
+                .FirstOrDefaultAsync(p => p.OfficeLocationId == officeId && 
+                                          p.CategoryId == categoryId && p.Status == PartStatus.Available);
         }
 
         public async Task<Part?> GetWithDetailsAsync(Guid partId)

@@ -181,7 +181,7 @@ func (h userHandler) GetByID(c *gin.Context) {
 	}
 
 	h.log.Info("user retrieved", "user_id", userID, "email", user.Email)
-	writeSuccessResponse(c, http.StatusOK, user)
+	writeSuccessResponse(c, http.StatusOK, dto.GenerateUserDTO(user))
 }
 
 // GetAll godoc
@@ -222,7 +222,7 @@ func (h userHandler) GetAll(c *gin.Context) {
 // @Success 200 {object} dto.APIResponse{data=[]dto.UserDTO} "Technicians retrieved successfully"
 // @Failure 401 {object} dto.APIResponse "Unauthorized"
 // @Failure 500 {object} dto.APIResponse "Internal server error"
-// @Router /users [get]
+// @Router /technicians/available [get]
 func (h userHandler) GetAvailableTechnician(c *gin.Context) {
 	err := allowedRoles(c, entity.UserRoleScStaff)
 	if err != nil {
