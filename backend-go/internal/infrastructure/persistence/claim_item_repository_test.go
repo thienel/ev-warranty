@@ -408,7 +408,7 @@ var _ = Describe("ClaimItemRepository", func() {
 					"id", "claim_id", "part_category_id", "faulty_part_id", "replacement_part_id",
 					"issue_description", "status", "type", "cost", "created_at", "updated_at", "deleted_at",
 				}).AddRow(
-					expected.ID, expected.ClaimID, expected.PartCategoryID, expected.FaultyPartID,
+					expected.ID, expected.ClaimID, expected.PartCategoryID, expected.FaultyPartSerial,
 					expected.ReplacementPartID, expected.IssueDescription, expected.Status,
 					expected.Type, expected.Cost, expected.CreatedAt, expected.UpdatedAt, expected.DeletedAt,
 				)
@@ -733,7 +733,7 @@ func newClaimItem() *entity.ClaimItem {
 		ID:                uuid.New(),
 		ClaimID:           uuid.New(),
 		PartCategoryID:    uuid.New(),
-		FaultyPartID:      uuid.New(),
+		FaultyPartSerial:  "Part serial",
 		ReplacementPartID: &replacementPartID,
 		IssueDescription:  "Test issue description",
 		Status:            entity.ClaimItemStatusPending,

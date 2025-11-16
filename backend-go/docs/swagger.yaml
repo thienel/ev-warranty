@@ -30,10 +30,7 @@ definitions:
     type: object
   dto.CreateClaimItemRequest:
     properties:
-      cost:
-        minimum: 0
-        type: number
-      faulty_part_id:
+      faulty_part_serial:
         type: string
       issue_description:
         maxLength: 1000
@@ -41,13 +38,10 @@ definitions:
         type: string
       part_category_id:
         type: string
-      replacement_part_id:
-        type: string
       type:
         type: string
     required:
-    - cost
-    - faulty_part_id
+    - faulty_part_serial
     - issue_description
     - part_category_id
     - type
@@ -60,6 +54,8 @@ definitions:
         maxLength: 1000
         minLength: 10
         type: string
+      kilometers:
+        type: integer
       technician_id:
         type: string
       vehicle_id:
@@ -67,6 +63,7 @@ definitions:
     required:
     - customer_id
     - description
+    - kilometers
     - technician_id
     - vehicle_id
     type: object
@@ -203,6 +200,8 @@ definitions:
         type: string
       id:
         type: string
+      kilometers:
+        type: integer
       staff_id:
         type: string
       status:
@@ -250,7 +249,7 @@ definitions:
         type: number
       created_at:
         type: string
-      faulty_part_id:
+      faulty_part_serial:
         type: string
       id:
         type: string
@@ -1570,7 +1569,7 @@ paths:
       summary: Update an office
       tags:
       - offices
-  /users:
+  /technicians/available:
     get:
       consumes:
       - application/json
@@ -1580,6 +1579,38 @@ paths:
       responses:
         "200":
           description: Technicians retrieved successfully
+          schema:
+            allOf:
+            - $ref: '#/definitions/dto.APIResponse'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/dto.UserDTO'
+                  type: array
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.APIResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/dto.APIResponse'
+      security:
+      - Bearer: []
+      summary: Get all users
+      tags:
+      - users
+  /users:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a list of all users
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Users retrieved successfully
           schema:
             allOf:
             - $ref: '#/definitions/dto.APIResponse'

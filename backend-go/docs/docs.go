@@ -1029,7 +1029,7 @@ const docTemplate = `{
                 "tags": [
                     "claims"
                 ],
-                "summary": "DoneReview a claim",
+                "summary": "Complete a claim",
                 "parameters": [
                     {
                         "type": "string",
@@ -2064,7 +2064,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/users": {
+        "/technicians/available": {
             "get": {
                 "security": [
                     {
@@ -2085,6 +2085,61 @@ const docTemplate = `{
                 "responses": {
                     "200": {
                         "description": "Technicians retrieved successfully",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/dto.APIResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/dto.UserDTO"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/dto.APIResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/dto.APIResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/users": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Retrieve a list of all users",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "users"
+                ],
+                "summary": "Get all users",
+                "responses": {
+                    "200": {
+                        "description": "Users retrieved successfully",
                         "schema": {
                             "allOf": [
                                 {
@@ -2446,18 +2501,13 @@ const docTemplate = `{
         "dto.CreateClaimItemRequest": {
             "type": "object",
             "required": [
-                "cost",
-                "faulty_part_id",
+                "faulty_part_serial",
                 "issue_description",
                 "part_category_id",
                 "type"
             ],
             "properties": {
-                "cost": {
-                    "type": "number",
-                    "minimum": 0
-                },
-                "faulty_part_id": {
+                "faulty_part_serial": {
                     "type": "string"
                 },
                 "issue_description": {
@@ -2466,9 +2516,6 @@ const docTemplate = `{
                     "minLength": 10
                 },
                 "part_category_id": {
-                    "type": "string"
-                },
-                "replacement_part_id": {
                     "type": "string"
                 },
                 "type": {
@@ -2481,6 +2528,7 @@ const docTemplate = `{
             "required": [
                 "customer_id",
                 "description",
+                "kilometers",
                 "technician_id",
                 "vehicle_id"
             ],
@@ -2492,6 +2540,9 @@ const docTemplate = `{
                     "type": "string",
                     "maxLength": 1000,
                     "minLength": 10
+                },
+                "kilometers": {
+                    "type": "integer"
                 },
                 "technician_id": {
                     "type": "string"
@@ -2697,6 +2748,9 @@ const docTemplate = `{
                 "id": {
                     "type": "string"
                 },
+                "kilometers": {
+                    "type": "integer"
+                },
                 "staff_id": {
                     "type": "string"
                 },
@@ -2769,7 +2823,7 @@ const docTemplate = `{
                 "created_at": {
                     "type": "string"
                 },
-                "faulty_part_id": {
+                "faulty_part_serial": {
                     "type": "string"
                 },
                 "id": {

@@ -18,6 +18,8 @@ var _ = Describe("ClaimItemService", func() {
 	var (
 		mockClaimRepo *mocks.ClaimRepository
 		mockItemRepo  *mocks.ClaimItemRepository
+		mockUserRepo  *mocks.UserRepository
+		mockClient    *mocks.Client
 		mockTx        *mocks.Tx
 		itemService   service.ClaimItemService
 		ctx           context.Context
@@ -26,8 +28,10 @@ var _ = Describe("ClaimItemService", func() {
 	BeforeEach(func() {
 		mockClaimRepo = mocks.NewClaimRepository(GinkgoT())
 		mockItemRepo = mocks.NewClaimItemRepository(GinkgoT())
+		mockUserRepo = mocks.NewUserRepository(GinkgoT())
+		mockClient = mocks.NewClient(GinkgoT())
 		mockTx = mocks.NewTx(GinkgoT())
-		itemService = service.NewClaimItemService(mockClaimRepo, mockItemRepo)
+		itemService = service.NewClaimItemService(mockClaimRepo, mockItemRepo, mockUserRepo, mockClient)
 		ctx = context.Background()
 	})
 
@@ -158,11 +162,10 @@ var _ = Describe("ClaimItemService", func() {
 			claimID = uuid.New()
 			cmd = &service.CreateClaimItemCommand{
 				PartCategoryID:   uuid.New(),
-				FaultyPartID:     uuid.New(),
+				FaultyPartSerial: "Part serial",
 				IssueDescription: "Part is damaged",
 				Status:           entity.ClaimItemStatusPending,
 				Type:             entity.ClaimItemTypeRepair,
-				Cost:             150.0,
 			}
 			mockTx.EXPECT().GetCtx().Return(ctx).Maybe()
 		})
@@ -179,8 +182,7 @@ var _ = Describe("ClaimItemService", func() {
 					return i.ClaimID == claimID &&
 						i.IssueDescription == cmd.IssueDescription &&
 						i.Status == cmd.Status &&
-						i.Type == cmd.Type &&
-						i.Cost == cmd.Cost
+						i.Type == cmd.Type
 				})).Return(nil).Once()
 
 				item, err := itemService.Create(mockTx, claimID, cmd)
@@ -278,7 +280,6 @@ var _ = Describe("ClaimItemService", func() {
 			cmd = &service.UpdateClaimItemCommand{
 				IssueDescription: "Updated description",
 				Type:             entity.ClaimItemTypeReplacement,
-				Cost:             200.0,
 			}
 			mockTx.EXPECT().GetCtx().Return(ctx).Maybe()
 		})
@@ -300,8 +301,7 @@ var _ = Describe("ClaimItemService", func() {
 				mockItemRepo.EXPECT().Update(mockTx, mock.MatchedBy(func(i *entity.ClaimItem) bool {
 					return i.ID == itemID &&
 						i.IssueDescription == cmd.IssueDescription &&
-						i.Type == cmd.Type &&
-						i.Cost == cmd.Cost
+						i.Type == cmd.Type
 				})).Return(nil).Once()
 				mockItemRepo.EXPECT().SumCostByClaimID(mockTx, claimID).Return(200.0, nil).Once()
 				mockClaimRepo.EXPECT().Update(mockTx, mock.AnythingOfType("*entity.Claim")).Return(nil).Once()

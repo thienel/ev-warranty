@@ -146,7 +146,7 @@ func (h *claimItemHandler) Create(c *gin.Context) {
 
 	cmd := &service.CreateClaimItemCommand{
 		PartCategoryID:   req.PartCategoryID,
-		FaultyPartID:     req.FaultyPartID,
+		FaultyPartSerial: req.FaultyPartSerial,
 		IssueDescription: req.IssueDescription,
 		Status:           entity.ClaimItemStatusPending,
 		Type:             req.Type,

@@ -13,7 +13,7 @@ import (
 
 type CreateClaimItemCommand struct {
 	PartCategoryID   uuid.UUID
-	FaultyPartID     uuid.UUID
+	FaultyPartSerial string
 	IssueDescription string
 	Status           string
 	Type             string
@@ -108,7 +108,7 @@ func (s *claimItemService) Create(tx application.Tx, claimID uuid.UUID,
 		cost = 0
 	}
 
-	item := entity.NewClaimItem(claimID, cmd.PartCategoryID, cmd.FaultyPartID, replacementPartID,
+	item := entity.NewClaimItem(claimID, cmd.PartCategoryID, cmd.FaultyPartSerial, replacementPartID,
 		cmd.IssueDescription, cmd.Status, cmd.Type, cost)
 	err = s.itemRepo.Create(tx, item)
 	if err != nil {

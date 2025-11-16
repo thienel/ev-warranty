@@ -21,7 +21,7 @@ type ClaimItem struct {
 	ClaimID           uuid.UUID       `gorm:"not null;type:uuid" json:"claim_id"`
 	Claim             Claim           `gorm:"foreignKey:ClaimID;references:ID;constraint:OnDelete:CASCADE" json:"-"`
 	PartCategoryID    uuid.UUID       `gorm:"not null" json:"part_category_id"`
-	FaultyPartID      uuid.UUID       `gorm:"not null;type:uuid" json:"faulty_part_id"`
+	FaultyPartSerial  string          `gorm:"not null" json:"faulty_part_serial"`
 	ReplacementPartID *uuid.UUID      `gorm:"type:uuid" json:"replacement_part_id,omitempty"`
 	IssueDescription  string          `gorm:"not null;type:text" json:"issue_description"`
 	Status            string          `gorm:"not null" json:"status"`
@@ -32,7 +32,7 @@ type ClaimItem struct {
 	DeletedAt         *gorm.DeletedAt `gorm:"index" json:"-"`
 }
 
-func NewClaimItem(claimID uuid.UUID, partCategoryID uuid.UUID, faultyPartID uuid.UUID,
+func NewClaimItem(claimID uuid.UUID, partCategoryID uuid.UUID, faultyPartSerial string,
 	replacementPartID *uuid.UUID,
 	issueDescription, status, itemType string, cost float64,
 ) *ClaimItem {
@@ -41,7 +41,7 @@ func NewClaimItem(claimID uuid.UUID, partCategoryID uuid.UUID, faultyPartID uuid
 		ID:                uuid.New(),
 		ClaimID:           claimID,
 		PartCategoryID:    partCategoryID,
-		FaultyPartID:      faultyPartID,
+		FaultyPartSerial:  faultyPartSerial,
 		ReplacementPartID: replacementPartID,
 		IssueDescription:  issueDescription,
 		Status:            status,
