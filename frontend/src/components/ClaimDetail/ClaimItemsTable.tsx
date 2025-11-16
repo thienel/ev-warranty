@@ -1,6 +1,12 @@
 import React from 'react'
 import { Table, Button, Typography, Divider, Card, Space } from 'antd'
-import { ToolOutlined, PlusOutlined, CheckOutlined, CloseOutlined, FileSearchOutlined } from '@ant-design/icons'
+import {
+  ToolOutlined,
+  PlusOutlined,
+  CheckOutlined,
+  CloseOutlined,
+  FileSearchOutlined,
+} from '@ant-design/icons'
 import type { ColumnsType } from 'antd/es/table'
 import { CLAIM_ITEM_STATUS_LABELS, CLAIM_ITEM_TYPE_LABELS } from '@constants/common-constants'
 import type { ClaimItem, PartCategory, Part } from '@/types/index'
@@ -70,7 +76,7 @@ const ClaimItemsTable: React.FC<ClaimItemsTableProps> = ({
       key: 'serial_number',
       width: '15%',
       render: (_, record: ClaimItem) => {
-        const serialNumber = getPartSerialNumber(record.faulty_part_id)
+        const serialNumber = getPartSerialNumber(record.faulty_part_serial)
         const isNotFound = serialNumber.includes('not found')
         return (
           <Text type={isNotFound ? 'secondary' : undefined} italic={isNotFound}>
@@ -92,7 +98,7 @@ const ClaimItemsTable: React.FC<ClaimItemsTableProps> = ({
       key: 'faulty_part_id',
       width: '12%',
       render: (_, record: ClaimItem) => {
-        const partName = getPartName(record.faulty_part_id)
+        const partName = getPartName(record.faulty_part_serial)
         const isNotFound = partName.includes('not found')
         return (
           <Text type={isNotFound ? 'secondary' : undefined} italic={isNotFound}>
@@ -160,7 +166,7 @@ const ClaimItemsTable: React.FC<ClaimItemsTableProps> = ({
       width: '20%',
       render: (_, record: ClaimItem) => {
         const categoryName = getPartCategoryName(record.part_category_id)
-        
+
         return (
           <Space size="small" direction="vertical">
             {/* Approve/Reject actions - only for PENDING items */}
@@ -189,7 +195,7 @@ const ClaimItemsTable: React.FC<ClaimItemsTableProps> = ({
                 )}
               </Space>
             )}
-            
+
             {/* View Coverage button - always available if permission allows */}
             {canViewPolicyCoverage && onViewCoverage && (
               <Button

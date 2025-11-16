@@ -188,7 +188,7 @@ export const useClaimData = (claimId?: string): UseClaimDataReturn => {
 
       try {
         // Get unique part IDs from claim items
-        const uniquePartIds = Array.from(new Set(claimItems.map((item) => item.faulty_part_id)))
+        const uniquePartIds = Array.from(new Set(claimItems.map((item) => item.faulty_part_serial)))
 
         // Fetch each part individually
         const partPromises = uniquePartIds.map((partId) => partsApi.getById(partId))
