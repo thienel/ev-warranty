@@ -64,7 +64,11 @@ const ClaimManagement: React.FC = () => {
         setLoading={setLoading}
         searchText={searchText}
         data={
-          (Array.isArray(claims) ? claims : []) as unknown as (Record<string, unknown> & {
+          (Array.isArray(claims) ? claims : []).sort((a, b) => {
+            const dateA = new Date(a.updated_at as string)
+            const dateB = new Date(b.updated_at as string)
+            return dateB.getTime() - dateA.getTime()
+          }) as unknown as (Record<string, unknown> & {
             id: string | number
           })[]
         }

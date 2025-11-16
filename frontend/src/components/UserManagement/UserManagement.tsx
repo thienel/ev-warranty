@@ -99,7 +99,13 @@ const UserManagement: React.FC = () => {
         setLoading={setLoading}
         searchText={searchText}
         data={
-          users.filter((v) => v.email !== 'admin@example.com') as (Record<string, unknown> & {
+          users
+            .sort((a, b) => {
+              const dateA = new Date(a.created_at as string)
+              const dateB = new Date(b.created_at as string)
+              return dateB.getTime() - dateA.getTime()
+            })
+            .filter((v) => v.email !== 'admin@example.com') as (Record<string, unknown> & {
             id: string | number
           })[]
         }

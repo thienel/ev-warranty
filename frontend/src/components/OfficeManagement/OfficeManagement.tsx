@@ -41,7 +41,13 @@ const OfficeManagement: React.FC = () => {
         setLoading={setLoading}
         searchText={searchText}
         data={
-          offices.filter((v) => v.office_name !== 'Head Office') as (Record<string, unknown> & {
+          offices
+            .sort((a, b) => {
+              const dateA = new Date(a.updated_at as string)
+              const dateB = new Date(b.updated_at as string)
+              return dateB.getTime() - dateA.getTime()
+            })
+            .filter((v) => v.office_name !== 'Head Office') as (Record<string, unknown> & {
             id: string | number
           })[]
         }
