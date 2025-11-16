@@ -85,7 +85,7 @@ namespace Backend.Dotnet.API.Controllers
         [HttpPost("reserve")]
         [ProducesResponseType(typeof(BaseResponseDto<PartResponse>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BaseResponseDto), StatusCodes.Status404NotFound)]
-        [Authorize(Roles = SystemRoles.UserRoleAdmin + "," + SystemRoles.UserRoleEvmStaff)]
+        [Authorize(Roles = SystemRoles.UserRoleScStaff)]
         public async Task<IActionResult> ReserveByOfficeIdAndCategoryId([FromBody] ReservePartRequest request)
         {
             var result = await _partService.
@@ -99,7 +99,7 @@ namespace Backend.Dotnet.API.Controllers
         [HttpPost("{id}/unreserve")]
         [ProducesResponseType(typeof(BaseResponseDto<PartResponse>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BaseResponseDto), StatusCodes.Status404NotFound)]
-        [Authorize(Roles = SystemRoles.UserRoleAdmin + "," + SystemRoles.UserRoleEvmStaff)]
+        [Authorize(Roles = SystemRoles.UserRoleScStaff + "," + SystemRoles.UserRoleEvmStaff)]
         public async Task<IActionResult> Unreserve(Guid id)
         {
             var result = await _partService.Unreserve(id);
