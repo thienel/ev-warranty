@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { Modal, Table, Typography, Tag, Spin, Alert } from 'antd'
+import { Modal, Table, Typography, Spin, Alert } from 'antd'
 import { SafetyOutlined } from '@ant-design/icons'
 import type { ColumnsType } from 'antd/es/table'
 import { policyCoveragePartsApi } from '@/services/policyCoveragePartsApi'
@@ -41,7 +41,8 @@ const PolicyCoverageModal: React.FC<PolicyCoverageModalProps> = ({
     try {
       setLoading(true)
       setError(null)
-      const response = await policyCoveragePartsApi.getAll(policyId)
+      // Pass both policyId and categoryId to the API
+      const response = await policyCoveragePartsApi.getAll(policyId, categoryId || undefined)
       let coverageData = response.data
 
       // Handle nested data structure
@@ -49,13 +50,7 @@ const PolicyCoverageModal: React.FC<PolicyCoverageModalProps> = ({
         coverageData = (coverageData as { data: unknown }).data as PolicyCoveragePart[]
       }
 
-      // Filter by category if specified
-      let filteredData = coverageData as PolicyCoveragePart[]
-      if (categoryId) {
-        filteredData = filteredData.filter((item) => item.part_category_id === categoryId)
-      }
-
-      setCoverageParts(filteredData)
+      setCoverageParts(coverageData as PolicyCoveragePart[])
     } catch (err) {
       console.error('Error fetching policy coverage parts:', err)
       setError('Failed to load policy coverage information')
@@ -86,9 +81,7 @@ const PolicyCoverageModal: React.FC<PolicyCoverageModalProps> = ({
       dataIndex: 'part_category_id',
       key: 'part_category_id',
       width: '30%',
-      render: (catId: string) => (
-        <Tag color="blue">{getCategoryName(catId)}</Tag>
-      ),
+      render: (catId: string) => <>{getCategoryName(catId)}</>,
     },
     {
       title: 'Coverage Conditions',
@@ -96,11 +89,11 @@ const PolicyCoverageModal: React.FC<PolicyCoverageModalProps> = ({
       key: 'coverage_conditions',
       width: '70%',
       render: (conditions: string) => (
-        <Paragraph 
-          style={{ 
+        <Paragraph
+          style={{
             margin: 0,
             whiteSpace: 'pre-wrap',
-            wordBreak: 'break-word'
+            wordBreak: 'break-word',
           }}
         >
           {conditions || 'No specific conditions specified'}
@@ -109,9 +102,7 @@ const PolicyCoverageModal: React.FC<PolicyCoverageModalProps> = ({
     },
   ]
 
-  const modalTitle = categoryId 
-    ? `Policy Coverage for ${categoryName}`
-    : 'Policy Coverage Parts'
+  const modalTitle = categoryId ? `Policy Coverage for ${categoryName}` : 'Policy Coverage Parts'
 
   return (
     <Modal
@@ -124,7 +115,7 @@ const PolicyCoverageModal: React.FC<PolicyCoverageModalProps> = ({
       onCancel={onCancel}
       footer={null}
       width={800}
-      destroyOnClose
+      destroyOnHidden
     >
       {loading ? (
         <div style={{ textAlign: 'center', padding: '40px' }}>
@@ -143,14 +134,6 @@ const PolicyCoverageModal: React.FC<PolicyCoverageModalProps> = ({
         />
       ) : coverageParts.length > 0 ? (
         <>
-          {categoryId && (
-            <Alert
-              message={`Showing coverage conditions for ${categoryName} category`}
-              type="info"
-              showIcon
-              style={{ marginBottom: '16px' }}
-            />
-          )}
           <Table
             dataSource={coverageParts}
             columns={columns}
@@ -163,10 +146,9 @@ const PolicyCoverageModal: React.FC<PolicyCoverageModalProps> = ({
       ) : (
         <div style={{ textAlign: 'center', padding: '40px' }}>
           <Text type="secondary">
-            {categoryId 
+            {categoryId
               ? `No coverage conditions found for ${categoryName} category`
-              : 'No policy coverage parts found'
-            }
+              : 'No policy coverage parts found'}
           </Text>
         </div>
       )}

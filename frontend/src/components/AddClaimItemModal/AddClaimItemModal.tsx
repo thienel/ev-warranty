@@ -78,7 +78,7 @@ const AddClaimItemModal: React.FC<AddClaimItemModalProps> = ({
       onCancel={onCancel}
       footer={null}
       width={700}
-      destroyOnClose
+      destroyOnHidden
     >
       <Form form={form} layout="vertical" onFinish={handleSubmit} autoComplete="off">
         <Form.Item

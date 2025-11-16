@@ -36,7 +36,7 @@ const ClaimDetail: React.FC = () => {
   const [addItemModalVisible, setAddItemModalVisible] = useState(false)
   const [addAttachmentModalVisible, setAddAttachmentModalVisible] = useState(false)
   const [policyCoverageModalVisible, setPolicyCoverageModalVisible] = useState(false)
-  const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(null)
+  const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(null)
   const [selectedCategoryName, setSelectedCategoryName] = useState<string>('')
   const [submitLoading, setSubmitLoading] = useState(false)
   const [deleteLoading, setDeleteLoading] = useState(false)
@@ -258,7 +258,7 @@ const ClaimDetail: React.FC = () => {
 
   // Policy coverage modal handlers
   const handleViewPolicyCoverage = (categoryId: string, categoryName: string) => {
-    setSelectedCategoryId(Number(categoryId))
+    setSelectedCategoryId(categoryId)
     setSelectedCategoryName(categoryName)
     setPolicyCoverageModalVisible(true)
   }
@@ -439,7 +439,7 @@ const ClaimDetail: React.FC = () => {
             visible={policyCoverageModalVisible}
             onCancel={handleClosePolicyCoverageModal}
             policyId={warrantyPolicy.id}
-            categoryId={selectedCategoryId.toString()}
+            categoryId={selectedCategoryId}
             categoryName={selectedCategoryName}
             partCategories={partCategories}
           />
