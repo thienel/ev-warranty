@@ -51,7 +51,7 @@ VALUES
      'CANCELLED', '550e8400-e29b-41d4-a716-446655440102', '550e8400-e29b-41d4-a716-446655440122', NULL, 0, '2024-11-09 16:00:00', '2024-11-09 18:30:00');
 
 -- Insert Claim Items (ensuring MinItemPerClaim = 1)
-INSERT INTO claim_items (id, claim_id, part_category_id, faulty_part_id, replacement_part_id, issue_description, status, type, cost, created_at, updated_at)
+INSERT INTO claim_items (id, claim_id, part_category_id, faulty_part_serial, replacement_part_id, issue_description, status, type, cost, created_at, updated_at)
 VALUES
     -- Claim 1 (DRAFT) - Battery Issue
     ('b50e8400-e29b-41d4-a716-446655440001', 'a50e8400-e29b-41d4-a716-446655440001', '150e8400-e29b-41d4-a716-446655440021', 

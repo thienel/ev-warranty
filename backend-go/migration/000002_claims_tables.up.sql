@@ -24,7 +24,7 @@ CREATE TABLE IF NOT EXISTS claim_items (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     claim_id UUID NOT NULL,
     part_category_id UUID NOT NULL,
-    faulty_part_id UUID NOT NULL,
+    faulty_part_serial TEXT NOT NULL,
     replacement_part_id UUID,
     issue_description TEXT NOT NULL,
     status TEXT NOT NULL,
