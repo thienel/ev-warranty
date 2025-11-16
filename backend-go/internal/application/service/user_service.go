@@ -107,12 +107,14 @@ func (s *userService) GetAvailableTechnicianByOfficeID(ctx context.Context, offi
 
 	var availableTechnicians []*entity.User
 	for _, user := range users {
-		count, err := s.claimRepo.CountPendingByTechnician(ctx, user.ID)
-		if err != nil {
-			return nil, err
-		}
-		if count < entity.MaxClaimsPerTechnician && user.OfficeID == officeID {
-			availableTechnicians = append(availableTechnicians, user)
+		if user.Role == entity.UserRoleScTechnician {
+			count, err := s.claimRepo.CountPendingByTechnician(ctx, user.ID)
+			if err != nil {
+				return nil, err
+			}
+			if count < entity.MaxClaimsPerTechnician && user.OfficeID == officeID {
+				availableTechnicians = append(availableTechnicians, user)
+			}
 		}
 	}
 

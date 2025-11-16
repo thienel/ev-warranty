@@ -1,8 +1,6 @@
 package dotnet
 
 import (
-	"time"
-
 	"github.com/google/uuid"
 )
 
@@ -31,8 +29,6 @@ type PartResponse struct {
 	CategoryName         *string    `json:"category_name,omitempty"`
 	OfficeLocationID     *uuid.UUID `json:"office_location_id,omitempty"`
 	Status               string     `json:"status"`
-	CreatedAt            time.Time  `json:"created_at"`
-	UpdatedAt            *time.Time `json:"updated_at,omitempty"`
 	CanBeUsedInWorkOrder bool       `json:"can_be_used_in_work_order"`
 	IsInStock            bool       `json:"is_in_stock"`
 }

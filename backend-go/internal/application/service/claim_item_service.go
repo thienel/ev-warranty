@@ -31,12 +31,12 @@ type ClaimItemService interface {
 	GetByID(ctx context.Context, id uuid.UUID) (*entity.ClaimItem, error)
 	GetByClaimID(ctx context.Context, claimID uuid.UUID) ([]*entity.ClaimItem, error)
 
-	Create(tx application.Tx, claimID uuid.UUID, cmd *CreateClaimItemCommand) (*entity.ClaimItem, error)
-	Update(tx application.Tx, claimID, itemID uuid.UUID, cmd *UpdateClaimItemCommand) error
-	HardDelete(tx application.Tx, claimID, itemID uuid.UUID) error
+	Create(tx application.Tx, claimID uuid.UUID, cmd *CreateClaimItemCommand, authToken string) (*entity.ClaimItem, error)
+	Update(tx application.Tx, claimID, itemID uuid.UUID, cmd *UpdateClaimItemCommand, authToken string) error
+	HardDelete(tx application.Tx, claimID, itemID uuid.UUID, authToken string) error
 
 	Approve(tx application.Tx, claimID, itemID uuid.UUID) error
-	Reject(tx application.Tx, claimID, itemID uuid.UUID) error
+	Reject(tx application.Tx, claimID, itemID uuid.UUID, authToken string) error
 }
 
 type claimItemService struct {
@@ -74,7 +74,7 @@ func (s *claimItemService) GetByClaimID(ctx context.Context, claimID uuid.UUID) 
 }
 
 func (s *claimItemService) Create(tx application.Tx, claimID uuid.UUID,
-	cmd *CreateClaimItemCommand) (*entity.ClaimItem, error) {
+	cmd *CreateClaimItemCommand, authToken string) (*entity.ClaimItem, error) {
 	claim, err := s.claimRepo.FindByID(tx.GetCtx(), claimID)
 	if err != nil {
 		return nil, err
@@ -96,7 +96,7 @@ func (s *claimItemService) Create(tx application.Tx, claimID uuid.UUID,
 			return nil, apperror.ErrNotFoundError.WithMessage("Technician not found")
 		}
 
-		reservedPart, err := s.dotnetClient.ReservePart(tx.GetCtx(), technician.OfficeID, cmd.PartCategoryID)
+		reservedPart, err := s.dotnetClient.ReservePart(tx.GetCtx(), technician.OfficeID, cmd.PartCategoryID, authToken)
 		if err != nil {
 			return nil, apperror.ErrExternalServiceError.WithMessage("Failed to reserve part: " + err.Error())
 		}
@@ -118,7 +118,7 @@ func (s *claimItemService) Create(tx application.Tx, claimID uuid.UUID,
 	return item, nil
 }
 
-func (s *claimItemService) Update(tx application.Tx, claimID, itemID uuid.UUID, cmd *UpdateClaimItemCommand) error {
+func (s *claimItemService) Update(tx application.Tx, claimID, itemID uuid.UUID, cmd *UpdateClaimItemCommand, authToken string) error {
 	claim, err := s.claimRepo.FindByID(tx.GetCtx(), claimID)
 	if err != nil {
 		return err
@@ -153,7 +153,7 @@ func (s *claimItemService) Update(tx application.Tx, claimID, itemID uuid.UUID, 
 
 	if oldType == entity.ClaimItemTypeReplacement && newType == entity.ClaimItemTypeRepair {
 		if item.ReplacementPartID != nil {
-			err := s.dotnetClient.UnreservePart(tx.GetCtx(), *item.ReplacementPartID)
+			err := s.dotnetClient.UnreservePart(tx.GetCtx(), *item.ReplacementPartID, authToken)
 			if err != nil {
 				return apperror.ErrExternalServiceError.WithMessage("Failed to unreserve part: " + err.Error())
 			}
@@ -166,7 +166,7 @@ func (s *claimItemService) Update(tx application.Tx, claimID, itemID uuid.UUID, 
 			return apperror.ErrNotFoundError.WithMessage("Technician not found")
 		}
 
-		reservedPart, err := s.dotnetClient.ReservePart(tx.GetCtx(), technician.OfficeID, item.PartCategoryID)
+		reservedPart, err := s.dotnetClient.ReservePart(tx.GetCtx(), technician.OfficeID, item.PartCategoryID, authToken)
 		if err != nil {
 			return apperror.ErrExternalServiceError.WithMessage("Failed to reserve part: " + err.Error())
 		}
@@ -180,7 +180,6 @@ func (s *claimItemService) Update(tx application.Tx, claimID, itemID uuid.UUID, 
 		replacementPartID = nil
 		cost = 0
 	}
-
 	item.IssueDescription = cmd.IssueDescription
 	item.Type = cmd.Type
 	item.ReplacementPartID = replacementPartID
@@ -204,7 +203,7 @@ func (s *claimItemService) Update(tx application.Tx, claimID, itemID uuid.UUID, 
 	return nil
 }
 
-func (s *claimItemService) HardDelete(tx application.Tx, claimID, itemID uuid.UUID) error {
+func (s *claimItemService) HardDelete(tx application.Tx, claimID, itemID uuid.UUID, authToken string) error {
 	claim, err := s.claimRepo.FindByID(tx.GetCtx(), claimID)
 	if err != nil {
 		return err
@@ -220,7 +219,7 @@ func (s *claimItemService) HardDelete(tx application.Tx, claimID, itemID uuid.UU
 	}
 
 	if item.Type == entity.ClaimItemTypeReplacement && item.ReplacementPartID != nil {
-		err := s.dotnetClient.UnreservePart(tx.GetCtx(), *item.ReplacementPartID)
+		err := s.dotnetClient.UnreservePart(tx.GetCtx(), *item.ReplacementPartID, authToken)
 		if err != nil {
 			return apperror.ErrExternalServiceError.WithMessage("Failed to unreserve part: " + err.Error())
 		}
@@ -272,7 +271,7 @@ func (s *claimItemService) Approve(tx application.Tx, claimID, itemID uuid.UUID)
 	return nil
 }
 
-func (s *claimItemService) Reject(tx application.Tx, claimID, itemID uuid.UUID) error {
+func (s *claimItemService) Reject(tx application.Tx, claimID, itemID uuid.UUID, authtoken string) error {
 	claim, err := s.claimRepo.FindByID(tx.GetCtx(), claimID)
 	if err != nil {
 		return err
@@ -288,7 +287,7 @@ func (s *claimItemService) Reject(tx application.Tx, claimID, itemID uuid.UUID) 
 	}
 
 	if item.Type == entity.ClaimItemTypeReplacement && item.ReplacementPartID != nil {
-		err := s.dotnetClient.UnreservePart(tx.GetCtx(), *item.ReplacementPartID)
+		err := s.dotnetClient.UnreservePart(tx.GetCtx(), *item.ReplacementPartID, authtoken)
 		if err != nil {
 			return apperror.ErrExternalServiceError.WithMessage("Failed to unreserve part: " + err.Error())
 		}

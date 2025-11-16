@@ -153,9 +153,10 @@ func (h *claimItemHandler) Create(c *gin.Context) {
 	}
 
 	var item *entity.ClaimItem
+	authToken := c.Request.Header.Get("Authorization")
 	err = h.txManager.Do(c.Request.Context(), func(tx application.Tx) error {
 		var txErr error
-		item, txErr = h.service.Create(tx, claimID, cmd)
+		item, txErr = h.service.Create(tx, claimID, cmd, authToken)
 		return txErr
 	})
 
@@ -201,8 +202,9 @@ func (h *claimItemHandler) Delete(c *gin.Context) {
 		return
 	}
 
+	authToken := c.Request.Header.Get("Authorization")
 	err = h.txManager.Do(c.Request.Context(), func(tx application.Tx) error {
-		return h.service.HardDelete(tx, claimID, itemID)
+		return h.service.HardDelete(tx, claimID, itemID, authToken)
 	})
 
 	if err != nil {
@@ -293,8 +295,9 @@ func (h *claimItemHandler) Reject(c *gin.Context) {
 		return
 	}
 
+	authToken := c.Request.Header.Get("Authorization")
 	err = h.txManager.Do(c.Request.Context(), func(tx application.Tx) error {
-		return h.service.Reject(tx, claimID, itemID)
+		return h.service.Reject(tx, claimID, itemID, authToken)
 	})
 
 	if err != nil {

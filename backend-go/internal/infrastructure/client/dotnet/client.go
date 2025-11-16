@@ -17,8 +17,8 @@ const (
 )
 
 type Client interface {
-	ReservePart(ctx context.Context, officeLocationID, categoryID uuid.UUID) (*PartResponse, error)
-	UnreservePart(ctx context.Context, partID uuid.UUID) error
+	ReservePart(ctx context.Context, officeLocationID, categoryID uuid.UUID, authToken string) (*PartResponse, error)
+	UnreservePart(ctx context.Context, partID uuid.UUID, authToken string) error
 }
 
 type client struct {
@@ -35,8 +35,9 @@ func NewClient(baseURL string) Client {
 	}
 }
 
-func (c *client) ReservePart(ctx context.Context, officeLocationID, categoryID uuid.UUID) (*PartResponse, error) {
-	url := fmt.Sprintf("%s/api/v1/parts/reserve", c.baseURL)
+func (c *client) ReservePart(ctx context.Context, officeLocationID, categoryID uuid.UUID, authToken string) (*PartResponse,
+	error) {
+	url := fmt.Sprintf("%s/parts/reserve", c.baseURL)
 
 	reqBody := ReservePartRequest{
 		OfficeLocationID: officeLocationID,
@@ -54,6 +55,7 @@ func (c *client) ReservePart(ctx context.Context, officeLocationID, categoryID u
 	}
 
 	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Authorization", authToken)
 
 	resp, err := c.httpClient.Do(req)
 	if err != nil {
@@ -87,7 +89,7 @@ func (c *client) ReservePart(ctx context.Context, officeLocationID, categoryID u
 	return response.Data, nil
 }
 
-func (c *client) UnreservePart(ctx context.Context, partID uuid.UUID) error {
+func (c *client) UnreservePart(ctx context.Context, partID uuid.UUID, authToken string) error {
 	url := fmt.Sprintf("%s/api/v1/parts/%s/unreserve", c.baseURL, partID.String())
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, url, nil)
@@ -96,6 +98,7 @@ func (c *client) UnreservePart(ctx context.Context, partID uuid.UUID) error {
 	}
 
 	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Authorization", authToken)
 
 	resp, err := c.httpClient.Do(req)
 	if err != nil {
