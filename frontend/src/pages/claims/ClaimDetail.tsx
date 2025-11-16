@@ -55,6 +55,7 @@ const ClaimDetail: React.FC = () => {
     claimHistory,
     partCategories,
     parts,
+    users,
     warrantyPolicy,
     claimLoading,
     customerLoading,
@@ -63,6 +64,7 @@ const ClaimDetail: React.FC = () => {
     itemsLoading,
     attachmentsLoading,
     historyLoading,
+    usersLoading,
     warrantyPolicyLoading,
     refetchClaim,
     refetchClaimItems,
@@ -316,8 +318,8 @@ const ClaimDetail: React.FC = () => {
           {/* Claim Items */}
           <ClaimItemsTable
             claimItems={claimItems}
-            parts={parts}
             partCategories={partCategories}
+            parts={parts}
             loading={itemsLoading}
             canAddItems={canAddItems}
             canApproveClaimItems={canApproveClaimItems}
@@ -338,7 +340,7 @@ const ClaimDetail: React.FC = () => {
           />
 
           {/* Claim History */}
-          <ClaimHistory history={claimHistory} loading={historyLoading} />
+          <ClaimHistory history={claimHistory} users={users} loading={historyLoading || usersLoading} />
 
           {/* Action Buttons */}
           {(canSubmitClaim ||

@@ -48,42 +48,21 @@ const ClaimItemsTable: React.FC<ClaimItemsTableProps> = ({
     return category?.category_name || `Category ${categoryId.slice(0, 8)}...`
   }
 
-  // Get part serial number by ID
-  const getPartSerialNumber = (partId: string): string => {
-    const part = parts.find((part) => part.id === partId)
-    if (part?.serial_number) {
-      return part.serial_number
-    }
-    // If part not found, show a more user-friendly message
-    return 'N/A (Part not found)'
-  }
-
-  // Get part name by ID
-  const getPartName = (partId: string): string => {
-    const part = parts.find((part) => part.id === partId)
-    if (part?.part_name) {
-      return part.part_name
-    }
-    // If part not found, show a more user-friendly message
-    return 'N/A (Part not found)'
+  // Get replacement part name by ID
+  const getReplacementPartName = (partId: string | undefined): string => {
+    if (!partId) return 'Not assigned'
+    const part = parts.find((p) => p.id === partId)
+    return part?.part_name || 'N/A (Part not found)'
   }
 
   // Claim items table columns
   const claimItemColumns: ColumnsType<ClaimItem> = [
     {
-      title: 'Serial no.',
-      dataIndex: 'faulty_part_id',
-      key: 'serial_number',
+      title: 'Faulty Part Serial',
+      dataIndex: 'faulty_part_serial',
+      key: 'faulty_part_serial',
       width: '15%',
-      render: (_, record: ClaimItem) => {
-        const serialNumber = getPartSerialNumber(record.faulty_part_serial)
-        const isNotFound = serialNumber.includes('not found')
-        return (
-          <Text type={isNotFound ? 'secondary' : undefined} italic={isNotFound}>
-            {serialNumber}
-          </Text>
-        )
-      },
+      render: (serialNumber: string) => <Text>{serialNumber}</Text>,
     },
     {
       title: 'Part Category',
@@ -93,15 +72,19 @@ const ClaimItemsTable: React.FC<ClaimItemsTableProps> = ({
       render: (_, record: ClaimItem) => <Text>{getPartCategoryName(record.part_category_id)}</Text>,
     },
     {
-      title: 'Faulty Part',
-      dataIndex: 'faulty_part_id',
-      key: 'faulty_part_id',
+      title: 'Replacement Part',
+      dataIndex: 'replacement_part_id',
+      key: 'replacement_part_id',
       width: '12%',
-      render: (_, record: ClaimItem) => {
-        const partName = getPartName(record.faulty_part_serial)
+      render: (replacementPartId: string | undefined) => {
+        const partName = getReplacementPartName(replacementPartId)
+        const isNotAssigned = partName === 'Not assigned'
         const isNotFound = partName.includes('not found')
         return (
-          <Text type={isNotFound ? 'secondary' : undefined} italic={isNotFound}>
+          <Text
+            type={isNotAssigned || isNotFound ? 'secondary' : undefined}
+            italic={isNotAssigned || isNotFound}
+          >
             {partName}
           </Text>
         )
@@ -130,21 +113,6 @@ const ClaimItemsTable: React.FC<ClaimItemsTableProps> = ({
       width: '10%',
       render: (type: string) => (
         <>{CLAIM_ITEM_TYPE_LABELS[type as keyof typeof CLAIM_ITEM_TYPE_LABELS] || type}</>
-      ),
-    },
-    {
-      title: 'Cost',
-      dataIndex: 'cost',
-      key: 'cost',
-      width: '10%',
-      align: 'right',
-      render: (cost: number) => (
-        <Text strong style={{ color: '#52c41a' }}>
-          {cost.toLocaleString('vi-VN', {
-            style: 'currency',
-            currency: 'VND',
-          })}
-        </Text>
       ),
     },
     {

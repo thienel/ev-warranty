@@ -38,6 +38,7 @@ interface UseClaimDataReturn {
   claimHistory: ClaimHistory[]
   partCategories: PartCategory[]
   parts: Part[]
+  users: User[]
   warrantyPolicy: WarrantyPolicy | null
 
   // Loading states
@@ -48,6 +49,7 @@ interface UseClaimDataReturn {
   itemsLoading: boolean
   attachmentsLoading: boolean
   historyLoading: boolean
+  usersLoading: boolean
   warrantyPolicyLoading: boolean
 
   // Refetch functions
@@ -70,6 +72,7 @@ export const useClaimData = (claimId?: string): UseClaimDataReturn => {
   const [claimHistory, setClaimHistory] = useState<ClaimHistory[]>([])
   const [partCategories, setPartCategories] = useState<PartCategory[]>([])
   const [parts, setParts] = useState<Part[]>([])
+  const [users, setUsers] = useState<User[]>([])
   const [warrantyPolicy, setWarrantyPolicy] = useState<WarrantyPolicy | null>(null)
 
   // Loading states
@@ -80,6 +83,7 @@ export const useClaimData = (claimId?: string): UseClaimDataReturn => {
   const [itemsLoading, setItemsLoading] = useState(false)
   const [attachmentsLoading, setAttachmentsLoading] = useState(false)
   const [historyLoading, setHistoryLoading] = useState(false)
+  const [usersLoading, setUsersLoading] = useState(false)
   const [warrantyPolicyLoading, setWarrantyPolicyLoading] = useState(false)
 
   // Fetch claim details
@@ -348,6 +352,24 @@ export const useClaimData = (claimId?: string): UseClaimDataReturn => {
     }
   }, [handleError])
 
+  // Fetch all users for displaying user names in history
+  const fetchUsers = useCallback(async () => {
+    try {
+      setUsersLoading(true)
+      const response = await usersApi.getAll()
+      let usersData = response.data
+      if (usersData && typeof usersData === 'object' && 'data' in usersData) {
+        usersData = (usersData as { data: unknown }).data as User[]
+      }
+      setUsers(usersData as User[])
+    } catch (error) {
+      handleError(error as Error)
+      setUsers([])
+    } finally {
+      setUsersLoading(false)
+    }
+  }, [handleError])
+
   // Fetch warranty policy by vehicle model's policy ID
   const fetchWarrantyPolicy = useCallback(
     async (policyId: string) => {
@@ -377,9 +399,10 @@ export const useClaimData = (claimId?: string): UseClaimDataReturn => {
       fetchAttachments()
       fetchHistory()
     }
-    // Fetch part categories for displaying category names
+    // Fetch part categories and users for displaying names
     fetchPartCategories()
-  }, [claimId, fetchClaim, fetchClaimItems, fetchAttachments, fetchHistory, fetchPartCategories])
+    fetchUsers()
+  }, [claimId, fetchClaim, fetchClaimItems, fetchAttachments, fetchHistory, fetchPartCategories, fetchUsers])
 
   // Fetch customer and vehicle when claim is loaded
   useEffect(() => {
@@ -416,6 +439,7 @@ export const useClaimData = (claimId?: string): UseClaimDataReturn => {
     claimHistory,
     partCategories,
     parts,
+    users,
     warrantyPolicy,
 
     // Loading states
@@ -426,6 +450,7 @@ export const useClaimData = (claimId?: string): UseClaimDataReturn => {
     itemsLoading,
     attachmentsLoading,
     historyLoading,
+    usersLoading,
     warrantyPolicyLoading,
 
     // Refetch functions

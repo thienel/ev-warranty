@@ -2,30 +2,21 @@ import React from 'react'
 import { Card, Timeline, Tag, Typography, Empty } from 'antd'
 import { ClockCircleOutlined, HistoryOutlined, UserOutlined } from '@ant-design/icons'
 import { CLAIM_STATUS_LABELS } from '@constants/common-constants'
-import type { ClaimHistory as ClaimHistoryType } from '@/types/index'
+import type { ClaimHistory as ClaimHistoryType, User } from '@/types/index'
 
 const { Title, Text } = Typography
 
 interface ClaimHistoryProps {
   history: ClaimHistoryType[]
+  users: User[]
   loading: boolean
 }
 
-const ClaimHistory: React.FC<ClaimHistoryProps> = ({ history, loading }) => {
-  // Get status color for tags
-  const getStatusColor = (status: string): string => {
-    const colors: Record<string, string> = {
-      DRAFT: 'default',
-      SUBMITTED: 'blue',
-      REVIEWING: 'cyan',
-      REQUEST_INFO: 'orange',
-      APPROVED: 'green',
-      PARTIALLY_APPROVED: 'lime',
-      REJECTED: 'red',
-      CANCELLED: 'gray',
-      COMPLETED: 'purple',
-    }
-    return colors[status] || 'default'
+const ClaimHistory: React.FC<ClaimHistoryProps> = ({ history, users, loading }) => {
+  // Get user name by ID
+  const getUserName = (userId: string): string => {
+    const user = users.find((u) => u.id === userId)
+    return user?.name || `User ${userId.slice(0, 8)}...`
   }
 
   // Sort history by date (most recent first)
@@ -54,7 +45,6 @@ const ClaimHistory: React.FC<ClaimHistoryProps> = ({ history, loading }) => {
           items={sortedHistory.map((record) => ({
             key: record.id,
             dot: <ClockCircleOutlined style={{ fontSize: '16px' }} />,
-            color: getStatusColor(record.status),
             label: (
               <Text type="secondary" style={{ fontSize: '12px' }}>
                 {record.changed_at
@@ -71,14 +61,14 @@ const ClaimHistory: React.FC<ClaimHistoryProps> = ({ history, loading }) => {
             children: (
               <div style={{ marginTop: '-4px' }}>
                 <div style={{ marginBottom: '8px' }}>
-                  <Tag color={getStatusColor(record.status)} style={{ fontSize: '13px' }}>
+                  <Tag style={{ fontSize: '13px' }}>
                     {CLAIM_STATUS_LABELS[record.status] || record.status}
                   </Tag>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
                   <UserOutlined style={{ fontSize: '12px', color: '#999' }} />
                   <Text type="secondary" style={{ fontSize: '12px' }}>
-                    Changed by: <Text code>{record.changed_by.slice(0, 8)}...</Text>
+                    Changed by: <Text strong>{getUserName(record.changed_by)}</Text>
                   </Text>
                 </div>
               </div>
