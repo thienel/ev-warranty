@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react'
-import { Modal, Button, Form, Input, message, Space, InputNumber } from 'antd'
+import { Modal, Button, Form, Input, message, Space, InputNumber, Select } from 'antd'
 import { SafetyOutlined, ClockCircleOutlined, CarOutlined } from '@ant-design/icons'
 import { API_ENDPOINTS } from '@constants/common-constants.js'
 import { type WarrantyPolicyModalProps, type WarrantyPolicyFormData } from '@/types/index.js'
@@ -7,6 +7,7 @@ import api from '@services/api.js'
 import useHandleApiError from '@/hooks/useHandleApiError.js'
 
 const { TextArea } = Input
+const { Option } = Select
 
 const WarrantyPolicyModal: React.FC<WarrantyPolicyModalProps> = ({
   loading,
@@ -15,6 +16,7 @@ const WarrantyPolicyModal: React.FC<WarrantyPolicyModalProps> = ({
   policy = null,
   opened = false,
   isUpdate,
+  vehicleModels,
 }) => {
   const [form] = Form.useForm<WarrantyPolicyFormData>()
   const handleError = useHandleApiError()
@@ -27,6 +29,7 @@ const WarrantyPolicyModal: React.FC<WarrantyPolicyModalProps> = ({
           warranty_duration_months: policy.warranty_duration_months,
           kilometer_limit: policy.kilometer_limit,
           terms_and_conditions: policy.terms_and_conditions,
+          vehicle_model_id: policy.vehicle_model_id,
         }
         form.setFieldsValue(formData)
       } else {
@@ -47,6 +50,7 @@ const WarrantyPolicyModal: React.FC<WarrantyPolicyModalProps> = ({
       const payload = {
         ...values,
         kilometer_limit: values.kilometer_limit || undefined,
+        vehicle_model_id: values.vehicle_model_id || undefined,
       }
 
       if (isUpdate) {
@@ -97,6 +101,29 @@ const WarrantyPolicyModal: React.FC<WarrantyPolicyModalProps> = ({
           ]}
         >
           <Input placeholder="Enter policy name" prefix={<SafetyOutlined />} size="large" />
+        </Form.Item>
+
+        <Form.Item
+          label="Vehicle Model (Optional)"
+          name="vehicle_model_id"
+        >
+          <Select
+            placeholder="Select a vehicle model"
+            size="large"
+            showSearch
+            allowClear
+            optionFilterProp="children"
+            filterOption={(input, option) => {
+              const label = option?.children as unknown as string
+              return label?.toLowerCase().includes(input.toLowerCase()) ?? false
+            }}
+          >
+            {vehicleModels.map((model) => (
+              <Option key={model.id} value={model.id}>
+                {model.brand} {model.model_name} ({model.year})
+              </Option>
+            ))}
+          </Select>
         </Form.Item>
 
         <Form.Item
