@@ -41,7 +41,7 @@ services:
       - FRONTEND_BASE_URL=${FRONTEND_BASE_URL}
       - CLOUDINARY_URL=${CLOUDINARY_URL}
       - CLOUDINARY_UPLOAD_FOLDER=${CLOUDINARY_UPLOAD_FOLDER}
-      - DOTNET_BACKEND_URL=https://${HOST_DOMAIN}/api/v1
+      - DOTNET_BACKEND_URL=http://${HOST_DOMAIN}/api/v1
     entrypoint: ["./entrypoint.sh"]
     depends_on:
       postgres:
