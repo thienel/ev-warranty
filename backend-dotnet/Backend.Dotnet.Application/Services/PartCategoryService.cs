@@ -1,13 +1,7 @@
 ﻿using Backend.Dotnet.Application.DTOs;
 using Backend.Dotnet.Application.Interfaces;
 using Backend.Dotnet.Application.Interfaces.Data;
-using Backend.Dotnet.Domain.Entities;
 using Backend.Dotnet.Domain.Exceptions;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using static Backend.Dotnet.Application.DTOs.PartCategoryDto;
 
 namespace Backend.Dotnet.Application.Services

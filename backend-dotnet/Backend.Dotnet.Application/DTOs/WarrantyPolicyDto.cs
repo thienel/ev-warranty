@@ -1,11 +1,6 @@
 ﻿using Backend.Dotnet.Domain.Entities;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
 using System.Text.Json.Serialization;
-using System.Threading.Tasks;
 
 namespace Backend.Dotnet.Application.DTOs
 {
@@ -31,6 +26,9 @@ namespace Backend.Dotnet.Application.DTOs
             [Required(ErrorMessage = "Terms and conditions are required")]
             [StringLength(5000, MinimumLength = 1, ErrorMessage = "Terms must be between 1 and 5000 characters")]
             public string TermsAndConditions { get; set; } = string.Empty;
+
+            [JsonPropertyName("vehicle_model_id")]
+            public Guid? VehicleModelId { get; set; }
         }
 
         public class UpdateWarrantyPolicyRequest
@@ -53,6 +51,9 @@ namespace Backend.Dotnet.Application.DTOs
             [Required(ErrorMessage = "Terms and conditions are required")]
             [StringLength(5000, MinimumLength = 1, ErrorMessage = "Terms must be between 1 and 5000 characters")]
             public string TermsAndConditions { get; set; } = string.Empty;
+
+            [JsonPropertyName("vehicle_model_id")]
+            public Guid? VehicleModelId { get; set; }
         }
 
         public class ChangeStatusRequest

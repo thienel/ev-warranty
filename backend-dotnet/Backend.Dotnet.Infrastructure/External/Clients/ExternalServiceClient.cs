@@ -1,5 +1,7 @@
 ﻿using Backend.Dotnet.Application.Interfaces.External;
 using Backend.Dotnet.Infrastructure.External.Models;
+using Microsoft.AspNetCore.Http;
+using System.Net.Http.Headers;
 using System.Text.Json;
 using static Backend.Dotnet.Application.DTOs.IntermediaryDto;
 using static Backend.Dotnet.Infrastructure.External.Models.ExternalModel;
@@ -9,17 +11,28 @@ namespace Backend.Dotnet.Infrastructure.External.Clients
     public class ExternalServiceClient : IExternalServiceClient
     {
         private readonly HttpClient _httpClient;
+        //private readonly IHttpContextAccessor _httpContextAccessor;
+
         private const string ExternalServiceBaseUrl = "http://localhost:8080";
 
         public ExternalServiceClient(HttpClient httpClient)
         {
             _httpClient = httpClient;
+            //_httpContextAccessor = httpContextAccessor;
         }
 
         public async Task<bool> CompleteClaimAsync(Guid claimId)
         {
             try
             {
+                //    var token = _httpContextAccessor.HttpContext?.Request.Headers["Authorization"].ToString();
+
+                //    if (string.IsNullOrEmpty(token))
+                //        throw new InvalidOperationException("Missing Authorization header in request");
+                //    // Replace() for clean jwt token
+                //    var 
+                //    _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwtToken);
+
                 var response = await _httpClient.PostAsync($"{ExternalServiceBaseUrl}/claims/{claimId}/complete", null);
 
                 if (!response.IsSuccessStatusCode)

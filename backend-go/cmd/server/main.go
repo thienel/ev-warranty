@@ -3,17 +3,18 @@ package main
 import (
 	"context"
 	"errors"
-	"ev-warranty-go/internal/application/services"
+	"ev-warranty-go/internal/application/service"
+	"ev-warranty-go/internal/infrastructure/client/dotnet"
 	"ev-warranty-go/internal/infrastructure/cloudinary"
 	"ev-warranty-go/internal/infrastructure/config"
 	"ev-warranty-go/internal/infrastructure/database"
 	"ev-warranty-go/internal/infrastructure/oauth"
 	"ev-warranty-go/internal/infrastructure/oauth/providers"
 	"ev-warranty-go/internal/infrastructure/persistence"
-	"ev-warranty-go/internal/interfaces/api"
-	"ev-warranty-go/internal/interfaces/api/handlers"
-	"ev-warranty-go/internal/security"
+	"ev-warranty-go/internal/interface/api"
+	"ev-warranty-go/internal/interface/api/handler"
 	"ev-warranty-go/pkg/logger"
+	"ev-warranty-go/pkg/security"
 	"net/http"
 	"os"
 	"os/signal"
@@ -100,23 +101,27 @@ func main() {
 		os.Exit(1)
 	}
 
-	officeService := services.NewOfficeService(officeRepo)
-	tokenService := services.NewTokenService(tokenRepo,
-		cfg.AccessTokenTTL, cfg.RefreshTokenTTL, security.PrivateKey(), security.PublicKey())
-	authService := services.NewAuthService(userRepo, tokenService)
-	userService := services.NewUserService(userRepo, officeRepo)
-	oauthService := oauth.NewOAuthService(googleProvider, userRepo)
-	claimService := services.NewClaimService(log, claimRepo, claimItemRepo, claimAttachmentRepo, claimHistoryRepo, cloudinaryService)
-	claimItemService := services.NewClaimItemService(claimRepo, claimItemRepo)
-	claimAttachmentService := services.NewClaimAttachmentService(log, claimRepo, claimAttachmentRepo, cloudinaryService)
+	dotnetClient := dotnet.NewClient(cfg.ExternalService.DotnetBackendURL)
 
-	officeHandler := handlers.NewOfficeHandler(log, officeService)
-	authHandler := handlers.NewAuthHandler(log, authService, tokenService, userService)
-	oauthHandler := handlers.NewOAuthHandler(log, cfg.OAuth.FrontendBaseURL, oauthService, authService)
-	userHandler := handlers.NewUserHandler(log, userService)
-	claimHandler := handlers.NewClaimHandler(log, txManager, claimService)
-	claimItemHandler := handlers.NewClaimItemHandler(log, txManager, claimItemService)
-	claimAttachmentHandler := handlers.NewClaimAttachmentHandler(log, txManager, claimAttachmentService)
+	officeService := service.NewOfficeService(officeRepo)
+	tokenService := service.NewTokenService(tokenRepo,
+		cfg.AccessTokenTTL, cfg.RefreshTokenTTL, security.PrivateKey(), security.PublicKey())
+	authService := service.NewAuthService(userRepo, tokenService)
+	userService := service.NewUserService(userRepo, officeRepo, claimRepo)
+	oauthService := oauth.NewOAuthService(googleProvider, userRepo)
+	claimService := service.NewClaimService(log, claimRepo, userRepo, claimItemRepo, claimAttachmentRepo,
+		claimHistoryRepo, cloudinaryService)
+	claimItemService := service.NewClaimItemService(claimRepo, claimItemRepo, userRepo, dotnetClient)
+	claimAttachmentService := service.NewClaimAttachmentService(log, claimRepo, claimAttachmentRepo,
+		cloudinaryService)
+
+	officeHandler := handler.NewOfficeHandler(log, officeService)
+	authHandler := handler.NewAuthHandler(log, authService, tokenService, userService)
+	oauthHandler := handler.NewOAuthHandler(log, cfg.OAuth.FrontendBaseURL, oauthService, authService)
+	userHandler := handler.NewUserHandler(log, userService)
+	claimHandler := handler.NewClaimHandler(log, txManager, claimService)
+	claimItemHandler := handler.NewClaimItemHandler(log, txManager, claimItemService)
+	claimAttachmentHandler := handler.NewClaimAttachmentHandler(log, txManager, claimAttachmentService)
 
 	r := api.NewRouter(app.DB, authHandler, oauthHandler, officeHandler,
 		userHandler, claimHandler, claimItemHandler, claimAttachmentHandler)

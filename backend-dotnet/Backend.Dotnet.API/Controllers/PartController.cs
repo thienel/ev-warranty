@@ -23,11 +23,11 @@ namespace Backend.Dotnet.API.Controllers
         [ProducesResponseType(typeof(BaseResponseDto<IEnumerable<PartResponse>>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BaseResponseDto), StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> GetAll(
-            [FromQuery] string serialNumber = null,
-            [FromQuery] string status = null,
+            [FromQuery] string? serialNumber = null,
+            [FromQuery] string? status = null,
             [FromQuery] Guid? categoryId = null,
             [FromQuery] Guid? officeLocationId = null,
-            [FromQuery] string search = null)
+            [FromQuery] string? search = null)
         {
             // Serial number - absolute
             if (!string.IsNullOrWhiteSpace(serialNumber))
@@ -85,7 +85,7 @@ namespace Backend.Dotnet.API.Controllers
         [HttpPost("reserve")]
         [ProducesResponseType(typeof(BaseResponseDto<PartResponse>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BaseResponseDto), StatusCodes.Status404NotFound)]
-        [Authorize(Roles = SystemRoles.UserRoleAdmin + "," + SystemRoles.UserRoleEvmStaff)]
+        [Authorize(Roles = SystemRoles.UserRoleScStaff)]
         public async Task<IActionResult> ReserveByOfficeIdAndCategoryId([FromBody] ReservePartRequest request)
         {
             var result = await _partService.
@@ -99,7 +99,7 @@ namespace Backend.Dotnet.API.Controllers
         [HttpPost("{id}/unreserve")]
         [ProducesResponseType(typeof(BaseResponseDto<PartResponse>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BaseResponseDto), StatusCodes.Status404NotFound)]
-        [Authorize(Roles = SystemRoles.UserRoleAdmin + "," + SystemRoles.UserRoleEvmStaff)]
+        [Authorize(Roles = SystemRoles.UserRoleScStaff + "," + SystemRoles.UserRoleEvmStaff)]
         public async Task<IActionResult> Unreserve(Guid id)
         {
             var result = await _partService.Unreserve(id);
@@ -134,7 +134,7 @@ namespace Backend.Dotnet.API.Controllers
             if (!result.IsSuccess)
                 return BadRequest(result);
 
-            return CreatedAtAction(nameof(GetById), new { id = result.Data.Id }, result);
+            return CreatedAtAction(nameof(GetById), new { id = result.Data!.Id }, result);
         }
 
         [HttpPut("{id}")]

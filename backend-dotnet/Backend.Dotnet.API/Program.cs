@@ -23,6 +23,8 @@ namespace Backend.Dotnet.API
             builder.Services.AddInfrastructure(builder.Configuration);
             builder.Services.AddHealthChecks();
 
+            //builder.Services.AddHttpContextAccessor();
+
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen(c =>
             {

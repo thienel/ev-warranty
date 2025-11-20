@@ -40,7 +40,7 @@ namespace Backend.Dotnet.API.Controllers
                 {
                     IsSuccess = true,
                     Message = result.Message,
-                    Data = new List<PolicyCoveragePartResponse> { result.Data }
+                    Data = new List<PolicyCoveragePartResponse> { result.Data! }
                 });
             }
 
@@ -75,6 +75,29 @@ namespace Backend.Dotnet.API.Controllers
             return Ok(result);
         }
 
+        [HttpGet("coverage-details")]
+        [ProducesResponseType(typeof(BaseResponseDto<CoverageDetailsResponse>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(BaseResponseDto), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(BaseResponseDto), StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> GetCoverageDetails(
+            [FromQuery] Guid policyId,
+            [FromQuery] Guid partCategoryId)
+        {
+            if (policyId == Guid.Empty || partCategoryId == Guid.Empty)
+            {
+                return BadRequest(new BaseResponseDto
+                {
+                    IsSuccess = false,
+                    Message = "Both policyId and partCategoryId are required",
+                    ErrorCode = "INVALID_PARAMETERS"
+                });
+            }
+
+            var result = await _policyCoveragePartService.GetCoverageDetailsAsync(policyId, partCategoryId);
+            return result.IsSuccess ? Ok(result) : NotFound(result);
+        }
+
+        // Remove later due to low usage - useless api
         [HttpGet("{id}/details")]
         [ProducesResponseType(typeof(BaseResponseDto<PolicyCoveragePartDetailResponse>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BaseResponseDto), StatusCodes.Status404NotFound)]
@@ -100,7 +123,7 @@ namespace Backend.Dotnet.API.Controllers
             if (!result.IsSuccess)
                 return BadRequest(result);
 
-            return CreatedAtAction(nameof(GetById), new { id = result.Data.Id }, result);
+            return CreatedAtAction(nameof(GetById), new { id = result.Data!.Id }, result);
         }
 
         [HttpPut("{id}")]

@@ -12,7 +12,9 @@
   "paths": {
     "/customers": {
       "get": {
-        "tags": ["Customers"],
+        "tags": [
+          "Customers"
+        ],
         "parameters": [
           {
             "name": "name",
@@ -60,7 +62,9 @@
         }
       },
       "post": {
-        "tags": ["Customers"],
+        "tags": [
+          "Customers"
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -106,7 +110,9 @@
     },
     "/customers/{id}": {
       "get": {
-        "tags": ["Customers"],
+        "tags": [
+          "Customers"
+        ],
         "parameters": [
           {
             "name": "id",
@@ -142,7 +148,9 @@
         }
       },
       "put": {
-        "tags": ["Customers"],
+        "tags": [
+          "Customers"
+        ],
         "parameters": [
           {
             "name": "id",
@@ -207,7 +215,9 @@
         }
       },
       "delete": {
-        "tags": ["Customers"],
+        "tags": [
+          "Customers"
+        ],
         "parameters": [
           {
             "name": "id",
@@ -255,7 +265,9 @@
     },
     "/customers/{id}/restore": {
       "post": {
-        "tags": ["Customers"],
+        "tags": [
+          "Customers"
+        ],
         "parameters": [
           {
             "name": "id",
@@ -896,6 +908,94 @@
         }
       }
     },
+    "/parts/reserve": {
+      "post": {
+        "tags": [
+          "Parts"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReservePartRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReservePartRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReservePartRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PartResponseBaseResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BaseResponseDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/parts/{id}/unreserve": {
+      "post": {
+        "tags": [
+          "Parts"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PartResponseBaseResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BaseResponseDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/parts/{id}/details": {
       "get": {
         "tags": [
@@ -1332,6 +1432,63 @@
         }
       }
     },
+    "/policy-coverage-parts/coverage-details": {
+      "get": {
+        "tags": [
+          "PolicyCoverageParts"
+        ],
+        "parameters": [
+          {
+            "name": "policyId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "partCategoryId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CoverageDetailsResponseBaseResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BaseResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BaseResponseDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/policy-coverage-parts/{id}/details": {
       "get": {
         "tags": [
@@ -1374,7 +1531,9 @@
     },
     "/vehicle-models": {
       "get": {
-        "tags": ["VehicleModels"],
+        "tags": [
+          "VehicleModels"
+        ],
         "parameters": [
           {
             "name": "brand",
@@ -1423,7 +1582,9 @@
         }
       },
       "post": {
-        "tags": ["VehicleModels"],
+        "tags": [
+          "VehicleModels"
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -1469,7 +1630,9 @@
     },
     "/vehicle-models/{id}": {
       "get": {
-        "tags": ["VehicleModels"],
+        "tags": [
+          "VehicleModels"
+        ],
         "parameters": [
           {
             "name": "id",
@@ -1505,7 +1668,9 @@
         }
       },
       "put": {
-        "tags": ["VehicleModels"],
+        "tags": [
+          "VehicleModels"
+        ],
         "parameters": [
           {
             "name": "id",
@@ -1570,7 +1735,9 @@
         }
       },
       "delete": {
-        "tags": ["VehicleModels"],
+        "tags": [
+          "VehicleModels"
+        ],
         "parameters": [
           {
             "name": "id",
@@ -1618,7 +1785,9 @@
     },
     "/vehicles": {
       "get": {
-        "tags": ["Vehicles"],
+        "tags": [
+          "Vehicles"
+        ],
         "parameters": [
           {
             "name": "vin",
@@ -1675,7 +1844,9 @@
         }
       },
       "post": {
-        "tags": ["Vehicles"],
+        "tags": [
+          "Vehicles"
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -1721,7 +1892,9 @@
     },
     "/vehicles/{id}": {
       "get": {
-        "tags": ["Vehicles"],
+        "tags": [
+          "Vehicles"
+        ],
         "parameters": [
           {
             "name": "id",
@@ -1757,7 +1930,9 @@
         }
       },
       "put": {
-        "tags": ["Vehicles"],
+        "tags": [
+          "Vehicles"
+        ],
         "parameters": [
           {
             "name": "id",
@@ -1822,7 +1997,9 @@
         }
       },
       "delete": {
-        "tags": ["Vehicles"],
+        "tags": [
+          "Vehicles"
+        ],
         "parameters": [
           {
             "name": "id",
@@ -1870,7 +2047,9 @@
     },
     "/vehicles/{id}/restore": {
       "post": {
-        "tags": ["Vehicles"],
+        "tags": [
+          "Vehicles"
+        ],
         "parameters": [
           {
             "name": "id",
@@ -2270,6 +2449,346 @@
           }
         }
       }
+    },
+    "/work-orders": {
+      "get": {
+        "tags": [
+          "WorkOrder"
+        ],
+        "parameters": [
+          {
+            "name": "claimId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "technicianId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkOrderResponseIEnumerableBaseResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BaseResponseDto"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "WorkOrder"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateWorkOrderRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateWorkOrderRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateWorkOrderRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkOrderResponseBaseResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BaseResponseDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/work-orders/{id}": {
+      "get": {
+        "tags": [
+          "WorkOrder"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkOrderResponseBaseResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BaseResponseDto"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "WorkOrder"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BaseResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BaseResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BaseResponseDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/work-orders/{id}/details": {
+      "get": {
+        "tags": [
+          "WorkOrder"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkOrderDetailResponseBaseResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BaseResponseDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/work-orders/{id}/complete": {
+      "post": {
+        "tags": [
+          "WorkOrder"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkOrderResponseBaseResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BaseResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BaseResponseDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/work-orders/{id}/status": {
+      "put": {
+        "tags": [
+          "WorkOrder"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateStatusRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateStatusRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateStatusRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkOrderResponseBaseResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BaseResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BaseResponseDto"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -2318,8 +2837,121 @@
         },
         "additionalProperties": false
       },
+      "ClaimInfo": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "vehicle_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "status": {
+            "type": "string",
+            "nullable": true
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "ClaimItem": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "issue_description": {
+            "type": "string",
+            "nullable": true
+          },
+          "part_category_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "faulty_part_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "replacement_part_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "status": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "CoverageDetailsResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "policy_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "part_category_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "part_category_name": {
+            "type": "string",
+            "nullable": true
+          },
+          "coverage_conditions": {
+            "type": "string",
+            "nullable": true
+          },
+          "is_inherited": {
+            "type": "boolean"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "CoverageDetailsResponseBaseResponseDto": {
+        "type": "object",
+        "properties": {
+          "is_success": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string",
+            "nullable": true
+          },
+          "error": {
+            "type": "string",
+            "nullable": true
+          },
+          "data": {
+            "$ref": "#/components/schemas/CoverageDetailsResponse"
+          }
+        },
+        "additionalProperties": false
+      },
       "CreateCustomerRequest": {
-        "required": ["first_name", "last_name"],
+        "required": [
+          "first_name",
+          "last_name"
+        ],
         "type": "object",
         "properties": {
           "first_name": {
@@ -2442,7 +3074,11 @@
         "additionalProperties": false
       },
       "CreateVehicleModelRequest": {
-        "required": ["brand", "model_name", "year"],
+        "required": [
+          "brand",
+          "model_name",
+          "year"
+        ],
         "type": "object",
         "properties": {
           "brand": {
@@ -2470,7 +3106,11 @@
         "additionalProperties": false
       },
       "CreateVehicleRequest": {
-        "required": ["customer_id", "model_id", "vin"],
+        "required": [
+          "customer_id",
+          "model_id",
+          "vin"
+        ],
         "type": "object",
         "properties": {
           "vin": {
@@ -2531,6 +3171,24 @@
             "maxLength": 5000,
             "minLength": 1,
             "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "CreateWorkOrderRequest": {
+        "required": [
+          "assigned_technician_id",
+          "claim_id"
+        ],
+        "type": "object",
+        "properties": {
+          "claim_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "assigned_technician_id": {
+            "type": "string",
+            "format": "uuid"
           }
         },
         "additionalProperties": false
@@ -3126,8 +3784,47 @@
         },
         "additionalProperties": false
       },
+      "ReservePartRequest": {
+        "required": [
+          "category_id",
+          "office_location_id"
+        ],
+        "type": "object",
+        "properties": {
+          "office_location_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "category_id": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "additionalProperties": false
+      },
+      "TechnicianInfo": {
+        "type": "object",
+        "properties": {
+          "ID": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "Name": {
+            "type": "string",
+            "nullable": true
+          },
+          "Role": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
       "UpdateCustomerRequest": {
-        "required": ["first_name", "last_name"],
+        "required": [
+          "first_name",
+          "last_name"
+        ],
         "type": "object",
         "properties": {
           "first_name": {
@@ -3221,8 +3918,26 @@
         },
         "additionalProperties": false
       },
+      "UpdateStatusRequest": {
+        "required": [
+          "status"
+        ],
+        "type": "object",
+        "properties": {
+          "status": {
+            "minLength": 1,
+            "pattern": "^(Pending|InProgress|ToVerify)$",
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
       "UpdateVehicleModelRequest": {
-        "required": ["brand", "model_name", "year"],
+        "required": [
+          "brand",
+          "model_name",
+          "year"
+        ],
         "type": "object",
         "properties": {
           "brand": {
@@ -3245,7 +3960,11 @@
         "additionalProperties": false
       },
       "UpdateVehicleRequest": {
-        "required": ["customer_id", "model_id", "vin"],
+        "required": [
+          "customer_id",
+          "model_id",
+          "vin"
+        ],
         "type": "object",
         "properties": {
           "vin": {
@@ -3634,7 +4353,194 @@
           }
         },
         "additionalProperties": false
+      },
+      "WorkOrderDetailResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "claim_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "assigned_technician_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "status": {
+            "type": "string",
+            "nullable": true
+          },
+          "scheduled_date": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "completed_date": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "note": {
+            "type": "string",
+            "nullable": true
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "claim_info": {
+            "$ref": "#/components/schemas/ClaimInfo"
+          },
+          "technician_info": {
+            "$ref": "#/components/schemas/TechnicianInfo"
+          },
+          "claim_items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ClaimItem"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "WorkOrderDetailResponseBaseResponseDto": {
+        "type": "object",
+        "properties": {
+          "is_success": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string",
+            "nullable": true
+          },
+          "error": {
+            "type": "string",
+            "nullable": true
+          },
+          "data": {
+            "$ref": "#/components/schemas/WorkOrderDetailResponse"
+          }
+        },
+        "additionalProperties": false
+      },
+      "WorkOrderResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "claim_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "assigned_technician_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "status": {
+            "type": "string",
+            "nullable": true
+          },
+          "scheduled_date": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "completed_date": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "note": {
+            "type": "string",
+            "nullable": true
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "WorkOrderResponseBaseResponseDto": {
+        "type": "object",
+        "properties": {
+          "is_success": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string",
+            "nullable": true
+          },
+          "error": {
+            "type": "string",
+            "nullable": true
+          },
+          "data": {
+            "$ref": "#/components/schemas/WorkOrderResponse"
+          }
+        },
+        "additionalProperties": false
+      },
+      "WorkOrderResponseIEnumerableBaseResponseDto": {
+        "type": "object",
+        "properties": {
+          "is_success": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string",
+            "nullable": true
+          },
+          "error": {
+            "type": "string",
+            "nullable": true
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WorkOrderResponse"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "securitySchemes": {
+      "Bearer": {
+        "type": "apiKey",
+        "description": "Enter 'Bearer <token>'",
+        "name": "Authorization",
+        "in": "header"
+      },
+      "X-User-Role": {
+        "type": "apiKey",
+        "description": "User Role header",
+        "name": "X-User-Role",
+        "in": "header"
       }
     }
-  }
+  },
+  "security": [
+    {
+      "Bearer": []
+    },
+    {
+      "X-User-Role": []
+    }
+  ]
 }

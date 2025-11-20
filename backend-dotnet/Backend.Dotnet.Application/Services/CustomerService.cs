@@ -1,7 +1,6 @@
 ﻿using Backend.Dotnet.Application.DTOs;
 using Backend.Dotnet.Application.Interfaces;
 using Backend.Dotnet.Application.Interfaces.Data;
-using Backend.Dotnet.Domain.Entities;
 using Backend.Dotnet.Domain.Exceptions;
 using static Backend.Dotnet.Application.DTOs.CustomerDto;
 

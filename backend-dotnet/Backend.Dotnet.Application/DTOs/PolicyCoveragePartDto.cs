@@ -1,11 +1,7 @@
 ﻿using Backend.Dotnet.Domain.Entities;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
 using System.Text.Json.Serialization;
-using System.Threading.Tasks;
+using static Backend.Dotnet.Application.DTOs.PolicyCoveragePartDto;
 
 namespace Backend.Dotnet.Application.DTOs
 {
@@ -40,7 +36,7 @@ namespace Backend.Dotnet.Application.DTOs
             [StringLength(1000, ErrorMessage = "Coverage conditions cannot exceed 1000 characters")]
             public string? CoverageConditions { get; set; }
         }
-
+        
         /// <summary>
         /// Response DTO for policy coverage part basic information
         /// Used in lists and simple queries
@@ -103,6 +99,34 @@ namespace Backend.Dotnet.Application.DTOs
             [JsonPropertyName("part_category")]
             public PartCategoryDto.PartCategoryResponse PartCategory { get; set; } = null!;
         }
+
+        public class CoverageDetailsResponse
+        {
+            [JsonPropertyName("id")]
+            public Guid Id { get; set; }
+
+            [JsonPropertyName("policy_id")]
+            public Guid PolicyId { get; set; }
+
+            [JsonPropertyName("part_category_id")]
+            public Guid PartCategoryId { get; set; }
+
+            [JsonPropertyName("part_category_name")]
+            public string PartCategoryName { get; set; }
+
+            [JsonPropertyName("coverage_conditions")]
+            public string CoverageConditions { get; set; }
+
+            [JsonPropertyName("is_inherited")]
+            public bool IsInherited { get; set; } = false;
+
+            [JsonPropertyName("created_at")]
+            public DateTime CreatedAt { get; set; }
+
+            [JsonPropertyName("updated_at")]
+            public DateTime? UpdatedAt { get; set; }
+        }
+
     }
 
     public static class PolicyCoveragePartMapper
@@ -148,6 +172,20 @@ namespace Backend.Dotnet.Application.DTOs
                 UpdatedAt = entity.UpdatedAt,
                 Policy = entity.Policy?.ToResponse(),
                 PartCategory = entity.PartCategory?.ToResponse()
+            };
+        }
+
+        public static CoverageDetailsResponse ToCoverageDetailsResponse(this PolicyCoveragePart entity)
+        {
+            return new CoverageDetailsResponse
+            {
+                Id = entity.Id,
+                PolicyId = entity.PolicyId,
+                PartCategoryId = entity.PartCategoryId,
+                PartCategoryName = entity.PartCategory.CategoryName,
+                CoverageConditions = entity.CoverageConditions,
+                CreatedAt = entity.CreatedAt,
+                UpdatedAt = entity.UpdatedAt
             };
         }
     }

@@ -3,6 +3,7 @@ package persistence_test
 import (
 	"context"
 	"errors"
+	"ev-warranty-go/pkg/apperror"
 	"ev-warranty-go/pkg/mocks"
 	"regexp"
 	"time"
@@ -13,9 +14,8 @@ import (
 	. "github.com/onsi/gomega"
 	"gorm.io/gorm"
 
-	"ev-warranty-go/internal/apperrors"
-	"ev-warranty-go/internal/application/repositories"
-	"ev-warranty-go/internal/domain/entities"
+	"ev-warranty-go/internal/application/repository"
+	"ev-warranty-go/internal/domain/entity"
 	"ev-warranty-go/internal/infrastructure/persistence"
 )
 
@@ -23,7 +23,7 @@ var _ = Describe("ClaimItemRepository", func() {
 	var (
 		mock       sqlmock.Sqlmock
 		db         *gorm.DB
-		repository repositories.ClaimItemRepository
+		repository repository.ClaimItemRepository
 		ctx        context.Context
 	)
 
@@ -38,7 +38,7 @@ var _ = Describe("ClaimItemRepository", func() {
 	})
 
 	Describe("Create", func() {
-		var item *entities.ClaimItem
+		var item *entity.ClaimItem
 
 		BeforeEach(func() {
 			item = newClaimItem()
@@ -64,7 +64,7 @@ var _ = Describe("ClaimItemRepository", func() {
 
 				err := repository.Create(mockTx, item)
 
-				ExpectAppError(err, apperrors.ErrorCodeDuplicateKey)
+				ExpectAppError(err, apperror.ErrDuplicateKey.ErrorCode)
 			})
 		})
 
@@ -76,7 +76,7 @@ var _ = Describe("ClaimItemRepository", func() {
 
 				err := repository.Create(mockTx, item)
 
-				ExpectAppError(err, apperrors.ErrorCodeDBOperation)
+				ExpectAppError(err, apperror.ErrDBOperation.ErrorCode)
 			})
 		})
 
@@ -84,7 +84,7 @@ var _ = Describe("ClaimItemRepository", func() {
 			It("should handle replacement type", func() {
 				mockTx := mocks.NewTx(GinkgoT())
 				mockTx.EXPECT().GetTx().Return(db)
-				item.Type = entities.ClaimItemTypeReplacement
+				item.Type = entity.ClaimItemTypeReplacement
 				MockSuccessfulInsert(mock, "claim_items", item.ID)
 
 				err := repository.Create(mockTx, item)
@@ -95,7 +95,7 @@ var _ = Describe("ClaimItemRepository", func() {
 			It("should handle repair type", func() {
 				mockTx := mocks.NewTx(GinkgoT())
 				mockTx.EXPECT().GetTx().Return(db)
-				item.Type = entities.ClaimItemTypeRepair
+				item.Type = entity.ClaimItemTypeRepair
 				MockSuccessfulInsert(mock, "claim_items", item.ID)
 
 				err := repository.Create(mockTx, item)
@@ -106,7 +106,7 @@ var _ = Describe("ClaimItemRepository", func() {
 	})
 
 	Describe("Update", func() {
-		var item *entities.ClaimItem
+		var item *entity.ClaimItem
 
 		BeforeEach(func() {
 			item = newClaimItem()
@@ -134,7 +134,7 @@ var _ = Describe("ClaimItemRepository", func() {
 
 				err := repository.Update(mockTx, item)
 
-				ExpectAppError(err, apperrors.ErrorCodeDBOperation)
+				ExpectAppError(err, apperror.ErrDBOperation.ErrorCode)
 			})
 		})
 
@@ -209,7 +209,7 @@ var _ = Describe("ClaimItemRepository", func() {
 
 				err := repository.HardDelete(mockTx, itemID)
 
-				ExpectAppError(err, apperrors.ErrorCodeDBOperation)
+				ExpectAppError(err, apperror.ErrDBOperation.ErrorCode)
 			})
 		})
 	})
@@ -249,7 +249,7 @@ var _ = Describe("ClaimItemRepository", func() {
 
 				err := repository.SoftDeleteByClaimID(mockTx, claimID)
 
-				ExpectAppError(err, apperrors.ErrorCodeDBOperation)
+				ExpectAppError(err, apperror.ErrDBOperation.ErrorCode)
 			})
 		})
 	})
@@ -260,7 +260,7 @@ var _ = Describe("ClaimItemRepository", func() {
 
 		BeforeEach(func() {
 			itemID = uuid.New()
-			status = entities.ClaimItemStatusApproved
+			status = entity.ClaimItemStatusApproved
 		})
 
 		Context("when status is updated successfully", func() {
@@ -291,16 +291,16 @@ var _ = Describe("ClaimItemRepository", func() {
 
 				err := repository.UpdateStatus(mockTx, itemID, status)
 
-				ExpectAppError(err, apperrors.ErrorCodeDBOperation)
+				ExpectAppError(err, apperror.ErrDBOperation.ErrorCode)
 			})
 		})
 
 		Context("boundary cases for status", func() {
 			It("should handle all valid status values", func() {
 				statuses := []string{
-					entities.ClaimItemStatusPending,
-					entities.ClaimItemStatusApproved,
-					entities.ClaimItemStatusRejected,
+					entity.ClaimItemStatusPending,
+					entity.ClaimItemStatusApproved,
+					entity.ClaimItemStatusRejected,
 				}
 
 				for _, s := range statuses {
@@ -371,7 +371,7 @@ var _ = Describe("ClaimItemRepository", func() {
 				totalCost, err := repository.SumCostByClaimID(mockTx, claimID)
 
 				Expect(totalCost).To(Equal(0.0))
-				ExpectAppError(err, apperrors.ErrorCodeDBOperation)
+				ExpectAppError(err, apperror.ErrDBOperation.ErrorCode)
 			})
 		})
 
@@ -408,7 +408,7 @@ var _ = Describe("ClaimItemRepository", func() {
 					"id", "claim_id", "part_category_id", "faulty_part_id", "replacement_part_id",
 					"issue_description", "status", "type", "cost", "created_at", "updated_at", "deleted_at",
 				}).AddRow(
-					expected.ID, expected.ClaimID, expected.PartCategoryID, expected.FaultyPartID,
+					expected.ID, expected.ClaimID, expected.PartCategoryID, expected.FaultyPartSerial,
 					expected.ReplacementPartID, expected.IssueDescription, expected.Status,
 					expected.Type, expected.Cost, expected.CreatedAt, expected.UpdatedAt, expected.DeletedAt,
 				)
@@ -433,7 +433,7 @@ var _ = Describe("ClaimItemRepository", func() {
 				item, err := repository.FindByID(ctx, itemID)
 
 				Expect(item).To(BeNil())
-				ExpectAppError(err, apperrors.ErrorCodeClaimItemNotFound)
+				ExpectAppError(err, apperror.ErrNotFoundError.ErrorCode)
 			})
 		})
 
@@ -444,7 +444,7 @@ var _ = Describe("ClaimItemRepository", func() {
 				item, err := repository.FindByID(ctx, itemID)
 
 				Expect(item).To(BeNil())
-				ExpectAppError(err, apperrors.ErrorCodeDBOperation)
+				ExpectAppError(err, apperror.ErrDBOperation.ErrorCode)
 			})
 		})
 	})
@@ -469,11 +469,11 @@ var _ = Describe("ClaimItemRepository", func() {
 					"issue_description", "status", "type", "cost", "created_at", "updated_at", "deleted_at",
 				}).AddRow(
 					itemID1, claimID, cateID, partID, &replacementPartID, "Issue 1",
-					entities.ClaimItemStatusPending, entities.ClaimItemTypeReplacement,
+					entity.ClaimItemStatusPending, entity.ClaimItemTypeReplacement,
 					1000.0, time.Now(), time.Now(), nil,
 				).AddRow(
 					itemID2, claimID, cateID, partID, nil, "Issue 2",
-					entities.ClaimItemStatusApproved, entities.ClaimItemTypeRepair,
+					entity.ClaimItemStatusApproved, entity.ClaimItemTypeRepair,
 					2000.0, time.Now(), time.Now(), nil,
 				)
 
@@ -517,7 +517,7 @@ var _ = Describe("ClaimItemRepository", func() {
 				items, err := repository.FindByClaimID(ctx, claimID)
 
 				Expect(items).To(BeNil())
-				ExpectAppError(err, apperrors.ErrorCodeDBOperation)
+				ExpectAppError(err, apperror.ErrDBOperation.ErrorCode)
 			})
 		})
 
@@ -532,7 +532,7 @@ var _ = Describe("ClaimItemRepository", func() {
 					"issue_description", "status", "type", "cost", "created_at", "updated_at", "deleted_at",
 				}).AddRow(
 					itemID, claimID, cateID, partID, nil, "Repair only",
-					entities.ClaimItemStatusPending, entities.ClaimItemTypeRepair,
+					entity.ClaimItemStatusPending, entity.ClaimItemTypeRepair,
 					500.0, time.Now(), time.Now(), nil,
 				)
 
@@ -595,7 +595,7 @@ var _ = Describe("ClaimItemRepository", func() {
 				count, err := repository.CountByClaimID(ctx, claimID)
 
 				Expect(count).To(Equal(int64(0)))
-				ExpectAppError(err, apperrors.ErrorCodeDBOperation)
+				ExpectAppError(err, apperror.ErrDBOperation.ErrorCode)
 			})
 		})
 	})
@@ -606,7 +606,7 @@ var _ = Describe("ClaimItemRepository", func() {
 
 		BeforeEach(func() {
 			claimID = uuid.New()
-			status = entities.ClaimItemStatusApproved
+			status = entity.ClaimItemStatusApproved
 		})
 
 		Context("when items are found with specified status", func() {
@@ -621,11 +621,11 @@ var _ = Describe("ClaimItemRepository", func() {
 					"issue_description", "status", "type", "cost", "created_at", "updated_at", "deleted_at",
 				}).AddRow(
 					itemID1, claimID, cateID, partID, nil, "Issue 1",
-					entities.ClaimItemStatusApproved, entities.ClaimItemTypeReplacement,
+					entity.ClaimItemStatusApproved, entity.ClaimItemTypeReplacement,
 					1000.0, time.Now(), time.Now(), nil,
 				).AddRow(
 					itemID2, claimID, cateID, partID, nil, "Issue 2",
-					entities.ClaimItemStatusApproved, entities.ClaimItemTypeRepair,
+					entity.ClaimItemStatusApproved, entity.ClaimItemTypeRepair,
 					2000.0, time.Now(), time.Now(), nil,
 				)
 
@@ -637,8 +637,8 @@ var _ = Describe("ClaimItemRepository", func() {
 
 				Expect(err).NotTo(HaveOccurred())
 				Expect(items).To(HaveLen(2))
-				Expect(items[0].Status).To(Equal(entities.ClaimItemStatusApproved))
-				Expect(items[1].Status).To(Equal(entities.ClaimItemStatusApproved))
+				Expect(items[0].Status).To(Equal(entity.ClaimItemStatusApproved))
+				Expect(items[1].Status).To(Equal(entity.ClaimItemStatusApproved))
 			})
 		})
 
@@ -669,7 +669,7 @@ var _ = Describe("ClaimItemRepository", func() {
 				items, err := repository.FindByStatus(ctx, claimID, status)
 
 				Expect(items).To(BeNil())
-				ExpectAppError(err, apperrors.ErrorCodeDBOperation)
+				ExpectAppError(err, apperror.ErrDBOperation.ErrorCode)
 			})
 		})
 
@@ -684,19 +684,19 @@ var _ = Describe("ClaimItemRepository", func() {
 					"issue_description", "status", "type", "cost", "created_at", "updated_at", "deleted_at",
 				}).AddRow(
 					itemID, claimID, cateID, partID, nil, "Pending item",
-					entities.ClaimItemStatusPending, entities.ClaimItemTypeRepair,
+					entity.ClaimItemStatusPending, entity.ClaimItemTypeRepair,
 					500.0, time.Now(), time.Now(), nil,
 				)
 
 				mock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "claim_items" WHERE (claim_id = $1 AND status = $2) AND "claim_items"."deleted_at" IS NULL ORDER BY created_at ASC`)).
-					WithArgs(claimID, entities.ClaimItemStatusPending).
+					WithArgs(claimID, entity.ClaimItemStatusPending).
 					WillReturnRows(rows)
 
-				items, err := repository.FindByStatus(ctx, claimID, entities.ClaimItemStatusPending)
+				items, err := repository.FindByStatus(ctx, claimID, entity.ClaimItemStatusPending)
 
 				Expect(err).NotTo(HaveOccurred())
 				Expect(items).To(HaveLen(1))
-				Expect(items[0].Status).To(Equal(entities.ClaimItemStatusPending))
+				Expect(items[0].Status).To(Equal(entity.ClaimItemStatusPending))
 			})
 
 			It("should handle rejected status", func() {
@@ -709,35 +709,35 @@ var _ = Describe("ClaimItemRepository", func() {
 					"issue_description", "status", "type", "cost", "created_at", "updated_at", "deleted_at",
 				}).AddRow(
 					itemID, claimID, cateID, partID, nil, "Rejected item",
-					entities.ClaimItemStatusRejected, entities.ClaimItemTypeRepair,
+					entity.ClaimItemStatusRejected, entity.ClaimItemTypeRepair,
 					500.0, time.Now(), time.Now(), nil,
 				)
 
 				mock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "claim_items" WHERE (claim_id = $1 AND status = $2) AND "claim_items"."deleted_at" IS NULL ORDER BY created_at ASC`)).
-					WithArgs(claimID, entities.ClaimItemStatusRejected).
+					WithArgs(claimID, entity.ClaimItemStatusRejected).
 					WillReturnRows(rows)
 
-				items, err := repository.FindByStatus(ctx, claimID, entities.ClaimItemStatusRejected)
+				items, err := repository.FindByStatus(ctx, claimID, entity.ClaimItemStatusRejected)
 
 				Expect(err).NotTo(HaveOccurred())
 				Expect(items).To(HaveLen(1))
-				Expect(items[0].Status).To(Equal(entities.ClaimItemStatusRejected))
+				Expect(items[0].Status).To(Equal(entity.ClaimItemStatusRejected))
 			})
 		})
 	})
 })
 
-func newClaimItem() *entities.ClaimItem {
+func newClaimItem() *entity.ClaimItem {
 	replacementPartID := uuid.New()
-	return &entities.ClaimItem{
+	return &entity.ClaimItem{
 		ID:                uuid.New(),
 		ClaimID:           uuid.New(),
 		PartCategoryID:    uuid.New(),
-		FaultyPartID:      uuid.New(),
+		FaultyPartSerial:  "Part serial",
 		ReplacementPartID: &replacementPartID,
 		IssueDescription:  "Test issue description",
-		Status:            entities.ClaimItemStatusPending,
-		Type:              entities.ClaimItemTypeReplacement,
+		Status:            entity.ClaimItemStatusPending,
+		Type:              entity.ClaimItemTypeReplacement,
 		Cost:              1000.0,
 		CreatedAt:         time.Now(),
 		UpdatedAt:         time.Now(),

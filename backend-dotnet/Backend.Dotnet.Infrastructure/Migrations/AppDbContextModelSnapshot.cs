@@ -119,7 +119,7 @@ namespace Backend.Dotnet.Infrastructure.Migrations
                         .HasColumnName("status");
 
                     b.Property<decimal>("UnitPrice")
-                        .HasColumnType("decimal(10,2)")
+                        .HasColumnType("decimal(18,2)")
                         .HasColumnName("unit_price");
 
                     b.Property<DateTime?>("UpdatedAt")

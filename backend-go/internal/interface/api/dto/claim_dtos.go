@@ -1,0 +1,36 @@
+package dto
+
+import (
+	"ev-warranty-go/internal/domain/entity"
+
+	"github.com/google/uuid"
+)
+
+type CreateClaimRequest struct {
+	VehicleID    uuid.UUID `json:"vehicle_id" binding:"required"`
+	CustomerID   uuid.UUID `json:"customer_id" binding:"required"`
+	Kilometers   int       `json:"kilometers" binding:"required"`
+	TechnicianID uuid.UUID `json:"technician_id" binding:"required"`
+	Description  string    `json:"description" binding:"required,min=10,max=1000"`
+}
+
+type UpdateClaimRequest struct {
+	Description string `json:"description" binding:"required,min=10,max=1000"`
+}
+
+type CreateClaimItemRequest struct {
+	PartCategoryID   uuid.UUID `json:"part_category_id" binding:"required"`
+	FaultyPartSerial string    `json:"faulty_part_serial" binding:"required"`
+	IssueDescription string    `json:"issue_description" binding:"required,min=10,max=1000"`
+	Type             string    `json:"type" binding:"required"`
+}
+
+type ClaimItemListResponse struct {
+	Items []entity.ClaimItem `json:"items"`
+	Total int                `json:"total"`
+}
+
+type ClaimAttachmentListResponse struct {
+	Attachments []entity.ClaimAttachment `json:"attachments"`
+	Total       int                      `json:"total"`
+}

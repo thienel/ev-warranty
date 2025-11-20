@@ -26,8 +26,8 @@ namespace Backend.Dotnet.API.Controllers
         [ProducesResponseType(typeof(BaseResponseDto<IEnumerable<VehicleModelResponse>>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BaseResponseDto), StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> GetAll(
-            [FromQuery] string brand = null,
-            [FromQuery] string model = null,
+            [FromQuery] string? brand = null,
+            [FromQuery] string? model = null,
             [FromQuery] int? year = null)
         {
             // Brand + model + year - relative
@@ -90,7 +90,7 @@ namespace Backend.Dotnet.API.Controllers
             if (!result.IsSuccess)
                 return BadRequest(result);
 
-            return CreatedAtAction(nameof(GetById), new { id = result.Data.Id }, result);
+            return CreatedAtAction(nameof(GetById), new { id = result.Data!.Id }, result);
         }
 
         [HttpPut("{id}")]

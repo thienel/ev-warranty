@@ -6,7 +6,7 @@ import (
 	context "context"
 	application "ev-warranty-go/internal/application"
 
-	entities "ev-warranty-go/internal/domain/entities"
+	entity "ev-warranty-go/internal/domain/entity"
 
 	mock "github.com/stretchr/testify/mock"
 
@@ -84,7 +84,7 @@ func (_c *ClaimItemRepository_CountByClaimID_Call) RunAndReturn(run func(context
 }
 
 // Create provides a mock function with given fields: tx, item
-func (_m *ClaimItemRepository) Create(tx application.Tx, item *entities.ClaimItem) error {
+func (_m *ClaimItemRepository) Create(tx application.Tx, item *entity.ClaimItem) error {
 	ret := _m.Called(tx, item)
 
 	if len(ret) == 0 {
@@ -92,7 +92,7 @@ func (_m *ClaimItemRepository) Create(tx application.Tx, item *entities.ClaimIte
 	}
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(application.Tx, *entities.ClaimItem) error); ok {
+	if rf, ok := ret.Get(0).(func(application.Tx, *entity.ClaimItem) error); ok {
 		r0 = rf(tx, item)
 	} else {
 		r0 = ret.Error(0)
@@ -108,14 +108,14 @@ type ClaimItemRepository_Create_Call struct {
 
 // Create is a helper method to define mock.On call
 //   - tx application.Tx
-//   - item *entities.ClaimItem
+//   - item *entity.ClaimItem
 func (_e *ClaimItemRepository_Expecter) Create(tx interface{}, item interface{}) *ClaimItemRepository_Create_Call {
 	return &ClaimItemRepository_Create_Call{Call: _e.mock.On("Create", tx, item)}
 }
 
-func (_c *ClaimItemRepository_Create_Call) Run(run func(tx application.Tx, item *entities.ClaimItem)) *ClaimItemRepository_Create_Call {
+func (_c *ClaimItemRepository_Create_Call) Run(run func(tx application.Tx, item *entity.ClaimItem)) *ClaimItemRepository_Create_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(application.Tx), args[1].(*entities.ClaimItem))
+		run(args[0].(application.Tx), args[1].(*entity.ClaimItem))
 	})
 	return _c
 }
@@ -125,29 +125,29 @@ func (_c *ClaimItemRepository_Create_Call) Return(_a0 error) *ClaimItemRepositor
 	return _c
 }
 
-func (_c *ClaimItemRepository_Create_Call) RunAndReturn(run func(application.Tx, *entities.ClaimItem) error) *ClaimItemRepository_Create_Call {
+func (_c *ClaimItemRepository_Create_Call) RunAndReturn(run func(application.Tx, *entity.ClaimItem) error) *ClaimItemRepository_Create_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
 // FindByClaimID provides a mock function with given fields: ctx, claimID
-func (_m *ClaimItemRepository) FindByClaimID(ctx context.Context, claimID uuid.UUID) ([]*entities.ClaimItem, error) {
+func (_m *ClaimItemRepository) FindByClaimID(ctx context.Context, claimID uuid.UUID) ([]*entity.ClaimItem, error) {
 	ret := _m.Called(ctx, claimID)
 
 	if len(ret) == 0 {
 		panic("no return value specified for FindByClaimID")
 	}
 
-	var r0 []*entities.ClaimItem
+	var r0 []*entity.ClaimItem
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID) ([]*entities.ClaimItem, error)); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID) ([]*entity.ClaimItem, error)); ok {
 		return rf(ctx, claimID)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID) []*entities.ClaimItem); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID) []*entity.ClaimItem); ok {
 		r0 = rf(ctx, claimID)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).([]*entities.ClaimItem)
+			r0 = ret.Get(0).([]*entity.ClaimItem)
 		}
 	}
 
@@ -179,34 +179,34 @@ func (_c *ClaimItemRepository_FindByClaimID_Call) Run(run func(ctx context.Conte
 	return _c
 }
 
-func (_c *ClaimItemRepository_FindByClaimID_Call) Return(_a0 []*entities.ClaimItem, _a1 error) *ClaimItemRepository_FindByClaimID_Call {
+func (_c *ClaimItemRepository_FindByClaimID_Call) Return(_a0 []*entity.ClaimItem, _a1 error) *ClaimItemRepository_FindByClaimID_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
-func (_c *ClaimItemRepository_FindByClaimID_Call) RunAndReturn(run func(context.Context, uuid.UUID) ([]*entities.ClaimItem, error)) *ClaimItemRepository_FindByClaimID_Call {
+func (_c *ClaimItemRepository_FindByClaimID_Call) RunAndReturn(run func(context.Context, uuid.UUID) ([]*entity.ClaimItem, error)) *ClaimItemRepository_FindByClaimID_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
 // FindByID provides a mock function with given fields: ctx, id
-func (_m *ClaimItemRepository) FindByID(ctx context.Context, id uuid.UUID) (*entities.ClaimItem, error) {
+func (_m *ClaimItemRepository) FindByID(ctx context.Context, id uuid.UUID) (*entity.ClaimItem, error) {
 	ret := _m.Called(ctx, id)
 
 	if len(ret) == 0 {
 		panic("no return value specified for FindByID")
 	}
 
-	var r0 *entities.ClaimItem
+	var r0 *entity.ClaimItem
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID) (*entities.ClaimItem, error)); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID) (*entity.ClaimItem, error)); ok {
 		return rf(ctx, id)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID) *entities.ClaimItem); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID) *entity.ClaimItem); ok {
 		r0 = rf(ctx, id)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*entities.ClaimItem)
+			r0 = ret.Get(0).(*entity.ClaimItem)
 		}
 	}
 
@@ -238,34 +238,34 @@ func (_c *ClaimItemRepository_FindByID_Call) Run(run func(ctx context.Context, i
 	return _c
 }
 
-func (_c *ClaimItemRepository_FindByID_Call) Return(_a0 *entities.ClaimItem, _a1 error) *ClaimItemRepository_FindByID_Call {
+func (_c *ClaimItemRepository_FindByID_Call) Return(_a0 *entity.ClaimItem, _a1 error) *ClaimItemRepository_FindByID_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
-func (_c *ClaimItemRepository_FindByID_Call) RunAndReturn(run func(context.Context, uuid.UUID) (*entities.ClaimItem, error)) *ClaimItemRepository_FindByID_Call {
+func (_c *ClaimItemRepository_FindByID_Call) RunAndReturn(run func(context.Context, uuid.UUID) (*entity.ClaimItem, error)) *ClaimItemRepository_FindByID_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
 // FindByStatus provides a mock function with given fields: ctx, claimID, status
-func (_m *ClaimItemRepository) FindByStatus(ctx context.Context, claimID uuid.UUID, status string) ([]*entities.ClaimItem, error) {
+func (_m *ClaimItemRepository) FindByStatus(ctx context.Context, claimID uuid.UUID, status string) ([]*entity.ClaimItem, error) {
 	ret := _m.Called(ctx, claimID, status)
 
 	if len(ret) == 0 {
 		panic("no return value specified for FindByStatus")
 	}
 
-	var r0 []*entities.ClaimItem
+	var r0 []*entity.ClaimItem
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID, string) ([]*entities.ClaimItem, error)); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID, string) ([]*entity.ClaimItem, error)); ok {
 		return rf(ctx, claimID, status)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID, string) []*entities.ClaimItem); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID, string) []*entity.ClaimItem); ok {
 		r0 = rf(ctx, claimID, status)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).([]*entities.ClaimItem)
+			r0 = ret.Get(0).([]*entity.ClaimItem)
 		}
 	}
 
@@ -298,12 +298,12 @@ func (_c *ClaimItemRepository_FindByStatus_Call) Run(run func(ctx context.Contex
 	return _c
 }
 
-func (_c *ClaimItemRepository_FindByStatus_Call) Return(_a0 []*entities.ClaimItem, _a1 error) *ClaimItemRepository_FindByStatus_Call {
+func (_c *ClaimItemRepository_FindByStatus_Call) Return(_a0 []*entity.ClaimItem, _a1 error) *ClaimItemRepository_FindByStatus_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
-func (_c *ClaimItemRepository_FindByStatus_Call) RunAndReturn(run func(context.Context, uuid.UUID, string) ([]*entities.ClaimItem, error)) *ClaimItemRepository_FindByStatus_Call {
+func (_c *ClaimItemRepository_FindByStatus_Call) RunAndReturn(run func(context.Context, uuid.UUID, string) ([]*entity.ClaimItem, error)) *ClaimItemRepository_FindByStatus_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -460,7 +460,7 @@ func (_c *ClaimItemRepository_SumCostByClaimID_Call) RunAndReturn(run func(appli
 }
 
 // Update provides a mock function with given fields: tx, item
-func (_m *ClaimItemRepository) Update(tx application.Tx, item *entities.ClaimItem) error {
+func (_m *ClaimItemRepository) Update(tx application.Tx, item *entity.ClaimItem) error {
 	ret := _m.Called(tx, item)
 
 	if len(ret) == 0 {
@@ -468,7 +468,7 @@ func (_m *ClaimItemRepository) Update(tx application.Tx, item *entities.ClaimIte
 	}
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(application.Tx, *entities.ClaimItem) error); ok {
+	if rf, ok := ret.Get(0).(func(application.Tx, *entity.ClaimItem) error); ok {
 		r0 = rf(tx, item)
 	} else {
 		r0 = ret.Error(0)
@@ -484,14 +484,14 @@ type ClaimItemRepository_Update_Call struct {
 
 // Update is a helper method to define mock.On call
 //   - tx application.Tx
-//   - item *entities.ClaimItem
+//   - item *entity.ClaimItem
 func (_e *ClaimItemRepository_Expecter) Update(tx interface{}, item interface{}) *ClaimItemRepository_Update_Call {
 	return &ClaimItemRepository_Update_Call{Call: _e.mock.On("Update", tx, item)}
 }
 
-func (_c *ClaimItemRepository_Update_Call) Run(run func(tx application.Tx, item *entities.ClaimItem)) *ClaimItemRepository_Update_Call {
+func (_c *ClaimItemRepository_Update_Call) Run(run func(tx application.Tx, item *entity.ClaimItem)) *ClaimItemRepository_Update_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(application.Tx), args[1].(*entities.ClaimItem))
+		run(args[0].(application.Tx), args[1].(*entity.ClaimItem))
 	})
 	return _c
 }
@@ -501,7 +501,7 @@ func (_c *ClaimItemRepository_Update_Call) Return(_a0 error) *ClaimItemRepositor
 	return _c
 }
 
-func (_c *ClaimItemRepository_Update_Call) RunAndReturn(run func(application.Tx, *entities.ClaimItem) error) *ClaimItemRepository_Update_Call {
+func (_c *ClaimItemRepository_Update_Call) RunAndReturn(run func(application.Tx, *entity.ClaimItem) error) *ClaimItemRepository_Update_Call {
 	_c.Call.Return(run)
 	return _c
 }

@@ -17,6 +17,10 @@ type CloudinaryConfig struct {
 	UploadFolder string
 }
 
+type ExternalServiceConfig struct {
+	DotnetBackendURL string
+}
+
 type Config struct {
 	Port            string
 	DatabaseURL     string
@@ -27,6 +31,7 @@ type Config struct {
 	RefreshTokenTTL time.Duration
 	OAuth           OAuthConfig
 	Cloudinary      CloudinaryConfig
+	ExternalService ExternalServiceConfig
 }
 
 func Load() *Config {
@@ -64,6 +69,9 @@ func Load() *Config {
 		Cloudinary: CloudinaryConfig{
 			URL:          cloudinaryURL,
 			UploadFolder: getEnv("CLOUDINARY_UPLOAD_FOLDER", "ev-warranty-claim-attachment"),
+		},
+		ExternalService: ExternalServiceConfig{
+			DotnetBackendURL: getEnv("DOTNET_BACKEND_URL", "http://localhost"),
 		},
 	}
 }
