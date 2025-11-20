@@ -24,9 +24,9 @@ func (_m *Client) EXPECT() *Client_Expecter {
 	return &Client_Expecter{mock: &_m.Mock}
 }
 
-// ReservePart provides a mock function with given fields: ctx, officeLocationID, categoryID
-func (_m *Client) ReservePart(ctx context.Context, officeLocationID uuid.UUID, categoryID uuid.UUID) (*dotnet.PartResponse, error) {
-	ret := _m.Called(ctx, officeLocationID, categoryID)
+// ReservePart provides a mock function with given fields: ctx, officeLocationID, categoryID, authToken
+func (_m *Client) ReservePart(ctx context.Context, officeLocationID uuid.UUID, categoryID uuid.UUID, authToken string) (*dotnet.PartResponse, error) {
+	ret := _m.Called(ctx, officeLocationID, categoryID, authToken)
 
 	if len(ret) == 0 {
 		panic("no return value specified for ReservePart")
@@ -34,19 +34,19 @@ func (_m *Client) ReservePart(ctx context.Context, officeLocationID uuid.UUID, c
 
 	var r0 *dotnet.PartResponse
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID, uuid.UUID) (*dotnet.PartResponse, error)); ok {
-		return rf(ctx, officeLocationID, categoryID)
+	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID, uuid.UUID, string) (*dotnet.PartResponse, error)); ok {
+		return rf(ctx, officeLocationID, categoryID, authToken)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID, uuid.UUID) *dotnet.PartResponse); ok {
-		r0 = rf(ctx, officeLocationID, categoryID)
+	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID, uuid.UUID, string) *dotnet.PartResponse); ok {
+		r0 = rf(ctx, officeLocationID, categoryID, authToken)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).(*dotnet.PartResponse)
 		}
 	}
 
-	if rf, ok := ret.Get(1).(func(context.Context, uuid.UUID, uuid.UUID) error); ok {
-		r1 = rf(ctx, officeLocationID, categoryID)
+	if rf, ok := ret.Get(1).(func(context.Context, uuid.UUID, uuid.UUID, string) error); ok {
+		r1 = rf(ctx, officeLocationID, categoryID, authToken)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -63,13 +63,14 @@ type Client_ReservePart_Call struct {
 //   - ctx context.Context
 //   - officeLocationID uuid.UUID
 //   - categoryID uuid.UUID
-func (_e *Client_Expecter) ReservePart(ctx interface{}, officeLocationID interface{}, categoryID interface{}) *Client_ReservePart_Call {
-	return &Client_ReservePart_Call{Call: _e.mock.On("ReservePart", ctx, officeLocationID, categoryID)}
+//   - authToken string
+func (_e *Client_Expecter) ReservePart(ctx interface{}, officeLocationID interface{}, categoryID interface{}, authToken interface{}) *Client_ReservePart_Call {
+	return &Client_ReservePart_Call{Call: _e.mock.On("ReservePart", ctx, officeLocationID, categoryID, authToken)}
 }
 
-func (_c *Client_ReservePart_Call) Run(run func(ctx context.Context, officeLocationID uuid.UUID, categoryID uuid.UUID)) *Client_ReservePart_Call {
+func (_c *Client_ReservePart_Call) Run(run func(ctx context.Context, officeLocationID uuid.UUID, categoryID uuid.UUID, authToken string)) *Client_ReservePart_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(uuid.UUID), args[2].(uuid.UUID))
+		run(args[0].(context.Context), args[1].(uuid.UUID), args[2].(uuid.UUID), args[3].(string))
 	})
 	return _c
 }
@@ -79,22 +80,22 @@ func (_c *Client_ReservePart_Call) Return(_a0 *dotnet.PartResponse, _a1 error) *
 	return _c
 }
 
-func (_c *Client_ReservePart_Call) RunAndReturn(run func(context.Context, uuid.UUID, uuid.UUID) (*dotnet.PartResponse, error)) *Client_ReservePart_Call {
+func (_c *Client_ReservePart_Call) RunAndReturn(run func(context.Context, uuid.UUID, uuid.UUID, string) (*dotnet.PartResponse, error)) *Client_ReservePart_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
-// UnreservePart provides a mock function with given fields: ctx, partID
-func (_m *Client) UnreservePart(ctx context.Context, partID uuid.UUID) error {
-	ret := _m.Called(ctx, partID)
+// UnreservePart provides a mock function with given fields: ctx, partID, authToken
+func (_m *Client) UnreservePart(ctx context.Context, partID uuid.UUID, authToken string) error {
+	ret := _m.Called(ctx, partID, authToken)
 
 	if len(ret) == 0 {
 		panic("no return value specified for UnreservePart")
 	}
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID) error); ok {
-		r0 = rf(ctx, partID)
+	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID, string) error); ok {
+		r0 = rf(ctx, partID, authToken)
 	} else {
 		r0 = ret.Error(0)
 	}
@@ -110,13 +111,14 @@ type Client_UnreservePart_Call struct {
 // UnreservePart is a helper method to define mock.On call
 //   - ctx context.Context
 //   - partID uuid.UUID
-func (_e *Client_Expecter) UnreservePart(ctx interface{}, partID interface{}) *Client_UnreservePart_Call {
-	return &Client_UnreservePart_Call{Call: _e.mock.On("UnreservePart", ctx, partID)}
+//   - authToken string
+func (_e *Client_Expecter) UnreservePart(ctx interface{}, partID interface{}, authToken interface{}) *Client_UnreservePart_Call {
+	return &Client_UnreservePart_Call{Call: _e.mock.On("UnreservePart", ctx, partID, authToken)}
 }
 
-func (_c *Client_UnreservePart_Call) Run(run func(ctx context.Context, partID uuid.UUID)) *Client_UnreservePart_Call {
+func (_c *Client_UnreservePart_Call) Run(run func(ctx context.Context, partID uuid.UUID, authToken string)) *Client_UnreservePart_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(uuid.UUID))
+		run(args[0].(context.Context), args[1].(uuid.UUID), args[2].(string))
 	})
 	return _c
 }
@@ -126,7 +128,7 @@ func (_c *Client_UnreservePart_Call) Return(_a0 error) *Client_UnreservePart_Cal
 	return _c
 }
 
-func (_c *Client_UnreservePart_Call) RunAndReturn(run func(context.Context, uuid.UUID) error) *Client_UnreservePart_Call {
+func (_c *Client_UnreservePart_Call) RunAndReturn(run func(context.Context, uuid.UUID, string) error) *Client_UnreservePart_Call {
 	_c.Call.Return(run)
 	return _c
 }
