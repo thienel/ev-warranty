@@ -8,8 +8,13 @@ import type {
 } from '@/types'
 
 export const policyCoveragePartsApi = {
-  getAll: (policyId?: string): Promise<ApiSuccessResponse<PolicyCoveragePart[]>> => {
-    const params = policyId ? { policyId } : {}
+  getAll: (
+    policyId?: string,
+    partCategoryId?: string,
+  ): Promise<ApiSuccessResponse<PolicyCoveragePart[]>> => {
+    const params: Record<string, string> = {}
+    if (policyId) params.policyId = policyId
+    if (partCategoryId) params.partCategoryId = partCategoryId
     return api.get(API_ENDPOINTS.POLICY_COVERAGE_PARTS, { params })
   },
 

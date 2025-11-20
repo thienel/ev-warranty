@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { API_ENDPOINTS } from '@constants/common-constants'
 import { type WarrantyPolicy, type VehicleModel } from '@/types/index'
 import { warrantyPoliciesApi, vehicleModelsApi } from '@services/index'
@@ -20,10 +20,12 @@ const WarrantyPolicyManagement: React.FC = () => {
     updateItem: updatePolicy,
     isUpdate,
     isOpenModal,
+    setIsOpenModal,
+    setUpdateItem,
     handleOpenModal,
-    handleReset,
   } = useManagement<WarrantyPolicy>(API_ENDPOINTS.WARRANTY_POLICIES)
 
+  const [vehicleModels, setVehicleModels] = useState<VehicleModel[]>([])
   const handleError = useHandleApiError()
 
   // Fetch vehicle models and enrich policies with vehicle model data
@@ -50,6 +52,9 @@ const WarrantyPolicyManagement: React.FC = () => {
       }
 
       if (Array.isArray(policiesData) && Array.isArray(vehicleModelsData)) {
+        // Store vehicle models for the modal
+        setVehicleModels(vehicleModelsData)
+
         // Map vehicle models to their policies
         const policiesWithModels = policiesData.map((policy) => {
           const relatedModels = vehicleModelsData
@@ -70,12 +75,23 @@ const WarrantyPolicyManagement: React.FC = () => {
         setPolicies(policiesWithModels)
       } else {
         setPolicies([])
+        setVehicleModels([])
       }
     } catch (error) {
       handleError(error as Error)
       setPolicies([])
+      setVehicleModels([])
     }
   }, [handleError, setPolicies])
+
+  const handleReset = useCallback(async () => {
+    setLoading(true)
+    setSearchText('')
+    setIsOpenModal(false)
+    setUpdateItem(null)
+    await enrichPoliciesWithVehicleModels()
+    setLoading(false)
+  }, [setLoading, setSearchText, setIsOpenModal, setUpdateItem, enrichPoliciesWithVehicleModels])
 
   useEffect(() => {
     enrichPoliciesWithVehicleModels()
@@ -132,6 +148,7 @@ const WarrantyPolicyManagement: React.FC = () => {
         policy={updatePolicy ? (updatePolicy as unknown as WarrantyPolicy) : null}
         opened={isOpenModal}
         isUpdate={isUpdate}
+        vehicleModels={vehicleModels}
       />
     </>
   )

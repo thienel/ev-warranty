@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from 'react'
 import api from '@services/api'
 import useDelay from '@/hooks/useDelay'
 import useHandleApiError from '@/hooks/useHandleApiError'
-import type { ErrorResponse } from '@/constants/error-messages'
+import type { ErrorResponse } from '@/utils/errorHandler'
 
 interface UseManagementReturn<T> {
   items: T[]

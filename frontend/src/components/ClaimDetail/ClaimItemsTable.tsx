@@ -1,0 +1,213 @@
+import React from 'react'
+import { Table, Button, Typography, Divider, Card, Space } from 'antd'
+import {
+  ToolOutlined,
+  PlusOutlined,
+  CheckOutlined,
+  CloseOutlined,
+  FileSearchOutlined,
+} from '@ant-design/icons'
+import type { ColumnsType } from 'antd/es/table'
+import { CLAIM_ITEM_STATUS_LABELS, CLAIM_ITEM_TYPE_LABELS } from '@constants/common-constants'
+import type { ClaimItem, PartCategory, Part } from '@/types/index'
+
+const { Title, Text } = Typography
+
+interface ClaimItemsTableProps {
+  claimItems: ClaimItem[]
+  partCategories: PartCategory[]
+  parts: Part[]
+  loading: boolean
+  canAddItems: boolean
+  canApproveClaimItems?: boolean
+  canRejectClaimItems?: boolean
+  canViewPolicyCoverage?: boolean
+  onAddItem: () => void
+  onApproveItem?: (itemId: string) => void
+  onRejectItem?: (itemId: string) => void
+  onViewCoverage?: (categoryId: string, categoryName: string) => void
+}
+
+const ClaimItemsTable: React.FC<ClaimItemsTableProps> = ({
+  claimItems,
+  partCategories,
+  parts,
+  loading,
+  canAddItems,
+  canApproveClaimItems = false,
+  canRejectClaimItems = false,
+  canViewPolicyCoverage = false,
+  onAddItem,
+  onApproveItem,
+  onRejectItem,
+  onViewCoverage,
+}) => {
+  // Get part category name by ID
+  const getPartCategoryName = (categoryId: string): string => {
+    const category = partCategories.find((cat) => cat.id === categoryId)
+    return category?.category_name || `Category ${categoryId.slice(0, 8)}...`
+  }
+
+  // Get replacement part name by ID
+  const getReplacementPartName = (partId: string | undefined): string => {
+    if (!partId) return 'Not assigned'
+    const part = parts.find((p) => p.id === partId)
+    return part?.part_name || 'N/A (Part not found)'
+  }
+
+  // Claim items table columns
+  const claimItemColumns: ColumnsType<ClaimItem> = [
+    {
+      title: 'Faulty Part Serial',
+      dataIndex: 'faulty_part_serial',
+      key: 'faulty_part_serial',
+      width: '15%',
+      render: (serialNumber: string) => <Text>{serialNumber}</Text>,
+    },
+    {
+      title: 'Part Category',
+      dataIndex: 'part_category_id',
+      key: 'part_category_id',
+      width: '15%',
+      render: (_, record: ClaimItem) => <Text>{getPartCategoryName(record.part_category_id)}</Text>,
+    },
+    {
+      title: 'Replacement Part',
+      dataIndex: 'replacement_part_id',
+      key: 'replacement_part_id',
+      width: '12%',
+      render: (replacementPartId: string | undefined) => {
+        const partName = getReplacementPartName(replacementPartId)
+        const isNotAssigned = partName === 'Not assigned'
+        const isNotFound = partName.includes('not found')
+        return (
+          <Text
+            type={isNotAssigned || isNotFound ? 'secondary' : undefined}
+            italic={isNotAssigned || isNotFound}
+          >
+            {partName}
+          </Text>
+        )
+      },
+    },
+    {
+      title: 'Issue Description',
+      dataIndex: 'issue_description',
+      key: 'issue_description',
+      width: '25%',
+      render: (text: string) => (
+        <div
+          style={{
+            whiteSpace: 'normal',
+            wordBreak: 'break-word',
+          }}
+        >
+          {text}
+        </div>
+      ),
+    },
+    {
+      title: 'Type',
+      dataIndex: 'type',
+      key: 'type',
+      width: '10%',
+      render: (type: string) => (
+        <>{CLAIM_ITEM_TYPE_LABELS[type as keyof typeof CLAIM_ITEM_TYPE_LABELS] || type}</>
+      ),
+    },
+    {
+      title: 'Status',
+      dataIndex: 'status',
+      key: 'status',
+      width: '13%',
+      render: (status: string) => (
+        <>{CLAIM_ITEM_STATUS_LABELS[status as keyof typeof CLAIM_ITEM_STATUS_LABELS] || status}</>
+      ),
+    },
+  ]
+
+  // Add Actions column if user can approve/reject claim items or view coverage
+  if (canApproveClaimItems || canRejectClaimItems || canViewPolicyCoverage) {
+    claimItemColumns.push({
+      title: 'Actions',
+      key: 'actions',
+      width: '20%',
+      render: (_, record: ClaimItem) => {
+        const categoryName = getPartCategoryName(record.part_category_id)
+
+        return (
+          <Space size="small" direction="vertical">
+            {/* Approve/Reject actions - only for PENDING items */}
+            {record.status === 'PENDING' && (
+              <Space size="small">
+                {canApproveClaimItems && onApproveItem && (
+                  <Button
+                    type="primary"
+                    size="small"
+                    icon={<CheckOutlined />}
+                    onClick={() => onApproveItem(record.id)}
+                  >
+                    Approve
+                  </Button>
+                )}
+                {canRejectClaimItems && onRejectItem && (
+                  <Button
+                    type="default"
+                    danger
+                    size="small"
+                    icon={<CloseOutlined />}
+                    onClick={() => onRejectItem(record.id)}
+                  >
+                    Reject
+                  </Button>
+                )}
+              </Space>
+            )}
+
+            {/* View Coverage button - always available if permission allows */}
+            {canViewPolicyCoverage && onViewCoverage && (
+              <Button
+                type="default"
+                size="small"
+                icon={<FileSearchOutlined />}
+                onClick={() => onViewCoverage(record.part_category_id, categoryName)}
+                style={{ width: '100%' }}
+              >
+                View Coverage
+              </Button>
+            )}
+          </Space>
+        )
+      },
+    })
+  }
+
+  return (
+    <Card
+      title={
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <Title level={4}>
+            <ToolOutlined /> Claim Items
+          </Title>
+          {canAddItems && (
+            <Button type="primary" icon={<PlusOutlined />} onClick={onAddItem}>
+              Add Item
+            </Button>
+          )}
+        </div>
+      }
+      loading={loading}
+    >
+      <Table
+        dataSource={claimItems}
+        columns={claimItemColumns}
+        rowKey="id"
+        pagination={false}
+        locale={{ emptyText: 'No claim items found' }}
+      />
+      {claimItems.length > 0 && <Divider />}
+    </Card>
+  )
+}
+
+export default ClaimItemsTable

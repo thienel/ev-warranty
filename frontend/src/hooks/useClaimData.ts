@@ -1,0 +1,464 @@
+import { useState, useEffect, useCallback } from 'react'
+import { message } from 'antd'
+import {
+  claims as claimsApi,
+  claimItems as claimItemsApi,
+  claimAttachments as claimAttachmentsApi,
+  customersApi,
+  vehiclesApi,
+  vehicleModelsApi,
+  partCategoriesApi,
+  partsApi,
+  warrantyPoliciesApi,
+} from '@services/index'
+import { usersApi } from '@/services/usersApi'
+import useHandleApiError from '@/hooks/useHandleApiError'
+import type {
+  ClaimDetail,
+  ClaimItem,
+  ClaimAttachment,
+  ClaimHistory,
+  Customer,
+  VehicleDetail,
+  VehicleModel,
+  PartCategory,
+  Part,
+  WarrantyPolicy,
+  User,
+} from '@/types/index'
+
+interface UseClaimDataReturn {
+  // Data
+  claim: ClaimDetail | null
+  customer: Customer | null
+  vehicle: VehicleDetail | null
+  technician: User | null
+  claimItems: ClaimItem[]
+  attachments: ClaimAttachment[]
+  claimHistory: ClaimHistory[]
+  partCategories: PartCategory[]
+  parts: Part[]
+  users: User[]
+  warrantyPolicy: WarrantyPolicy | null
+
+  // Loading states
+  claimLoading: boolean
+  customerLoading: boolean
+  vehicleLoading: boolean
+  technicianLoading: boolean
+  itemsLoading: boolean
+  attachmentsLoading: boolean
+  historyLoading: boolean
+  usersLoading: boolean
+  warrantyPolicyLoading: boolean
+
+  // Refetch functions
+  refetchClaim: () => Promise<void>
+  refetchClaimItems: () => Promise<void>
+  refetchAttachments: () => Promise<void>
+  refetchHistory: () => Promise<void>
+}
+
+export const useClaimData = (claimId?: string): UseClaimDataReturn => {
+  const handleError = useHandleApiError()
+
+  // Data state
+  const [claim, setClaim] = useState<ClaimDetail | null>(null)
+  const [customer, setCustomer] = useState<Customer | null>(null)
+  const [vehicle, setVehicle] = useState<VehicleDetail | null>(null)
+  const [technician, setTechnician] = useState<User | null>(null)
+  const [claimItems, setClaimItems] = useState<ClaimItem[]>([])
+  const [attachments, setAttachments] = useState<ClaimAttachment[]>([])
+  const [claimHistory, setClaimHistory] = useState<ClaimHistory[]>([])
+  const [partCategories, setPartCategories] = useState<PartCategory[]>([])
+  const [parts, setParts] = useState<Part[]>([])
+  const [users, setUsers] = useState<User[]>([])
+  const [warrantyPolicy, setWarrantyPolicy] = useState<WarrantyPolicy | null>(null)
+
+  // Loading states
+  const [claimLoading, setClaimLoading] = useState(false)
+  const [customerLoading, setCustomerLoading] = useState(false)
+  const [vehicleLoading, setVehicleLoading] = useState(false)
+  const [technicianLoading, setTechnicianLoading] = useState(false)
+  const [itemsLoading, setItemsLoading] = useState(false)
+  const [attachmentsLoading, setAttachmentsLoading] = useState(false)
+  const [historyLoading, setHistoryLoading] = useState(false)
+  const [usersLoading, setUsersLoading] = useState(false)
+  const [warrantyPolicyLoading, setWarrantyPolicyLoading] = useState(false)
+
+  // Fetch claim details
+  const fetchClaim = useCallback(async () => {
+    if (!claimId) return
+
+    try {
+      setClaimLoading(true)
+      const response = await claimsApi.getById(claimId)
+      let claimData = response.data
+
+      if (claimData && typeof claimData === 'object' && 'data' in claimData) {
+        claimData = (claimData as { data: unknown }).data as ClaimDetail
+      }
+
+      setClaim(claimData as ClaimDetail)
+    } catch (error) {
+      handleError(error as Error)
+      message.error('Failed to load claim details')
+    } finally {
+      setClaimLoading(false)
+    }
+  }, [claimId, handleError])
+
+  // Fetch customer details
+  const fetchCustomer = useCallback(
+    async (customerId: string) => {
+      try {
+        setCustomerLoading(true)
+        const customerResponse = await customersApi.getById(customerId)
+        let customerData = customerResponse.data
+        if (customerData && typeof customerData === 'object' && 'data' in customerData) {
+          customerData = (customerData as { data: unknown }).data as Customer
+        }
+        setCustomer(customerData as Customer)
+      } catch (error) {
+        handleError(error as Error)
+      } finally {
+        setCustomerLoading(false)
+      }
+    },
+    [handleError],
+  )
+
+  // Fetch vehicle details with model info
+  const fetchVehicle = useCallback(
+    async (vehicleId: string) => {
+      try {
+        setVehicleLoading(true)
+        const vehicleResponse = await vehiclesApi.getById(vehicleId)
+        let vehicleData = vehicleResponse.data
+        if (vehicleData && typeof vehicleData === 'object' && 'data' in vehicleData) {
+          vehicleData = (vehicleData as { data: unknown }).data as VehicleDetail
+        }
+
+        const vehicleInfo = vehicleData as VehicleDetail
+
+        // Fetch vehicle model if model_id exists
+        if (vehicleInfo.model_id) {
+          try {
+            const modelResponse = await vehicleModelsApi.getById(vehicleInfo.model_id)
+            let modelData: unknown = modelResponse.data
+            if (modelData && typeof modelData === 'object' && 'data' in modelData) {
+              modelData = (modelData as { data: VehicleModel }).data
+            }
+            vehicleInfo.model = modelData as VehicleModel
+          } catch (error) {
+            console.error('Failed to fetch vehicle model:', error)
+          }
+        }
+
+        setVehicle(vehicleInfo)
+      } catch (error) {
+        handleError(error as Error)
+      } finally {
+        setVehicleLoading(false)
+      }
+    },
+    [handleError],
+  )
+
+  // Fetch technician details
+  const fetchTechnician = useCallback(
+    async (technicianId: string) => {
+      try {
+        setTechnicianLoading(true)
+        const response = await usersApi.getById(technicianId)
+        let userData = response.data
+        if (userData && typeof userData === 'object' && 'data' in userData) {
+          userData = (userData as { data: unknown }).data as User
+        }
+        setTechnician(userData as User)
+      } catch (error) {
+        handleError(error as Error)
+      } finally {
+        setTechnicianLoading(false)
+      }
+    },
+    [handleError],
+  )
+
+  // Fetch parts for claim items
+  const fetchPartsForClaimItems = useCallback(
+    async (claimItems: ClaimItem[]) => {
+      if (claimItems.length === 0) return
+
+      try {
+        // Get unique part IDs from claim items
+        const uniquePartIds = Array.from(new Set(claimItems.map((item) => item.faulty_part_serial)))
+
+        // Fetch each part individually
+        const partPromises = uniquePartIds.map((partId) => partsApi.getById(partId))
+        const partResponses = await Promise.allSettled(partPromises)
+
+        const fetchedParts: Part[] = []
+        let hasFailures = false
+
+        partResponses.forEach((response, index) => {
+          if (response.status === 'fulfilled') {
+            let partData = response.value.data
+            if (partData && typeof partData === 'object' && 'data' in partData) {
+              partData = (partData as { data: unknown }).data as Part
+            }
+            fetchedParts.push(partData as Part)
+          } else {
+            console.warn(`Part ${uniquePartIds[index]} not found, it may have been deleted`)
+            hasFailures = true
+          }
+        })
+
+        // If we couldn't fetch some parts individually, fall back to fetching all parts
+        if (hasFailures && fetchedParts.length < uniquePartIds.length) {
+          console.warn('Some parts not found individually, falling back to fetch all parts')
+          try {
+            const response = await partsApi.getAll()
+            let partsData = response.data
+            if (partsData && typeof partsData === 'object' && 'data' in partsData) {
+              partsData = (partsData as { data: unknown }).data as Part[]
+            }
+            setParts(partsData as Part[])
+            return
+          } catch (fallbackError) {
+            console.error('Failed to fetch all parts as fallback:', fallbackError)
+          }
+        }
+
+        setParts(fetchedParts)
+      } catch (error) {
+        handleError(error as Error)
+        setParts([])
+      }
+    },
+    [handleError],
+  )
+
+  // Fetch claim items
+  const fetchClaimItems = useCallback(async () => {
+    if (!claimId) return
+
+    try {
+      setItemsLoading(true)
+      const response = await claimItemsApi.getByClaimId(claimId)
+      const itemsData: unknown = response.data
+
+      // Backend returns: { data: ClaimItem[] } not { data: { items: ClaimItem[] } }
+      let items: ClaimItem[] = []
+      if (itemsData && typeof itemsData === 'object' && 'data' in itemsData) {
+        const nestedData = (itemsData as { data: unknown }).data
+        if (Array.isArray(nestedData)) {
+          items = nestedData
+          setClaimItems(nestedData)
+        } else {
+          setClaimItems([])
+        }
+      } else if (Array.isArray(itemsData)) {
+        items = itemsData
+        setClaimItems(itemsData)
+      } else {
+        setClaimItems([])
+      }
+
+      // Fetch parts for the claim items
+      if (items.length > 0) {
+        await fetchPartsForClaimItems(items)
+      }
+    } catch (error) {
+      handleError(error as Error)
+      setClaimItems([])
+    } finally {
+      setItemsLoading(false)
+    }
+  }, [claimId, handleError, fetchPartsForClaimItems])
+
+  // Fetch claim attachments
+  const fetchAttachments = useCallback(async () => {
+    if (!claimId) return
+
+    try {
+      setAttachmentsLoading(true)
+      const response = await claimAttachmentsApi.getByClaimId(claimId)
+      const attachmentsData: unknown = response.data
+
+      // Backend returns: { data: ClaimAttachment[] } not { data: { attachments: ClaimAttachment[] } }
+      if (attachmentsData && typeof attachmentsData === 'object' && 'data' in attachmentsData) {
+        const nestedData = (attachmentsData as { data: unknown }).data
+        if (Array.isArray(nestedData)) {
+          setAttachments(nestedData)
+        } else {
+          setAttachments([])
+        }
+      } else if (Array.isArray(attachmentsData)) {
+        setAttachments(attachmentsData)
+      } else {
+        setAttachments([])
+      }
+    } catch (error) {
+      handleError(error as Error)
+      setAttachments([])
+    } finally {
+      setAttachmentsLoading(false)
+    }
+  }, [claimId, handleError])
+
+  // Fetch claim history
+  const fetchHistory = useCallback(async () => {
+    if (!claimId) return
+
+    try {
+      setHistoryLoading(true)
+      const response = await claimsApi.getHistory(claimId)
+      const historyData: unknown = response.data
+
+      // Backend returns: { data: ClaimHistory[] }
+      if (historyData && typeof historyData === 'object' && 'data' in historyData) {
+        const nestedData = (historyData as { data: unknown }).data
+        if (Array.isArray(nestedData)) {
+          setClaimHistory(nestedData)
+        } else {
+          setClaimHistory([])
+        }
+      } else if (Array.isArray(historyData)) {
+        setClaimHistory(historyData)
+      } else {
+        setClaimHistory([])
+      }
+    } catch (error) {
+      handleError(error as Error)
+      setClaimHistory([])
+    } finally {
+      setHistoryLoading(false)
+    }
+  }, [claimId, handleError])
+
+  // Fetch part categories
+  const fetchPartCategories = useCallback(async () => {
+    try {
+      const response = await partCategoriesApi.getAll()
+      let categoriesData = response.data
+      if (categoriesData && typeof categoriesData === 'object' && 'data' in categoriesData) {
+        categoriesData = (categoriesData as { data: unknown }).data as PartCategory[]
+      }
+      setPartCategories(categoriesData as PartCategory[])
+    } catch (error) {
+      handleError(error as Error)
+      setPartCategories([])
+    }
+  }, [handleError])
+
+  // Fetch all users for displaying user names in history
+  const fetchUsers = useCallback(async () => {
+    try {
+      setUsersLoading(true)
+      const response = await usersApi.getAll()
+      let usersData = response.data
+      if (usersData && typeof usersData === 'object' && 'data' in usersData) {
+        usersData = (usersData as { data: unknown }).data as User[]
+      }
+      setUsers(usersData as User[])
+    } catch (error) {
+      handleError(error as Error)
+      setUsers([])
+    } finally {
+      setUsersLoading(false)
+    }
+  }, [handleError])
+
+  // Fetch warranty policy by vehicle model's policy ID
+  const fetchWarrantyPolicy = useCallback(
+    async (policyId: string) => {
+      try {
+        setWarrantyPolicyLoading(true)
+        const response = await warrantyPoliciesApi.getById(policyId)
+        let policyData = response.data
+        if (policyData && typeof policyData === 'object' && 'data' in policyData) {
+          policyData = (policyData as { data: unknown }).data as WarrantyPolicy
+        }
+        setWarrantyPolicy(policyData as WarrantyPolicy)
+      } catch (error) {
+        handleError(error as Error)
+        setWarrantyPolicy(null)
+      } finally {
+        setWarrantyPolicyLoading(false)
+      }
+    },
+    [handleError],
+  )
+
+  // Initial data fetch
+  useEffect(() => {
+    if (claimId) {
+      fetchClaim()
+      fetchClaimItems()
+      fetchAttachments()
+      fetchHistory()
+    }
+    // Fetch part categories and users for displaying names
+    fetchPartCategories()
+    fetchUsers()
+  }, [claimId, fetchClaim, fetchClaimItems, fetchAttachments, fetchHistory, fetchPartCategories, fetchUsers])
+
+  // Fetch customer and vehicle when claim is loaded
+  useEffect(() => {
+    if (claim) {
+      if (claim.customer_id) {
+        fetchCustomer(claim.customer_id)
+      }
+      if (claim.vehicle_id) {
+        fetchVehicle(claim.vehicle_id)
+      }
+      if (claim.technician_id) {
+        fetchTechnician(claim.technician_id)
+      }
+    }
+  }, [claim, fetchCustomer, fetchVehicle, fetchTechnician])
+
+  // Fetch warranty policy when vehicle is loaded and has policy_id
+  useEffect(() => {
+    if (vehicle?.model?.policy_id) {
+      fetchWarrantyPolicy(vehicle.model.policy_id)
+    } else {
+      setWarrantyPolicy(null)
+    }
+  }, [vehicle, fetchWarrantyPolicy])
+
+  return {
+    // Data
+    claim,
+    customer,
+    vehicle,
+    technician,
+    claimItems,
+    attachments,
+    claimHistory,
+    partCategories,
+    parts,
+    users,
+    warrantyPolicy,
+
+    // Loading states
+    claimLoading,
+    customerLoading,
+    vehicleLoading,
+    technicianLoading,
+    itemsLoading,
+    attachmentsLoading,
+    historyLoading,
+    usersLoading,
+    warrantyPolicyLoading,
+
+    // Refetch functions
+    refetchClaim: fetchClaim,
+    refetchClaimItems: fetchClaimItems,
+    refetchAttachments: fetchAttachments,
+    refetchHistory: fetchHistory,
+  }
+}
+
+export default useClaimData

@@ -3,7 +3,7 @@ import { claimsApi } from '@/services/claimsApi'
 import { customersApi } from '@/services/customersApi'
 import useDelay from '@/hooks/useDelay'
 import useHandleApiError from '@/hooks/useHandleApiError'
-import type { ErrorResponse } from '@/constants/error-messages'
+import type { ErrorResponse } from '@/utils/errorHandler'
 import type { Claim, PaginationParams, Customer } from '@/types'
 import { allowRoles } from '@/utils/navigationHelpers'
 import { USER_ROLES } from '@/constants/common-constants'
@@ -32,9 +32,8 @@ interface UseClaimsManagementReturn {
   handleReset: () => Promise<void>
   handleSubmit: (claimId: string) => Promise<void>
   handleCancel: (claimId: string) => Promise<void>
-  handleComplete: (claimId: string) => Promise<void>
+  handleDoneReview: (claimId: string) => Promise<void>
   handleReview: (claimId: string) => Promise<void>
-  handleRequestInfo: (claimId: string) => Promise<void>
   allowCreate: boolean
 }
 
@@ -141,10 +140,10 @@ const useClaimsManagement = (): UseClaimsManagementReturn => {
     }
   }
 
-  const handleComplete = async (claimId: string) => {
+  const handleDoneReview = async (claimId: string) => {
     try {
       setLoading(true)
-      await claimsApi.complete(claimId)
+      await claimsApi.doneReview(claimId)
       await fetchClaims()
     } catch (error) {
       handleError(error as ErrorResponse)
@@ -157,18 +156,6 @@ const useClaimsManagement = (): UseClaimsManagementReturn => {
     try {
       setLoading(true)
       await claimsApi.review(claimId)
-      await fetchClaims()
-    } catch (error) {
-      handleError(error as ErrorResponse)
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  const handleRequestInfo = async (claimId: string) => {
-    try {
-      setLoading(true)
-      await claimsApi.requestInfo(claimId)
       await fetchClaims()
     } catch (error) {
       handleError(error as ErrorResponse)
@@ -205,9 +192,8 @@ const useClaimsManagement = (): UseClaimsManagementReturn => {
     handleReset,
     handleSubmit,
     handleCancel,
-    handleComplete,
+    handleDoneReview,
     handleReview,
-    handleRequestInfo,
     allowCreate,
   }
 }

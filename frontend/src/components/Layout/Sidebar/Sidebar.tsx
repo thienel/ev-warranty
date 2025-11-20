@@ -10,7 +10,6 @@ import {
   InboxOutlined,
   AppstoreOutlined,
   ToolOutlined,
-  OrderedListOutlined,
   TeamOutlined,
   HomeOutlined,
 } from '@ant-design/icons'
@@ -136,6 +135,24 @@ const MENU_ITEMS: Record<UserRole, MenuItemData[]> = {
       label: 'Offices',
       path: '/admin/offices',
     },
+    {
+      key: 'policies',
+      icon: <SafetyOutlined />,
+      label: 'Policies',
+      path: '/admin/policies',
+    },
+    {
+      key: 'models',
+      icon: <AppstoreOutlined />,
+      label: 'Models',
+      path: '/admin/vehicle-models',
+    },
+    {
+      key: 'part-categories',
+      icon: <ToolOutlined />,
+      label: 'Part Categories',
+      path: '/admin/part-categories',
+    },
   ],
   [USER_ROLES.EVM_STAFF]: [
     {
@@ -143,12 +160,6 @@ const MENU_ITEMS: Record<UserRole, MenuItemData[]> = {
       icon: <FileTextOutlined />,
       label: 'Claims',
       path: '/evm-staff/claims',
-    },
-    {
-      key: 'policies',
-      icon: <SafetyOutlined />,
-      label: 'Policies',
-      path: '/evm-staff/policies',
     },
     {
       key: 'vehicles',
@@ -162,18 +173,6 @@ const MENU_ITEMS: Record<UserRole, MenuItemData[]> = {
       label: 'Inventories',
       path: '/evm-staff/inventories',
     },
-    {
-      key: 'models',
-      icon: <AppstoreOutlined />,
-      label: 'Models',
-      path: '/evm-staff/vehicle-models',
-    },
-    {
-      key: 'part-categories',
-      icon: <ToolOutlined />,
-      label: 'Part Categories',
-      path: '/evm-staff/part-categories',
-    },
   ],
   [USER_ROLES.SC_STAFF]: [
     {
@@ -183,12 +182,6 @@ const MENU_ITEMS: Record<UserRole, MenuItemData[]> = {
       path: '/sc-staff/claims',
     },
     {
-      key: 'work-orders',
-      icon: <OrderedListOutlined />,
-      label: 'Work Orders',
-      path: '/sc-staff/work-orders',
-    },
-    {
       key: 'customers',
       icon: <TeamOutlined />,
       label: 'Customers',
@@ -196,12 +189,6 @@ const MENU_ITEMS: Record<UserRole, MenuItemData[]> = {
     },
   ],
   [USER_ROLES.SC_TECHNICIAN]: [
-    {
-      key: 'work-orders',
-      icon: <OrderedListOutlined />,
-      label: 'Work Orders',
-      path: '/sc-technician/work-orders',
-    },
     {
       key: 'claims',
       icon: <FileTextOutlined />,

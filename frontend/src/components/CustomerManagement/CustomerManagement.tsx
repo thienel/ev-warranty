@@ -47,7 +47,13 @@ const CustomerManagement: React.FC = () => {
         loading={loading}
         setLoading={setLoading}
         searchText={searchText}
-        data={customers as (Record<string, unknown> & { id: string | number })[]}
+        data={
+          customers.sort((a, b) => {
+            const dateA = new Date(a.updated_at as string)
+            const dateB = new Date(b.updated_at as string)
+            return dateB.getTime() - dateA.getTime()
+          }) as unknown as (Record<string, unknown> & { id: string | number })[]
+        }
         onOpenModal={handleOpenModal}
         onRefresh={handleReset}
         generateColumns={GenerateColumns}

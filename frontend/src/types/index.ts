@@ -33,7 +33,7 @@ export interface User {
   name: string
   role: UserRole
   office_id: string
-  is_active?: boolean
+  is_active: boolean
 }
 
 export interface UserFormData {
@@ -132,6 +132,8 @@ export interface Claim {
   description: string
   status: ClaimStatus
   total_cost: number
+  kilometers: number
+  technician_id: string
   approved_by?: string
   created_at?: string
   updated_at?: string
@@ -157,6 +159,8 @@ export interface CreateClaimRequest {
   customer_id: string
   vehicle_id: string
   description: string
+  kilometers: number
+  technician_id: string
 }
 
 export interface UpdateClaimRequest {
@@ -174,8 +178,8 @@ export interface ClaimListResponse {
 export interface ClaimItem {
   id: string
   claim_id: string
-  part_category_id: number
-  faulty_part_id: string
+  part_category_id: string
+  faulty_part_serial: string
   replacement_part_id?: string
   issue_description: string
   type: ClaimItemType
@@ -186,12 +190,10 @@ export interface ClaimItem {
 }
 
 export interface CreateClaimItemRequest {
-  part_category_id: number
-  faulty_part_id: string
-  replacement_part_id?: string
+  part_category_id: string
+  faulty_part_serial: string
   issue_description: string
   type: ClaimItemType
-  cost: number
 }
 
 export interface ClaimItemListResponse {
@@ -459,6 +461,7 @@ export interface WarrantyPolicy {
   warranty_duration_months: number
   kilometer_limit?: number
   terms_and_conditions: string
+  vehicle_model_id?: string
   created_at: string
   updated_at?: string
   vehicle_models?: Array<{
@@ -474,6 +477,7 @@ export interface WarrantyPolicyFormData {
   warranty_duration_months: number
   kilometer_limit?: number
   terms_and_conditions: string
+  vehicle_model_id?: string
 }
 
 export interface CreateWarrantyPolicyRequest {
@@ -481,6 +485,7 @@ export interface CreateWarrantyPolicyRequest {
   warranty_duration_months: number
   kilometer_limit?: number
   terms_and_conditions: string
+  vehicle_model_id?: string
 }
 
 export interface UpdateWarrantyPolicyRequest {
@@ -488,6 +493,7 @@ export interface UpdateWarrantyPolicyRequest {
   warranty_duration_months: number
   kilometer_limit?: number
   terms_and_conditions: string
+  vehicle_model_id?: string
 }
 
 export interface PolicyCoveragePart {
@@ -518,6 +524,7 @@ export interface UpdatePolicyCoveragePartRequest {
 
 export interface WarrantyPolicyModalProps extends BaseModalProps {
   policy?: WarrantyPolicy | null
+  vehicleModels: VehicleModel[]
 }
 
 export interface PolicyCoveragePartModalProps extends BaseModalProps {

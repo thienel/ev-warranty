@@ -14,21 +14,21 @@ import { useTokenRefresh } from '@/hooks/useTokenRefresh'
 import EVMStaffClaims from '@pages/evm-staff/Claims'
 import SCStaffClaims from '@pages/sc-staff/Claims'
 import SCTechnicianClaims from '@pages/sc-technician/Claims'
-import ClaimDetail from '@pages/claims/ClaimDetail'
 import ClaimCreate from '@pages/sc-staff/ClaimCreate'
 
 // New management pages
 import Customers from '@pages/sc-staff/Customers'
 import Vehicles from '@pages/evm-staff/Vehicles'
-import VehicleModels from '@pages/evm-staff/VehicleModels'
-import PartCategories from '@/pages/evm-staff/PartCategories'
+import VehicleModels from '@/pages/admin/VehicleModels'
+import PartCategories from '@/pages/admin/PartCategories'
 import Inventories from '@pages/evm-staff/Inventories'
-import Policies from '@pages/evm-staff/Policies'
-import PolicyDetail from '@pages/evm-staff/PolicyDetail'
+import Policies from '@/pages/admin/Policies'
+import PolicyDetail from '@/pages/admin/PolicyDetail'
 
 import type { RootState } from '@redux/store'
 import { App as AntdApp, ConfigProvider } from 'antd'
 import { antdThemeConfig } from './styles/antdThemeConfig'
+import ClaimDetailRefactored from './pages/claims/ClaimDetail'
 
 export const ProtectedRoute: React.FC = () => {
   const authState = useSelector((state: RootState) => state.auth)
@@ -89,6 +89,21 @@ const App: React.FC = () => {
               path: 'offices',
               element: <Offices />,
             },
+            {
+              path: 'vehicle-models',
+              element: <VehicleModels />,
+            },
+            {
+              path: 'part-categories',
+              element: <PartCategories />,
+            },
+            {
+              path: 'policies',
+              children: [
+                { path: '', element: <Policies /> },
+                { path: ':id', element: <PolicyDetail /> },
+              ],
+            },
           ],
         },
         {
@@ -99,7 +114,7 @@ const App: React.FC = () => {
               path: 'claims',
               children: [
                 { path: '', element: <EVMStaffClaims /> },
-                { path: ':id', element: <ClaimDetail /> },
+                { path: ':id', element: <ClaimDetailRefactored /> },
               ],
             },
             {
@@ -107,23 +122,8 @@ const App: React.FC = () => {
               element: <Vehicles />,
             },
             {
-              path: 'vehicle-models',
-              element: <VehicleModels />,
-            },
-            {
-              path: 'part-categories',
-              element: <PartCategories />,
-            },
-            {
               path: 'inventories',
               element: <Inventories />,
-            },
-            {
-              path: 'policies',
-              children: [
-                { path: '', element: <Policies /> },
-                { path: ':id', element: <PolicyDetail /> },
-              ],
             },
           ],
         },
@@ -136,7 +136,7 @@ const App: React.FC = () => {
               children: [
                 { path: '', element: <SCStaffClaims /> },
                 { path: 'create', element: <ClaimCreate /> },
-                { path: ':id', element: <ClaimDetail /> },
+                { path: ':id', element: <ClaimDetailRefactored /> },
               ],
             },
             {
@@ -153,7 +153,7 @@ const App: React.FC = () => {
               path: 'claims',
               children: [
                 { path: '', element: <SCTechnicianClaims /> },
-                { path: ':id', element: <ClaimDetail /> },
+                { path: ':id', element: <ClaimDetailRefactored /> },
               ],
             },
           ],

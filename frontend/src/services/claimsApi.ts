@@ -51,16 +51,12 @@ export const claimsApi = {
     return api.post(API_ENDPOINTS.CLAIM_ACTIONS.CANCEL(id))
   },
 
-  complete: (id: string): Promise<void> => {
-    return api.post(API_ENDPOINTS.CLAIM_ACTIONS.COMPLETE(id))
+  doneReview: (id: string): Promise<void> => {
+    return api.post(API_ENDPOINTS.CLAIM_ACTIONS.DONE_REVIEW(id))
   },
 
   review: (id: string): Promise<void> => {
     return api.post(API_ENDPOINTS.CLAIM_ACTIONS.REVIEW(id))
-  },
-
-  requestInfo: (id: string): Promise<void> => {
-    return api.post(API_ENDPOINTS.CLAIM_ACTIONS.REQUEST_INFO(id))
   },
 
   getHistory: (id: string): Promise<ApiSuccessResponse<ClaimHistory[]>> => {

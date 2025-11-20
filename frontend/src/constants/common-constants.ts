@@ -80,13 +80,13 @@ export const API_ENDPOINTS = {
   PARTS: '/api/v1/parts',
   WARRANTY_POLICIES: '/api/v1/warranty-policies',
   POLICY_COVERAGE_PARTS: '/api/v1/policy-coverage-parts',
+  AVAILABLE_TECHNICIANS: '/api/v1/users/technicians/available',
 
   CLAIM_ACTIONS: {
     SUBMIT: (id: string) => `/api/v1/claims/${id}/submit`,
     CANCEL: (id: string) => `/api/v1/claims/${id}/cancel`,
-    COMPLETE: (id: string) => `/api/v1/claims/${id}/complete`,
+    DONE_REVIEW: (id: string) => `/api/v1/claims/${id}/done-review`,
     REVIEW: (id: string) => `/api/v1/claims/${id}/review`,
-    REQUEST_INFO: (id: string) => `/api/v1/claims/${id}/request-information`,
     HISTORY: (id: string) => `/api/v1/claims/${id}/history`,
     ITEMS: (id: string) => `/api/v1/claims/${id}/items`,
     ATTACHMENTS: (id: string) => `/api/v1/claims/${id}/attachments`,
@@ -103,7 +103,6 @@ export const CLAIM_STATUSES = {
   DRAFT: 'DRAFT',
   SUBMITTED: 'SUBMITTED',
   REVIEWING: 'REVIEWING',
-  REQUEST_INFO: 'REQUEST_INFO',
   APPROVED: 'APPROVED',
   PARTIALLY_APPROVED: 'PARTIALLY_APPROVED',
   REJECTED: 'REJECTED',
@@ -117,7 +116,6 @@ export const CLAIM_STATUS_LABELS: Record<ClaimStatus, string> = {
   [CLAIM_STATUSES.DRAFT]: 'Draft',
   [CLAIM_STATUSES.SUBMITTED]: 'Submitted',
   [CLAIM_STATUSES.REVIEWING]: 'Reviewing',
-  [CLAIM_STATUSES.REQUEST_INFO]: 'Request Info',
   [CLAIM_STATUSES.APPROVED]: 'Approved',
   [CLAIM_STATUSES.PARTIALLY_APPROVED]: 'Partially Approved',
   [CLAIM_STATUSES.REJECTED]: 'Rejected',
@@ -128,10 +126,14 @@ export const CLAIM_STATUS_LABELS: Record<ClaimStatus, string> = {
 export const CLAIM_ITEM_TYPES = {
   REPAIR: 'REPAIR',
   REPLACEMENT: 'REPLACEMENT',
-  INSPECTION: 'INSPECTION',
 } as const
 
 export type ClaimItemType = (typeof CLAIM_ITEM_TYPES)[keyof typeof CLAIM_ITEM_TYPES]
+
+export const CLAIM_ITEM_TYPE_LABELS: Record<ClaimItemType, string> = {
+  [CLAIM_ITEM_TYPES.REPAIR]: 'Repair',
+  [CLAIM_ITEM_TYPES.REPLACEMENT]: 'Replacement',
+}
 
 export const CLAIM_ITEM_STATUSES = {
   PENDING: 'PENDING',
@@ -192,3 +194,17 @@ export const ATTACHMENT_TYPE_LABELS: Record<AttachmentType, string> = {
   [ATTACHMENTS_TYPES.VIDEO]: 'Video',
   [ATTACHMENTS_TYPES.IMAGE]: 'Image',
 }
+
+export const CLAIM_STATUS_FILTERS = [
+  { text: CLAIM_STATUS_LABELS[CLAIM_STATUSES.DRAFT], value: CLAIM_STATUSES.DRAFT },
+  { text: CLAIM_STATUS_LABELS[CLAIM_STATUSES.SUBMITTED], value: CLAIM_STATUSES.SUBMITTED },
+  { text: CLAIM_STATUS_LABELS[CLAIM_STATUSES.REVIEWING], value: CLAIM_STATUSES.REVIEWING },
+  { text: CLAIM_STATUS_LABELS[CLAIM_STATUSES.APPROVED], value: CLAIM_STATUSES.APPROVED },
+  {
+    text: CLAIM_STATUS_LABELS[CLAIM_STATUSES.PARTIALLY_APPROVED],
+    value: CLAIM_STATUSES.PARTIALLY_APPROVED,
+  },
+  { text: CLAIM_STATUS_LABELS[CLAIM_STATUSES.REJECTED], value: CLAIM_STATUSES.REJECTED },
+  { text: CLAIM_STATUS_LABELS[CLAIM_STATUSES.CANCELLED], value: CLAIM_STATUSES.CANCELLED },
+  { text: CLAIM_STATUS_LABELS[CLAIM_STATUSES.COMPLETED], value: CLAIM_STATUSES.COMPLETED },
+]

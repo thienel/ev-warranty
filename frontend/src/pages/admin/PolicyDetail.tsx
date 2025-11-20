@@ -217,7 +217,7 @@ const PolicyDetail: React.FC = () => {
         <Card>
           <div style={{ textAlign: 'center', padding: '50px' }}>
             <Title level={4}>Policy not found</Title>
-            <Button type="primary" onClick={() => navigate('/evm-staff/policies')}>
+            <Button type="primary" onClick={() => navigate('/admin/policies')}>
               Back to Policies
             </Button>
           </div>
@@ -229,7 +229,7 @@ const PolicyDetail: React.FC = () => {
   return (
     <AppLayout title="Policy Details">
       <div style={{ marginBottom: 16 }}>
-        <Button icon={<ArrowLeftOutlined />} onClick={() => navigate('/evm-staff/policies')}>
+        <Button icon={<ArrowLeftOutlined />} onClick={() => navigate('/admin/policies')}>
           Back to Policies
         </Button>
       </div>
