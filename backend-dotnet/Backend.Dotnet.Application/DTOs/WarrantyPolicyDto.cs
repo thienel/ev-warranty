@@ -26,6 +26,9 @@ namespace Backend.Dotnet.Application.DTOs
             [Required(ErrorMessage = "Terms and conditions are required")]
             [StringLength(5000, MinimumLength = 1, ErrorMessage = "Terms must be between 1 and 5000 characters")]
             public string TermsAndConditions { get; set; } = string.Empty;
+
+            [JsonPropertyName("vehicle_model_id")]
+            public Guid? VehicleModelId { get; set; }
         }
 
         public class UpdateWarrantyPolicyRequest
@@ -48,6 +51,9 @@ namespace Backend.Dotnet.Application.DTOs
             [Required(ErrorMessage = "Terms and conditions are required")]
             [StringLength(5000, MinimumLength = 1, ErrorMessage = "Terms must be between 1 and 5000 characters")]
             public string TermsAndConditions { get; set; } = string.Empty;
+
+            [JsonPropertyName("vehicle_model_id")]
+            public Guid? VehicleModelId { get; set; }
         }
 
         public class ChangeStatusRequest

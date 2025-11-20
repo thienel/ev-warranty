@@ -31,9 +31,47 @@ namespace Backend.Dotnet.Application.Services
                     };
                 }
 
+                // Validate vehicle model if provided
+                if (request.VehicleModelId.HasValue)
+                {
+                    var vehicleModel = await _unitOfWork.VehicleModels.GetByIdAsync(request.VehicleModelId.Value);
+                    if (vehicleModel == null)
+                    {
+                        return new BaseResponseDto<WarrantyPolicyResponse>
+                        {
+                            IsSuccess = false,
+                            Message = $"Vehicle model with ID '{request.VehicleModelId.Value}' not found",
+                            ErrorCode = "VEHICLE_MODEL_NOT_FOUND"
+                        };
+                    }
+
+                    // Check if vehicle model already has a policy assigned
+                    if (vehicleModel.PolicyId.HasValue)
+                    {
+                        return new BaseResponseDto<WarrantyPolicyResponse>
+                        {
+                            IsSuccess = false,
+                            Message = "Vehicle model already has a warranty policy assigned",
+                            ErrorCode = "VEHICLE_MODEL_ALREADY_HAS_POLICY"
+                        };
+                    }
+                }
+
                 var policy = request.ToEntity();
                 await _unitOfWork.WarrantyPolicies.AddAsync(policy);
                 await _unitOfWork.SaveChangesAsync();
+
+                // Assign policy to vehicle model if provided
+                if (request.VehicleModelId.HasValue)
+                {
+                    var vehicleModel = await _unitOfWork.VehicleModels.GetByIdAsync(request.VehicleModelId.Value);
+                    if (vehicleModel != null)
+                    {
+                        vehicleModel.AssignPolicy(policy.Id);
+                        _unitOfWork.VehicleModels.Update(vehicleModel);
+                        await _unitOfWork.SaveChangesAsync();
+                    }
+                }
 
                 return new BaseResponseDto<WarrantyPolicyResponse>
                 {
@@ -225,7 +263,7 @@ namespace Backend.Dotnet.Application.Services
         {
             try
             {
-                var policy = await _unitOfWork.WarrantyPolicies.GetByIdAsync(id);
+                var policy = await _unitOfWork.WarrantyPolicies.GetWithDetailsAsync(id);
                 if (policy == null)
                 {
                     return new BaseResponseDto<WarrantyPolicyResponse>
@@ -245,6 +283,54 @@ namespace Backend.Dotnet.Application.Services
                         Message = "Policy name already exists",
                         ErrorCode = "DUPLICATE_POLICY_NAME"
                     };
+                }
+
+                // Handle vehicle model assignment changes
+                var currentModelId = policy.AssignedModel?.Id;
+                var newModelId = request.VehicleModelId;
+
+                // If vehicle model is changing
+                if (currentModelId != newModelId)
+                {
+                    // Remove old assignment if exists
+                    if (currentModelId.HasValue)
+                    {
+                        var oldModel = await _unitOfWork.VehicleModels.GetByIdAsync(currentModelId.Value);
+                        if (oldModel != null)
+                        {
+                            oldModel.RemovePolicy();
+                            _unitOfWork.VehicleModels.Update(oldModel);
+                        }
+                    }
+
+                    // Add new assignment if provided
+                    if (newModelId.HasValue)
+                    {
+                        var newModel = await _unitOfWork.VehicleModels.GetByIdAsync(newModelId.Value);
+                        if (newModel == null)
+                        {
+                            return new BaseResponseDto<WarrantyPolicyResponse>
+                            {
+                                IsSuccess = false,
+                                Message = $"Vehicle model with ID '{newModelId.Value}' not found",
+                                ErrorCode = "VEHICLE_MODEL_NOT_FOUND"
+                            };
+                        }
+
+                        // Check if new vehicle model already has a different policy assigned
+                        if (newModel.PolicyId.HasValue && newModel.PolicyId.Value != id)
+                        {
+                            return new BaseResponseDto<WarrantyPolicyResponse>
+                            {
+                                IsSuccess = false,
+                                Message = "Vehicle model already has a different warranty policy assigned",
+                                ErrorCode = "VEHICLE_MODEL_ALREADY_HAS_POLICY"
+                            };
+                        }
+
+                        newModel.AssignPolicy(id);
+                        _unitOfWork.VehicleModels.Update(newModel);
+                    }
                 }
 
                 request.ApplyToEntity(policy);

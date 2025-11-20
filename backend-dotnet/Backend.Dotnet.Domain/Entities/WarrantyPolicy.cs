@@ -100,6 +100,27 @@ namespace Backend.Dotnet.Domain.Entities
             SetUpdatedAt();
         }
 
+        // Vehicle Model Assignment
+        public void AssignToVehicleModel(Guid vehicleModelId)
+        {
+            if (vehicleModelId == Guid.Empty)
+                throw new BusinessRuleViolationException("Vehicle model ID cannot be empty");
+
+            if (AssignedModel != null)
+                throw new BusinessRuleViolationException("This policy is already assigned to a vehicle model");
+
+            // Note: The actual assignment will be handled by the repository/service layer
+            SetUpdatedAt();
+        }
+
+        public void RemoveVehicleModelAssignment()
+        {
+            if (AssignedModel == null)
+                throw new BusinessRuleViolationException("This policy is not assigned to any vehicle model");
+
+            SetUpdatedAt();
+        }
+
         // Coverage Parts
         public void AddCoveragePart(PolicyCoveragePart coveragePart)
         {
