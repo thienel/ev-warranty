@@ -17,23 +17,23 @@ export function getErrorMessage(
   error: ErrorResponse,
   defaultMessage = 'An unexpected error occurred. Please try again.',
 ): string {
-  // First priority: message field from API response
-  if (error?.response?.data?.message) {
-    return error.response.data.message
-  }
+  // // First priority: message field from API response
+  // if (error?.response?.data?.message) {
+  //   return error.response.data.message
+  // }
 
-  // Second priority: error field from API response (fallback)
-  if (error?.response?.data?.error) {
-    return error.response.data.error
-  }
+  // // Second priority: error field from API response (fallback)
+  // if (error?.response?.data?.error) {
+  //   return error.response.data.error
+  // }
 
-  // Third priority: error message from the error object
-  if (error?.message) {
-    return error.message
-  }
+  // // Third priority: error message from the error object
+  // if (error?.message) {
+  //   return error.message
+  // }
 
   // Default fallback message
-  return defaultMessage
+  return error.response?.data?.message || defaultMessage
 }
 
 /**
