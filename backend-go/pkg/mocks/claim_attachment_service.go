@@ -28,9 +28,9 @@ func (_m *ClaimAttachmentService) EXPECT() *ClaimAttachmentService_Expecter {
 	return &ClaimAttachmentService_Expecter{mock: &_m.Mock}
 }
 
-// Create provides a mock function with given fields: tx, claimID, file
-func (_m *ClaimAttachmentService) Create(tx application.Tx, claimID uuid.UUID, file multipart.File) (*entity.ClaimAttachment, error) {
-	ret := _m.Called(tx, claimID, file)
+// Create provides a mock function with given fields: tx, technicianID, claimID, file
+func (_m *ClaimAttachmentService) Create(tx application.Tx, technicianID uuid.UUID, claimID uuid.UUID, file multipart.File) (*entity.ClaimAttachment, error) {
+	ret := _m.Called(tx, technicianID, claimID, file)
 
 	if len(ret) == 0 {
 		panic("no return value specified for Create")
@@ -38,19 +38,19 @@ func (_m *ClaimAttachmentService) Create(tx application.Tx, claimID uuid.UUID, f
 
 	var r0 *entity.ClaimAttachment
 	var r1 error
-	if rf, ok := ret.Get(0).(func(application.Tx, uuid.UUID, multipart.File) (*entity.ClaimAttachment, error)); ok {
-		return rf(tx, claimID, file)
+	if rf, ok := ret.Get(0).(func(application.Tx, uuid.UUID, uuid.UUID, multipart.File) (*entity.ClaimAttachment, error)); ok {
+		return rf(tx, technicianID, claimID, file)
 	}
-	if rf, ok := ret.Get(0).(func(application.Tx, uuid.UUID, multipart.File) *entity.ClaimAttachment); ok {
-		r0 = rf(tx, claimID, file)
+	if rf, ok := ret.Get(0).(func(application.Tx, uuid.UUID, uuid.UUID, multipart.File) *entity.ClaimAttachment); ok {
+		r0 = rf(tx, technicianID, claimID, file)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).(*entity.ClaimAttachment)
 		}
 	}
 
-	if rf, ok := ret.Get(1).(func(application.Tx, uuid.UUID, multipart.File) error); ok {
-		r1 = rf(tx, claimID, file)
+	if rf, ok := ret.Get(1).(func(application.Tx, uuid.UUID, uuid.UUID, multipart.File) error); ok {
+		r1 = rf(tx, technicianID, claimID, file)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -65,15 +65,16 @@ type ClaimAttachmentService_Create_Call struct {
 
 // Create is a helper method to define mock.On call
 //   - tx application.Tx
+//   - technicianID uuid.UUID
 //   - claimID uuid.UUID
 //   - file multipart.File
-func (_e *ClaimAttachmentService_Expecter) Create(tx interface{}, claimID interface{}, file interface{}) *ClaimAttachmentService_Create_Call {
-	return &ClaimAttachmentService_Create_Call{Call: _e.mock.On("Create", tx, claimID, file)}
+func (_e *ClaimAttachmentService_Expecter) Create(tx interface{}, technicianID interface{}, claimID interface{}, file interface{}) *ClaimAttachmentService_Create_Call {
+	return &ClaimAttachmentService_Create_Call{Call: _e.mock.On("Create", tx, technicianID, claimID, file)}
 }
 
-func (_c *ClaimAttachmentService_Create_Call) Run(run func(tx application.Tx, claimID uuid.UUID, file multipart.File)) *ClaimAttachmentService_Create_Call {
+func (_c *ClaimAttachmentService_Create_Call) Run(run func(tx application.Tx, technicianID uuid.UUID, claimID uuid.UUID, file multipart.File)) *ClaimAttachmentService_Create_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(application.Tx), args[1].(uuid.UUID), args[2].(multipart.File))
+		run(args[0].(application.Tx), args[1].(uuid.UUID), args[2].(uuid.UUID), args[3].(multipart.File))
 	})
 	return _c
 }
@@ -83,7 +84,7 @@ func (_c *ClaimAttachmentService_Create_Call) Return(_a0 *entity.ClaimAttachment
 	return _c
 }
 
-func (_c *ClaimAttachmentService_Create_Call) RunAndReturn(run func(application.Tx, uuid.UUID, multipart.File) (*entity.ClaimAttachment, error)) *ClaimAttachmentService_Create_Call {
+func (_c *ClaimAttachmentService_Create_Call) RunAndReturn(run func(application.Tx, uuid.UUID, uuid.UUID, multipart.File) (*entity.ClaimAttachment, error)) *ClaimAttachmentService_Create_Call {
 	_c.Call.Return(run)
 	return _c
 }

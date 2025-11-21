@@ -125,6 +125,12 @@ func (h *claimAttachmentHandler) Create(c *gin.Context) {
 		return
 	}
 
+	userID, err := getUserIDFromHeader(c)
+	if err != nil {
+		writeErrorResponse(h.log, c, err)
+		return
+	}
+
 	claimID, err := parseClaimIDParam(c)
 	if err != nil {
 		writeErrorResponse(h.log, c, err)
@@ -150,7 +156,7 @@ func (h *claimAttachmentHandler) Create(c *gin.Context) {
 			if err != nil {
 				return apperror.ErrInvalidMultipartForm
 			}
-			attachment, err := h.service.Create(tx, claimID, file)
+			attachment, err := h.service.Create(tx, userID, claimID, file)
 			if err != nil {
 				return err
 			}

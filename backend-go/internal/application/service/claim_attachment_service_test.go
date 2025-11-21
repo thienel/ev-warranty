@@ -142,12 +142,14 @@ var _ = Describe("ClaimAttachmentService", func() {
 
 	Describe("Create", func() {
 		var (
-			claimID uuid.UUID
-			file    multipart.File
+			claimID      uuid.UUID
+			technicianID uuid.UUID
+			file         multipart.File
 		)
 
 		BeforeEach(func() {
 			claimID = uuid.New()
+			technicianID = uuid.Nil
 			mockTx.EXPECT().GetCtx().Return(ctx).Maybe()
 		})
 
@@ -170,7 +172,7 @@ var _ = Describe("ClaimAttachmentService", func() {
 						a.URL == "https://example.com/image.jpg"
 				})).Return(nil).Once()
 
-				attachment, err := attachService.Create(mockTx, claimID, file)
+				attachment, err := attachService.Create(mockTx, technicianID, claimID, file)
 
 				Expect(err).NotTo(HaveOccurred())
 				Expect(attachment).NotTo(BeNil())
@@ -194,7 +196,7 @@ var _ = Describe("ClaimAttachmentService", func() {
 				mockCloudServ.EXPECT().UploadFile(ctx, file, "image").Return("https://example.com/image.png", nil).Once()
 				mockAttachRepo.EXPECT().Create(mockTx, mock.AnythingOfType("*entity.ClaimAttachment")).Return(nil).Once()
 
-				attachment, err := attachService.Create(mockTx, claimID, file)
+				attachment, err := attachService.Create(mockTx, technicianID, claimID, file)
 
 				Expect(err).NotTo(HaveOccurred())
 				Expect(attachment).NotTo(BeNil())
@@ -207,7 +209,7 @@ var _ = Describe("ClaimAttachmentService", func() {
 				notFoundErr := apperror.ErrNotFoundError
 				mockClaimRepo.EXPECT().FindByID(ctx, claimID).Return(nil, notFoundErr).Once()
 
-				attachment, err := attachService.Create(mockTx, claimID, file)
+				attachment, err := attachService.Create(mockTx, technicianID, claimID, file)
 
 				Expect(err).To(HaveOccurred())
 				Expect(attachment).To(BeNil())
@@ -225,7 +227,7 @@ var _ = Describe("ClaimAttachmentService", func() {
 
 				mockClaimRepo.EXPECT().FindByID(ctx, claimID).Return(claim, nil).Once()
 
-				attachment, err := attachService.Create(mockTx, claimID, file)
+				attachment, err := attachService.Create(mockTx, technicianID, claimID, file)
 
 				Expect(err).To(HaveOccurred())
 				Expect(attachment).To(BeNil())
@@ -242,7 +244,7 @@ var _ = Describe("ClaimAttachmentService", func() {
 
 				mockClaimRepo.EXPECT().FindByID(ctx, claimID).Return(claim, nil).Once()
 
-				attachment, err := attachService.Create(mockTx, claimID, file)
+				attachment, err := attachService.Create(mockTx, technicianID, claimID, file)
 
 				Expect(err).To(HaveOccurred())
 				Expect(attachment).To(BeNil())
@@ -262,7 +264,7 @@ var _ = Describe("ClaimAttachmentService", func() {
 
 				mockClaimRepo.EXPECT().FindByID(ctx, claimID).Return(claim, nil).Once()
 
-				attachment, err := attachService.Create(mockTx, claimID, file)
+				attachment, err := attachService.Create(mockTx, technicianID, claimID, file)
 
 				Expect(attachment).To(BeNil())
 				ExpectAppError(err, apperror.ErrInvalidInput.ErrorCode)
@@ -284,7 +286,7 @@ var _ = Describe("ClaimAttachmentService", func() {
 				mockClaimRepo.EXPECT().FindByID(ctx, claimID).Return(claim, nil).Once()
 				mockCloudServ.EXPECT().UploadFile(ctx, file, "image").Return("", cloudErr).Once()
 
-				attachment, err := attachService.Create(mockTx, claimID, file)
+				attachment, err := attachService.Create(mockTx, technicianID, claimID, file)
 
 				Expect(err).To(HaveOccurred())
 				Expect(attachment).To(BeNil())
@@ -308,7 +310,7 @@ var _ = Describe("ClaimAttachmentService", func() {
 				mockCloudServ.EXPECT().UploadFile(ctx, file, "image").Return("https://example.com/image.jpg", nil).Once()
 				mockAttachRepo.EXPECT().Create(mockTx, mock.AnythingOfType("*entity.ClaimAttachment")).Return(dbErr).Once()
 
-				attachment, err := attachService.Create(mockTx, claimID, file)
+				attachment, err := attachService.Create(mockTx, technicianID, claimID, file)
 
 				Expect(err).To(HaveOccurred())
 				Expect(attachment).To(BeNil())

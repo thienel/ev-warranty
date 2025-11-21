@@ -18,7 +18,7 @@ type ClaimAttachmentService interface {
 	GetByID(ctx context.Context, id uuid.UUID) (*entity.ClaimAttachment, error)
 	GetByClaimID(ctx context.Context, claimID uuid.UUID) ([]*entity.ClaimAttachment, error)
 
-	Create(tx application.Tx, claimID uuid.UUID, file multipart.File) (*entity.ClaimAttachment, error)
+	Create(tx application.Tx, technicianID, claimID uuid.UUID, file multipart.File) (*entity.ClaimAttachment, error)
 	HardDelete(tx application.Tx, claimID, attachmentID uuid.UUID) error
 }
 
@@ -59,11 +59,15 @@ func (s *claimAttachmentService) GetByClaimID(ctx context.Context, claimID uuid.
 	return claimAttachments, nil
 }
 
-func (s *claimAttachmentService) Create(tx application.Tx, claimID uuid.UUID, file multipart.File,
+func (s *claimAttachmentService) Create(tx application.Tx, technicianID, claimID uuid.UUID, file multipart.File,
 ) (*entity.ClaimAttachment, error) {
-	_, err := s.claimRepo.FindByID(tx.GetCtx(), claimID)
+	claim, err := s.claimRepo.FindByID(tx.GetCtx(), claimID)
 	if err != nil {
 		return nil, err
+	}
+
+	if claim.TechnicianID != technicianID {
+		return nil, apperror.ErrInvalidInput.WithMessage("Only assigned technician can add attachment")
 	}
 
 	mimeType, err := getMimeType(file)
